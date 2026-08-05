@@ -1,58 +1,76 @@
-# Plan: initial architecture checkpoint
+# Plan: bounded LC1 lifecycle registry
 
-Status: **Complete**
+Status: **In progress**
 Date: **2026-08-05**
 
 ## Objective
 
-Establish the smallest durable, source-grounded project baseline in the empty
-workspace before introducing Rust code or public APIs.
+Record the approved project identity, licensing intent, lifecycle, application
+identity, message-bus, and configuration decisions, then implement only the
+smallest logical lifecycle and identity slice that can be exhaustively tested.
 
 ## Context
 
-The workspace contained no files and was not a Git repository. The first run
-must define scope truth, responsibility boundaries, bounded v0.1 behavior and
-its unresolved acceptance parameters, and the initial execution decision
-without creating a forest of speculative crates.
+The user approved the name Rust Flight Framework, the LC1 stop-gated lifecycle,
+runtime-local application identity, bounded per-application inbox semantics,
+and monotonic configuration revision allocation with one-level rollback. The
+repository previously contained architecture documents but no Rust code.
+
+The approved licensing expression is `MIT OR Apache-2.0`. Applying it remains
+blocked on the exact copyright-holder text, so this slice remains unpublished
+and does not add licence files or a Cargo licence declaration.
 
 ## Acceptance criteria
 
-- Work occurs on a newly initialized `codex/nightly` branch.
-- Safety limitations and non-affiliation are prominent and consistent.
-- Official NASA and Rust primary sources support factual research statements.
-- A small v0.1 requirement set has honest, pre-implementation traceability.
-- One consequential, reversible execution-model decision compares alternatives
-  and states revisit conditions.
-- Roadmap and project state identify the next bounded vertical slice.
-- Relative Markdown links resolve and `git diff --check` succeeds.
-- The coherent checkpoint is committed locally and not pushed.
+- The approved decisions are recorded in focused ADRs with limitations and
+  revisit conditions.
+- One unpublished, dependency-free Rust package exposes a finite-capacity
+  lifecycle registry.
+- Registration produces opaque identifiers that remain stable and unreused for
+  the registry's lifetime.
+- The logical LC1 transitions `Registered -> Running -> Stopped -> Running`
+  are explicit; every invalid state/operation pair returns a typed error without
+  changing state.
+- Capacity exhaustion and zero capacity return typed errors without mutation.
+- Tests demonstrate the complete transition table and independent lifecycle
+  records.
+- Formatting, build, lint, tests, documentation, Markdown links, and repository
+  consistency checks pass before local commits are created.
+- Traceability calls RFF-REQ-002 only partially verified: no application object,
+  execution boundary, returned-error ingress, or host mission exists yet.
 
-## Files
+## Proposed files and components
 
-This checkpoint creates contributor guidance, the README, charter, architecture
-analysis, requirements, roadmap, project state, ADR-0001, source register,
-traceability register, and this plan. It intentionally creates no Cargo
-manifest or implementation crate.
+- `Cargo.toml`, `src/lib.rs`, and `src/lifecycle.rs` for the minimal library.
+- `tests/lifecycle_registry.rs` for public-boundary behavior.
+- ADR-0002 through ADR-0005 for the approved decisions.
+- Existing project, roadmap, requirement, provenance, and verification records
+  for truthful state updates.
 
 ## Verification approach
 
-- Inspect all Markdown files and search for misleading compatibility/readiness
-  claims.
-- Resolve every relative Markdown link against its containing file.
-- Run `git diff --check` and review the full staged diff.
-- Confirm branch, commit, and working-tree state after the local commit.
+- Run `cargo fmt --all -- --check`.
+- Run `cargo check --workspace --all-targets --all-features`.
+- Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+- Run `cargo test --workspace --all-features`.
+- Run `cargo doc --workspace --no-deps`.
+- Resolve relative Markdown links and cross-check requirement/source identifiers.
+- Run `git diff --check` and review the complete diff.
 
-## Risks and safe stopping point
+## Known risks
 
-The main risk is over-specifying an API without executable evidence. The safe
-stopping point is the documentation/decision checkpoint alone. If consistency
-checks fail, correct only this run's documents before committing; do not add
-implementation to compensate.
+- An identifier from one registry may numerically alias an identifier from
+  another; validity is scoped to the originating registry and the API does not
+  yet encode that origin.
+- The `Failed` state is represented for an exhaustive lifecycle model, but this
+  slice intentionally provides no failure-ingress operation.
+- The future application execution boundary may require a compatible extension
+  or a revision of this logical registry API.
+- The approved bus and configuration policies have no implementation evidence
+  in this slice.
 
-## Result
+## Safe rollback or stopping point
 
-The checkpoint was completed without adding a Cargo workspace. Relative links
-resolved across all 11 Markdown files, all eight requirement IDs matched the
-traceability register, all eight referenced source IDs were defined, and
-`git diff --cached --check` passed. Cargo checks were not applicable because no
-manifest or Rust implementation exists.
+Stop with the bounded logical registry and decision records. Do not add an
+application callback API, message bus, configuration service, concurrency,
+external dependency, or speculative portability layer in this increment.

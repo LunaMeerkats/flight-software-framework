@@ -1,24 +1,25 @@
 # Verification traceability
 
-No runtime behavior is implemented. RFF-REQ-001 notices exist in current entry
-points, but the v0.1 review has not occurred. Implementation and verification
-state are tracked separately so neither planned evidence nor existing prose is
+The first Rust slice implements only bounded logical lifecycle records. It does
+not execute application objects, admit returned application errors, or satisfy
+the two-application scenario in full. Implementation and verification state are
+tracked separately so neither planned evidence nor existing code is
 misrepresented.
 
 | Requirement | Implementation state | Planned verification | Exact verification evidence | Last verified commit | Verification state |
 | --- | --- | --- | --- | --- | --- |
-| RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented human checklist covering user-facing docs and sample output | None | — | Pending |
-| RFF-REQ-002 | Not implemented | Exhaustive lifecycle unit tests plus two-application integration scenario | None | — | Not verified |
-| RFF-REQ-003 | Not implemented | Queue boundary/FIFO/overflow/disconnect unit and fan-out integration tests | None | — | Not verified |
-| RFF-REQ-004 | Not implemented | Manual-clock unit tests and replayed scheduling integration scenario | None | — | Not verified |
-| RFF-REQ-005 | Not implemented | Structured-field and bounded-event-path tests | None | — | Not verified |
-| RFF-REQ-006 | Not implemented | Configuration state-machine and activation/rejection/rollback integration tests | None | — | Not verified |
-| RFF-REQ-007 | Not implemented | Valid command/telemetry and adapter-defined malformed-input integration tests | None | — | Not verified |
-| RFF-REQ-008 | Not implemented | Returned-error fault-injection integration scenario | None | — | Not verified |
+| RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented human checklist covering user-facing docs and sample output | None | - | Pending |
+| RFF-REQ-002 | Partial: bounded logical registry, opaque runtime-local IDs, and successful LC1 transitions; no application objects, returned-error ingress, or host scenario | Exhaustive lifecycle unit tests plus two-application integration scenario | Tests exist in the working slice but are not yet tied to a committed evidence revision | - | Pending committed evidence |
+| RFF-REQ-003 | Not implemented | Queue boundary/FIFO/overflow/disconnect unit and fan-out integration tests | None | - | Not verified |
+| RFF-REQ-004 | Not implemented | Manual-clock unit tests and replayed scheduling integration scenario | None | - | Not verified |
+| RFF-REQ-005 | Not implemented | Structured-field and bounded-event-path tests | None | - | Not verified |
+| RFF-REQ-006 | Not implemented | Configuration state-machine and activation/rejection/rollback integration tests | None | - | Not verified |
+| RFF-REQ-007 | Not implemented | Valid command/telemetry and adapter-defined malformed-input integration tests | None | - | Not verified |
+| RFF-REQ-008 | Not implemented | Returned-error fault-injection integration scenario | None | - | Not verified |
 
 ## Evidence policy
 
-“Verified” requires all of the following:
+"Verified" requires all of the following:
 
 - an exact test, review artefact, or other observable evidence;
 - the successful command that exercised it when applicable, or the documented

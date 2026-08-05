@@ -24,29 +24,27 @@ translate NASA C source.
 - `docs/research/SOURCES.md`: primary-source provenance and adoption decisions.
 - `docs/verification/TRACEABILITY.md`: requirement-to-evidence status.
 - `PLANS.md`: the active or most recently completed bounded work plan.
+- `src/`: the single unpublished library package; currently lifecycle records.
+- `tests/`: public-API integration tests for implemented behavior.
+- `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and locked
+  dependency graph.
 
-There is intentionally no Cargo workspace yet. When implementation begins, add
-only the smallest crate layout needed for the selected vertical slice, then
-document it here.
+The root contains one unpublished package and workspace. Add another crate only
+when a demonstrated boundary cannot remain coherent in the existing package.
 
 ## Supported checks
 
-The current documentation-only baseline uses:
-
-```text
-git diff --check
-```
-
-Also verify that relative Markdown links resolve and review the rendered
-documents. Once a Cargo workspace exists, the default required checks are:
+The required baseline is:
 
 ```text
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-features
 cargo doc --workspace --no-deps
+git diff --check
 ```
 
+Also verify that relative Markdown links resolve and review rendered documents.
 Document any justified adaptation before treating it as the baseline. Never
 report a check as passing unless it was run successfully.
 
@@ -76,7 +74,9 @@ report a check as passing unless it was run successfully.
 - Do not push unless this file is explicitly updated to authorize pushing.
 - Never force-push, merge into the default branch, tag, release, publish a
   crate, deploy, or commit secrets.
-- Do not select or change the project licence without explicit human approval.
+- The approved licensing intent is `MIT OR Apache-2.0`; do not add licence files
+  until the exact copyright holder is confirmed, and do not change the intent
+  without explicit human approval.
 
 ## Completion
 

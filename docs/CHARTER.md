@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Rust Flight Framework working title denotes an experimental project to
+Rust Flight Framework denotes an experimental project to
 investigate a coherent, host-based framework for composing and testing
 flight-software-style applications. NASA cFS informs the responsibility set,
 but this repository designs and verifies its own Rust-native behavior rather
@@ -61,8 +61,10 @@ sources take priority. Facts observed upstream must be distinguished from this
 project's design choices. Substantial reused material would require explicit
 provenance and licence analysis; none is currently planned.
 
-No project licence has been selected. That decision, as well as public naming
-and branding, requires human review.
+The project name and `MIT OR Apache-2.0` licensing intent have human approval in
+[ADR-0002](adr/0002-project-name-and-licensing-intent.md). Licence application
+remains incomplete until the exact copyright holder is confirmed and both
+licence texts are added. Public namespace or trademark clearance is not claimed.
 
 ## Success for v0.1
 

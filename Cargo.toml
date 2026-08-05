@@ -1,0 +1,15 @@
+[package]
+name = "rust-flight-framework"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Experimental host-based Rust flight-software framework"
+
+[workspace]
+resolver = "3"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[lints]
+workspace = true

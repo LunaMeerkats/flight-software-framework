@@ -16,11 +16,22 @@ diff checks, and a local commit on `codex/nightly`.
 
 ## Stage 1 — One lifecycle vertical slice
 
+Status: **In progress**
+
 - Create the smallest stable-Rust crate structure needed for one runtime and
   independently defined test applications.
 - Implement explicit identity and lifecycle states for registration and start.
 - Extend through stop/restart only when transition semantics are tested.
 - Use no external runtime or framework dependency unless a recorded need arises.
+
+Completed slice: the single unpublished library now provides a bounded logical
+lifecycle registry, opaque runtime-local identities, and exhaustive successful
+LC1 transition evidence. It intentionally does not yet own or invoke application
+objects.
+
+Next slice: introduce the smallest real application execution boundary that can
+preserve returned errors and prove terminal `Failed` behavior without adding a
+factory, thread, or async runtime.
 
 Exit evidence: applicable Cargo checks and complete transition tests for the
 implemented slice. This stage begins RFF-REQ-002; it need not claim the entire

@@ -44,9 +44,9 @@ an integration test observes both applications completing the scenario.
 ### RFF-REQ-003 — Bounded publish/subscribe
 
 Publish/subscribe storage shall enforce configured finite capacity. Routing,
-FIFO ordering, successful delivery, saturation, and disconnected-subscriber
-outcomes shall be explicit. The chosen backpressure or overflow policy shall not
-silently depend on a library default.
+FIFO ordering, successful delivery, saturation, and known-but-unavailable
+subscriber outcomes shall be explicit. The chosen backpressure or overflow
+policy shall not silently depend on a library default.
 
 Acceptance: tests fill each relevant queue to its exact limit and assert the
 publisher-visible result and unaffected-subscriber behavior.
@@ -99,18 +99,21 @@ Acceptance: a fault-injection integration test observes the failed
 application's state/event and successful subsequent work by the other
 application.
 
-## Parameters to settle before implementation
+## Approved parameters and remaining refinement
 
-These provisional requirements define behavior without freezing APIs. Before
-implementing the relevant stage, record and review:
+These provisional requirements define behavior without freezing unnecessary
+public APIs. Human-approved decisions now settle:
 
-- for RFF-REQ-002, the lifecycle state/transition table and each rejected
-  transition's resulting state;
-- for RFF-REQ-003, where capacity applies, the FIFO ordering domain, and the
-  exact saturation policy;
-- for RFF-REQ-006, the observable version rule and retained rollback depth; and
-- for RFF-REQ-007, the selected host adapter's input grammar and validation
-  boundary.
+- RFF-REQ-002 lifecycle and identity in
+  [ADR-0003](adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md);
+- RFF-REQ-003 capacity, FIFO, saturation, fan-out, and unavailable endpoints in
+  [ADR-0004](adr/0004-bounded-application-inboxes.md); and
+- RFF-REQ-006 revision and rollback behavior in
+  [ADR-0005](adr/0005-configuration-revisions-and-rollback.md).
+
+Before implementing RFF-REQ-007, record the selected host adapter's input
+grammar and validation boundary. The approved ADRs define observable behavior,
+not a broad Rust API.
 
 Do not use an implementation's accidental behavior to settle these parameters
 after the fact.

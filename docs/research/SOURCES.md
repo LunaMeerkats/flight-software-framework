@@ -107,3 +107,37 @@ code. Any future source reuse must record provenance and licence obligations.
 - Local treatment: use the smallest workspace needed once a crate boundary is
   proven, require each member to inherit workspace lints, and do not create a
   multi-crate topology in this checkpoint.
+
+## SRC-RUST-CARGO-LICENCE — Cargo licence metadata
+
+- Title: The Manifest Format — licence and licence-file fields
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/cargo/reference/manifest.html#the-license-and-license-file-fields>
+- Version: stable documentation accessed 2026-08-05
+- Informed: Cargo uses SPDX expressions, and `OR` permits recipients to choose
+  either listed licence.
+- Local treatment: adopt `MIT OR Apache-2.0` only after the approved licence
+  files and copyright holder are complete; keep publication disabled meanwhile.
+
+## SRC-OSI-MIT — The MIT License
+
+- Title: The MIT License
+- Organisation: Open Source Initiative
+- Source: <https://opensource.org/license/mit>
+- Version: SPDX identifier `MIT`, accessed 2026-08-05
+- Informed: permissive use and redistribution terms, required notice retention,
+  and warranty/liability disclaimer.
+- Local treatment: approved as one recipient-selectable branch of the intended
+  dual licence; not yet applied to repository content.
+
+## SRC-OSI-APACHE-2.0 — Apache License, Version 2.0
+
+- Title: Apache License, Version 2.0
+- Organisation: Apache Software Foundation; canonical text published by the
+  Open Source Initiative
+- Source: <https://opensource.org/license/apache-2.0>
+- Version: SPDX identifier `Apache-2.0`, accessed 2026-08-05
+- Informed: copyright and patent grants, redistribution conditions, trademark
+  limitation, and warranty/liability disclaimer.
+- Local treatment: approved as one recipient-selectable branch of the intended
+  dual licence; not yet applied to repository content.

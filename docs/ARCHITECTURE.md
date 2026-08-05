@@ -64,6 +64,27 @@ the same initial state, simulated time, and ordered inputs. It does not mean
 hard real-time execution, bounded wall-clock latency, freedom from OS jitter, or
 fault tolerance.
 
+## Approved service policies
+
+- [ADR-0003](adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md)
+  defines the LC1 stop-gated lifecycle and bounded runtime-local identity.
+- [ADR-0004](adr/0004-bounded-application-inboxes.md) defines one bounded inbox
+  per application, non-blocking reject-newest overflow, and explicit partial
+  fan-out reporting. It is not implemented.
+- [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
+  monotonic snapshot revisions and one consume-once rollback slot. It is not
+  implemented.
+
+## Current implementation boundary
+
+The first Rust slice is a bounded `LifecycleRegistry`. It reserves a positive
+logical record limit, allocates opaque identities in registration order, and
+enforces `Registered -> Running -> Stopped -> Running`. It does not own or invoke
+application objects. Consequently, it does not yet prove returned-error
+containment, actual object retention on restart, or a two-application host
+scenario. Those limitations are intentional rather than hidden behind a
+placeholder application abstraction.
+
 ## Alternatives kept open
 
 - One OS thread per application may later help isolate blocking work, but it
