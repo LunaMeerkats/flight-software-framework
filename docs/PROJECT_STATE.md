@@ -11,11 +11,13 @@ not.
 ## Verified baseline
 
 - Commit `35b1a4f` is the verified documentation-only architecture checkpoint.
-- The current Rust slice has successfully run formatting, build, lint, six
-  tests, and documentation generation on rustc/cargo 1.96.1. Its exact evidence
-  commit still needs to be recorded in traceability.
-- Relative Markdown links, requirement identifiers, and referenced source
-  identifiers resolve in the current working slice.
+- Commit `0844d7c21a715492a7754072c0d80fa2d7b812fe` contains the
+  lifecycle implementation and exact RFF-REQ-002 partial evidence.
+- Formatting, build, lint, all six tests, and documentation generation pass on
+  rustc/cargo 1.96.1.
+- Relative links resolve across all 15 Markdown files; all eight requirement
+  identifiers match traceability; all eight referenced source identifiers are
+  defined.
 
 ## Current architecture
 
@@ -33,8 +35,8 @@ threads, executor, application callback, message bus, or configuration service.
 
 ## Work in progress
 
-Tie the successful lifecycle checks to a committed evidence revision, then stop
-this increment.
+No implementation work is in progress. The bounded LC1 registry increment is at
+its intended stopping point.
 
 ## Highest risks and uncertainties
 
@@ -69,5 +71,7 @@ this increment.
 ## Latest run
 
 2026-08-05: Recorded the approved project, lifecycle, inbox, and configuration
-decisions and implemented the bounded logical LC1 registry. Final evidence and
-repository-state recording are in progress.
+decisions and implemented the bounded logical LC1 registry. All formatting,
+build, lint, test, documentation, link, identifier, and diff checks passed. Six
+tests provide partial RFF-REQ-002 evidence; no broader runtime behavior is
+claimed.

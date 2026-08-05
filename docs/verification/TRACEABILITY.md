@@ -9,7 +9,7 @@ misrepresented.
 | Requirement | Implementation state | Planned verification | Exact verification evidence | Last verified commit | Verification state |
 | --- | --- | --- | --- | --- | --- |
 | RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented human checklist covering user-facing docs and sample output | None | - | Pending |
-| RFF-REQ-002 | Partial: bounded logical registry, opaque runtime-local IDs, and successful LC1 transitions; no application objects, returned-error ingress, or host scenario | Exhaustive lifecycle unit tests plus two-application integration scenario | Tests exist in the working slice but are not yet tied to a committed evidence revision | - | Pending committed evidence |
+| RFF-REQ-002 | Partial: bounded logical registry, opaque runtime-local IDs, and successful LC1 transitions; no application objects, returned-error ingress, or host scenario | Exhaustive lifecycle unit tests plus two-application integration scenario | `lifecycle::tests::registry_enforces_every_state_operation_pair`; `lifecycle::tests::unknown_identity_is_rejected_without_mutating_existing_records`; all four tests in `tests/lifecycle_registry.rs`; `cargo test --workspace --all-features` (6 passed) | `0844d7c21a715492a7754072c0d80fa2d7b812fe` | Partially verified |
 | RFF-REQ-003 | Not implemented | Queue boundary/FIFO/overflow/disconnect unit and fan-out integration tests | None | - | Not verified |
 | RFF-REQ-004 | Not implemented | Manual-clock unit tests and replayed scheduling integration scenario | None | - | Not verified |
 | RFF-REQ-005 | Not implemented | Structured-field and bounded-event-path tests | None | - | Not verified |
