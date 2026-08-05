@@ -9,8 +9,12 @@ compatibility claim.
 "#]
 
 mod lifecycle;
+mod runtime;
 
 pub use lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry,
     RegistrationError, RegistryCreateError,
+};
+pub use runtime::{
+    Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeStartError,
 };

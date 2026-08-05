@@ -1,20 +1,30 @@
 //! Bounded application identity and lifecycle-state supervision.
 //!
-//! This module implements the successful LC1 lifecycle transitions for logical
-//! application registrations. It deliberately does not define or invoke an
-//! application object, callback, factory, thread, executor, or recovery policy.
+//! This module implements the standalone logical LC1 transition model. The
+//! owned [`crate::Runtime`] uses the same state and error vocabulary for its
+//! start-only execution slice.
 
 use std::error::Error;
 use std::fmt;
 
-/// An opaque slot key allocated by one lifecycle registry.
+/// An opaque slot key allocated by one lifecycle registry or runtime.
 ///
-/// Callers must scope the key to the registry that issued it. This initial
-/// representation does not encode registry origin: equal-position keys from
-/// separate registries can compare equal and can address the corresponding
+/// Callers must scope the key to the registry or runtime that issued it. This
+/// initial representation does not encode registry origin: equal-position keys
+/// from separate issuers can compare equal and can address the corresponding
 /// slot. It is not a persistent mission identifier or wire-format value.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct ApplicationId(usize);
+
+impl ApplicationId {
+    pub(crate) const fn from_index(index: usize) -> Self {
+        Self(index)
+    }
+
+    pub(crate) const fn index(self) -> usize {
+        self.0
+    }
+}
 
 /// A stable LC1 application lifecycle state.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -27,12 +37,13 @@ pub enum ApplicationState {
     Stopped,
     /// An application lifecycle or work operation returned an error.
     ///
-    /// This state is terminal in LC1. The current registry slice does not yet
-    /// own an application boundary that can enter this state.
+    /// This state is terminal in LC1. The standalone registry cannot enter it,
+    /// while [`crate::Runtime`] enters it when application start returns an
+    /// error.
     Failed,
 }
 
-/// A lifecycle operation exposed by the logical registry.
+/// An LC1 lifecycle operation.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum LifecycleOperation {
     /// Start a registered application for the first time.
@@ -94,13 +105,13 @@ impl fmt::Display for RegistrationError {
 
 impl Error for RegistrationError {}
 
-/// A lifecycle request rejected by the logical registry.
+/// A lifecycle request rejected by the logical registry or owned runtime.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum LifecycleError {
-    /// The identity's slot does not name a record in this registry.
+    /// The identity's slot does not name a record in this registry or runtime.
     ///
-    /// This does not detect a key issued by another registry when that key's
-    /// slot exists in the addressed registry.
+    /// This does not detect a key issued by another registry or runtime when
+    /// that key's slot exists in the addressed owner.
     UnknownApplication {
         /// Requested runtime-local identity.
         application_id: ApplicationId,
@@ -306,7 +317,7 @@ impl LifecycleRegistry {
     }
 }
 
-const fn next_state(
+pub(crate) const fn next_state(
     state: ApplicationState,
     operation: LifecycleOperation,
 ) -> Option<ApplicationState> {

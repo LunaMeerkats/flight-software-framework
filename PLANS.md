@@ -1,86 +1,89 @@
-# Plan: bounded LC1 lifecycle registry
+# Plan: start-only owned application execution
 
-Status: **Complete**
-Date: **2026-08-05**
+Status: **In progress**
+Date: **2026-08-06**
 
 ## Objective
 
-Record the approved project identity, licensing intent, lifecycle, application
-identity, message-bus, and configuration decisions, then implement only the
-smallest logical lifecycle and identity slice that can be exhaustively tested.
+Add the smallest synchronous runtime boundary that owns registered application
+values and executes one valid start operation. A successful start shall enter
+`Running`; a returned application error shall be preserved in the caller-visible
+result while the affected application enters terminal `Failed`.
 
 ## Context
 
-The user approved the name Rust Flight Framework, the LC1 stop-gated lifecycle,
-runtime-local application identity, bounded per-application inbox semantics,
-and monotonic configuration revision allocation with one-level rollback. The
-repository previously contained architecture documents but no Rust code.
+The existing `LifecycleRegistry` exhaustively verifies logical LC1 transitions
+but owns no application values and cannot enter `Failed` from returned
+application behavior. ADR-0001 selects a serial caller-driven runtime, and
+ADR-0003 already defines returned errors as the initial failure boundary.
 
-The approved licensing expression is `MIT OR Apache-2.0`. Applying it remains
-blocked on the exact copyright-holder text, so this slice remains unpublished
-and does not add licence files or a Cargo licence declaration.
+This slice deliberately stops before application work, stop/restart callbacks,
+contexts, factories, threads, async execution, panic handling, or framework
+services. It compares static generic ownership with type-erased ownership before
+committing the first application interface.
 
 ## Acceptance criteria
 
-- The approved decisions are recorded in focused ADRs with limitations and
-  revisit conditions.
-- One unpublished, dependency-free Rust package exposes a finite-capacity
-  lifecycle registry.
-- Registration produces opaque identifiers that remain stable and unreused for
-  the registry's lifetime.
-- The logical LC1 transitions `Registered -> Running -> Stopped -> Running`
-  are explicit; every invalid state/operation pair returns a typed error without
-  changing state.
-- Capacity exhaustion and zero capacity return typed errors without mutation.
-- Tests demonstrate the complete transition table and independent lifecycle
-  records.
-- Formatting, build, lint, tests, documentation, Markdown links, and repository
-  consistency checks pass before local commits are created.
-- Traceability calls RFF-REQ-002 only partially verified: no application object,
-  execution boundary, returned-error ingress, or host mission exists yet.
+- A finite-capacity runtime owns every successfully registered application and
+  exposes opaque identities in registration order.
+- The application boundary contains only the start behavior demonstrated by
+  this slice and returns a concrete associated error type.
+- A valid start invokes the selected application exactly once and commits
+  `Registered -> Running` only after success.
+- A returned start error remains programmatically available in the exact runtime
+  result and commits the selected application to terminal `Failed`.
+- An invalid start returns the existing typed lifecycle error without invoking
+  application behavior or changing state.
+- A two-application public-API test uses independently defined application types
+  and proves that one returned start error does not prevent the other from
+  starting successfully.
+- Runtime capacity exhaustion is explicit and returns ownership of the rejected
+  application value.
+- Documentation and traceability describe this as partial RFF-REQ-002 and
+  partial RFF-REQ-008 evidence, not as fault tolerance or a complete runtime.
+- The documented baseline and repository consistency checks pass before a local
+  commit is created.
 
 ## Proposed files and components
 
-- `Cargo.toml`, `src/lib.rs`, and `src/lifecycle.rs` for the minimal library.
-- `tests/lifecycle_registry.rs` for public-boundary behavior.
-- ADR-0002 through ADR-0005 for the approved decisions.
-- Existing project, roadmap, requirement, provenance, and verification records
-  for truthful state updates.
+- `src/runtime.rs`, plus narrow shared-type updates in `src/lifecycle.rs` and
+  `src/lib.rs`, for the owned `Runtime`, minimal `Application` start boundary,
+  and typed runtime errors.
+- `tests/application_runtime.rs` for public-boundary success, returned-error,
+  invalid-transition, capacity, and peer-progress evidence.
+- A focused ADR for static ownership and concrete error preservation.
+- Existing architecture, roadmap, state, and traceability documents for
+  truthful boundary and evidence updates.
 
 ## Verification approach
 
 - Run `cargo fmt --all -- --check`.
-- Run `cargo check --workspace --all-targets --all-features`.
 - Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
 - Run `cargo test --workspace --all-features`.
 - Run `cargo doc --workspace --no-deps`.
-- Resolve relative Markdown links and cross-check requirement/source identifiers.
-- Run `git diff --check` and review the complete diff.
+- Resolve relative Markdown links and cross-check requirement/source
+  identifiers.
+- Run `git diff --check`, inspect the complete diff, and confirm repository
+  status before committing.
 
 ## Known risks
 
-- An identifier from one registry may numerically alias an identifier from
-  another; validity is scoped to the originating registry and the API does not
-  yet encode that origin.
-- The `Failed` state is represented for an exhaustive lifecycle model, but this
-  slice intentionally provides no failure-ingress operation.
-- The future application execution boundary may require a compatible extension
-  or a revision of this logical registry API.
-- The approved bus and configuration policies have no implementation evidence
-  in this slice.
+- A generic runtime stores one concrete application representation; a mission
+  that composes distinct application types must provide an explicit enum or
+  similar static sum type.
+- Reserved runtime storage is bounded by record count but scales with the size
+  of that representation and does not bound allocations made internally by an
+  application or its returned error.
+- The start-only `Application` trait is an early pre-v0.1 API and may require a
+  recorded revision when work, stop, restart, or context behavior is proven.
+- Runtime and standalone registry identities retain the documented origin-
+  alias risk because the opaque key does not encode its issuer.
+- Returned errors do not contain panics, hangs, process failure, allocation
+  failure inside application code, or hardware faults.
 
 ## Safe rollback or stopping point
 
-Stop with the bounded logical registry and decision records. Do not add an
-application callback API, message bus, configuration service, concurrency,
-external dependency, or speculative portability layer in this increment.
-
-## Result
-
-The stopping point was reached in commit
-`0844d7c21a715492a7754072c0d80fa2d7b812fe`. The package remains unpublished
-and dependency-free. The exhaustive 12-pair lifecycle table and four public API
-tests passed, for six tests total. Formatting, build, lint, documentation,
-relative-link, requirement/source-identifier, and staged-diff checks also
-passed. RFF-REQ-002 is recorded as partially verified; no application execution,
-returned-error containment, bus, or configuration behavior is claimed.
+Stop after owned registration and start behavior is verified and documented.
+Do not extend into work dispatch, stop/restart callbacks, event emission, a
+message bus, scheduling, configuration, concurrency, or external dependencies in
+this increment.
