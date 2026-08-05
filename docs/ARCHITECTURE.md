@@ -74,16 +74,25 @@ fault tolerance.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   monotonic snapshot revisions and one consume-once rollback slot. It is not
   implemented.
+- [ADR-0006](adr/0006-static-application-ownership-for-initial-runtime.md)
+  selects a finite-capacity generic runtime, explicit static mission
+  composition, and concrete returned start errors for the first owned slice.
 
 ## Current implementation boundary
 
-The first Rust slice is a bounded `LifecycleRegistry`. It reserves a positive
-logical record limit, allocates opaque identities in registration order, and
-enforces `Registered -> Running -> Stopped -> Running`. It does not own or invoke
-application objects. Consequently, it does not yet prove returned-error
-containment, actual object retention on restart, or a two-application host
-scenario. Those limitations are intentional rather than hidden behind a
-placeholder application abstraction.
+The bounded `LifecycleRegistry` remains the standalone logical LC1 state model:
+it allocates opaque identities in registration order and enforces
+`Registered -> Running -> Stopped -> Running` without owning application
+objects. The start-only `Runtime<A>` separately owns finite-capacity application
+records. A mission-selected concrete representation, such as an enum, implements
+one synchronous `Application::start` boundary with a concrete error type.
+
+Runtime start validates state before invocation. Success commits `Running`; a
+returned error is preserved in the caller-visible result and commits terminal
+`Failed`. Public-API tests compose two independently defined application types
+and show that one returned start error does not prevent the peer from starting.
+The runtime has no application work, stop/restart callbacks, service context,
+event emission, or sample mission, so RFF-REQ-002 and RFF-REQ-008 remain partial.
 
 ## Alternatives kept open
 
@@ -100,7 +109,8 @@ placeholder application abstraction.
 
 ## Major technical risks
 
-- Premature public traits may freeze the wrong lifecycle and ownership model.
+- The start-only public trait may freeze the wrong lifecycle or context shape
+  before stop, restart, work, and framework services are demonstrated.
 - “Deterministic” may be overstated unless every input and ordering source is
   controlled and the claim remains limited to repeatability.
 - Bounded bus queues can coexist with unbounded event, telemetry, or diagnostic

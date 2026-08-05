@@ -1,7 +1,7 @@
 # v0.1 requirements
 
-Status: **Provisional, pre-implementation**
-Last reviewed: **2026-08-05**
+Status: **Provisional, partially implemented**
+Last reviewed: **2026-08-06**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.

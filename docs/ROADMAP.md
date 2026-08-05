@@ -24,14 +24,16 @@ Status: **In progress**
 - Extend through stop/restart only when transition semantics are tested.
 - Use no external runtime or framework dependency unless a recorded need arises.
 
-Completed slice: the single unpublished library now provides a bounded logical
-lifecycle registry, opaque runtime-local identities, and exhaustive successful
-LC1 transition evidence. It intentionally does not yet own or invoke application
-objects.
+Completed slices: the single unpublished library provides a bounded logical
+lifecycle registry with exhaustive LC1 transition evidence, plus a
+finite-capacity generic runtime that owns statically composed applications. The
+runtime executes start synchronously, preserves a returned concrete start error,
+commits terminal `Failed`, and permits a peer application to start afterward.
 
-Next slice: introduce the smallest real application execution boundary that can
-preserve returned errors and prove terminal `Failed` behavior without adding a
-factory, thread, or async runtime.
+Next slice: add the smallest owned stop operation that can prove
+`Running -> Stopped`, callback suppression for invalid transitions, and terminal
+`Failed` on a returned stop error without adding work dispatch, restart,
+factories, threads, or async execution.
 
 Exit evidence: applicable Cargo checks and complete transition tests for the
 implemented slice. This stage begins RFF-REQ-002; it need not claim the entire

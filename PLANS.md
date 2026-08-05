@@ -1,6 +1,6 @@
 # Plan: start-only owned application execution
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-06**
 
 ## Objective
@@ -87,3 +87,17 @@ Stop after owned registration and start behavior is verified and documented.
 Do not extend into work dispatch, stop/restart callbacks, event emission, a
 message bus, scheduling, configuration, concurrency, or external dependencies in
 this increment.
+
+## Result
+
+The stopping point was reached in commit
+`1696f65a87f9a06ccb80894d2b07ffa211bdc991`. The dependency-free runtime owns a
+finite number of statically composed application values and implements only
+synchronous start. Three public runtime tests cover success, concrete returned
+errors, terminal `Failed`, peer progress, invalid and unknown callback
+suppression, and capacity rejection with application ownership preserved. The
+existing six logical lifecycle tests continue to pass, for nine tests total.
+
+ADR-0006 records the static-ownership decision and alternatives. RFF-REQ-002 and
+RFF-REQ-008 remain only partially verified; application work, owned stop/restart,
+events, and the complete host scenarios remain outside this increment.

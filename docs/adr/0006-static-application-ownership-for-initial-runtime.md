@@ -1,6 +1,6 @@
 # ADR-0006: Static application ownership for the initial runtime
 
-- Status: Accepted for the start-only runtime slice
+- Status: Accepted; start-only runtime slice implemented
 - Date: 2026-08-06
 - Scope: Owned application representation and returned start errors
 

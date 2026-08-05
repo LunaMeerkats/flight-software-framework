@@ -13,15 +13,18 @@ fit Rust's ownership, type, error, and testing models.
 
 ## Current status
 
-The repository contains an initial research and architecture baseline plus the
-first bounded Rust behavior: a no-dependency `LifecycleRegistry` that allocates
-runtime-local identities and enforces the successful LC1 lifecycle sequence.
-This is only a logical lifecycle-record slice, not an executable application
-runtime or sample mission.
+The repository contains an initial research and architecture baseline plus two
+bounded Rust lifecycle slices. A no-dependency `LifecycleRegistry` verifies the
+logical LC1 transition table. A finite-capacity `Runtime<A>` owns statically
+composed application values and executes start synchronously: success enters
+`Running`, while a returned concrete start error enters terminal `Failed`
+without preventing a peer application from starting.
 
-Returned application errors, application-object ownership, the message bus, and
-configuration lifecycle remain unimplemented. Traceability distinguishes this
-partial evidence from complete v0.1 requirements.
+The owned runtime does not yet execute application work or stop/restart
+callbacks and is not a sample mission. The message bus, time, events,
+configuration, and command/telemetry boundaries remain unimplemented.
+Traceability distinguishes this partial evidence from complete v0.1
+requirements and from containment of panics, hangs, or other arbitrary faults.
 
 ## Development
 
@@ -46,6 +49,7 @@ cargo doc --workspace --no-deps
 - [Lifecycle and identity decision](docs/adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md)
 - [Bounded inbox decision](docs/adr/0004-bounded-application-inboxes.md)
 - [Configuration rollback decision](docs/adr/0005-configuration-revisions-and-rollback.md)
+- [Initial application ownership decision](docs/adr/0006-static-application-ownership-for-initial-runtime.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Contributor and automation guidance](AGENTS.md)

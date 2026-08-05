@@ -24,7 +24,8 @@ translate NASA C source.
 - `docs/research/SOURCES.md`: primary-source provenance and adoption decisions.
 - `docs/verification/TRACEABILITY.md`: requirement-to-evidence status.
 - `PLANS.md`: the active or most recently completed bounded work plan.
-- `src/`: the single unpublished library package; currently lifecycle records.
+- `src/`: the single unpublished library package; currently logical lifecycle
+  records and a start-only owned runtime.
 - `tests/`: public-API integration tests for implemented behavior.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and locked
   dependency graph.
