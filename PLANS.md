@@ -1,6 +1,6 @@
 # Plan: synchronous owned application stop
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-07**
 
 ## Objective
@@ -92,3 +92,21 @@ made coherent without widening scope, preserve the decision analysis and tests
 but do not commit broken implementation. Do not continue into restart, work
 dispatch, framework services, scheduling, concurrency, or dependencies in this
 increment.
+
+## Result
+
+The stopping point was reached in commit
+`8899cf986ad35ea32b8aff7950a958ca80365d7d`. The dependency-free runtime now
+validates and executes synchronous owned stop. Success commits `Stopped`; a
+returned concrete stop error remains available through `RuntimeStopError` while
+the selected record enters terminal `Failed`.
+
+Five public runtime tests cover start and stop success, exact returned-error
+preservation, terminal failure, eligible peer progress, capacity ownership, and
+callback suppression for invalid and unknown requests. Together with the
+logical lifecycle tests, the suite contains 11 passing tests. ADR-0007 records
+the operation-specific error decision and its cleanup limitations.
+
+RFF-REQ-002 and RFF-REQ-008 remain only partially verified. Owned restart,
+application work, structured events, and the complete host scenarios remain
+outside this increment.

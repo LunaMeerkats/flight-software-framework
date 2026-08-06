@@ -13,18 +13,19 @@ fit Rust's ownership, type, error, and testing models.
 
 ## Current status
 
-The repository contains an initial research and architecture baseline plus two
-bounded Rust lifecycle slices. A no-dependency `LifecycleRegistry` verifies the
-logical LC1 transition table. A finite-capacity `Runtime<A>` owns statically
-composed application values and executes start synchronously: success enters
-`Running`, while a returned concrete start error enters terminal `Failed`
-without preventing a peer application from starting.
+The repository contains an initial research and architecture baseline plus
+three bounded Rust lifecycle increments. A no-dependency `LifecycleRegistry`
+verifies the logical LC1 transition table. A finite-capacity `Runtime<A>` owns
+statically composed application values and executes start and stop
+synchronously. Successful start enters `Running`, successful stop enters
+`Stopped`, and a returned concrete start or stop error enters terminal `Failed`
+without mutating peer records.
 
-The owned runtime does not yet execute application work or stop/restart
-callbacks and is not a sample mission. The message bus, time, events,
-configuration, and command/telemetry boundaries remain unimplemented.
-Traceability distinguishes this partial evidence from complete v0.1
-requirements and from containment of panics, hangs, or other arbitrary faults.
+The owned runtime does not yet execute application work or restart callbacks
+and is not a sample mission. The message bus, time, events, configuration, and
+command/telemetry boundaries remain unimplemented. Traceability distinguishes
+this partial evidence from complete v0.1 requirements and from containment of
+panics, hangs, cleanup failures, or other arbitrary faults.
 
 ## Development
 
@@ -50,6 +51,7 @@ cargo doc --workspace --no-deps
 - [Bounded inbox decision](docs/adr/0004-bounded-application-inboxes.md)
 - [Configuration rollback decision](docs/adr/0005-configuration-revisions-and-rollback.md)
 - [Initial application ownership decision](docs/adr/0006-static-application-ownership-for-initial-runtime.md)
+- [Owned stop boundary decision](docs/adr/0007-operation-specific-owned-stop-boundary.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Contributor and automation guidance](AGENTS.md)

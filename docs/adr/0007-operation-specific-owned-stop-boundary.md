@@ -1,6 +1,6 @@
 # ADR-0007: Operation-specific synchronous owned stop boundary
 
-- Status: Accepted for the pre-v0.1 owned runtime
+- Status: Accepted; owned stop slice implemented
 - Date: 2026-08-07
 - Scope: Owned application stop callback and returned-error shape
 
@@ -79,6 +79,8 @@ the honest bounded outcome.
   returned-error policy.
 - ADR-0006 records direct static application ownership and deliberate
   operation-by-operation growth of the pre-v0.1 boundary.
+- Public-API tests verify exact stop-error preservation, state commitment,
+  callback suppression, and an eligible peer lifecycle operation.
 
 This decision is local architecture; no external source prescribes its Rust API
 shape.

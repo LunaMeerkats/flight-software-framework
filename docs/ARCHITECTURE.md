@@ -77,22 +77,27 @@ fault tolerance.
 - [ADR-0006](adr/0006-static-application-ownership-for-initial-runtime.md)
   selects a finite-capacity generic runtime, explicit static mission
   composition, and concrete returned start errors for the first owned slice.
+- [ADR-0007](adr/0007-operation-specific-owned-stop-boundary.md) extends that
+  pre-v0.1 boundary with synchronous stop and a distinct concrete stop error.
 
 ## Current implementation boundary
 
 The bounded `LifecycleRegistry` remains the standalone logical LC1 state model:
 it allocates opaque identities in registration order and enforces
 `Registered -> Running -> Stopped -> Running` without owning application
-objects. The start-only `Runtime<A>` separately owns finite-capacity application
-records. A mission-selected concrete representation, such as an enum, implements
-one synchronous `Application::start` boundary with a concrete error type.
+objects. `Runtime<A>` separately owns finite-capacity application records. A
+mission-selected concrete representation, such as an enum, implements
+synchronous `Application::start` and `Application::stop` boundaries with
+distinct concrete error types.
 
-Runtime start validates state before invocation. Success commits `Running`; a
-returned error is preserved in the caller-visible result and commits terminal
-`Failed`. Public-API tests compose two independently defined application types
-and show that one returned start error does not prevent the peer from starting.
-The runtime has no application work, stop/restart callbacks, service context,
-event emission, or sample mission, so RFF-REQ-002 and RFF-REQ-008 remain partial.
+Runtime start and stop validate state before invocation. Success commits
+`Running` or `Stopped` respectively; a returned error is preserved in the
+caller-visible operation-specific result and commits terminal `Failed`.
+Public-API tests compose independently defined application types, suppress
+callbacks for rejected operations, and show that one returned lifecycle error
+does not mutate peer records or prevent an eligible peer operation. The runtime
+has no application work, restart callback, service context, event emission, or
+sample mission, so RFF-REQ-002 and RFF-REQ-008 remain partial.
 
 ## Alternatives kept open
 
@@ -109,8 +114,10 @@ event emission, or sample mission, so RFF-REQ-002 and RFF-REQ-008 remain partial
 
 ## Major technical risks
 
-- The start-only public trait may freeze the wrong lifecycle or context shape
-  before stop, restart, work, and framework services are demonstrated.
+- The pre-v0.1 public trait may freeze the wrong lifecycle or context shape
+  before restart, work, and framework services are demonstrated.
+- A returned stop error may follow partial application-internal cleanup; the
+  runtime records `Failed` but provides no rollback or cleanup guarantee.
 - “Deterministic” may be overstated unless every input and ordering source is
   controlled and the claim remains limited to repeatability.
 - Bounded bus queues can coexist with unbounded event, telemetry, or diagnostic

@@ -27,13 +27,14 @@ Status: **In progress**
 Completed slices: the single unpublished library provides a bounded logical
 lifecycle registry with exhaustive LC1 transition evidence, plus a
 finite-capacity generic runtime that owns statically composed applications. The
-runtime executes start synchronously, preserves a returned concrete start error,
-commits terminal `Failed`, and permits a peer application to start afterward.
+runtime executes start and stop synchronously, preserves distinct concrete
+operation errors, commits terminal `Failed` on either returned error, suppresses
+callbacks for rejected operations, and leaves peer records unchanged.
 
-Next slice: add the smallest owned stop operation that can prove
-`Running -> Stopped`, callback suppression for invalid transitions, and terminal
-`Failed` on a returned stop error without adding work dispatch, restart,
-factories, threads, or async execution.
+Next slice: add the smallest in-place owned restart operation that can prove
+`Stopped -> Running`, preservation of the same application object, callback
+suppression for invalid transitions, and terminal `Failed` on a returned error
+without adding work dispatch, factories, threads, or async execution.
 
 Exit evidence: applicable Cargo checks and complete transition tests for the
 implemented slice. This stage begins RFF-REQ-002; it need not claim the entire

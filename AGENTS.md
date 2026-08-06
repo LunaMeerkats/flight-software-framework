@@ -25,7 +25,7 @@ translate NASA C source.
 - `docs/verification/TRACEABILITY.md`: requirement-to-evidence status.
 - `PLANS.md`: the active or most recently completed bounded work plan.
 - `src/`: the single unpublished library package; currently logical lifecycle
-  records and a start-only owned runtime.
+  records and a synchronous start/stop owned runtime.
 - `tests/`: public-API integration tests for implemented behavior.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and locked
   dependency graph.
