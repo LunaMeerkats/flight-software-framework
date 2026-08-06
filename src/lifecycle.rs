@@ -38,8 +38,8 @@ pub enum ApplicationState {
     /// An application lifecycle or work operation returned an error.
     ///
     /// This state is terminal in LC1. The standalone registry cannot enter it,
-    /// while [`crate::Runtime`] enters it when application start returns an
-    /// error.
+    /// while [`crate::Runtime`] enters it when application start or stop returns
+    /// an error.
     Failed,
 }
 

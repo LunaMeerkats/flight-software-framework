@@ -1,7 +1,7 @@
-//! Start-only owned application execution.
+//! Owned application lifecycle execution.
 //!
-//! This module adds one synchronous execution boundary over the LC1 lifecycle
-//! vocabulary. It deliberately omits work dispatch, stop/restart callbacks,
+//! This module adds synchronous start and stop boundaries over the LC1
+//! lifecycle vocabulary. It deliberately omits work dispatch, restart,
 //! factories, threads, executors, panic containment, and recovery policy.
 
 use std::error::Error;
@@ -11,10 +11,10 @@ use crate::lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, next_state,
 };
 
-/// The start behavior required by the first owned runtime slice.
+/// The lifecycle behavior currently required by the owned runtime.
 ///
-/// The runtime invokes this method synchronously and starts no hidden work.
-/// Work, stop, restart, service context, and recovery behaviors are deliberately
+/// The runtime invokes these methods synchronously and starts no hidden work.
+/// Work, restart, service context, and recovery behaviors are deliberately
 /// absent until later slices can define and verify them.
 pub trait Application {
     /// The concrete error returned by this application's start operation.
@@ -26,6 +26,17 @@ pub trait Application {
     /// runtime record to terminal [`ApplicationState::Failed`]. Panics and
     /// non-returning calls are outside this cooperative failure boundary.
     fn start(&mut self) -> Result<(), Self::StartError>;
+
+    /// The concrete error returned by this application's stop operation.
+    type StopError: Error + 'static;
+
+    /// Attempts to stop the application.
+    ///
+    /// A returned error is retained in [`RuntimeStopError`] and moves the
+    /// runtime record to terminal [`ApplicationState::Failed`]. Success records
+    /// only that this cooperative callback returned successfully; the runtime
+    /// does not independently prove cleanup of application-owned resources.
+    fn stop(&mut self) -> Result<(), Self::StopError>;
 }
 
 /// Failure to construct bounded owned runtime storage.
@@ -141,6 +152,44 @@ impl<E: Error + 'static> Error for RuntimeStartError<E> {
     }
 }
 
+/// A runtime stop request rejected by lifecycle or failed by the application.
+#[derive(Debug, Eq, PartialEq)]
+pub enum RuntimeStopError<E> {
+    /// Lifecycle validation rejected the request before application code ran.
+    Lifecycle(LifecycleError),
+    /// Application stop returned a cooperative failure.
+    Application {
+        /// Runtime-local identity of the application that returned the error.
+        application_id: ApplicationId,
+        /// The original concrete error returned by [`Application::stop`].
+        source: E,
+    },
+}
+
+impl<E: fmt::Display> fmt::Display for RuntimeStopError<E> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Lifecycle(error) => error.fmt(formatter),
+            Self::Application {
+                application_id,
+                source,
+            } => write!(
+                formatter,
+                "application {application_id:?} returned a stop error: {source}"
+            ),
+        }
+    }
+}
+
+impl<E: Error + 'static> Error for RuntimeStopError<E> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Lifecycle(error) => Some(error),
+            Self::Application { source, .. } => Some(source),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct RuntimeRecord<A> {
     state: ApplicationState,
@@ -150,7 +199,7 @@ struct RuntimeRecord<A> {
 /// A finite-capacity, caller-driven owner of application values.
 ///
 /// This pre-v0.1 slice supports registration, state inspection, and synchronous
-/// start only. The concrete application representation is selected by the
+/// start and stop. The concrete application representation is selected by the
 /// mission. Different application types can be composed explicitly in an enum
 /// without requiring trait-object allocation.
 ///
@@ -298,6 +347,51 @@ impl<A: Application> Runtime<A> {
             Err(source) => {
                 record.state = ApplicationState::Failed;
                 Err(RuntimeStartError::Application {
+                    application_id,
+                    source,
+                })
+            }
+        }
+    }
+
+    /// Invokes application stop after validating `Running -> Stopped`.
+    ///
+    /// Success commits [`ApplicationState::Stopped`]. A returned application
+    /// error is preserved in [`RuntimeStopError::Application`] and commits
+    /// terminal [`ApplicationState::Failed`].
+    ///
+    /// # Errors
+    ///
+    /// Invalid or unknown lifecycle requests return
+    /// [`RuntimeStopError::Lifecycle`] before application code is invoked.
+    /// Cooperative application failure returns [`RuntimeStopError::Application`].
+    pub fn stop(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Result<ApplicationState, RuntimeStopError<A::StopError>> {
+        let record = self
+            .record_mut(application_id)
+            .map_err(RuntimeStopError::Lifecycle)?;
+        let current = record.state;
+
+        if next_state(current, LifecycleOperation::Stop) != Some(ApplicationState::Stopped) {
+            return Err(RuntimeStopError::Lifecycle(
+                LifecycleError::InvalidTransition {
+                    application_id,
+                    state: current,
+                    operation: LifecycleOperation::Stop,
+                },
+            ));
+        }
+
+        match record.application.stop() {
+            Ok(()) => {
+                record.state = ApplicationState::Stopped;
+                Ok(ApplicationState::Stopped)
+            }
+            Err(source) => {
+                record.state = ApplicationState::Failed;
+                Err(RuntimeStopError::Application {
                     application_id,
                     source,
                 })
