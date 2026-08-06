@@ -1,6 +1,6 @@
 # ADR-0008: Distinct synchronous in-place owned restart
 
-- Status: Accepted for implementation
+- Status: Accepted; owned restart slice implemented
 - Date: 2026-08-07
 - Scope: Owned application restart callback and returned-error shape
 
@@ -78,9 +78,9 @@ containment boundary. Both conflict with the accepted LC1 transition table.
   suppression, and terminal returned-error policy.
 - ADR-0006 and ADR-0007 record direct static ownership and deliberate
   operation-by-operation growth of the pre-v0.1 boundary.
-- Public-API tests for this slice will observe retained application state,
-  exact restart-error preservation, state commitment, callback suppression,
-  and an eligible peer restart.
+- Public-API tests observe retained application state, exact restart-error
+  preservation, state commitment, callback suppression, and an eligible peer
+  restart.
 
 This decision is local architecture; no external source prescribes its Rust API
 shape.

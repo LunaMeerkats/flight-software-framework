@@ -1,6 +1,6 @@
 # Plan: synchronous in-place owned application restart
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-07**
 
 ## Objective
@@ -98,3 +98,27 @@ API cannot be made coherent without widening scope, preserve the decision
 analysis and tests but do not commit broken implementation. Do not continue
 into work dispatch, framework services, scheduling, concurrency, factories, or
 dependencies in this increment.
+
+## Result
+
+The stopping point was reached in commit
+`f957233e790058af20a49ffdd4b9e637c21ef195`. The dependency-free runtime now
+validates and executes synchronous in-place restart. Success mutably borrows the
+retained application value and commits `Running`; a returned concrete restart
+error remains available through `RuntimeRestartError` while the selected record
+enters terminal `Failed`.
+
+Two new public restart tests, plus the extended unknown-identity test, cover
+state retained across start/stop/restart, exact returned-error preservation,
+terminal failure, eligible peer restart, and callback suppression for
+registered, running, failed, and unknown requests. Together with the existing
+logical and owned lifecycle tests, the suite contains 13 passing tests.
+ADR-0008 records the distinct restart callback and its mutation limitations.
+Relative links, identifiers, and Markdown source structure also pass local
+checks. Browser-rendered Markdown review was attempted but the available
+browser policy rejects local rendered content, so that check is recorded as
+blocked rather than passed.
+
+RFF-REQ-002 and RFF-REQ-008 remain only partially verified. Application work,
+structured events, and the complete host scenarios remain outside this
+increment.
