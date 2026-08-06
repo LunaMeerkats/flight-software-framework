@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use rust_flight_framework::{
     Application, ApplicationState, LifecycleError, LifecycleOperation, Runtime, RuntimeCreateError,
-    RuntimeStartError, RuntimeStopError,
+    RuntimeRestartError, RuntimeStartError, RuntimeStopError,
 };
 
 #[derive(Debug)]
@@ -69,21 +69,83 @@ impl StopFaultingApplication {
 }
 
 #[derive(Debug)]
+struct StatefulRestartApplication {
+    start_calls: Rc<Cell<usize>>,
+    stop_calls: Rc<Cell<usize>>,
+    restart_calls: Rc<Cell<usize>>,
+    retained_marker: u16,
+    observed_restart_marker: Rc<Cell<u16>>,
+}
+
+impl StatefulRestartApplication {
+    fn start(&mut self) -> Result<(), MissionStartError> {
+        self.start_calls.set(self.start_calls.get() + 1);
+        self.retained_marker = 11;
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), MissionStopError> {
+        self.stop_calls.set(self.stop_calls.get() + 1);
+        self.retained_marker += 18;
+        Ok(())
+    }
+
+    fn restart(&mut self) -> Result<(), MissionRestartError> {
+        self.restart_calls.set(self.restart_calls.get() + 1);
+        self.observed_restart_marker.set(self.retained_marker);
+        self.retained_marker = 47;
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+struct RestartFaultingApplication {
+    start_calls: Rc<Cell<usize>>,
+    stop_calls: Rc<Cell<usize>>,
+    restart_calls: Rc<Cell<usize>>,
+    error_code: u16,
+}
+
+impl RestartFaultingApplication {
+    fn start(&mut self) -> Result<(), MissionStartError> {
+        self.start_calls.set(self.start_calls.get() + 1);
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), MissionStopError> {
+        self.stop_calls.set(self.stop_calls.get() + 1);
+        Ok(())
+    }
+
+    fn restart(&mut self) -> Result<(), MissionRestartError> {
+        self.restart_calls.set(self.restart_calls.get() + 1);
+        Err(MissionRestartError::Rejected(RestartRejected {
+            code: self.error_code,
+        }))
+    }
+}
+
+#[derive(Debug)]
 enum MissionApplication {
     Healthy(HealthyApplication),
     Faulting(FaultingApplication),
     StopFaulting(StopFaultingApplication),
+    StatefulRestart(StatefulRestartApplication),
+    RestartFaulting(RestartFaultingApplication),
 }
 
 impl Application for MissionApplication {
     type StartError = MissionStartError;
     type StopError = MissionStopError;
+    type RestartError = MissionRestartError;
 
     fn start(&mut self) -> Result<(), Self::StartError> {
         match self {
             Self::Healthy(application) => application.start(),
             Self::Faulting(application) => application.start(),
             Self::StopFaulting(application) => application.start(),
+            Self::StatefulRestart(application) => application.start(),
+            Self::RestartFaulting(application) => application.start(),
         }
     }
 
@@ -92,6 +154,16 @@ impl Application for MissionApplication {
             Self::Healthy(application) => application.stop(),
             Self::Faulting(application) => application.stop(),
             Self::StopFaulting(application) => application.stop(),
+            Self::StatefulRestart(application) => application.stop(),
+            Self::RestartFaulting(application) => application.stop(),
+        }
+    }
+
+    fn restart(&mut self) -> Result<(), Self::RestartError> {
+        match self {
+            Self::Healthy(_) | Self::Faulting(_) | Self::StopFaulting(_) => Ok(()),
+            Self::StatefulRestart(application) => application.restart(),
+            Self::RestartFaulting(application) => application.restart(),
         }
     }
 }
@@ -163,6 +235,40 @@ impl fmt::Display for StopRejected {
 }
 
 impl Error for StopRejected {}
+
+#[derive(Debug, Eq, PartialEq)]
+enum MissionRestartError {
+    Rejected(RestartRejected),
+}
+
+impl fmt::Display for MissionRestartError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Rejected(error) => error.fmt(formatter),
+        }
+    }
+}
+
+impl Error for MissionRestartError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Rejected(error) => Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct RestartRejected {
+    code: u16,
+}
+
+impl fmt::Display for RestartRejected {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "restart rejected with code {}", self.code)
+    }
+}
+
+impl Error for RestartRejected {}
 
 #[test]
 fn returned_start_error_fails_only_the_selected_application() {
@@ -313,6 +419,166 @@ fn valid_stop_commits_stopped_and_rejected_stops_suppress_the_callback() {
 }
 
 #[test]
+fn valid_restart_reuses_owned_state_and_rejected_restarts_suppress_the_callback() {
+    let start_calls = Rc::new(Cell::new(0));
+    let stop_calls = Rc::new(Cell::new(0));
+    let restart_calls = Rc::new(Cell::new(0));
+    let observed_restart_marker = Rc::new(Cell::new(0));
+    let mut runtime = Runtime::new(1).expect("one runtime record can be reserved");
+    let application_id = runtime
+        .register(MissionApplication::StatefulRestart(
+            StatefulRestartApplication {
+                start_calls: Rc::clone(&start_calls),
+                stop_calls: Rc::clone(&stop_calls),
+                restart_calls: Rc::clone(&restart_calls),
+                retained_marker: 0,
+                observed_restart_marker: Rc::clone(&observed_restart_marker),
+            },
+        ))
+        .expect("stateful application fits");
+
+    assert_eq!(
+        runtime.restart(application_id),
+        Err(RuntimeRestartError::Lifecycle(
+            LifecycleError::InvalidTransition {
+                application_id,
+                state: ApplicationState::Registered,
+                operation: LifecycleOperation::Restart,
+            }
+        ))
+    );
+    assert_eq!(
+        runtime.state(application_id),
+        Ok(ApplicationState::Registered)
+    );
+    assert_eq!(restart_calls.get(), 0);
+    assert_eq!(observed_restart_marker.get(), 0);
+
+    assert_eq!(runtime.start(application_id), Ok(ApplicationState::Running));
+    assert_eq!(
+        runtime.restart(application_id),
+        Err(RuntimeRestartError::Lifecycle(
+            LifecycleError::InvalidTransition {
+                application_id,
+                state: ApplicationState::Running,
+                operation: LifecycleOperation::Restart,
+            }
+        ))
+    );
+    assert_eq!(runtime.state(application_id), Ok(ApplicationState::Running));
+    assert_eq!(restart_calls.get(), 0);
+
+    assert_eq!(runtime.stop(application_id), Ok(ApplicationState::Stopped));
+    assert_eq!(
+        runtime.restart(application_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(runtime.state(application_id), Ok(ApplicationState::Running));
+    assert_eq!(start_calls.get(), 1);
+    assert_eq!(stop_calls.get(), 1);
+    assert_eq!(restart_calls.get(), 1);
+    assert_eq!(observed_restart_marker.get(), 29);
+
+    assert_eq!(
+        runtime.restart(application_id),
+        Err(RuntimeRestartError::Lifecycle(
+            LifecycleError::InvalidTransition {
+                application_id,
+                state: ApplicationState::Running,
+                operation: LifecycleOperation::Restart,
+            }
+        ))
+    );
+    assert_eq!(restart_calls.get(), 1);
+    assert_eq!(observed_restart_marker.get(), 29);
+
+    assert_eq!(runtime.stop(application_id), Ok(ApplicationState::Stopped));
+    assert_eq!(stop_calls.get(), 2);
+    assert_eq!(runtime.len(), 1);
+    assert_eq!(runtime.capacity(), 1);
+}
+
+#[test]
+fn returned_restart_error_fails_only_the_selected_application() {
+    let faulting_start_calls = Rc::new(Cell::new(0));
+    let faulting_stop_calls = Rc::new(Cell::new(0));
+    let faulting_restart_calls = Rc::new(Cell::new(0));
+    let peer_start_calls = Rc::new(Cell::new(0));
+    let peer_stop_calls = Rc::new(Cell::new(0));
+    let peer_restart_calls = Rc::new(Cell::new(0));
+    let peer_observed_restart_marker = Rc::new(Cell::new(0));
+    let mut runtime = Runtime::new(2).expect("two runtime records can be reserved");
+
+    let faulting_id = runtime
+        .register(MissionApplication::RestartFaulting(
+            RestartFaultingApplication {
+                start_calls: Rc::clone(&faulting_start_calls),
+                stop_calls: Rc::clone(&faulting_stop_calls),
+                restart_calls: Rc::clone(&faulting_restart_calls),
+                error_code: 43,
+            },
+        ))
+        .expect("restart-faulting application fits");
+    let peer_id = runtime
+        .register(MissionApplication::StatefulRestart(
+            StatefulRestartApplication {
+                start_calls: Rc::clone(&peer_start_calls),
+                stop_calls: Rc::clone(&peer_stop_calls),
+                restart_calls: Rc::clone(&peer_restart_calls),
+                retained_marker: 0,
+                observed_restart_marker: Rc::clone(&peer_observed_restart_marker),
+            },
+        ))
+        .expect("stateful peer fits");
+
+    assert_eq!(runtime.start(faulting_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.start(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.stop(faulting_id), Ok(ApplicationState::Stopped));
+    assert_eq!(runtime.stop(peer_id), Ok(ApplicationState::Stopped));
+
+    let returned_error = runtime
+        .restart(faulting_id)
+        .expect_err("restart-faulting application returns its concrete error");
+    assert_eq!(
+        returned_error,
+        RuntimeRestartError::Application {
+            application_id: faulting_id,
+            source: MissionRestartError::Rejected(RestartRejected { code: 43 }),
+        }
+    );
+    assert_eq!(
+        Error::source(&returned_error).and_then(|source| source.downcast_ref()),
+        Some(&MissionRestartError::Rejected(RestartRejected { code: 43 }))
+    );
+    assert_eq!(runtime.state(faulting_id), Ok(ApplicationState::Failed));
+    assert_eq!(faulting_start_calls.get(), 1);
+    assert_eq!(faulting_stop_calls.get(), 1);
+    assert_eq!(faulting_restart_calls.get(), 1);
+
+    assert_eq!(
+        runtime.restart(faulting_id),
+        Err(RuntimeRestartError::Lifecycle(
+            LifecycleError::InvalidTransition {
+                application_id: faulting_id,
+                state: ApplicationState::Failed,
+                operation: LifecycleOperation::Restart,
+            }
+        ))
+    );
+    assert_eq!(runtime.state(faulting_id), Ok(ApplicationState::Failed));
+    assert_eq!(faulting_restart_calls.get(), 1);
+
+    assert_eq!(runtime.restart(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.state(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(peer_start_calls.get(), 1);
+    assert_eq!(peer_stop_calls.get(), 1);
+    assert_eq!(peer_restart_calls.get(), 1);
+    assert_eq!(peer_observed_restart_marker.get(), 29);
+    assert_eq!(runtime.len(), 2);
+    assert_eq!(runtime.capacity(), 2);
+}
+
+#[test]
 fn returned_stop_error_fails_only_the_selected_application() {
     let faulting_start_calls = Rc::new(Cell::new(0));
     let faulting_stop_calls = Rc::new(Cell::new(0));
@@ -407,7 +673,10 @@ fn runtime_capacity_rejection_preserves_application_ownership() {
             assert!(Rc::ptr_eq(&application.start_calls, &rejected_calls));
             assert_eq!(application.error_code, 23);
         }
-        MissionApplication::Healthy(_) | MissionApplication::StopFaulting(_) => {
+        MissionApplication::Healthy(_)
+        | MissionApplication::StopFaulting(_)
+        | MissionApplication::StatefulRestart(_)
+        | MissionApplication::RestartFaulting(_) => {
             panic!("the rejected application changed variant")
         }
     }
@@ -428,12 +697,19 @@ fn runtime_capacity_rejection_preserves_application_ownership() {
 fn unknown_identity_is_rejected_before_application_code_runs() {
     let target_calls = Rc::new(Cell::new(0));
     let target_stop_calls = Rc::new(Cell::new(0));
+    let target_restart_calls = Rc::new(Cell::new(0));
+    let target_observed_restart_marker = Rc::new(Cell::new(0));
     let mut target_runtime = Runtime::new(1).expect("one target record can be reserved");
     let target_id = target_runtime
-        .register(MissionApplication::Healthy(HealthyApplication {
-            start_calls: Rc::clone(&target_calls),
-            stop_calls: Rc::clone(&target_stop_calls),
-        }))
+        .register(MissionApplication::StatefulRestart(
+            StatefulRestartApplication {
+                start_calls: Rc::clone(&target_calls),
+                stop_calls: Rc::clone(&target_stop_calls),
+                restart_calls: Rc::clone(&target_restart_calls),
+                retained_marker: 0,
+                observed_restart_marker: Rc::clone(&target_observed_restart_marker),
+            },
+        ))
         .expect("target application fits");
 
     let mut issuing_runtime = Runtime::new(2).expect("two issuing records can be reserved");
@@ -468,6 +744,16 @@ fn unknown_identity_is_rejected_before_application_code_runs() {
         ))
     );
     assert_eq!(target_stop_calls.get(), 0);
+    assert_eq!(
+        target_runtime.restart(out_of_range_id),
+        Err(RuntimeRestartError::Lifecycle(
+            LifecycleError::UnknownApplication {
+                application_id: out_of_range_id,
+            }
+        ))
+    );
+    assert_eq!(target_restart_calls.get(), 0);
+    assert_eq!(target_observed_restart_marker.get(), 0);
     assert_eq!(
         target_runtime.state(target_id),
         Ok(ApplicationState::Registered)

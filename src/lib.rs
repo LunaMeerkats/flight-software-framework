@@ -16,6 +16,6 @@ pub use lifecycle::{
     RegistrationError, RegistryCreateError,
 };
 pub use runtime::{
-    Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeStartError,
-    RuntimeStopError,
+    Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,
+    RuntimeStartError, RuntimeStopError,
 };

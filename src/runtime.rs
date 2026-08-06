@@ -1,7 +1,7 @@
 //! Owned application lifecycle execution.
 //!
-//! This module adds synchronous start and stop boundaries over the LC1
-//! lifecycle vocabulary. It deliberately omits work dispatch, restart,
+//! This module adds synchronous start, stop, and in-place restart boundaries
+//! over the LC1 lifecycle vocabulary. It deliberately omits work dispatch,
 //! factories, threads, executors, panic containment, and recovery policy.
 
 use std::error::Error;
@@ -14,8 +14,8 @@ use crate::lifecycle::{
 /// The lifecycle behavior currently required by the owned runtime.
 ///
 /// The runtime invokes these methods synchronously and starts no hidden work.
-/// Work, restart, service context, and recovery behaviors are deliberately
-/// absent until later slices can define and verify them.
+/// Work, service context, and recovery behaviors are deliberately absent until
+/// later slices can define and verify them.
 pub trait Application {
     /// The concrete error returned by this application's start operation.
     type StartError: Error + 'static;
@@ -37,6 +37,18 @@ pub trait Application {
     /// only that this cooperative callback returned successfully; the runtime
     /// does not independently prove cleanup of application-owned resources.
     fn stop(&mut self) -> Result<(), Self::StopError>;
+
+    /// The concrete error returned by this application's restart operation.
+    type RestartError: Error + 'static;
+
+    /// Attempts to restart the stopped application in place.
+    ///
+    /// The callback receives the same application value retained across its
+    /// successful start and stop. A returned error is retained in
+    /// [`RuntimeRestartError`] and moves the runtime record to terminal
+    /// [`ApplicationState::Failed`]. The runtime does not reconstruct or reset
+    /// application-owned state.
+    fn restart(&mut self) -> Result<(), Self::RestartError>;
 }
 
 /// Failure to construct bounded owned runtime storage.
@@ -190,6 +202,44 @@ impl<E: Error + 'static> Error for RuntimeStopError<E> {
     }
 }
 
+/// A runtime restart request rejected by lifecycle or failed by the application.
+#[derive(Debug, Eq, PartialEq)]
+pub enum RuntimeRestartError<E> {
+    /// Lifecycle validation rejected the request before application code ran.
+    Lifecycle(LifecycleError),
+    /// Application restart returned a cooperative failure.
+    Application {
+        /// Runtime-local identity of the application that returned the error.
+        application_id: ApplicationId,
+        /// The original concrete error returned by [`Application::restart`].
+        source: E,
+    },
+}
+
+impl<E: fmt::Display> fmt::Display for RuntimeRestartError<E> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Lifecycle(error) => error.fmt(formatter),
+            Self::Application {
+                application_id,
+                source,
+            } => write!(
+                formatter,
+                "application {application_id:?} returned a restart error: {source}"
+            ),
+        }
+    }
+}
+
+impl<E: Error + 'static> Error for RuntimeRestartError<E> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Lifecycle(error) => Some(error),
+            Self::Application { source, .. } => Some(source),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct RuntimeRecord<A> {
     state: ApplicationState,
@@ -199,9 +249,9 @@ struct RuntimeRecord<A> {
 /// A finite-capacity, caller-driven owner of application values.
 ///
 /// This pre-v0.1 slice supports registration, state inspection, and synchronous
-/// start and stop. The concrete application representation is selected by the
-/// mission. Different application types can be composed explicitly in an enum
-/// without requiring trait-object allocation.
+/// start, stop, and in-place restart. The concrete application representation
+/// is selected by the mission. Different application types can be composed
+/// explicitly in an enum without requiring trait-object allocation.
 ///
 /// Construction reserves storage for the configured record count. That bounds
 /// the number of runtime records, not memory allocated inside application or
@@ -392,6 +442,53 @@ impl<A: Application> Runtime<A> {
             Err(source) => {
                 record.state = ApplicationState::Failed;
                 Err(RuntimeStopError::Application {
+                    application_id,
+                    source,
+                })
+            }
+        }
+    }
+
+    /// Invokes application restart after validating `Stopped -> Running`.
+    ///
+    /// The callback mutably borrows the same application value retained across
+    /// start and stop. Success commits [`ApplicationState::Running`]. A returned
+    /// application error is preserved in [`RuntimeRestartError::Application`]
+    /// and commits terminal [`ApplicationState::Failed`].
+    ///
+    /// # Errors
+    ///
+    /// Invalid or unknown lifecycle requests return
+    /// [`RuntimeRestartError::Lifecycle`] before application code is invoked.
+    /// Cooperative application failure returns
+    /// [`RuntimeRestartError::Application`].
+    pub fn restart(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Result<ApplicationState, RuntimeRestartError<A::RestartError>> {
+        let record = self
+            .record_mut(application_id)
+            .map_err(RuntimeRestartError::Lifecycle)?;
+        let current = record.state;
+
+        if next_state(current, LifecycleOperation::Restart) != Some(ApplicationState::Running) {
+            return Err(RuntimeRestartError::Lifecycle(
+                LifecycleError::InvalidTransition {
+                    application_id,
+                    state: current,
+                    operation: LifecycleOperation::Restart,
+                },
+            ));
+        }
+
+        match record.application.restart() {
+            Ok(()) => {
+                record.state = ApplicationState::Running;
+                Ok(ApplicationState::Running)
+            }
+            Err(source) => {
+                record.state = ApplicationState::Failed;
+                Err(RuntimeRestartError::Application {
                     application_id,
                     source,
                 })

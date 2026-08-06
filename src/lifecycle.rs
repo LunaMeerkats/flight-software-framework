@@ -2,7 +2,7 @@
 //!
 //! This module implements the standalone logical LC1 transition model. The
 //! owned [`crate::Runtime`] uses the same state and error vocabulary for its
-//! start-only execution slice.
+//! synchronous lifecycle execution boundary.
 
 use std::error::Error;
 use std::fmt;
@@ -38,8 +38,8 @@ pub enum ApplicationState {
     /// An application lifecycle or work operation returned an error.
     ///
     /// This state is terminal in LC1. The standalone registry cannot enter it,
-    /// while [`crate::Runtime`] enters it when application start or stop returns
-    /// an error.
+    /// while [`crate::Runtime`] enters it when application start, stop, or
+    /// restart returns an error.
     Failed,
 }
 
