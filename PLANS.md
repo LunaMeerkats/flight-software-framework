@@ -1,6 +1,6 @@
 # Plan: prove bounded available-endpoint fan-out
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-24**
 
 ## Objective
@@ -93,3 +93,19 @@ Stop after the available-endpoint routing core, its public tests, ADR, and
 partial traceability are coherent and verified. Do not add lifecycle hooks,
 service contexts, automatic dispatch, event reporting, time, scheduling,
 runtime mutation APIs, or external protocol identifiers in this run.
+
+## Result
+
+Implementation commit `6c6e0b0b31e7338414f28f330024c2bfbd3eec40`
+reached the intended routing-core stopping point. The public surface now
+provides inline bounded messages, immutable configured inbox topology, FIFO
+dequeue, serial selective fan-out, reject-newest saturation, and one ordered
+publisher report. Seven focused tests bring the complete suite to 23.
+
+Independent review added mixed-topic selective-routing evidence, strengthened
+all-full and no-subscriber assertions, and narrowed topology and waiting claims
+to behavior the detached core proves. All Cargo checks, warnings-denied rustdoc,
+source widths, reasoned expectations, relative links, rendered document
+structure, identifiers, tables, and whitespace checks pass. No dependency,
+thread, executor, lifecycle integration, work context, protocol boundary,
+licence change, or push was added.

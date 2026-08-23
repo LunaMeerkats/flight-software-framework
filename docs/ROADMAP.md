@@ -66,19 +66,26 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **Implementation not started**
+Status: **In progress (2026-08-24)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
 - Add structured events without creating an unbounded side channel.
 - Add injected and simulated time, then caller-driven scheduled work.
 
-Next slice: reorient from ADR-0004 and implement the smallest coherent bounded
-inbox and publish/subscribe behavior that can feed the existing caller-driven
-work boundary, with exact capacity and publisher-visible saturation evidence.
+Completed partial slice: the available-endpoint routing core uses inline
+const-bounded payloads, immutable unique topic sets, pre-reserved inboxes with
+positive capacities, cross-topic FIFO, reject-newest saturation, continued
+partial fan-out, and ordered publisher-visible classifications. It remains
+separate from the application runtime, so RFF-REQ-003 is not yet fully verified.
 
-Exit evidence: exact-boundary, ordering, saturation, disconnect, and simulated-
-time integration tests for RFF-REQ-003 through RFF-REQ-005.
+Next slice: select the smallest runtime-owned lifecycle integration that makes
+stopped and failed endpoints unavailable, returns the discarded queued count,
+and reconnects an empty inbox after restart. Defer an application work context
+until that ownership and borrowing shape is concrete.
+
+Exit evidence: exact-boundary, ordering, saturation, unavailable/clearing, and
+simulated-time integration tests for RFF-REQ-003 through RFF-REQ-005.
 
 ## Stage 3 — Configuration and mission boundaries
 

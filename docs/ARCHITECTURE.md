@@ -70,8 +70,9 @@ fault tolerance.
 - [ADR-0003](adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md)
   defines the LC1 stop-gated lifecycle and bounded runtime-local identity.
 - [ADR-0004](adr/0004-bounded-application-inboxes.md) defines one bounded inbox
-  per application, non-blocking reject-newest overflow, and explicit partial
-  fan-out reporting. It is not implemented.
+  per application, reject-newest overflow without waiting for inbox capacity or
+  subscriber progress, and explicit partial fan-out reporting. Its routing core
+  for available endpoints is partially implemented.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   monotonic snapshot revisions and one consume-once rollback slot. It is not
   implemented.
@@ -86,6 +87,10 @@ fault tolerance.
 - [ADR-0009](adr/0009-caller-driven-owned-work.md) adds one explicit
   caller-selected work operation for `Running` applications without defining
   automatic dispatch, scheduling, or a service context.
+- [ADR-0010](adr/0010-bounded-message-routing-core.md) selects inline
+  const-bounded payloads, mission-defined copied topics, immutable configured
+  inbox topology, and one ordered publication report for the first ADR-0004
+  slice.
 
 ## Current implementation boundary
 
@@ -107,6 +112,19 @@ does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The runtime
 has no automatic dispatch, service context, event emission, or sample mission,
 so RFF-REQ-008 remains partial.
+
+`MessageBus<Topic, MAX_PAYLOAD_BYTES>` is a separate available-endpoint routing
+core. It copies a caller-supplied contiguous-prefix application topology,
+reserves each positive-capacity inbox and unique topic set, routes in
+registration order, preserves FIFO across topics, rejects the newest delivery
+at saturation, and reports every matching destination in order. Inline payload
+storage enforces the selected maximum for each bus type.
+
+The bus is not owned by `Runtime`, cannot prove the identity issuer has no
+additional application, and does not observe lifecycle state. It therefore does
+not yet implement unavailable endpoints, queue clearing, restart reconnection,
+application self-publication, or runtime-owned dispatch. RFF-REQ-003 remains
+partial.
 
 ## Alternatives kept open
 
@@ -132,6 +150,10 @@ so RFF-REQ-008 remains partial.
   controlled and the claim remains limited to repeatability.
 - Bounded bus queues can coexist with unbounded event, telemetry, or diagnostic
   accumulation unless every operational path is reviewed.
+- The detached routing core can be paired with a same-shaped foreign identity
+  issuer or an incomplete runtime topology until ownership is integrated.
+- Mission-defined topic equality and per-publication report allocation are
+  bounded by configured route count but are not a general non-blocking claim.
 - A returned application error is not equivalent to containing a panic, hang,
   process failure, memory exhaustion, or hardware fault.
 - Platform seams created without a second backend may become decorative layers.
