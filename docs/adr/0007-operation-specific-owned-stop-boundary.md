@@ -90,15 +90,16 @@ shape.
 - Missions can use distinct concrete start and stop errors while the runtime
   preserves each unchanged.
 - Implementors of the pre-v0.1 `Application` trait must add stop behavior.
-- Start and stop error wrappers duplicate a small amount of display and source
-  plumbing; later evidence may justify a shared internal or public type.
+- Operation-specific error wrappers duplicate a small amount of display and
+  source plumbing. ADR-0009 later reassesses and retains the explicit public
+  shape after work is implemented.
 - A returned error contains only cooperative failure. Panics, hangs, process
   termination, application-created threads, and external resource cleanup are
   outside this boundary.
 
 ## Revisit conditions
 
-Revisit when restart or work exposes stable common error structure, a real
-mission needs independently composable lifecycle capabilities, cleanup needs a
-separate state or protocol, or concurrency introduces cancellation and forced-
-termination semantics.
+Revisit when a service context or mission exposes a stable common error
+structure, a real mission needs independently composable lifecycle
+capabilities, cleanup needs a separate state or protocol, or concurrency
+introduces cancellation and forced-termination semantics.

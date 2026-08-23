@@ -13,19 +13,22 @@ fit Rust's ownership, type, error, and testing models.
 
 ## Current status
 
-The repository contains an initial research and architecture baseline plus four
-bounded Rust lifecycle increments. A no-dependency `LifecycleRegistry` verifies
-the logical LC1 transition table. A finite-capacity `Runtime<A>` owns statically
-composed application values and executes start, stop, and in-place restart
-synchronously. Successful operations enter `Running`, `Stopped`, and `Running`
-respectively. Restart retains application-owned state, while a returned
-concrete operation error enters terminal `Failed` without mutating peer records.
+The repository contains an initial research and architecture baseline plus five
+bounded Rust lifecycle and work increments. A no-dependency `LifecycleRegistry`
+verifies the logical LC1 transition table. A finite-capacity `Runtime<A>` owns
+statically composed application values and executes start, caller-selected
+work, stop, and in-place restart synchronously. Successful lifecycle operations
+enter `Running`, `Stopped`, and `Running`; successful work retains `Running`.
+Restart and work retain application-owned state, while a returned concrete
+operation error enters terminal `Failed` without mutating peer records.
 
-The owned runtime does not yet execute application work and is not a sample
-mission. The message bus, time, events, configuration, and command/telemetry
-boundaries remain unimplemented. Traceability distinguishes this partial
-evidence from complete v0.1 requirements and from containment of panics, hangs,
-cleanup failures, or other arbitrary faults.
+A public integration test runs two independently defined applications through
+registration, start, work, stop, restart, and work, completing the bounded
+RFF-REQ-002 lifecycle evidence. The runtime still has no automatic dispatch and
+is not a sample mission. The message bus, time, events, configuration, and
+command/telemetry boundaries remain unimplemented. Traceability distinguishes
+this evidence from broader v0.1 requirements and from containment of panics,
+hangs, cleanup failures, or other arbitrary faults.
 
 ## Development
 
@@ -53,6 +56,7 @@ cargo doc --workspace --no-deps
 - [Initial application ownership decision](docs/adr/0006-static-application-ownership-for-initial-runtime.md)
 - [Owned stop boundary decision](docs/adr/0007-operation-specific-owned-stop-boundary.md)
 - [In-place owned restart decision](docs/adr/0008-distinct-in-place-owned-restart.md)
+- [Caller-driven owned work decision](docs/adr/0009-caller-driven-owned-work.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Contributor and automation guidance](AGENTS.md)

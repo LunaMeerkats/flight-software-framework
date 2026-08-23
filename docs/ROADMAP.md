@@ -16,7 +16,7 @@ diff checks, and a local commit on `codex/nightly`.
 
 ## Stage 1 — One lifecycle vertical slice
 
-Status: **In progress**
+Status: **Complete (2026-08-23)**
 
 - Create the smallest stable-Rust crate structure needed for one runtime and
   independently defined test applications.
@@ -27,28 +27,32 @@ Status: **In progress**
 Completed slices: the single unpublished library provides a bounded logical
 lifecycle registry with exhaustive LC1 transition evidence, plus a
 finite-capacity generic runtime that owns statically composed applications. The
-runtime executes start, stop, and in-place restart synchronously, preserves
-distinct concrete operation errors, commits terminal `Failed` on any returned
-error, suppresses callbacks for rejected operations, and leaves peer records
-unchanged. Restart tests observe application state retained across the complete
-start/stop/restart sequence and a stopped peer remaining restartable after
-another application returns an error.
-
-Next slice: add the smallest caller-driven work operation for `Running`
-applications, proving state retention on success, callback suppression outside
-`Running`, terminal `Failed` on a returned work error, and subsequent peer work
-without adding service contexts, time, messaging, threads, or async execution.
+runtime executes start, caller-selected work, stop, and in-place restart
+synchronously, preserves distinct concrete operation errors, commits terminal
+`Failed` on any returned error, suppresses callbacks for rejected operations,
+and leaves peer records unchanged. Tests observe retained application state,
+successful subsequent peer work after a returned work error, and two
+independently defined applications completing registration, start, work, stop,
+restart, and work.
 
 Exit evidence: applicable Cargo checks and complete transition tests for the
-implemented slice. Owned LC1 operations are present, but RFF-REQ-002 remains
-partial until a complete two-application host scenario is verified.
+implemented slice plus the complete two-application host scenario. RFF-REQ-002
+is verified by the exhaustive logical transition matrix and public integration
+evidence. No dependency, thread, executor, service context, or automatic
+dispatch was added.
 
 ## Stage 2 — Bounded interaction under controlled time
+
+Status: **Implementation not started**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
 - Add structured events without creating an unbounded side channel.
 - Add injected and simulated time, then caller-driven scheduled work.
+
+Next slice: reorient from ADR-0004 and implement the smallest coherent bounded
+inbox and publish/subscribe behavior that can feed the existing caller-driven
+work boundary, with exact capacity and publisher-visible saturation evidence.
 
 Exit evidence: exact-boundary, ordering, saturation, disconnect, and simulated-
 time integration tests for RFF-REQ-003 through RFF-REQ-005.

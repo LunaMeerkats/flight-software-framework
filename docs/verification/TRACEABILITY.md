@@ -1,21 +1,22 @@
 # Verification traceability
 
 The implemented Rust slices cover bounded logical lifecycle records and owned
-synchronous start/stop/in-place-restart boundaries. They do not execute
-application work and do not satisfy the complete two-application lifecycle or
-error-containment scenarios. Implementation and verification state are tracked
-separately so neither planned evidence nor existing code is misrepresented.
+synchronous start/work/stop/in-place-restart boundaries. A public integration
+test satisfies the complete two-application RFF-REQ-002 scenario. Returned-error
+containment remains partial because no structured failure event exists.
+Implementation and verification state are tracked separately so neither planned
+evidence nor existing code is misrepresented.
 
 | Requirement | Implementation state | Planned verification | Exact verification evidence | Last verified commit | Verification state |
 | --- | --- | --- | --- | --- | --- |
 | RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented human checklist covering user-facing docs and sample output | None | - | Pending |
-| RFF-REQ-002 | Partial: bounded logical LC1 transitions plus owned registration, start, stop, and retained-state in-place restart for statically composed applications; no complete two-application host scenario | Exhaustive lifecycle tests plus complete two-application start/stop/restart scenario | `lifecycle::tests::registry_enforces_every_state_operation_pair`; `lifecycle::tests::unknown_identity_is_rejected_without_mutating_existing_records`; four tests in `tests/lifecycle_registry.rs`; `valid_stop_commits_stopped_and_rejected_stops_suppress_the_callback`; `valid_restart_reuses_owned_state_and_rejected_restarts_suppress_the_callback`; `unknown_identity_is_rejected_before_application_code_runs`; `cargo test --workspace --all-features` (13 passed) | `f957233e790058af20a49ffdd4b9e637c21ef195` | Partially verified |
+| RFF-REQ-002 | Implemented: bounded logical LC1 transitions plus two statically composed applications completing owned registration, start, work, stop, restart, and work | Preserve exhaustive lifecycle and complete two-application scenario regression coverage | `lifecycle::tests::registry_enforces_every_state_operation_pair`; `configured_capacity_bounds_registration_without_mutating_existing_records`; `approved_lc1_sequence_preserves_identity_and_registry_bound`; `invalid_transition_is_typed_and_leaves_state_unchanged`; `two_lifecycle_records_transition_independently`; `two_applications_complete_lifecycle_with_running_work`; `unknown_identity_is_rejected_before_application_code_runs`; `cargo test --workspace --all-features` (15 passed) | `43ef56b92da18302eee0c0a0a1f071a29aae0ade` | Verified |
 | RFF-REQ-003 | Not implemented | Queue boundary/FIFO/overflow/disconnect unit and fan-out integration tests | None | - | Not verified |
 | RFF-REQ-004 | Not implemented | Manual-clock unit tests and replayed scheduling integration scenario | None | - | Not verified |
 | RFF-REQ-005 | Not implemented | Structured-field and bounded-event-path tests | None | - | Not verified |
 | RFF-REQ-006 | Not implemented | Configuration state-machine and activation/rejection/rollback integration tests | None | - | Not verified |
 | RFF-REQ-007 | Not implemented | Valid command/telemetry and adapter-defined malformed-input integration tests | None | - | Not verified |
-| RFF-REQ-008 | Partial: returned start, stop, and restart errors commit only the selected application to terminal `Failed`, preserve the concrete error, and do not prevent an eligible peer lifecycle operation; no structured event or subsequent peer work | Returned-error fault-injection integration scenario including event and subsequent peer work | `returned_start_error_fails_only_the_selected_application`; `returned_stop_error_fails_only_the_selected_application`; `returned_restart_error_fails_only_the_selected_application`; `cargo test --workspace --all-features` (13 passed) | `f957233e790058af20a49ffdd4b9e637c21ef195` | Partially verified |
+| RFF-REQ-008 | Partial: returned start, work, stop, and restart errors commit only the selected application to terminal `Failed` and preserve the concrete error; a running peer completes subsequent work; no structured failure event | Add the structured event to the returned-error fault-injection integration scenario | `returned_start_error_fails_only_the_selected_application`; `returned_work_error_fails_only_the_selected_application`; `returned_stop_error_fails_only_the_selected_application`; `returned_restart_error_fails_only_the_selected_application`; `cargo test --workspace --all-features` (15 passed) | `43ef56b92da18302eee0c0a0a1f071a29aae0ade` | Partially verified |
 
 ## Evidence policy
 

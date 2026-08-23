@@ -1,6 +1,6 @@
 # ADR-0003: Stop-gated lifecycle and runtime-local identity
 
-- Status: Accepted; logical and owned start/stop/restart behavior implemented
+- Status: Accepted; logical and owned lifecycle/work behavior implemented
 - Date: 2026-08-05
 - Scope: v0.1 application lifecycle and logical identity
 
@@ -53,14 +53,15 @@ Logical application identity is:
 ## Current implementation boundary
 
 The standalone `LifecycleRegistry` owns only bounded logical records and
-successful LC1 transitions. The separate finite-capacity `Runtime<A>` now owns
-application values and implements synchronous start, stop, and in-place
-restart: success enters `Running`, `Stopped`, or `Running`, while any returned
-concrete operation error enters terminal `Failed`. Restart mutably borrows the
-same retained application value, and tests observe state retained through its
-prior start/stop sequence. It does not implement application work or a complete
-host scenario. RFF-REQ-002 and RFF-REQ-008 therefore remain only partially
-implemented.
+successful LC1 transitions. The separate finite-capacity `Runtime<A>` owns
+application values and implements synchronous start, caller-selected work,
+stop, and in-place restart. Lifecycle success enters `Running`, `Stopped`, or
+`Running`; work success retains `Running`; any returned concrete operation
+error enters terminal `Failed`. Restart and work mutably borrow the retained
+application value. A public integration test observes two independently defined
+applications completing the full LC1 sequence with work before and after
+restart, so RFF-REQ-002 is verified. RFF-REQ-008 remains partial until returned
+failure produces a structured event.
 
 ## Alternatives considered
 

@@ -1,6 +1,6 @@
 # ADR-0006: Static application ownership for the initial runtime
 
-- Status: Accepted; initial start slice implemented and extended by ADR-0007 and ADR-0008
+- Status: Accepted; initial start slice implemented and extended through ADR-0009
 - Date: 2026-08-06
 - Scope: Owned application representation and returned start errors
 
@@ -87,9 +87,9 @@ evidence. Each operation is added only with its own coherent behavior and tests.
   operation-error type.
 - The framework record bound does not constrain application-internal
   allocation, blocking, I/O, thread creation, or error size.
-- The original start-only public trait was extended by ADR-0007 for stop and
-  ADR-0008 for restart and remains deliberately pre-v0.1. It may change when
-  work or service contexts are demonstrated.
+- The original start-only public trait was extended by ADR-0007 for stop,
+  ADR-0008 for restart, and ADR-0009 for work and remains deliberately pre-v0.1.
+  It may change when framework service contexts are demonstrated.
 - A returned error contains only cooperative failure. It is not fault tolerance
   and does not isolate arbitrary application behavior.
 

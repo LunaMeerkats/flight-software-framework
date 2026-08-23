@@ -53,10 +53,11 @@ initial runtime will not spawn hidden work.
 ## Chosen first execution model
 
 [ADR-0001](adr/0001-caller-driven-host-runtime.md) selects a serial,
-caller-driven host runtime for the first v0.1 slices. A host advances work using
-an injected clock; deterministic tests explicitly advance a simulated clock.
-This makes event and transition ordering testable without adopting an async
-runtime or thread lifecycle early.
+caller-driven host runtime for the first v0.1 slices. The current host explicitly
+selects one application work call and has no clock or scheduler. Later scheduled
+work will use an injected clock, with deterministic tests explicitly advancing
+a simulated clock. This keeps eventual event and transition ordering testable
+without adopting an async runtime or thread lifecycle early.
 
 Here, **deterministic** means that conforming, terminating applications with
 controlled external effects produce the same framework-observable ordering from
@@ -82,6 +83,9 @@ fault tolerance.
 - [ADR-0008](adr/0008-distinct-in-place-owned-restart.md) completes the owned
   LC1 transition surface with a distinct in-place restart callback and concrete
   restart error.
+- [ADR-0009](adr/0009-caller-driven-owned-work.md) adds one explicit
+  caller-selected work operation for `Running` applications without defining
+  automatic dispatch, scheduling, or a service context.
 
 ## Current implementation boundary
 
@@ -90,18 +94,19 @@ it allocates opaque identities in registration order and enforces
 `Registered -> Running -> Stopped -> Running` without owning application
 objects. `Runtime<A>` separately owns finite-capacity application records. A
 mission-selected concrete representation, such as an enum, implements
-synchronous `Application::start`, `Application::stop`, and
-`Application::restart` boundaries with distinct concrete error types.
+  synchronous `Application::start`, `Application::work`, `Application::stop`,
+  and `Application::restart` boundaries with distinct concrete error types.
 
-Runtime start, stop, and restart validate state before invocation. Success
-commits `Running`, `Stopped`, or `Running` respectively; restart mutably borrows
-the same application value and retains state through the preceding start/stop
-sequence. A returned error is preserved in the caller-visible operation-specific
-result and commits terminal `Failed`. Public-API tests suppress callbacks for
-rejected operations and show that one returned lifecycle error does not mutate
-peer records or prevent an eligible peer operation. The runtime has no
-application work, service context, event emission, or sample mission, so
-RFF-REQ-002 and RFF-REQ-008 remain partial.
+Runtime start, work, stop, and restart validate identity and state before
+invocation. Lifecycle success commits `Running`, `Stopped`, or `Running`, while
+work success retains `Running`. Restart and work mutably borrow the retained
+application value. A returned error is preserved in the caller-visible
+operation-specific result and commits terminal `Failed`. Public-API tests
+suppress callbacks for rejected operations and show that a returned work error
+does not mutate peer records or prevent subsequent peer work. A complete
+two-application lifecycle integration test now verifies RFF-REQ-002. The runtime
+has no automatic dispatch, service context, event emission, or sample mission,
+so RFF-REQ-008 remains partial.
 
 ## Alternatives kept open
 
@@ -118,9 +123,9 @@ RFF-REQ-002 and RFF-REQ-008 remain partial.
 
 ## Major technical risks
 
-- The pre-v0.1 public trait may freeze the wrong work or service-context shape
-  before those behaviors and framework services are demonstrated.
-- A returned stop or restart error may follow partial application-internal
+- The pre-v0.1 public trait may freeze a context-free work shape before
+  framework services demonstrate the borrowing and error behavior they need.
+- A returned application callback error may follow partial application-internal
   cleanup or mutation; the runtime records `Failed` but provides no rollback or
   cleanup guarantee.
 - “Deterministic” may be overstated unless every input and ordering source is

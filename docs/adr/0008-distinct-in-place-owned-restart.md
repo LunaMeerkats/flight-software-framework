@@ -92,14 +92,16 @@ shape.
 - Implementors of the pre-v0.1 `Application` trait must add restart behavior.
 - The runtime preserves application-owned state but cannot establish whether
   that state is clean, internally consistent, or safe to resume.
-- Three operation-specific runtime error wrappers duplicate some display and
-  source plumbing; later evidence may justify a shared internal or public type.
+- Four operation-specific runtime error wrappers now duplicate some display and
+  source plumbing. ADR-0009 reassesses and retains that explicit public shape;
+  later evidence may still justify a shared internal or public type.
 - A returned error contains only cooperative failure. Panics, hangs, process
   termination, application-created threads, and external resource cleanup are
   outside this boundary.
 
 ## Revisit conditions
 
-Revisit when application work exposes stable common error structure, recovery
-from `Failed` needs a fresh incarnation, cleanup requires a separate protocol,
-or concurrency introduces cancellation and forced-termination semantics.
+Revisit when a service context or mission exposes a clearer common error
+structure, recovery from `Failed` needs a fresh incarnation, cleanup requires a
+separate protocol, or concurrency introduces cancellation and forced-
+termination semantics.
