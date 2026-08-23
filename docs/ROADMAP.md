@@ -41,6 +41,26 @@ is verified by the exhaustive logical transition matrix and public integration
 evidence. No dependency, thread, executor, service context, or automatic
 dispatch was added.
 
+### Source-quality checkpoint before Stage 2
+
+Status: **Complete (2026-08-23)**
+
+The first whole-tree source-form audit found no handwritten Rust line over 100
+columns, eight comment-only lines over the 80-column review default, and five
+cohesive chronological integration tests over the proposed 60-line Clippy
+threshold. Tracked stable rustfmt and Clippy configuration now enforce the
+100-column format and individual function-size lint. The comments were
+reflowed, and each intentionally linear test has a narrow reasoned expectation
+instead of count-driven fragmentation.
+
+The contributor policy now records progressive source ordering, module and
+naming conventions, waiver retirement, manual review boundaries, exact tool
+versions, and a warning-free baseline. Official Rust, JPL, NASA, ECSS, JAXA,
+and Australian public-source decisions are recorded without claiming agency
+applicability or compliance. Other lints, a strict physical-line checker,
+complexity tooling, dependency policy, CI, and toolchain pinning remain
+separate measured increments.
+
 ## Stage 2 — Bounded interaction under controlled time
 
 Status: **Implementation not started**

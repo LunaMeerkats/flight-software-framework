@@ -22,16 +22,21 @@ translate NASA C source.
 - `docs/PROJECT_STATE.md`: concise current milestone, evidence, and risks.
 - `docs/adr/`: consequential architecture decisions and revisit conditions.
 - `docs/research/SOURCES.md`: primary-source provenance and adoption decisions.
-- `docs/verification/TRACEABILITY.md`: requirement-to-evidence status.
+- `docs/verification/`: requirement traceability and verification baselines.
 - `PLANS.md`: the active or most recently completed bounded work plan.
 - `src/`: the single unpublished library package; currently logical lifecycle
   records and a synchronous start/work/stop/in-place-restart owned runtime.
-- `tests/`: public-API integration tests for implemented behavior.
-- `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and locked
-  dependency graph.
+- `tests/`: public-API and multi-service integration tests.
+- `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
+  configuration.
+- `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
+  locked dependency graph.
 
 The root contains one unpublished package and workspace. Add another crate only
 when a demonstrated boundary cannot remain coherent in the existing package.
+Follow standard Cargo placement for libraries, binaries, examples, benchmarks,
+and integration tests. Use descriptive `foo.rs` modules with children under
+`foo/`; do not introduce a mixed legacy `mod.rs` layout.
 
 ## Supported checks
 
@@ -39,15 +44,24 @@ The required baseline is:
 
 ```text
 cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-features
-cargo doc --workspace --no-deps
+cargo doc --workspace --all-features --no-deps
 git diff --check
 ```
 
-Also verify that relative Markdown links resolve and review rendered documents.
-Document any justified adaptation before treating it as the baseline. Never
-report a check as passing unless it was run successfully.
+Run the rustdoc command with `RUSTDOCFLAGS=-D warnings`. In PowerShell, set
+`$env:RUSTDOCFLAGS = "-D warnings"` before invoking Cargo. Also verify that
+relative Markdown links resolve, inspect changed rendered documents, audit
+handwritten Rust physical and comment-only line widths, and review the complete
+diff. Document any justified adaptation before treating it as the baseline.
+Never report a check as passing unless it completed successfully.
+
+The source-quality policy was established with rustc/cargo 1.96.1, rustfmt
+1.9.0-stable, and Clippy 0.1.96. These versions record evidence, not a minimum
+supported Rust version or a toolchain pin. Re-audit the configuration and whole
+tree when the active toolchain changes.
 
 ## Engineering conventions
 
@@ -65,6 +79,88 @@ report a check as passing unless it was run successfully.
   real-time or scheduling guarantee.
 - Explain invariants and reasoning in comments rather than restating syntax.
 
+## Source form and organization
+
+Stable rustfmt owns ordinary formatting, with `max_width = 100`. Comment-only
+prose should normally fit within 80 columns. Rustfmt does not prove that every
+comment, URL, literal, macro, generated line, or physical source line fits a
+limit, so reviewers must inspect those cases until a narrowly designed checker
+is separately adopted.
+
+Functions and methods should normally contain at most 60 Clippy-counted lines.
+The workspace denies `clippy::too_many_lines` at the threshold configured in
+`clippy.toml` for library, test, example, benchmark, and binary targets. This
+is a review trigger, not an incentive to compress statements or fragment a
+cohesive low-complexity flow.
+
+For an intentional exception, prefer an item-level expectation:
+
+```rust
+#[expect(
+    clippy::too_many_lines,
+    reason = "extraction would split one chronological state-machine scenario"
+)]
+```
+
+The reason must identify the invariant, control-flow, or coupling cost that
+makes extraction worse. Review every exception in the diff and keep it close to
+the item. Do not raise the global threshold, add crate-wide allows, or create a
+mass waiver list. An unfulfilled expectation must remain visible under the
+warnings-denied baseline so stale exceptions are retired.
+
+Give each module one coherent responsibility and a small intentional public
+surface. Split only on independent reasons to change or independently testable
+concepts; do not create shallow forwarding layers, catch-all `utils`,
+`common`, `misc`, `helpers`, or `manager` modules, or arbitrary
+directories to reduce counts.
+
+Arrange non-trivial modules for progressive reading: module documentation and
+invariants; imports and module declarations; constants, identifiers,
+configuration, data, state, and error types; public traits and entry points;
+core implementations; private helpers; tests. Keep a private helper near its
+consumer only when that locality is clearer than putting incidental detail
+after the main flow.
+
+Use `snake_case` for modules, module files, functions, and variables;
+`UpperCamelCase` for types and traits; and `SCREAMING_SNAKE_CASE` for
+constants. Prefer names that state domain responsibility, ownership, failure,
+blocking, units, or bounds accurately. Avoid vague verbs, unexplained
+abbreviations, boolean mode flags, deeply nested control flow, hidden side
+effects, and mixed abstraction levels.
+
+Document public behavior, invariants, units, bounds, ownership, state
+transitions, expected errors, and panic conditions where applicable. Keep unit
+tests beside private implementation when they verify local invariants; keep
+public-API and multi-service behavior under `tests/`. A chronological or
+table-driven test may justify a narrow function-size expectation when helpers
+would obscure the state trace.
+
+Generated source must identify its generator and provenance, be reproducible,
+and never be hand-edited. A future source-shape checker may exclude generated
+files explicitly while compilation and tests continue to cover them.
+
+## Lint and checker baseline policy
+
+Adopt lints individually after a whole-tree audit. This checkpoint selects only
+`clippy::too_many_lines` in addition to the existing Rust `unsafe_code`
+policy. It does not enable Clippy's pedantic, restriction, or nursery groups.
+`missing_errors_doc`, `missing_panics_doc`, `mod_module_files`,
+`allow_attributes_without_reason`, and `excessive_nesting` remain candidates
+for separate measured increments.
+
+Do not use Clippy's `cognitive_complexity` lint as evidence of cognitive or
+cyclomatic complexity. Evaluate and validate a parse-aware Rust metric in a
+separate plan if complexity measurement becomes useful. Keep naming, source
+ordering, module cohesion, and abstraction quality in review unless a narrow
+parse-aware rule proves reliable; do not enforce architecture with regular
+expressions.
+
+A strict physical-line checker, dependency-policy tool, CI workflow, or
+toolchain pin requires its own justified baseline and review. New and touched
+code must not worsen known findings while a gate is deferred. Record any
+environment-only failure precisely rather than weakening a threshold or hiding
+warnings.
+
 ## Git expectations
 
 - Autonomous work occurs only on `codex/nightly`.
@@ -75,20 +171,21 @@ report a check as passing unless it was run successfully.
 - Do not push unless this file is explicitly updated to authorize pushing.
 - Never force-push, merge into the default branch, tag, release, publish a
   crate, deploy, or commit secrets.
-- The approved licensing intent is `MIT OR Apache-2.0`; do not add licence files
-  until the exact copyright holder is confirmed, and do not change the intent
-  without explicit human approval.
+- The approved licensing intent is `MIT OR Apache-2.0`; do not add licence
+  files until the exact copyright holder is confirmed, and do not change the
+  intent without explicit human approval.
 
 ## Completion
 
 A work item is complete only when one coherent behavior or decision checkpoint
 is implemented or recorded, applicable verification has actually passed, the
-diff is reviewed, traceability and project state are truthful, and the next run
-can continue without relying on chat history.
+complete diff and source form are reviewed, traceability and project state are
+truthful, and the next run can continue without relying on chat history.
 
 ## Prohibited progress substitutes
 
 Do not add empty crates, placeholder modules, generic traits, broad TODO trees,
-speculative portability layers, or dependencies merely to make the repository
-look active. Do not widen scope into hardware, no-std, RTOS, broad protocol, or
-deployment work before the host framework has a reviewed, verified need.
+speculative portability layers, dependencies, suppressions, or checker
+exclusions merely to make the repository look active. Do not widen scope into
+hardware, no-std, RTOS, broad protocol, or deployment work before the host
+framework has a reviewed, verified need.

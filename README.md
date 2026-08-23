@@ -30,16 +30,28 @@ command/telemetry boundaries remain unimplemented. Traceability distinguishes
 this evidence from broader v0.1 requirements and from containment of panics,
 hangs, cleanup failures, or other arbitrary faults.
 
+The first source-quality checkpoint tracks stable rustfmt at 100 columns and
+denies Clippy functions over a 60-line review threshold across all targets.
+Five cohesive chronological integration tests carry narrow reasoned
+expectations; production code needs no function-length waiver. Source ordering,
+module cohesion, names, comment prose, and exceptional physical lines remain
+review responsibilities rather than unsupported automated claims.
+
 ## Development
 
 The package is unpublished and uses stable Rust with no external dependencies.
 
 ```text
 cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 cargo test --workspace --all-features
-cargo doc --workspace --no-deps
+cargo doc --workspace --all-features --no-deps
 ```
+
+Run rustdoc with warnings denied; in PowerShell, set
+`$env:RUSTDOCFLAGS = "-D warnings"` before the documentation command. Contributor
+guidance records the remaining structural and document checks.
 
 ## Start here
 
@@ -59,6 +71,7 @@ cargo doc --workspace --no-deps
 - [Caller-driven owned work decision](docs/adr/0009-caller-driven-owned-work.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
+- [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)
 - [Contributor and automation guidance](AGENTS.md)
 
 ## Licence status

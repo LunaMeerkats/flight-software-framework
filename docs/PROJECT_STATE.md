@@ -5,25 +5,32 @@ Last updated: **2026-08-23**
 ## Current milestone
 
 Stage 1 is complete: the bounded logical LC1 model and owned synchronous
-start/work/stop/in-place-restart boundary are implemented. Stage 2 bounded
-interaction policies have recorded decisions, but implementation has not
-started.
+start/work/stop/in-place-restart boundary are implemented. The first
+source-quality policy checkpoint is also complete. Stage 2 bounded interaction
+policies have recorded decisions, but implementation has not started.
 
 ## Verified baseline
 
 - Implementation commit `43ef56b92da18302eee0c0a0a1f071a29aae0ade`
-  contains the caller-driven work boundary, complete RFF-REQ-002 integration
-  evidence, and additional partial RFF-REQ-008 evidence.
-- Formatting, linting with warnings denied, all 15 tests, and documentation
-  generation pass on stable rustc/cargo 1.96.1.
-- All 33 relative links resolve across 19 Markdown files; all eight requirement
+  contains the caller-driven work boundary and complete RFF-REQ-002 integration
+  evidence.
+- Source-quality commit `c8f2f7af9232aa370a3ea9ded211eac1581dd375`
+  adds tracked stable rustfmt and Clippy configuration, denies
+  `clippy::too_many_lines` at 60 for all targets, reflows the eight initial
+  comment-width findings, and records five narrow reasoned test expectations.
+- Formatting, all-target checking, warnings-denied Clippy, all 15 tests, and
+  warnings-denied all-feature documentation generation pass with rustc/cargo
+  1.96.1, rustfmt 1.9.0-stable, and Clippy 0.1.96.
+- No handwritten Rust physical line exceeds 100 columns and no comment-only Rust
+  line exceeds the 80-column review default.
+- All 37 relative links resolve across 20 Markdown files; all eight requirement
   identifiers match traceability; all eight referenced source identifiers are
-  defined in the 11-entry source register; both Markdown tables have consistent
-  row shapes.
-- Thirteen changed or controlling Markdown documents were rendered locally to
-  HTML and inspected structurally. README, project state, ADR-0009, and
-  traceability screenshots were also reviewed without a visible layout defect;
-  the wide traceability table retains its expected horizontal scroll.
+  defined in the 21-entry register; both Markdown tables have consistent row
+  shapes; and all 20 documents render structurally with one top-level heading.
+
+The tool versions record this baseline but do not set a minimum supported Rust
+version or a repository toolchain pin. The detailed initial audit is in
+[the source-quality baseline](verification/SOURCE_QUALITY_BASELINE.md).
 
 ## Current architecture
 
@@ -51,10 +58,24 @@ applications through registration, start, work, stop, restart, and work, so
 RFF-REQ-002 is verified. RFF-REQ-008 remains partial because no structured
 failure event exists.
 
+## Source-quality policy
+
+Stable rustfmt owns normal formatting at 100 columns. Clippy enforces a
+normally-60-line function threshold for every target. The five current
+expectations preserve complete chronological state/error traces and have
+item-level reasons; production functions need no exception.
+
+Comment prose, exceptional physical lines, progressive source ordering, module
+cohesion, abstraction level, and naming remain review responsibilities. A
+strict physical-line checker, additional selected lints, validated complexity
+metric, dependency-policy tool, CI workflow, and toolchain pin are deliberately
+deferred to separate measured increments. Clippy's cognitive-complexity lint is
+not accepted as evidence of cognitive or cyclomatic complexity.
+
 ## Work in progress
 
-No implementation work is in progress. The caller-driven owned-work increment
-is at its intended stopping point.
+No implementation work is in progress. The source-quality checkpoint reached
+its intended stopping point before Stage 2 feature growth.
 
 ## Highest risks and uncertainties
 
@@ -76,6 +97,10 @@ is at its intended stopping point.
   exhaustion, or hardware faults.
 - Queue-slot limits will not constitute memory bounds until message payloads
   receive a separate enforced bound.
+- The function-size gate can detect lines, not semantic complexity. Reviewers
+  must reject count-gaming and reassess each reasoned expectation when its test
+  changes.
+- No CI currently executes the local baseline.
 
 ## Important unresolved decisions
 
@@ -86,7 +111,8 @@ is at its intended stopping point.
 - RFF-REQ-007 still needs a host-adapter grammar and validation boundary.
 - No explicit minimum supported Rust version or panic-containment policy has
   been selected.
-- No CI configuration exists; all current verification is local.
+- Additional source lints, a physical-line checker, a complexity metric,
+  dependency-policy tooling, and toolchain pinning remain unselected.
 
 ## Most likely next tasks
 
@@ -100,11 +126,11 @@ is at its intended stopping point.
 
 ## Latest run
 
-2026-08-23: Added one synchronous caller-selected work operation for `Running`
-applications. Tests verify retained application state, typed callback
-suppression for registered/stopped/failed/unknown targets, exact concrete work
-error preservation, terminal `Failed`, successful subsequent peer work, and a
-complete two-application LC1 scenario. Formatting, linting, 15 tests, rustdoc,
-links, identifier consistency, Markdown structural rendering, and diff checks
-passed. Stage 1 and RFF-REQ-002 are complete; no automatic dispatch, context,
-messaging, clock, event service, dependency, thread, or executor was added.
+2026-08-23: Audited the complete Rust tree and policy configuration before
+unrelated feature growth. Added stable `rustfmt.toml` and `clippy.toml`,
+activated the individual 60-line Clippy gate, reflowed all eight comment-width
+findings, and retained five low-complexity chronological integration tests under
+narrow reasoned expectations. Expanded contributor guidance, exact public-source
+provenance, tool-version evidence, release gates, roadmap state, and the
+warnings-denied baseline. No runtime behavior, dependency, crate, thread,
+executor, checker, CI workflow, licence, remote, or push was added.

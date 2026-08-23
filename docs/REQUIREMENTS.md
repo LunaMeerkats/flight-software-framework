@@ -125,7 +125,8 @@ These gates support the requirements but are not additional system behaviors:
 - a documented executable host sample demonstrates RFF-REQ-002 through
   RFF-REQ-008 and carries the RFF-REQ-001 safety notice;
 - RFF-REQ-001 is reviewed separately across all user-facing entry points;
-- formatting, linting, unit, integration, and documentation checks pass in CI;
+- formatting, selected source-quality lints, warning-free checks, unit and
+  integration tests, and documentation checks pass in CI;
 - important requirements map to exact evidence in the traceability register;
 - dependency licences and enabled features are reviewed;
 - unsupported claims and known limitations receive a human architecture review.

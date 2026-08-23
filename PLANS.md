@@ -1,138 +1,127 @@
-# Plan: caller-driven owned application work
+# Plan: initial source-quality policy checkpoint
 
 Status: **Complete**
 Date: **2026-08-23**
 
 ## Objective
 
-Add the smallest synchronous caller-driven work boundary to the existing owned
-runtime. Only a `Running` application shall receive work. Successful work shall
-retain `Running`; a returned concrete work error shall remain available in the
-caller-visible result while the selected application enters terminal `Failed`.
-
-Use the public integration evidence to run two independently defined
-applications through registration, start, work, stop, restart, and work. This
-shall complete the remaining RFF-REQ-002 host scenario without introducing a
-sample binary or widening the runtime surface.
+Measure the existing Rust source against the newly approved source-quality
+rules and adopt the smallest coherent machine-enforced checkpoint before Stage
+2 feature growth. Track stable 100-column formatting, activate one audited
+60-line function review gate, resolve or justify every initial finding, and
+record exact public-source provenance and waiver policy.
 
 ## Context
 
-ADR-0001 selects a serial, caller-driven host runtime. ADR-0003 already decides
-that only `Running` applications receive work, successful work retains
-`Running`, and a returned work error enters terminal `Failed`. The runtime now
-owns and executes start, stop, and in-place restart, but it has no work
-operation. The roadmap and project state identify this as the next Stage 1
-slice and as the concrete dispatch consumer needed before bounded inbox work.
+The pre-change baseline passed with 15 tests, but the repository encoded only
+the workspace `unsafe_code = "forbid"` lint. It had no tracked rustfmt or Clippy
+configuration, source-shape checker, CI workflow, dependency policy, or
+toolchain pin. Contributor guidance omitted `cargo check`, warnings-denied
+rustdoc, source ordering, module layout, naming, and lint-waiver rules.
 
-This is a local pre-v0.1 API decision. A focused ADR will compare a direct
-`Application::work` callback with caller-supplied work and a premature service
-context. No external research is needed because accepted local decisions
-already define the observable behavior.
+The whole-tree audit found no handwritten Rust physical line over 100 columns,
+eight comment-only lines between 81 and 83 columns, and five integration tests
+between 70 and 76 Clippy-counted lines at a proposed threshold of 60. Production
+functions were below the threshold. The five tests are linear lifecycle and
+failure traces whose complete order is part of the evidence.
 
-This slice deliberately stops before service contexts, time, scheduling,
-messages, events, configuration, threads, async execution, panic handling,
-recovery from `Failed`, or automatic work iteration.
+Official Rust tooling and style sources define the mechanisms. JPL, NASA, ECSS,
+and JAXA sources inform the value of local coding rules, review, analysis, and
+recorded evidence, but do not prescribe this Rust policy or apply to this
+experimental repository. A bounded Australian public-source search found no
+independent agency Rust or code-style standard; the absence is recorded rather
+than filled by inference.
 
 ## Acceptance criteria
 
-- The application boundary exposes one synchronous work callback and a
-  concrete work-error type without changing the start, stop, or restart error
-  contracts.
-- `Runtime::work` invokes the selected `Running` application exactly once.
-  Success leaves the record in `Running` and preserves application-owned state.
-- Registered, stopped, and failed targets return a typed state error before
-  application code runs and retain their current state. Unknown identities
-  also return a typed error without invoking application code or mutating
-  records.
-- A returned work error remains programmatically available in the exact runtime
-  result and commits the selected application to terminal `Failed`.
-- One application's returned work error does not prevent a separately defined
-  running peer from completing subsequent work and remaining `Running`.
-- A public integration test registers two independently defined applications
-  and observes both completing start, stop, and restart, with eligible work
-  before and after restart. Together with the existing exhaustive LC1 tests,
-  this satisfies RFF-REQ-002 without claiming broader sample-mission evidence.
-- Runtime identity, length, capacity, application ownership, serial execution,
-  and dependency-free construction remain unchanged.
-- Documentation describes only cooperative returned-error behavior. RFF-REQ-008
-  remains partial until a structured failure event exists.
-- The documented baseline and repository consistency checks pass before local
-  commits are created.
+- Track stable rustfmt with `max_width = 100`.
+- Track Clippy with `too-many-lines-threshold = 60` and deny only
+  `clippy::too_many_lines` through inherited workspace lints.
+- Reflow all eight initial comment-only width findings.
+- Review all five test findings individually. Use item-level expectations with
+  specific reasons only where extracting the chronological state trace would
+  make the test harder to understand.
+- Leave no unexplained or broad lint suppression, threshold increase, lint-group
+  enablement, generated waiver list, new dependency, or runtime behavior change.
+- Record naming, module layout, progressive ordering, documentation, generated
+  code, manual-review boundaries, tool versions, waiver retirement, and
+  checker-baseline rules in `AGENTS.md`.
+- Record exact public sources and adopt/adapt/reject decisions in the source
+  register.
+- Update the release gate, roadmap, project state, README, and a durable
+  source-quality baseline without inventing a behavioral requirement or ADR.
+- Pass the expanded serial baseline and repository consistency checks before
+  the documentation commit.
 
 ## Proposed files and components
 
-- `src/runtime.rs`, `src/lib.rs`, and the narrow shared state-error vocabulary
-  in `src/lifecycle.rs` for `Application::work`, `Runtime::work`, and the typed
-  caller-visible work error.
-- `tests/application_runtime.rs` for retained-state success, complete
-  two-application lifecycle evidence, non-running and unknown callback
-  suppression, exact concrete error/source preservation, and peer progress.
-- A focused ADR for direct synchronous work and its operation-specific error.
-- Existing contributor, architecture, roadmap, state, requirements, and
-  traceability documents for truthful boundary and evidence updates.
+- `rustfmt.toml`, `clippy.toml`, and `Cargo.toml` for selected machine
+  configuration.
+- Existing Rust comments and the five public integration tests for the complete
+  audited finding set.
+- `AGENTS.md`, `README.md`, `docs/research/SOURCES.md`,
+  `docs/verification/SOURCE_QUALITY_BASELINE.md`, `docs/REQUIREMENTS.md`,
+  `docs/ROADMAP.md`, and `docs/PROJECT_STATE.md` for durable policy and state.
+- This plan for scope, evidence, risks, and the stopping point.
 
 ## Verification approach
 
 - Run `cargo fmt --all -- --check`.
-- Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+- Run `cargo check --workspace --all-targets --all-features`.
+- Run
+  `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
 - Run `cargo test --workspace --all-features`.
-- Run `cargo doc --workspace --no-deps`.
+- Run `cargo doc --workspace --all-features --no-deps` with
+  `RUSTDOCFLAGS=-D warnings`.
+- Audit handwritten Rust lines over 100 columns and comment-only lines over 80.
 - Resolve relative Markdown links and cross-check requirement/source
-  identifiers.
-- Render changed Markdown to HTML and inspect its document structure; record
-  any environment limitation instead of treating it as a pass.
-- Run `git diff --check`, inspect the complete diff, and confirm repository
-  status before committing.
+  identifiers and Markdown table shapes.
+- Render changed Markdown to HTML and inspect its document structure.
+- Run `git diff --check`, inspect the complete diff, and confirm branch/status
+  before local commits.
 
 ## Known risks
 
-- Extending the pre-v0.1 `Application` trait is source-breaking for
-  implementors, although the package is unpublished and this behavior is
-  already selected by ADR-0003.
-- A returned work error may follow partial application-internal mutation. The
-  runtime records `Failed` but cannot promise rollback, cleanup, isolation, or
-  a recoverable state.
-- Four operation-specific error wrappers duplicate a small amount of display
-  and source plumbing. This slice will reassess that pattern but will not force
-  a shared abstraction without clearer evidence.
-- Direct `work` has no framework context, deadline, fairness, or automatic
-  iteration semantics. Those remain deliberately undefined.
-- The runtime record bound still does not constrain application-internal
-  allocation, blocking, I/O, thread creation, or error size.
-- Runtime identities retain the documented origin-alias risk; this slice does
-  not change identity representation.
+- Function length is a coarse review trigger and does not measure correctness,
+  coupling, nesting, or complexity.
+- Suppressing the five tests without precise reasons would hide debt; splitting
+  them mechanically would obscure chronological evidence. Each expectation must
+  remain narrow and become unfulfilled when the finding disappears.
+- Stable rustfmt does not wrap every comment, URL, literal, macro, or generated
+  line, so a formatting pass is not a complete physical-line proof.
+- Enabling additional lints in this increment would mix separate audits and
+  could create warning debt or cosmetic churn.
+- Agency material can be misrepresented as an applicable Rust standard. Every
+  source decision must distinguish local adaptation from compliance.
 
 ## Safe rollback or stopping point
 
-Stop after caller-driven work and the complete two-application LC1 integration
-scenario are verified and documented. If the API cannot remain coherent
-without service contexts or broader execution policy, preserve the decision
-analysis but do not commit broken implementation. Do not continue into inboxes,
-time, events, scheduling, configuration, concurrency, or dependencies in this
-increment.
+Stop after the tracked configuration, complete initial finding disposition,
+durable policy/provenance, and expanded serial baseline are coherent. If the
+60-line gate cannot be adopted without artificial fragmentation or broad
+suppression, retain the measured baseline and rustfmt policy but defer the lint.
+Do not continue into messaging, events, time, configuration, CI, dependency
+tooling, complexity tooling, or another lint in this increment.
 
 ## Result
 
-The stopping point was reached in implementation commit
-`43ef56b92da18302eee0c0a0a1f071a29aae0ade`. The dependency-free runtime now
-validates and executes one synchronous caller-selected work operation.
-Successful work mutably borrows the retained application value and preserves
-`Running`; a returned concrete work error remains available through
-`RuntimeWorkError` while only the selected record enters terminal `Failed`.
+Implementation commit `c8f2f7af9232aa370a3ea9ded211eac1581dd375`
+reached the code-side stopping point. It adds the two stable configuration
+files, activates the individual workspace lint, reflows all eight comment
+findings, and adds five item-level expectations with review-specific reasons.
+No production function requires an exception.
 
-Two new public tests plus the extended unknown-identity test cover retained
-state, registered/stopped/failed/unknown callback suppression, exact returned-
-error and source preservation, terminal failure, and successful subsequent peer
-work. One test runs separately defined healthy and stateful applications through
-registration, start, work, stop, restart, and work. Together with the existing
-logical transition matrix, this completes RFF-REQ-002. The suite contains 15
-passing tests; RFF-REQ-008 remains partial only because no structured failure
-event exists.
+The initial audit and final configuration use rustc/cargo 1.96.1, rustfmt
+1.9.0-stable, and Clippy 0.1.96. The implementation-side expanded baseline
+passed: formatting, all-target checking, warnings-denied Clippy, 15 tests,
+warnings-denied all-feature rustdoc, Git whitespace, zero Rust physical lines
+over 100 columns, and zero comment-only Rust lines over 80 columns.
 
-ADR-0009 records the direct work callback, narrow `NotRunning` eligibility
-error, operation-specific error wrapper, and deferral of service contexts and
-automatic dispatch. Stage 1 is complete. Formatting, warnings-denied linting,
-tests, rustdoc, all 33 relative links across 19 Markdown files, requirement and
-source identifier consistency, Markdown table shapes, rendered-document review,
-and Git whitespace checks pass. No external research, dependency, context,
-message bus, clock, event service, thread, executor, or push was added.
+The documentation commit records the exact research, adopt/adapt/reject
+decisions, contributor and waiver policy, release gate, roadmap, project state,
+and repository-consistency verification. All 37 relative links resolve across
+20 Markdown files; eight requirements match traceability; eight referenced
+source identifiers resolve in the 21-entry register; both tables have
+consistent row shapes; and all 20 documents render structurally with one
+top-level heading. The run stops before unrelated Stage 2 behavior or another
+enforcement mechanism.
