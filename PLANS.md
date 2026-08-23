@@ -1,107 +1,95 @@
-# Plan: apply source-formatting principles
+# Plan: prove bounded available-endpoint fan-out
 
-Status: **Complete**
-Date: **2026-08-23**
+Status: **In progress**
+Date: **2026-08-24**
 
 ## Objective
 
-Apply the newly recorded source-form principles to the existing runtime code
-without changing public behavior. Improve progressive reading and naming,
-make public callback failure documentation explicit, and retire only those
-function-size expectations that clearer test structure makes unnecessary.
+Implement the smallest available-endpoint routing core from ADR-0004: an
+inline payload with an enforced maximum, immutable bounded inbox topology,
+stable publish/subscribe fan-out, exact reject-newest saturation, and an
+ordered publisher-visible result.
 
 ## Context
 
-The pre-change baseline passed with 15 tests and all enforced formatting and
-lint gates. The audit found no width, unsafe-code, module-layout, nesting, or
-production function-size violation. It did find:
+Stage 1 and the first source-quality checkpoint are complete. The clean
+pre-change baseline passes with 16 tests. ADR-0004 already fixes queue, routing,
+ordering, and overflow behavior, but the first payload representation was still
+unselected.
 
-- private runtime record-lookup helpers before the public lifecycle methods;
-- four public `Application` callbacks whose expected errors were described but
-  lacked explicit `# Errors` sections;
-- one restart-faulting fixture implementation separated from its type;
-- a start-only fault fixture with a vague name; and
-- two test expectations whose underlying tests could become clearer through a
-  focused behavior split and a smaller identity fixture.
-
-The other three long tests remain cohesive chronological lifecycle or
-containment scenarios. Splitting them would add artificial helpers or scatter
-the state trace.
+This slice will use a mission-selected `Copy + Eq` topic type and an inline
+const-generic byte payload. It will model configured endpoints as available so
+the queue and fan-out policy can be verified without prematurely changing
+`Application::work`. Runtime ownership, lifecycle-derived unavailability,
+queue clearing on stop/failure, restart reconnection, and application access
+remain later integration work. RFF-REQ-003 will therefore remain partial.
 
 ## Acceptance criteria
 
-- Present all public `Runtime` entry points before private record-lookup
-  helpers.
-- Give each fallible public `Application` callback an accurate `# Errors`
-  section without implying cleanup, containment, or recovery.
-- Co-locate the restart-faulting fixture and its implementation.
-- Rename the start-only fault fixture and its observations to state the
-  operation and peer roles precisely.
-- Split restart rejection from successful retained-state restart because they
-  are independently meaningful behaviors.
-- Replace irrelevant dummy applications in the unknown-identity test with a
-  bounded logical identity issuer and share the expected lifecycle error.
-- Retire exactly the two expectations made unnecessary by those changes; keep
-  the three cohesive expectations with their existing specific reasons.
-- Preserve the public API, lifecycle behavior, ownership, capacity, error
-  values, dependencies, and runtime execution model.
-- Pass all repository checks and independent diff review before committing.
+- Enforce the message payload maximum, accepting exactly the configured bound
+  and rejecting one byte beyond it.
+- Construct the caller-supplied configured inboxes and unique topic
+  subscriptions as one immutable topology with positive per-inbox capacities.
+- Require application identities in registration order and document the
+  existing same-slot foreign-identity limitation.
+- Reserve queue and topology storage during construction; add no dependency,
+  thread, executor, wait for inbox capacity or subscriber progress, retry,
+  spill path, or hidden work.
+- Deliver accepted messages FIFO within each inbox across topics.
+- Retain older entries and reject the newest delivery at the exact logical
+  capacity while continuing fan-out to unaffected subscribers.
+- Return stable registration-order destination outcomes whose derived class is
+  `NoSubscribers`, `Complete`, `Partial`, or `WhollyUndelivered`.
+- Reserve the complete report before mutating an inbox so report-allocation
+  failure delivers nothing.
+- Test duplicate topics, invalid topology, unknown identities, payload bounds,
+  exact saturation, cross-topic FIFO, partial fan-out, all-full publication,
+  stable result ordering, and no-subscriber publication.
+- Keep new and touched Rust within the source-form policy without adding a lint
+  suppression.
 
 ## Files and components
 
-- `src/runtime.rs`: public callback documentation and public-first method
-  ordering.
-- `tests/application_runtime.rs`: fixture naming and locality, focused restart
-  evidence, and simplified unknown-identity setup.
-- `README.md`, `docs/PROJECT_STATE.md`, `docs/ROADMAP.md`,
-  `docs/verification/SOURCE_QUALITY_BASELINE.md`, and
-  `docs/verification/TRACEABILITY.md`: current counts and durable evidence.
-- This plan: scope, acceptance criteria, verification, and stopping point.
+- `src/messaging.rs`: bounded messages, topology, fan-out outcomes, and inbox
+  access.
+- `src/lib.rs`: the intentional public pre-v0.1 surface.
+- `tests/message_bus.rs`: public behavior and boundary evidence.
+- `docs/adr/0010-bounded-message-routing-core.md`: representation and slice
+  boundary.
+- `README.md`, ADR-0004, project state, roadmap, and traceability: truthful
+  partial implementation and evidence.
+- This plan: acceptance, verification, risks, and stopping point.
 
 ## Verification approach
 
 - Run `cargo fmt --all -- --check`.
 - Run `cargo check --workspace --all-targets --all-features`.
 - Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
-- Probe `clippy::missing_errors_doc` separately and require zero findings.
 - Run `cargo test --workspace --all-features`.
 - Run warnings-denied all-feature rustdoc generation.
-- Audit handwritten Rust physical and comment-only widths.
-- Confirm exactly three fulfilled reasoned expectations remain.
-- Resolve relative Markdown links, render changed documents, and check
-  requirement/source identifiers and table shapes.
+- Audit handwritten Rust physical and comment-only widths and all reasoned
+  expectations.
+- Resolve relative Markdown links; render changed documents; check requirement
+  and source identifiers and table shapes.
 - Run `git diff --check` and review the complete diff.
 
 ## Known risks
 
-- Source movement can hide an accidental semantic edit; the complete diff and
-  behavior tests must show only equivalent ordering, naming, documentation, and
-  test-evidence structure.
-- Splitting a chronological test merely to satisfy a line threshold can make
-  evidence harder to follow. Only the restart test has two independently named
-  responsibilities; the remaining three expectations stay in place.
-- Replacing the unknown-ID fixture must preserve a genuinely out-of-range
-  identity and all four callback-suppression assertions.
-- `missing_errors_doc` is probed but not enabled as a new workspace gate; lint
-  adoption remains a separate policy decision.
+- The routing core is not yet owned by `Runtime`; callers could pair it with a
+  different same-shaped identity issuer or fail to synchronize lifecycle state.
+- Treating configured endpoints as available is only a routing test boundary,
+  not the accepted stopped/failed availability policy.
+- Inline payload slots consume the configured maximum even for short payloads;
+  a poorly chosen maximum can waste storage or stack space.
+- External code can retain dequeued messages and publish reports, so this slice
+  bounds framework-owned inbox/topology storage rather than all caller memory.
+- A returned report is allocated per publish. Allocation failure must occur
+  before any delivery; process-wide allocation failure remains outside broader
+  fault-containment claims.
 
 ## Safe rollback or stopping point
 
-Stop after the runtime and integration-test source is progressively ordered,
-the two avoidable expectations are retired, and all existing behavior remains
-verified. Do not continue into messaging, another lint gate, module splitting,
-generic test fixtures, or unrelated cleanup.
-
-## Result
-
-Implementation commit `c2aa32772c2fd32a0b87893f913e32ecacc5d051`
-reached the code-side stopping point. All public runtime methods now precede
-private lookup details; the four application callbacks have explicit error
-sections; test fixture names and implementation locality are clearer; and the
-restart and unknown-identity tests retain their evidence without line-count
-exceptions.
-
-Three reasoned expectations remain, down from five. The runtime integration
-suite now contains ten focused tests, and the complete suite contains 16 tests.
-No public API, runtime behavior, dependency, thread, executor, or message path
-changed.
+Stop after the available-endpoint routing core, its public tests, ADR, and
+partial traceability are coherent and verified. Do not add lifecycle hooks,
+service contexts, automatic dispatch, event reporting, time, scheduling,
+runtime mutation APIs, or external protocol identifiers in this run.

@@ -9,11 +9,17 @@ compatibility claim.
 "#]
 
 mod lifecycle;
+mod messaging;
 mod runtime;
 
 pub use lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry,
     RegistrationError, RegistryCreateError,
+};
+pub use messaging::{
+    ApplicationInboxConfig, DeliveryStatus, DestinationOutcome, InboxAccessError, Message,
+    MessageBus, MessageBusCreateError, MessageCreateError, PublishClassification, PublishError,
+    PublishReport,
 };
 pub use runtime::{
     Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,

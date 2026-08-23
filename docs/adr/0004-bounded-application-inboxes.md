@@ -1,6 +1,6 @@
 # ADR-0004: Bounded application inboxes and partial fan-out
 
-- Status: Accepted; not implemented
+- Status: Accepted; available-endpoint routing core partially implemented
 - Date: 2026-08-05
 - Scope: In-process v0.1 publish/subscribe delivery
 
@@ -24,7 +24,9 @@ compatibility claim. (`SRC-NASA-CFE`)
   stable application-registration order.
 - Successfully accepted deliveries are FIFO within one inbox across all topics,
   ordered by serial publish-call order.
-- Publication never blocks, waits, retries, spills, or creates hidden work.
+- Publication never waits for inbox capacity or subscriber progress, retries,
+  spills, or creates hidden work. This queue policy is not a claim that
+  arbitrary mission topic comparisons or host allocation cannot block.
 - An available inbox with space accepts one delivery. A full inbox retains its
   older entries and rejects the incoming delivery. An unavailable endpoint does
   not enqueue. Every other destination is still processed.
@@ -51,6 +53,19 @@ compatibility claim. (`SRC-NASA-CFE`)
   fairness rules and weaken the per-application total bound.
 - A global pool, reliable delivery, priorities, and dynamic subscriptions are
   deferred until requirements justify them.
+
+## Current implementation boundary
+
+[ADR-0010](0010-bounded-message-routing-core.md) implements the first
+available-endpoint routing core with inline bounded payloads, immutable topic
+sets, pre-reserved positive-capacity inboxes, FIFO dequeue, reject-newest
+fan-out, stable per-destination outcomes, and publisher-visible classification.
+
+The core is not yet owned by the application runtime and treats every
+configured endpoint as available. It does not implement lifecycle-derived
+unavailability, discarded-count clearing, restart reconnection, application
+self-publication, or the one in-flight dispatch rule. This ADR and RFF-REQ-003
+therefore remain only partially implemented.
 
 ## Required verification and revisit conditions
 
