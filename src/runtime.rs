@@ -23,9 +23,14 @@ pub trait Application {
 
     /// Attempts to start the application.
     ///
-    /// A returned error is retained in [`RuntimeStartError`] and moves the
-    /// runtime record to terminal [`ApplicationState::Failed`]. Panics and
-    /// non-returning calls are outside this cooperative failure boundary.
+    /// Panics and non-returning calls are outside this cooperative failure
+    /// boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns an application-defined error when cooperative startup fails.
+    /// The runtime retains that error in [`RuntimeStartError`] and moves the
+    /// runtime record to terminal [`ApplicationState::Failed`].
     fn start(&mut self) -> Result<(), Self::StartError>;
 
     /// The concrete error returned by this application's work operation.
@@ -34,10 +39,14 @@ pub trait Application {
     /// Attempts one caller-selected unit of application work.
     ///
     /// The runtime invokes this callback only while the application is
-    /// [`ApplicationState::Running`]. Success retains that state. A returned
-    /// error is retained in [`RuntimeWorkError`] and moves the runtime record
-    /// to terminal [`ApplicationState::Failed`]. Panics and non-returning calls
-    /// are outside this cooperative failure boundary.
+    /// [`ApplicationState::Running`]. Success retains that state. Panics and
+    /// non-returning calls are outside this cooperative failure boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns an application-defined error when the cooperative work attempt
+    /// fails. The runtime retains that error in [`RuntimeWorkError`] and moves
+    /// the runtime record to terminal [`ApplicationState::Failed`].
     fn work(&mut self) -> Result<(), Self::WorkError>;
 
     /// The concrete error returned by this application's stop operation.
@@ -45,10 +54,15 @@ pub trait Application {
 
     /// Attempts to stop the application.
     ///
-    /// A returned error is retained in [`RuntimeStopError`] and moves the
-    /// runtime record to terminal [`ApplicationState::Failed`]. Success records
-    /// only that this cooperative callback returned successfully; the runtime
-    /// does not independently prove cleanup of application-owned resources.
+    /// Success records only that this cooperative callback returned
+    /// successfully; the runtime does not independently prove cleanup of
+    /// application-owned resources.
+    ///
+    /// # Errors
+    ///
+    /// Returns an application-defined error when the cooperative stop attempt
+    /// fails. The runtime retains that error in [`RuntimeStopError`] and moves
+    /// the runtime record to terminal [`ApplicationState::Failed`].
     fn stop(&mut self) -> Result<(), Self::StopError>;
 
     /// The concrete error returned by this application's restart operation.
@@ -57,10 +71,14 @@ pub trait Application {
     /// Attempts to restart the stopped application in place.
     ///
     /// The callback receives the same application value retained across its
-    /// successful start and stop. A returned error is retained in
-    /// [`RuntimeRestartError`] and moves the runtime record to terminal
-    /// [`ApplicationState::Failed`]. The runtime does not reconstruct or reset
+    /// successful start and stop. The runtime does not reconstruct or reset
     /// application-owned state.
+    ///
+    /// # Errors
+    ///
+    /// Returns an application-defined error when cooperative restart fails.
+    /// The runtime retains that error in [`RuntimeRestartError`] and moves the
+    /// runtime record to terminal [`ApplicationState::Failed`].
     fn restart(&mut self) -> Result<(), Self::RestartError>;
 }
 
@@ -394,21 +412,6 @@ impl<A> Runtime<A> {
         let record = self.record(application_id)?;
         Ok(record.state)
     }
-
-    fn record(&self, application_id: ApplicationId) -> Result<&RuntimeRecord<A>, LifecycleError> {
-        self.records
-            .get(application_id.index())
-            .ok_or(LifecycleError::UnknownApplication { application_id })
-    }
-
-    fn record_mut(
-        &mut self,
-        application_id: ApplicationId,
-    ) -> Result<&mut RuntimeRecord<A>, LifecycleError> {
-        self.records
-            .get_mut(application_id.index())
-            .ok_or(LifecycleError::UnknownApplication { application_id })
-    }
 }
 
 impl<A: Application> Runtime<A> {
@@ -593,5 +596,22 @@ impl<A: Application> Runtime<A> {
                 })
             }
         }
+    }
+}
+
+impl<A> Runtime<A> {
+    fn record(&self, application_id: ApplicationId) -> Result<&RuntimeRecord<A>, LifecycleError> {
+        self.records
+            .get(application_id.index())
+            .ok_or(LifecycleError::UnknownApplication { application_id })
+    }
+
+    fn record_mut(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Result<&mut RuntimeRecord<A>, LifecycleError> {
+        self.records
+            .get_mut(application_id.index())
+            .ok_or(LifecycleError::UnknownApplication { application_id })
     }
 }
