@@ -38,8 +38,8 @@ pub enum ApplicationState {
     /// An application lifecycle or work operation returned an error.
     ///
     /// This state is terminal in LC1. The standalone registry cannot enter it,
-    /// while [`crate::Runtime`] enters it when application start, stop, or
-    /// restart returns an error.
+    /// while [`crate::Runtime`] enters it when application start, work, stop,
+    /// or restart returns an error.
     Failed,
 }
 
@@ -105,7 +105,8 @@ impl fmt::Display for RegistrationError {
 
 impl Error for RegistrationError {}
 
-/// A lifecycle request rejected by the logical registry or owned runtime.
+/// A lifecycle or running-only work request rejected by the logical registry or
+/// owned runtime.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum LifecycleError {
     /// The identity's slot does not name a record in this registry or runtime.
@@ -115,6 +116,14 @@ pub enum LifecycleError {
     UnknownApplication {
         /// Requested runtime-local identity.
         application_id: ApplicationId,
+    },
+    /// Application work requires a record in [`ApplicationState::Running`].
+    NotRunning {
+        /// Requested runtime-local identity.
+        application_id: ApplicationId,
+        /// Current state, which remains unchanged because application work was
+        /// not invoked.
+        state: ApplicationState,
     },
     /// The operation is not valid in the record's current state.
     InvalidTransition {
@@ -136,6 +145,13 @@ impl fmt::Display for LifecycleError {
                     "application {application_id:?} is not registered"
                 )
             }
+            Self::NotRunning {
+                application_id,
+                state,
+            } => write!(
+                formatter,
+                "application {application_id:?} cannot perform work while {state:?}"
+            ),
             Self::InvalidTransition {
                 application_id,
                 state,

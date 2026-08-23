@@ -1,8 +1,9 @@
-//! Owned application lifecycle execution.
+//! Owned application lifecycle and work execution.
 //!
-//! This module adds synchronous start, stop, and in-place restart boundaries
-//! over the LC1 lifecycle vocabulary. It deliberately omits work dispatch,
-//! factories, threads, executors, panic containment, and recovery policy.
+//! This module adds synchronous start, caller-selected work, stop, and in-place
+//! restart boundaries over the LC1 lifecycle vocabulary. It deliberately omits
+//! automatic dispatch, scheduling, service contexts, factories, threads,
+//! executors, panic containment, and recovery policy.
 
 use std::error::Error;
 use std::fmt;
@@ -11,11 +12,11 @@ use crate::lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, next_state,
 };
 
-/// The lifecycle behavior currently required by the owned runtime.
+/// The lifecycle and work behavior currently required by the owned runtime.
 ///
 /// The runtime invokes these methods synchronously and starts no hidden work.
-/// Work, service context, and recovery behaviors are deliberately absent until
-/// later slices can define and verify them.
+/// Service context and recovery behaviors are deliberately absent until later
+/// slices can define and verify them.
 pub trait Application {
     /// The concrete error returned by this application's start operation.
     type StartError: Error + 'static;
@@ -26,6 +27,18 @@ pub trait Application {
     /// runtime record to terminal [`ApplicationState::Failed`]. Panics and
     /// non-returning calls are outside this cooperative failure boundary.
     fn start(&mut self) -> Result<(), Self::StartError>;
+
+    /// The concrete error returned by this application's work operation.
+    type WorkError: Error + 'static;
+
+    /// Attempts one caller-selected unit of application work.
+    ///
+    /// The runtime invokes this callback only while the application is
+    /// [`ApplicationState::Running`]. Success retains that state. A returned
+    /// error is retained in [`RuntimeWorkError`] and moves the runtime record to
+    /// terminal [`ApplicationState::Failed`]. Panics and non-returning calls are
+    /// outside this cooperative failure boundary.
+    fn work(&mut self) -> Result<(), Self::WorkError>;
 
     /// The concrete error returned by this application's stop operation.
     type StopError: Error + 'static;
@@ -164,6 +177,44 @@ impl<E: Error + 'static> Error for RuntimeStartError<E> {
     }
 }
 
+/// A runtime work request rejected by lifecycle or failed by the application.
+#[derive(Debug, Eq, PartialEq)]
+pub enum RuntimeWorkError<E> {
+    /// Lifecycle validation rejected the request before application code ran.
+    Lifecycle(LifecycleError),
+    /// Application work returned a cooperative failure.
+    Application {
+        /// Runtime-local identity of the application that returned the error.
+        application_id: ApplicationId,
+        /// The original concrete error returned by [`Application::work`].
+        source: E,
+    },
+}
+
+impl<E: fmt::Display> fmt::Display for RuntimeWorkError<E> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Lifecycle(error) => error.fmt(formatter),
+            Self::Application {
+                application_id,
+                source,
+            } => write!(
+                formatter,
+                "application {application_id:?} returned a work error: {source}"
+            ),
+        }
+    }
+}
+
+impl<E: Error + 'static> Error for RuntimeWorkError<E> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Lifecycle(error) => Some(error),
+            Self::Application { source, .. } => Some(source),
+        }
+    }
+}
+
 /// A runtime stop request rejected by lifecycle or failed by the application.
 #[derive(Debug, Eq, PartialEq)]
 pub enum RuntimeStopError<E> {
@@ -249,9 +300,10 @@ struct RuntimeRecord<A> {
 /// A finite-capacity, caller-driven owner of application values.
 ///
 /// This pre-v0.1 slice supports registration, state inspection, and synchronous
-/// start, stop, and in-place restart. The concrete application representation
-/// is selected by the mission. Different application types can be composed
-/// explicitly in an enum without requiring trait-object allocation.
+/// start, caller-selected work, stop, and in-place restart. The concrete
+/// application representation is selected by the mission. Different
+/// application types can be composed explicitly in an enum without requiring
+/// trait-object allocation.
 ///
 /// Construction reserves storage for the configured record count. That bounds
 /// the number of runtime records, not memory allocated inside application or
@@ -397,6 +449,48 @@ impl<A: Application> Runtime<A> {
             Err(source) => {
                 record.state = ApplicationState::Failed;
                 Err(RuntimeStartError::Application {
+                    application_id,
+                    source,
+                })
+            }
+        }
+    }
+
+    /// Invokes one unit of application work while the record is running.
+    ///
+    /// Success retains [`ApplicationState::Running`]. A returned application
+    /// error is preserved in [`RuntimeWorkError::Application`] and commits
+    /// terminal [`ApplicationState::Failed`].
+    ///
+    /// # Errors
+    ///
+    /// Unknown applications and applications that are not running return
+    /// [`RuntimeWorkError::Lifecycle`] before application code is invoked.
+    /// Cooperative application failure returns [`RuntimeWorkError::Application`].
+    pub fn work(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Result<ApplicationState, RuntimeWorkError<A::WorkError>> {
+        let record = self
+            .record_mut(application_id)
+            .map_err(RuntimeWorkError::Lifecycle)?;
+        let current = record.state;
+
+        if current != ApplicationState::Running {
+            return Err(RuntimeWorkError::Lifecycle(LifecycleError::NotRunning {
+                application_id,
+                state: current,
+            }));
+        }
+
+        match record.application.work() {
+            Ok(()) => {
+                record.state = ApplicationState::Running;
+                Ok(ApplicationState::Running)
+            }
+            Err(source) => {
+                record.state = ApplicationState::Failed;
+                Err(RuntimeWorkError::Application {
                     application_id,
                     source,
                 })

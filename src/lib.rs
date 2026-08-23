@@ -17,5 +17,5 @@ pub use lifecycle::{
 };
 pub use runtime::{
     Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,
-    RuntimeStartError, RuntimeStopError,
+    RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
