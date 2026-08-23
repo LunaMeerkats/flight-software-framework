@@ -35,9 +35,9 @@ pub trait Application {
     ///
     /// The runtime invokes this callback only while the application is
     /// [`ApplicationState::Running`]. Success retains that state. A returned
-    /// error is retained in [`RuntimeWorkError`] and moves the runtime record to
-    /// terminal [`ApplicationState::Failed`]. Panics and non-returning calls are
-    /// outside this cooperative failure boundary.
+    /// error is retained in [`RuntimeWorkError`] and moves the runtime record
+    /// to terminal [`ApplicationState::Failed`]. Panics and non-returning calls
+    /// are outside this cooperative failure boundary.
     fn work(&mut self) -> Result<(), Self::WorkError>;
 
     /// The concrete error returned by this application's stop operation.
@@ -253,7 +253,8 @@ impl<E: Error + 'static> Error for RuntimeStopError<E> {
     }
 }
 
-/// A runtime restart request rejected by lifecycle or failed by the application.
+/// A runtime restart request rejected by lifecycle or failed by the
+/// application.
 #[derive(Debug, Eq, PartialEq)]
 pub enum RuntimeRestartError<E> {
     /// Lifecycle validation rejected the request before application code ran.
@@ -421,7 +422,8 @@ impl<A: Application> Runtime<A> {
     ///
     /// Invalid or unknown lifecycle requests return
     /// [`RuntimeStartError::Lifecycle`] before application code is invoked.
-    /// Cooperative application failure returns [`RuntimeStartError::Application`].
+    /// Cooperative application failure returns
+    /// [`RuntimeStartError::Application`].
     pub fn start(
         &mut self,
         application_id: ApplicationId,
@@ -466,7 +468,8 @@ impl<A: Application> Runtime<A> {
     ///
     /// Unknown applications and applications that are not running return
     /// [`RuntimeWorkError::Lifecycle`] before application code is invoked.
-    /// Cooperative application failure returns [`RuntimeWorkError::Application`].
+    /// Cooperative application failure returns
+    /// [`RuntimeWorkError::Application`].
     pub fn work(
         &mut self,
         application_id: ApplicationId,
@@ -508,7 +511,8 @@ impl<A: Application> Runtime<A> {
     ///
     /// Invalid or unknown lifecycle requests return
     /// [`RuntimeStopError::Lifecycle`] before application code is invoked.
-    /// Cooperative application failure returns [`RuntimeStopError::Application`].
+    /// Cooperative application failure returns
+    /// [`RuntimeStopError::Application`].
     pub fn stop(
         &mut self,
         application_id: ApplicationId,
@@ -546,9 +550,10 @@ impl<A: Application> Runtime<A> {
     /// Invokes application restart after validating `Stopped -> Running`.
     ///
     /// The callback mutably borrows the same application value retained across
-    /// start and stop. Success commits [`ApplicationState::Running`]. A returned
-    /// application error is preserved in [`RuntimeRestartError::Application`]
-    /// and commits terminal [`ApplicationState::Failed`].
+    /// start and stop. Success commits [`ApplicationState::Running`]. A
+    /// returned application error is preserved in
+    /// [`RuntimeRestartError::Application`] and commits terminal
+    /// [`ApplicationState::Failed`].
     ///
     /// # Errors
     ///

@@ -225,7 +225,8 @@ impl LifecycleRegistry {
         self.records.is_empty()
     }
 
-    /// Allocates one runtime-local identity in [`ApplicationState::Registered`].
+    /// Allocates one runtime-local identity in
+    /// [`ApplicationState::Registered`].
     ///
     /// # Errors
     ///

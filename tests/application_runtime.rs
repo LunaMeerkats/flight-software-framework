@@ -391,6 +391,10 @@ impl fmt::Display for WorkRejected {
 
 impl Error for WorkRejected {}
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "the chronological two-application lifecycle trace is clearer as one scenario"
+)]
 #[test]
 fn two_applications_complete_lifecycle_with_running_work() {
     let healthy_start_calls = Rc::new(Cell::new(0));
@@ -533,6 +537,10 @@ fn returned_work_error_fails_only_the_selected_application() {
     assert_eq!(runtime.capacity(), 2);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "failure and peer-progress assertions form one chronological containment scenario"
+)]
 #[test]
 fn returned_start_error_fails_only_the_selected_application() {
     let faulting_calls = Rc::new(Cell::new(0));
@@ -683,6 +691,10 @@ fn valid_stop_commits_stopped_and_rejected_stops_suppress_the_callback() {
     assert_eq!(runtime.capacity(), 1);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "ordered rejection and retained-state checks form one restart scenario"
+)]
 #[test]
 fn valid_restart_reuses_owned_state_and_rejected_restarts_suppress_the_callback() {
     let start_calls = Rc::new(Cell::new(0));
@@ -763,6 +775,10 @@ fn valid_restart_reuses_owned_state_and_rejected_restarts_suppress_the_callback(
     assert_eq!(runtime.capacity(), 1);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "failure and peer-progress assertions form one chronological containment scenario"
+)]
 #[test]
 fn returned_restart_error_fails_only_the_selected_application() {
     let faulting_start_calls = Rc::new(Cell::new(0));
@@ -962,6 +978,10 @@ fn runtime_capacity_rejection_preserves_application_ownership() {
     assert_eq!(rejected_calls.get(), 0);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "all operation rejections share one setup and prove callback suppression together"
+)]
 #[test]
 fn unknown_identity_is_rejected_before_application_code_runs() {
     let target_start_calls = Rc::new(Cell::new(0));
