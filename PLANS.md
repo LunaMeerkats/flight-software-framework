@@ -1,127 +1,107 @@
-# Plan: initial source-quality policy checkpoint
+# Plan: apply source-formatting principles
 
 Status: **Complete**
 Date: **2026-08-23**
 
 ## Objective
 
-Measure the existing Rust source against the newly approved source-quality
-rules and adopt the smallest coherent machine-enforced checkpoint before Stage
-2 feature growth. Track stable 100-column formatting, activate one audited
-60-line function review gate, resolve or justify every initial finding, and
-record exact public-source provenance and waiver policy.
+Apply the newly recorded source-form principles to the existing runtime code
+without changing public behavior. Improve progressive reading and naming,
+make public callback failure documentation explicit, and retire only those
+function-size expectations that clearer test structure makes unnecessary.
 
 ## Context
 
-The pre-change baseline passed with 15 tests, but the repository encoded only
-the workspace `unsafe_code = "forbid"` lint. It had no tracked rustfmt or Clippy
-configuration, source-shape checker, CI workflow, dependency policy, or
-toolchain pin. Contributor guidance omitted `cargo check`, warnings-denied
-rustdoc, source ordering, module layout, naming, and lint-waiver rules.
+The pre-change baseline passed with 15 tests and all enforced formatting and
+lint gates. The audit found no width, unsafe-code, module-layout, nesting, or
+production function-size violation. It did find:
 
-The whole-tree audit found no handwritten Rust physical line over 100 columns,
-eight comment-only lines between 81 and 83 columns, and five integration tests
-between 70 and 76 Clippy-counted lines at a proposed threshold of 60. Production
-functions were below the threshold. The five tests are linear lifecycle and
-failure traces whose complete order is part of the evidence.
+- private runtime record-lookup helpers before the public lifecycle methods;
+- four public `Application` callbacks whose expected errors were described but
+  lacked explicit `# Errors` sections;
+- one restart-faulting fixture implementation separated from its type;
+- a start-only fault fixture with a vague name; and
+- two test expectations whose underlying tests could become clearer through a
+  focused behavior split and a smaller identity fixture.
 
-Official Rust tooling and style sources define the mechanisms. JPL, NASA, ECSS,
-and JAXA sources inform the value of local coding rules, review, analysis, and
-recorded evidence, but do not prescribe this Rust policy or apply to this
-experimental repository. A bounded Australian public-source search found no
-independent agency Rust or code-style standard; the absence is recorded rather
-than filled by inference.
+The other three long tests remain cohesive chronological lifecycle or
+containment scenarios. Splitting them would add artificial helpers or scatter
+the state trace.
 
 ## Acceptance criteria
 
-- Track stable rustfmt with `max_width = 100`.
-- Track Clippy with `too-many-lines-threshold = 60` and deny only
-  `clippy::too_many_lines` through inherited workspace lints.
-- Reflow all eight initial comment-only width findings.
-- Review all five test findings individually. Use item-level expectations with
-  specific reasons only where extracting the chronological state trace would
-  make the test harder to understand.
-- Leave no unexplained or broad lint suppression, threshold increase, lint-group
-  enablement, generated waiver list, new dependency, or runtime behavior change.
-- Record naming, module layout, progressive ordering, documentation, generated
-  code, manual-review boundaries, tool versions, waiver retirement, and
-  checker-baseline rules in `AGENTS.md`.
-- Record exact public sources and adopt/adapt/reject decisions in the source
-  register.
-- Update the release gate, roadmap, project state, README, and a durable
-  source-quality baseline without inventing a behavioral requirement or ADR.
-- Pass the expanded serial baseline and repository consistency checks before
-  the documentation commit.
+- Present all public `Runtime` entry points before private record-lookup
+  helpers.
+- Give each fallible public `Application` callback an accurate `# Errors`
+  section without implying cleanup, containment, or recovery.
+- Co-locate the restart-faulting fixture and its implementation.
+- Rename the start-only fault fixture and its observations to state the
+  operation and peer roles precisely.
+- Split restart rejection from successful retained-state restart because they
+  are independently meaningful behaviors.
+- Replace irrelevant dummy applications in the unknown-identity test with a
+  bounded logical identity issuer and share the expected lifecycle error.
+- Retire exactly the two expectations made unnecessary by those changes; keep
+  the three cohesive expectations with their existing specific reasons.
+- Preserve the public API, lifecycle behavior, ownership, capacity, error
+  values, dependencies, and runtime execution model.
+- Pass all repository checks and independent diff review before committing.
 
-## Proposed files and components
+## Files and components
 
-- `rustfmt.toml`, `clippy.toml`, and `Cargo.toml` for selected machine
-  configuration.
-- Existing Rust comments and the five public integration tests for the complete
-  audited finding set.
-- `AGENTS.md`, `README.md`, `docs/research/SOURCES.md`,
-  `docs/verification/SOURCE_QUALITY_BASELINE.md`, `docs/REQUIREMENTS.md`,
-  `docs/ROADMAP.md`, and `docs/PROJECT_STATE.md` for durable policy and state.
-- This plan for scope, evidence, risks, and the stopping point.
+- `src/runtime.rs`: public callback documentation and public-first method
+  ordering.
+- `tests/application_runtime.rs`: fixture naming and locality, focused restart
+  evidence, and simplified unknown-identity setup.
+- `README.md`, `docs/PROJECT_STATE.md`, `docs/ROADMAP.md`,
+  `docs/verification/SOURCE_QUALITY_BASELINE.md`, and
+  `docs/verification/TRACEABILITY.md`: current counts and durable evidence.
+- This plan: scope, acceptance criteria, verification, and stopping point.
 
 ## Verification approach
 
 - Run `cargo fmt --all -- --check`.
 - Run `cargo check --workspace --all-targets --all-features`.
-- Run
-  `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+- Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+- Probe `clippy::missing_errors_doc` separately and require zero findings.
 - Run `cargo test --workspace --all-features`.
-- Run `cargo doc --workspace --all-features --no-deps` with
-  `RUSTDOCFLAGS=-D warnings`.
-- Audit handwritten Rust lines over 100 columns and comment-only lines over 80.
-- Resolve relative Markdown links and cross-check requirement/source
-  identifiers and Markdown table shapes.
-- Render changed Markdown to HTML and inspect its document structure.
-- Run `git diff --check`, inspect the complete diff, and confirm branch/status
-  before local commits.
+- Run warnings-denied all-feature rustdoc generation.
+- Audit handwritten Rust physical and comment-only widths.
+- Confirm exactly three fulfilled reasoned expectations remain.
+- Resolve relative Markdown links, render changed documents, and check
+  requirement/source identifiers and table shapes.
+- Run `git diff --check` and review the complete diff.
 
 ## Known risks
 
-- Function length is a coarse review trigger and does not measure correctness,
-  coupling, nesting, or complexity.
-- Suppressing the five tests without precise reasons would hide debt; splitting
-  them mechanically would obscure chronological evidence. Each expectation must
-  remain narrow and become unfulfilled when the finding disappears.
-- Stable rustfmt does not wrap every comment, URL, literal, macro, or generated
-  line, so a formatting pass is not a complete physical-line proof.
-- Enabling additional lints in this increment would mix separate audits and
-  could create warning debt or cosmetic churn.
-- Agency material can be misrepresented as an applicable Rust standard. Every
-  source decision must distinguish local adaptation from compliance.
+- Source movement can hide an accidental semantic edit; the complete diff and
+  behavior tests must show only equivalent ordering, naming, documentation, and
+  test-evidence structure.
+- Splitting a chronological test merely to satisfy a line threshold can make
+  evidence harder to follow. Only the restart test has two independently named
+  responsibilities; the remaining three expectations stay in place.
+- Replacing the unknown-ID fixture must preserve a genuinely out-of-range
+  identity and all four callback-suppression assertions.
+- `missing_errors_doc` is probed but not enabled as a new workspace gate; lint
+  adoption remains a separate policy decision.
 
 ## Safe rollback or stopping point
 
-Stop after the tracked configuration, complete initial finding disposition,
-durable policy/provenance, and expanded serial baseline are coherent. If the
-60-line gate cannot be adopted without artificial fragmentation or broad
-suppression, retain the measured baseline and rustfmt policy but defer the lint.
-Do not continue into messaging, events, time, configuration, CI, dependency
-tooling, complexity tooling, or another lint in this increment.
+Stop after the runtime and integration-test source is progressively ordered,
+the two avoidable expectations are retired, and all existing behavior remains
+verified. Do not continue into messaging, another lint gate, module splitting,
+generic test fixtures, or unrelated cleanup.
 
 ## Result
 
-Implementation commit `c8f2f7af9232aa370a3ea9ded211eac1581dd375`
-reached the code-side stopping point. It adds the two stable configuration
-files, activates the individual workspace lint, reflows all eight comment
-findings, and adds five item-level expectations with review-specific reasons.
-No production function requires an exception.
+Implementation commit `c2aa32772c2fd32a0b87893f913e32ecacc5d051`
+reached the code-side stopping point. All public runtime methods now precede
+private lookup details; the four application callbacks have explicit error
+sections; test fixture names and implementation locality are clearer; and the
+restart and unknown-identity tests retain their evidence without line-count
+exceptions.
 
-The initial audit and final configuration use rustc/cargo 1.96.1, rustfmt
-1.9.0-stable, and Clippy 0.1.96. The implementation-side expanded baseline
-passed: formatting, all-target checking, warnings-denied Clippy, 15 tests,
-warnings-denied all-feature rustdoc, Git whitespace, zero Rust physical lines
-over 100 columns, and zero comment-only Rust lines over 80 columns.
-
-The documentation commit records the exact research, adopt/adapt/reject
-decisions, contributor and waiver policy, release gate, roadmap, project state,
-and repository-consistency verification. All 37 relative links resolve across
-20 Markdown files; eight requirements match traceability; eight referenced
-source identifiers resolve in the 21-entry register; both tables have
-consistent row shapes; and all 20 documents render structurally with one
-top-level heading. The run stops before unrelated Stage 2 behavior or another
-enforcement mechanism.
+Three reasoned expectations remain, down from five. The runtime integration
+suite now contains ten focused tests, and the complete suite contains 16 tests.
+No public API, runtime behavior, dependency, thread, executor, or message path
+changed.

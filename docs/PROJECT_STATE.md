@@ -18,7 +18,11 @@ policies have recorded decisions, but implementation has not started.
   adds tracked stable rustfmt and Clippy configuration, denies
   `clippy::too_many_lines` at 60 for all targets, reflows the eight initial
   comment-width findings, and records five narrow reasoned test expectations.
-- Formatting, all-target checking, warnings-denied Clippy, all 15 tests, and
+- Source-order cleanup commit `c2aa32772c2fd32a0b87893f913e32ecacc5d051`
+  puts public runtime operations before private lookup details, adds explicit
+  callback error sections, and retires two avoidable test expectations through
+  clearer evidence structure.
+- Formatting, all-target checking, warnings-denied Clippy, all 16 tests, and
   warnings-denied all-feature documentation generation pass with rustc/cargo
   1.96.1, rustfmt 1.9.0-stable, and Clippy 0.1.96.
 - No handwritten Rust physical line exceeds 100 columns and no comment-only Rust
@@ -61,7 +65,7 @@ failure event exists.
 ## Source-quality policy
 
 Stable rustfmt owns normal formatting at 100 columns. Clippy enforces a
-normally-60-line function threshold for every target. The five current
+normally-60-line function threshold for every target. The three current
 expectations preserve complete chronological state/error traces and have
 item-level reasons; production functions need no exception.
 
@@ -74,8 +78,8 @@ not accepted as evidence of cognitive or cyclomatic complexity.
 
 ## Work in progress
 
-No implementation work is in progress. The source-quality checkpoint reached
-its intended stopping point before Stage 2 feature growth.
+No implementation work is in progress. The source-order cleanup reached its
+intended stopping point before Stage 2 feature growth.
 
 ## Highest risks and uncertainties
 
@@ -126,11 +130,12 @@ its intended stopping point before Stage 2 feature growth.
 
 ## Latest run
 
-2026-08-23: Audited the complete Rust tree and policy configuration before
-unrelated feature growth. Added stable `rustfmt.toml` and `clippy.toml`,
-activated the individual 60-line Clippy gate, reflowed all eight comment-width
-findings, and retained five low-complexity chronological integration tests under
-narrow reasoned expectations. Expanded contributor guidance, exact public-source
-provenance, tool-version evidence, release gates, roadmap state, and the
-warnings-denied baseline. No runtime behavior, dependency, crate, thread,
-executor, checker, CI workflow, licence, remote, or push was added.
+2026-08-23: Applied the source-form principles to the runtime without changing
+public behavior. Public operations now precede private lookup helpers; all four
+application callbacks have explicit error sections; test fixtures use precise
+names and local implementations; and focused restart and unknown-identity
+evidence retired two avoidable line-count expectations. Formatting, checking,
+warnings-denied Clippy, all 16 tests, rustdoc, source widths, links, document
+rendering, identifiers, tables, and diff checks pass. Three cohesive reasoned
+expectations remain. No dependency, crate, thread, executor, message path,
+licence change, or push was added.

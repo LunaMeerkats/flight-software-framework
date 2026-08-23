@@ -49,16 +49,33 @@ strict Markdown physical-line limit.
   `clippy::too_many_lines` for all targets.
 - The eight comment-only findings were reflowed to the 80-column review
   default.
-- The five linear integration tests retain their complete chronological state
-  traces under item-level `expect` attributes. Each expectation carries a
-  specific reason why extracting setup or assertions would make the tested
-  invariant harder to review.
+- At adoption, the five linear integration tests retained their complete
+  chronological state traces under item-level `expect` attributes. Each
+  expectation carried a specific reason why extracting setup or assertions
+  would make the tested invariant harder to review.
 - The required baseline now includes `cargo check`, warnings-denied Clippy,
   all-feature tests, and warnings-denied all-feature rustdoc generation.
 - Naming, progressive source ordering, module cohesion, abstraction level, and
   exceptional physical lines remain explicit review responsibilities.
 
 The exact waiver and retirement rules are in [AGENTS.md](../../AGENTS.md).
+
+## Follow-up source-order cleanup
+
+Commit `c2aa32772c2fd32a0b87893f913e32ecacc5d051` applied the manual
+progressive-reading and naming rules without enabling another lint or changing
+runtime behavior. It moved private lookup helpers after all public runtime
+operations, added explicit error sections to the four public application
+callbacks, co-located one displaced fixture implementation, and clarified the
+start-failure vocabulary.
+
+The restart evidence was separated into independently meaningful rejection and
+retained-state success tests. The unknown-identity test now uses the bounded
+logical registry as its identity issuer and shares one expected lifecycle error
+across all four operations. Those changes retired two expectations without
+line compression or artificial helpers. Three reasoned chronological
+expectations remain, `missing_errors_doc` has zero current findings, and the
+suite contains 16 passing tests.
 
 ## Deferred and rejected gates
 

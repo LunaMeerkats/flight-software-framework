@@ -50,8 +50,11 @@ columns, eight comment-only lines over the 80-column review default, and five
 cohesive chronological integration tests over the proposed 60-line Clippy
 threshold. Tracked stable rustfmt and Clippy configuration now enforce the
 100-column format and individual function-size lint. The comments were
-reflowed, and each intentionally linear test has a narrow reasoned expectation
-instead of count-driven fragmentation.
+reflowed, and the five initial test findings received narrow reasoned
+expectations instead of count-driven fragmentation. A follow-up source-order
+cleanup split two independently meaningful behaviors and simplified one
+identity fixture, retiring two expectations; three cohesive chronological
+scenarios remain explicitly justified.
 
 The contributor policy now records progressive source ordering, module and
 naming conventions, waiver retirement, manual review boundaries, exact tool

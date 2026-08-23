@@ -32,8 +32,9 @@ hangs, cleanup failures, or other arbitrary faults.
 
 The first source-quality checkpoint tracks stable rustfmt at 100 columns and
 denies Clippy functions over a 60-line review threshold across all targets.
-Five cohesive chronological integration tests carry narrow reasoned
-expectations; production code needs no function-length waiver. Source ordering,
+Three cohesive chronological integration tests carry narrow reasoned
+expectations; two avoidable expectations were retired through focused test
+structure. Production code needs no function-length waiver. Source ordering,
 module cohesion, names, comment prose, and exceptional physical lines remain
 review responsibilities rather than unsupported automated claims.
 
