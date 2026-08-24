@@ -1,6 +1,6 @@
 # ADR-0004: Bounded application inboxes and partial fan-out
 
-- Status: Accepted; available-endpoint routing core partially implemented
+- Status: Accepted; routing and lifecycle-availability slices partially implemented
 - Date: 2026-08-05
 - Scope: In-process v0.1 publish/subscribe delivery
 
@@ -33,9 +33,12 @@ compatibility claim. (`SRC-NASA-CFE`)
 - The publisher receives a structured report distinguishing complete, partial,
   wholly undelivered, and `NoSubscribers` outcomes, including full and
   unavailable destinations.
-- Subscriptions remain mission topology while an application is stopped or
-  failed. Its queued entries are cleared with an observable discarded count,
-  publication reports it unavailable, and restart reconnects an empty inbox.
+- Only a `Running` application is available. Subscriptions remain mission
+  topology while an application is `Registered`, stopped, or failed, and
+  publication reports those matching endpoints unavailable. Stop or returned
+  callback error clears queued entries with an observable discarded count.
+  Successful restart from `Stopped` reconnects an empty inbox; terminal
+  `Failed` does not restart under LC1.
 - Overflow diagnostics are returned directly and are not recursively published
   onto the same potentially saturated bus.
 - Slot capacity alone is not a byte bound. Messages must use statically bounded
@@ -61,18 +64,25 @@ available-endpoint routing core with inline bounded payloads, immutable topic
 sets, pre-reserved positive-capacity inboxes, FIFO dequeue, reject-newest
 fan-out, stable per-destination outcomes, and publisher-visible classification.
 
-The core is not yet owned by the application runtime and treats every
-configured endpoint as available. It does not implement lifecycle-derived
-unavailability, discarded-count clearing, restart reconnection, application
-self-publication, or the one in-flight dispatch rule. This ADR and RFF-REQ-003
-therefore remain only partially implemented.
+[ADR-0011](0011-runtime-owned-message-availability.md) adds an owning
+integration that constructs one fresh inbox per still-registered runtime
+record, derives availability from lifecycle state, clears stopped and failed
+endpoints with exact discarded-delivery counts, and reconnects an empty inbox
+only after successful restart from `Stopped`.
+
+Applications still cannot consume or publish messages through their work
+callback, and no one-in-flight dispatch rule exists. The standalone
+`MessageBus` deliberately continues to model direct construction as
+available-endpoint routing. This ADR and RFF-REQ-003 therefore remain only
+partially implemented.
 
 ## Required verification and revisit conditions
 
-Tests must cover the exact capacity boundary, cross-topic FIFO, self-publication,
-partial fan-out, all-full delivery, no subscribers, unavailable endpoints,
-clearing/reconnect, duplicate subscriptions, stable report ordering, and payload
-limits.
+Tests must preserve the exact capacity boundary, cross-topic FIFO, partial
+fan-out, all-full delivery, no subscribers, unavailable endpoints,
+clearing/reconnect, duplicate subscriptions, stable report ordering, and
+payload limits. Application self-publication and one-in-flight dispatch remain
+required evidence.
 
 Revisit when an application needs independent traffic classes, lossless or
 priority delivery, runtime subscription mutation, concurrency, or a stricter

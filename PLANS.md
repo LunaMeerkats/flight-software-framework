@@ -1,6 +1,6 @@
 # Plan: couple messaging availability to runtime lifecycle
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-25**
 
 ## Objective
@@ -102,3 +102,21 @@ reconnection, focused public tests, the ADR, and partial traceability are
 coherent and verified. Do not add application message access, automatic
 dispatch, events, time, scheduling, configuration, or protocol work in this
 run.
+
+## Result
+
+Implementation commit `65bd4fa458bb6f82fe73af291f90e90ee582e3d5`
+reached the intended ownership stopping point. `MessagingRuntime` consumes a
+fully composed still-registered runtime, constructs one fresh inbox per record,
+derives availability from lifecycle state, returns exact stop/returned-error
+clearing counts, and reconnects an empty inbox only after successful restart
+from `Stopped`. Ten focused tests bring the complete suite to 33.
+
+Independent review corrected stale standalone-bus wording, strengthened the
+clearing evidence from one to two queued deliveries, asserted registration-order
+identities and distinct positional capacities, narrowed topology guarantees,
+and restored public-first helper placement. All required Cargo checks,
+warnings-denied rustdoc, source widths, reasoned expectations, relative links,
+rendered document structure, identifiers, tables, and whitespace checks pass.
+No dependency, thread, executor, work context, dispatch, protocol boundary,
+licence change, or push was added.

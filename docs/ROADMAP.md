@@ -66,23 +66,26 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-24)**
+Status: **In progress (2026-08-25)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
 - Add structured events without creating an unbounded side channel.
 - Add injected and simulated time, then caller-driven scheduled work.
 
-Completed partial slice: the available-endpoint routing core uses inline
-const-bounded payloads, immutable unique topic sets, pre-reserved inboxes with
-positive capacities, cross-topic FIFO, reject-newest saturation, continued
-partial fan-out, and ordered publisher-visible classifications. It remains
-separate from the application runtime, so RFF-REQ-003 is not yet fully verified.
+Completed partial slices: the standalone routing core uses inline const-bounded
+payloads, immutable unique topic sets, pre-reserved positive-capacity inboxes,
+cross-topic FIFO, reject-newest saturation, continued partial fan-out, and
+ordered publisher-visible classifications. The owning integration constructs
+one fresh inbox per still-registered runtime application, makes only `Running`
+endpoints available, returns exact clearing counts after stop or returned
+callback error, and reconnects an empty inbox after successful restart from
+`Stopped`.
 
-Next slice: select the smallest runtime-owned lifecycle integration that makes
-stopped and failed endpoints unavailable, returns the discarded queued count,
-and reconnects an empty inbox after restart. Defer an application work context
-until that ownership and borrowing shape is concrete.
+Next slice: select the smallest application messaging-context and one-in-flight
+dispatch boundary that proves ownership and borrowing without adding automatic
+dispatch, concurrency, or scheduling. Include true self-publication evidence
+before treating RFF-REQ-003 as verified.
 
 Exit evidence: exact-boundary, ordering, saturation, unavailable/clearing, and
 simulated-time integration tests for RFF-REQ-003 through RFF-REQ-005.

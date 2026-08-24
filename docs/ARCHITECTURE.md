@@ -71,8 +71,9 @@ fault tolerance.
   defines the LC1 stop-gated lifecycle and bounded runtime-local identity.
 - [ADR-0004](adr/0004-bounded-application-inboxes.md) defines one bounded inbox
   per application, reject-newest overflow without waiting for inbox capacity or
-  subscriber progress, and explicit partial fan-out reporting. Its routing core
-  for available endpoints is partially implemented.
+  subscriber progress, explicit partial fan-out reporting, and lifecycle-aware
+  clearing and reconnection. Its routing and ownership slices are partially
+  implemented.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   monotonic snapshot revisions and one consume-once rollback slot. It is not
   implemented.
@@ -91,6 +92,10 @@ fault tolerance.
   const-bounded payloads, mission-defined copied topics, immutable configured
   inbox topology, and one ordered publication report for the first ADR-0004
   slice.
+- [ADR-0011](adr/0011-runtime-owned-message-availability.md) couples a fresh
+  complete inbox topology to a still-registered runtime, makes only `Running`
+  endpoints available, and returns exact queue-clearing counts on stop and
+  returned callback errors.
 
 ## Current implementation boundary
 
@@ -113,18 +118,27 @@ two-application lifecycle integration test now verifies RFF-REQ-002. The runtime
 has no automatic dispatch, service context, event emission, or sample mission,
 so RFF-REQ-008 remains partial.
 
-`MessageBus<Topic, MAX_PAYLOAD_BYTES>` is a separate available-endpoint routing
-core. It copies a caller-supplied contiguous-prefix application topology,
-reserves each positive-capacity inbox and unique topic set, routes in
+`MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
+routing core. It copies a caller-supplied contiguous-prefix application
+topology, reserves each positive-capacity inbox and unique topic set, routes in
 registration order, preserves FIFO across topics, rejects the newest delivery
 at saturation, and reports every matching destination in order. Inline payload
 storage enforces the selected maximum for each bus type.
 
-The bus is not owned by `Runtime`, cannot prove the identity issuer has no
-additional application, and does not observe lifecycle state. It therefore does
-not yet implement unavailable endpoints, queue clearing, restart reconnection,
-application self-publication, or runtime-owned dispatch. RFF-REQ-003 remains
-partial.
+`MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>` consumes a fully composed
+`Runtime<A>` whose records are still `Registered`, assigns one fresh inbox to
+each record internally, and freezes both owners behind one API. Publication
+derives availability from runtime state: only `Running` accepts delivery;
+`Registered`, `Stopped`, and terminal `Failed` remain known but unavailable.
+Successful stop and returned callback errors clear only the selected inbox
+before returning the exact discarded-delivery count. Successful restart from
+`Stopped` reconnects the already-empty inbox. Public tests preserve the
+operation-specific concrete error and leave peer queues and work operable.
+
+The integration has no application message context, self-publication, dequeue
+dispatch, or one-in-flight rule. Its positional configurations also rely on
+mission composition to associate each capacity and topic set with the intended
+registration position. RFF-REQ-003 remains partial.
 
 ## Alternatives kept open
 
@@ -150,8 +164,12 @@ partial.
   controlled and the claim remains limited to repeatability.
 - Bounded bus queues can coexist with unbounded event, telemetry, or diagnostic
   accumulation unless every operational path is reviewed.
-- The detached routing core can be paired with a same-shaped foreign identity
-  issuer or an incomplete runtime topology until ownership is integrated.
+- Direct standalone routing-core construction can still be paired with a
+  same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
+  guarantees apply only to `MessagingRuntime`.
+- Runtime-owned inbox configurations are positional. The integration proves
+  identity order and count, but cannot recognize two valid configurations that
+  mission composition accidentally swaps.
 - Mission-defined topic equality and per-publication report allocation are
   bounded by configured route count but are not a general non-blocking claim.
 - A returned application error is not equivalent to containing a panic, hang,

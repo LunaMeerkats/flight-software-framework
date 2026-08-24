@@ -53,12 +53,14 @@ The first message and routing slice uses these rules:
   application dispatch API and does not establish ADR-0004's future one
   in-flight delivery rule.
 
-This core models every configured endpoint as available. It is deliberately
-not owned by `Runtime` yet and does not consult lifecycle state. Stopped/failed
-unavailability, discarded-count clearing, restart reconnection, true
-self-publication from application work, and service-context borrowing remain
-required integration work. RFF-REQ-003 therefore remains partially implemented
-and not verified in full.
+Direct `MessageBus::new` and `MessageBus::publish` model every configured
+endpoint as available and do not consult lifecycle state. The subsequent
+owning integration in
+[ADR-0011](0011-runtime-owned-message-availability.md) constructs a fresh bus
+internally and supplies lifecycle-derived availability and clearing. True
+self-publication from application work, service-context borrowing, and
+one-in-flight dispatch remain required. RFF-REQ-003 is therefore still
+partially implemented and not verified in full.
 
 ## Alternatives considered
 
@@ -97,6 +99,15 @@ The slice adds no dependency, thread, executor, wait for inbox capacity or
 subscriber progress, retry, spill path, hidden work, external protocol, or
 runtime lifecycle mutation.
 
+## Subsequent integration boundary
+
+ADR-0011 reuses this routing and storage core without changing its standalone
+available-endpoint behavior. `MessagingRuntime` assigns identities internally,
+requires one fresh configuration per still-registered application, derives
+availability from runtime state, and clears stopped or failed queues before
+returning exact discarded-delivery counts. It does not expose `dequeue` as
+application dispatch or add a work context.
+
 ## Consequences and risks
 
 - The bus bounds its queued message count and payload storage per slot, but
@@ -115,13 +126,13 @@ runtime lifecycle mutation.
 - Publication performs an inline copy of the full message representation for
   each accepted destination. A later measured payload size may justify a
   different ownership strategy.
-- Configured endpoints must not be represented as lifecycle-integrated until
-  availability is derived from runtime state.
+- Directly configured endpoints remain available-endpoint routing. Only the
+  owner in ADR-0011 derives lifecycle-integrated availability from runtime
+  state.
 
 ## Revisit conditions
 
-Revisit this decision when lifecycle integration supplies unavailable and
-clearing behavior, `Application::work` needs a messaging context, measured
-payloads make inline copies unsuitable, a protocol boundary requires a
-validated external identifier, independent traffic classes are required, or
+Revisit this decision when `Application::work` needs a messaging context,
+measured payloads make inline copies unsuitable, a protocol boundary requires
+a validated external identifier, independent traffic classes are required, or
 concurrency changes serial ordering and allocation assumptions.

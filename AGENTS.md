@@ -25,10 +25,11 @@ translate NASA C source.
 - `docs/verification/`: requirement traceability and verification baselines.
 - `PLANS.md`: the active or most recently completed bounded work plan.
 - `src/`: the single unpublished library package; currently logical lifecycle
-  records, a synchronous start/work/stop/in-place-restart owned runtime, and a
-  bounded available-endpoint message-routing core.
-- `tests/`: public-API lifecycle, runtime, and message-routing integration
-  tests.
+  records, a synchronous start/work/stop/in-place-restart owned runtime, a
+  bounded message-routing core, and lifecycle-aware runtime ownership of one
+  inbox per registered application.
+- `tests/`: public-API lifecycle, runtime, message-routing, and runtime-messaging
+  integration tests.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

@@ -50,7 +50,7 @@ this decision apply only to `MessagingRuntime`.
 
 ### Availability table
 
-| Runtime state | Publication result | Queue invariant |
+| Runtime state | Matching destination status | Queue invariant |
 | --- | --- | --- |
 | `Registered` | `Unavailable` | Empty because construction is fresh and delivery is rejected |
 | `Running` | `Delivered` or `InboxFull` | Retains accepted deliveries up to its configured slot limit |
