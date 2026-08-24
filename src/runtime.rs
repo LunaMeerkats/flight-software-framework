@@ -600,6 +600,14 @@ impl<A: Application> Runtime<A> {
 }
 
 impl<A> Runtime<A> {
+    pub(crate) fn first_non_registered(&self) -> Option<(ApplicationId, ApplicationState)> {
+        self.records
+            .iter()
+            .enumerate()
+            .find(|(_, record)| record.state != ApplicationState::Registered)
+            .map(|(index, record)| (ApplicationId::from_index(index), record.state))
+    }
+
     fn record(&self, application_id: ApplicationId) -> Result<&RuntimeRecord<A>, LifecycleError> {
         self.records
             .get(application_id.index())

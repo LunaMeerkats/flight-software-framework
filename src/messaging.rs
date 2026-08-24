@@ -1,11 +1,12 @@
-//! Bounded in-process messages and available-endpoint fan-out.
+//! Bounded in-process messages and serial fan-out.
 //!
 //! This module implements the first routing core from ADR-0004. It copies an
 //! immutable mission topology, pre-reserves each inbox, and processes matching
-//! destinations in application-registration order. Configured endpoints are
-//! modeled as available; lifecycle-derived unavailability, queue clearing,
-//! restart reconnection, application dispatch, and service contexts remain
-//! outside this slice.
+//! destinations in application-registration order. Standalone [`MessageBus`]
+//! publication models configured endpoints as available.
+//! [`crate::MessagingRuntime`] owns a freshly configured bus and supplies
+//! lifecycle-derived availability and clearing; application dispatch and
+//! service contexts remain outside this module.
 
 use std::collections::VecDeque;
 use std::error::Error;
@@ -120,6 +121,30 @@ impl<'a, Topic> ApplicationInboxConfig<'a, Topic> {
             capacity,
             topics,
         }
+    }
+}
+
+/// Immutable inbox configuration in application-registration order.
+///
+/// [`crate::MessagingRuntime`] assigns each entry to the application at the
+/// same registration position. Callers therefore cannot pair its owned bus
+/// with identities from another runtime or omit an inbox for a registered
+/// application. Mission composition remains responsible for placing each
+/// application's intended capacity and topics at the correct position.
+#[derive(Clone, Copy, Debug)]
+pub struct RuntimeInboxConfig<'a, Topic> {
+    capacity: usize,
+    topics: &'a [Topic],
+}
+
+impl<'a, Topic> RuntimeInboxConfig<'a, Topic> {
+    /// Describes one runtime-owned inbox and its immutable topic set.
+    ///
+    /// A zero-capacity inbox and repeated topic are rejected atomically during
+    /// [`crate::MessagingRuntime`] construction. An empty topic set is valid.
+    #[must_use]
+    pub const fn new(capacity: usize, topics: &'a [Topic]) -> Self {
+        Self { capacity, topics }
     }
 }
 
@@ -240,13 +265,15 @@ impl DestinationOutcome {
     }
 }
 
-/// The result of attempting delivery to one available endpoint.
+/// The result of attempting delivery to one matching endpoint.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DeliveryStatus {
     /// The message was appended to the destination inbox.
     Delivered,
     /// The logical inbox limit was already full; its older entries were kept.
     InboxFull,
+    /// The application was known but its lifecycle state was not `Running`.
+    Unavailable,
 }
 
 /// Publisher-visible summary derived from ordered destination outcomes.
@@ -346,17 +373,18 @@ impl fmt::Display for InboxAccessError {
 
 impl Error for InboxAccessError {}
 
-/// A finite available-endpoint routing core with immutable subscriptions.
+/// A finite serial routing core with immutable subscriptions.
 ///
 /// Each configuration position must match the same registration position in
 /// one [`crate::Runtime`] or [`crate::LifecycleRegistry`]. The existing opaque
 /// identity representation cannot detect a same-position key from another
-/// issuer. All configured endpoints are treated as available in this slice;
-/// this type is not yet integrated with runtime lifecycle state.
+/// issuer. Direct construction and [`MessageBus::publish`] treat all configured
+/// endpoints as available.
 ///
 /// Construction also cannot prove that the identity issuer has no additional
-/// application records. Runtime ownership must enforce one configured inbox
-/// per registered application in a later integration slice.
+/// application records. [`crate::MessagingRuntime`] instead constructs and owns
+/// a fresh bus with exactly one inbox per registered application, and derives
+/// availability from runtime lifecycle state.
 ///
 /// Queue and topic storage are reserved during construction. Logical inbox
 /// limits are enforced independently of allocator capacity. Messages and
@@ -386,7 +414,11 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
                 requested: configurations.len(),
             })?;
         for configuration in configurations {
-            endpoints.push(create_endpoint(configuration)?);
+            endpoints.push(create_endpoint(
+                configuration.application_id,
+                configuration.capacity,
+                configuration.topics,
+            )?);
         }
 
         Ok(Self { endpoints })
@@ -407,27 +439,7 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
         &mut self,
         message: &Message<Topic, MAX_PAYLOAD_BYTES>,
     ) -> Result<PublishReport, PublishError> {
-        let destination_count = self
-            .endpoints
-            .iter()
-            .filter(|endpoint| endpoint.subscribes_to(message.topic()))
-            .count();
-        let mut outcomes = Vec::new();
-        outcomes.try_reserve_exact(destination_count).map_err(|_| {
-            PublishError::ReportAllocationFailed {
-                destinations: destination_count,
-            }
-        })?;
-
-        for endpoint in &mut self.endpoints {
-            if endpoint.subscribes_to(message.topic()) {
-                outcomes.push(DestinationOutcome {
-                    application_id: endpoint.application_id,
-                    status: endpoint.enqueue(*message),
-                });
-            }
-        }
-        Ok(PublishReport { outcomes })
+        self.publish_with_availability(message, |_| true)
     }
 
     /// Returns the configured logical slot limit for one inbox.
@@ -465,6 +477,68 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
     ) -> Result<Option<Message<Topic, MAX_PAYLOAD_BYTES>>, InboxAccessError> {
         Ok(self.endpoint_mut(application_id)?.messages.pop_front())
     }
+}
+
+impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAYLOAD_BYTES> {
+    pub(crate) fn from_runtime_configs(
+        configurations: &[RuntimeInboxConfig<'_, Topic>],
+    ) -> Result<Self, MessageBusCreateError> {
+        validate_runtime_topology(configurations)?;
+
+        let mut endpoints = Vec::new();
+        endpoints
+            .try_reserve_exact(configurations.len())
+            .map_err(|_| MessageBusCreateError::EndpointStorageAllocationFailed {
+                requested: configurations.len(),
+            })?;
+        for (index, configuration) in configurations.iter().enumerate() {
+            endpoints.push(create_endpoint(
+                ApplicationId::from_index(index),
+                configuration.capacity,
+                configuration.topics,
+            )?);
+        }
+
+        Ok(Self { endpoints })
+    }
+
+    pub(crate) fn publish_with_availability(
+        &mut self,
+        message: &Message<Topic, MAX_PAYLOAD_BYTES>,
+        mut is_available: impl FnMut(ApplicationId) -> bool,
+    ) -> Result<PublishReport, PublishError> {
+        let destination_count = self
+            .endpoints
+            .iter()
+            .filter(|endpoint| endpoint.subscribes_to(message.topic()))
+            .count();
+        let mut outcomes = Vec::new();
+        outcomes.try_reserve_exact(destination_count).map_err(|_| {
+            PublishError::ReportAllocationFailed {
+                destinations: destination_count,
+            }
+        })?;
+
+        for endpoint in &mut self.endpoints {
+            if endpoint.subscribes_to(message.topic()) {
+                outcomes.push(DestinationOutcome {
+                    application_id: endpoint.application_id,
+                    status: endpoint.enqueue(*message, is_available(endpoint.application_id)),
+                });
+            }
+        }
+        Ok(PublishReport { outcomes })
+    }
+
+    pub(crate) fn clear_runtime_inbox(&mut self, application_id: ApplicationId) -> usize {
+        // MessagingRuntime construction fixes this vector to the runtime's
+        // complete registration order, and runtime operations validate the ID.
+        let endpoint = &mut self.endpoints[application_id.index()];
+        debug_assert_eq!(endpoint.application_id, application_id);
+        let discarded = endpoint.messages.len();
+        endpoint.messages.clear();
+        discarded
+    }
 
     fn endpoint(
         &self,
@@ -498,7 +572,14 @@ impl<Topic: Eq, const MAX_PAYLOAD_BYTES: usize> ApplicationEndpoint<Topic, MAX_P
         self.topics.contains(topic)
     }
 
-    fn enqueue(&mut self, message: Message<Topic, MAX_PAYLOAD_BYTES>) -> DeliveryStatus {
+    fn enqueue(
+        &mut self,
+        message: Message<Topic, MAX_PAYLOAD_BYTES>,
+        is_available: bool,
+    ) -> DeliveryStatus {
+        if !is_available {
+            return DeliveryStatus::Unavailable;
+        }
         if self.messages.len() >= self.capacity {
             return DeliveryStatus::InboxFull;
         }
@@ -522,26 +603,54 @@ fn validate_topology<Topic: Eq>(
                 expected_index,
             });
         }
-        if configuration.capacity == 0 {
-            return Err(MessageBusCreateError::ZeroInboxCapacity {
-                application_id: configuration.application_id,
-            });
-        }
-        validate_unique_topics(configuration)?;
+        validate_endpoint(
+            configuration.application_id,
+            configuration.capacity,
+            configuration.topics,
+        )?;
     }
     Ok(())
 }
 
-fn validate_unique_topics<Topic: Eq>(
-    configuration: &ApplicationInboxConfig<'_, Topic>,
+fn validate_runtime_topology<Topic: Eq>(
+    configurations: &[RuntimeInboxConfig<'_, Topic>],
 ) -> Result<(), MessageBusCreateError> {
-    for duplicate_index in 1..configuration.topics.len() {
-        if let Some(first_index) = configuration.topics[..duplicate_index]
+    if configurations.is_empty() {
+        return Err(MessageBusCreateError::NoInboxes);
+    }
+
+    for (index, configuration) in configurations.iter().enumerate() {
+        validate_endpoint(
+            ApplicationId::from_index(index),
+            configuration.capacity,
+            configuration.topics,
+        )?;
+    }
+    Ok(())
+}
+
+fn validate_endpoint<Topic: Eq>(
+    application_id: ApplicationId,
+    capacity: usize,
+    topics: &[Topic],
+) -> Result<(), MessageBusCreateError> {
+    if capacity == 0 {
+        return Err(MessageBusCreateError::ZeroInboxCapacity { application_id });
+    }
+    validate_unique_topics(application_id, topics)
+}
+
+fn validate_unique_topics<Topic: Eq>(
+    application_id: ApplicationId,
+    topics: &[Topic],
+) -> Result<(), MessageBusCreateError> {
+    for duplicate_index in 1..topics.len() {
+        if let Some(first_index) = topics[..duplicate_index]
             .iter()
-            .position(|topic| topic == &configuration.topics[duplicate_index])
+            .position(|topic| topic == &topics[duplicate_index])
         {
             return Err(MessageBusCreateError::DuplicateTopic {
-                application_id: configuration.application_id,
+                application_id,
                 first_index,
                 duplicate_index,
             });
@@ -551,27 +660,29 @@ fn validate_unique_topics<Topic: Eq>(
 }
 
 fn create_endpoint<Topic: Copy, const MAX_PAYLOAD_BYTES: usize>(
-    configuration: &ApplicationInboxConfig<'_, Topic>,
+    application_id: ApplicationId,
+    capacity: usize,
+    configured_topics: &[Topic],
 ) -> Result<ApplicationEndpoint<Topic, MAX_PAYLOAD_BYTES>, MessageBusCreateError> {
     let mut topics = Vec::new();
     topics
-        .try_reserve_exact(configuration.topics.len())
+        .try_reserve_exact(configured_topics.len())
         .map_err(|_| MessageBusCreateError::TopicStorageAllocationFailed {
-            application_id: configuration.application_id,
-            requested: configuration.topics.len(),
+            application_id,
+            requested: configured_topics.len(),
         })?;
-    topics.extend_from_slice(configuration.topics);
+    topics.extend_from_slice(configured_topics);
 
     let mut messages = VecDeque::new();
-    messages
-        .try_reserve_exact(configuration.capacity)
-        .map_err(|_| MessageBusCreateError::InboxStorageAllocationFailed {
-            application_id: configuration.application_id,
-            requested: configuration.capacity,
-        })?;
+    messages.try_reserve_exact(capacity).map_err(|_| {
+        MessageBusCreateError::InboxStorageAllocationFailed {
+            application_id,
+            requested: capacity,
+        }
+    })?;
     Ok(ApplicationEndpoint {
-        application_id: configuration.application_id,
-        capacity: configuration.capacity,
+        application_id,
+        capacity,
         topics,
         messages,
     })

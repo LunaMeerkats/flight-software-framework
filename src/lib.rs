@@ -10,6 +10,7 @@ compatibility claim.
 
 mod lifecycle;
 mod messaging;
+mod messaging_runtime;
 mod runtime;
 
 pub use lifecycle::{
@@ -19,7 +20,11 @@ pub use lifecycle::{
 pub use messaging::{
     ApplicationInboxConfig, DeliveryStatus, DestinationOutcome, InboxAccessError, Message,
     MessageBus, MessageBusCreateError, MessageCreateError, PublishClassification, PublishError,
-    PublishReport,
+    PublishReport, RuntimeInboxConfig,
+};
+pub use messaging_runtime::{
+    MessagingOperationError, MessagingRuntime, MessagingRuntimeCreateError,
+    MessagingRuntimeCreateErrorKind, MessagingStopOutcome,
 };
 pub use runtime::{
     Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,
