@@ -316,6 +316,11 @@ struct RuntimeRecord<A> {
     application: A,
 }
 
+pub(crate) enum RunningCallbackError<E> {
+    Lifecycle(LifecycleError),
+    Application(E),
+}
+
 /// A finite-capacity, caller-driven owner of application values.
 ///
 /// This pre-v0.1 slice supports registration, state inspection, and synchronous
@@ -477,30 +482,16 @@ impl<A: Application> Runtime<A> {
         &mut self,
         application_id: ApplicationId,
     ) -> Result<ApplicationState, RuntimeWorkError<A::WorkError>> {
-        let record = self
-            .record_mut(application_id)
-            .map_err(RuntimeWorkError::Lifecycle)?;
-        let current = record.state;
-
-        if current != ApplicationState::Running {
-            return Err(RuntimeWorkError::Lifecycle(LifecycleError::NotRunning {
+        match self.invoke_running(application_id, |application| {
+            application.work()?;
+            Ok(ApplicationState::Running)
+        }) {
+            Ok(state) => Ok(state),
+            Err(RunningCallbackError::Lifecycle(error)) => Err(RuntimeWorkError::Lifecycle(error)),
+            Err(RunningCallbackError::Application(source)) => Err(RuntimeWorkError::Application {
                 application_id,
-                state: current,
-            }));
-        }
-
-        match record.application.work() {
-            Ok(()) => {
-                record.state = ApplicationState::Running;
-                Ok(ApplicationState::Running)
-            }
-            Err(source) => {
-                record.state = ApplicationState::Failed;
-                Err(RuntimeWorkError::Application {
-                    application_id,
-                    source,
-                })
-            }
+                source,
+            }),
         }
     }
 
@@ -600,6 +591,47 @@ impl<A: Application> Runtime<A> {
 }
 
 impl<A> Runtime<A> {
+    pub(crate) fn copy_states_into(&self, destination: &mut [ApplicationState]) {
+        assert_eq!(
+            destination.len(),
+            self.records.len(),
+            "dispatch state storage must match the frozen runtime topology"
+        );
+        for (state, record) in destination.iter_mut().zip(&self.records) {
+            *state = record.state;
+        }
+    }
+
+    pub(crate) fn invoke_running<T, E>(
+        &mut self,
+        application_id: ApplicationId,
+        callback: impl FnOnce(&mut A) -> Result<T, E>,
+    ) -> Result<T, RunningCallbackError<E>> {
+        let record = self
+            .record_mut(application_id)
+            .map_err(RunningCallbackError::Lifecycle)?;
+        let current = record.state;
+        if current != ApplicationState::Running {
+            return Err(RunningCallbackError::Lifecycle(
+                LifecycleError::NotRunning {
+                    application_id,
+                    state: current,
+                },
+            ));
+        }
+
+        match callback(&mut record.application) {
+            Ok(value) => {
+                record.state = ApplicationState::Running;
+                Ok(value)
+            }
+            Err(source) => {
+                record.state = ApplicationState::Failed;
+                Err(RunningCallbackError::Application(source))
+            }
+        }
+    }
+
     pub(crate) fn first_non_registered(&self) -> Option<(ApplicationId, ApplicationState)> {
         self.records
             .iter()

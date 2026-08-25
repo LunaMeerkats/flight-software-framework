@@ -540,6 +540,17 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
         discarded
     }
 
+    pub(crate) fn dequeue_runtime_inbox(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Option<Message<Topic, MAX_PAYLOAD_BYTES>> {
+        // MessagingRuntime fixes endpoint positions to runtime identities and
+        // validates the selected identity before reaching this operation.
+        let endpoint = &mut self.endpoints[application_id.index()];
+        debug_assert_eq!(endpoint.application_id, application_id);
+        endpoint.messages.pop_front()
+    }
+
     fn endpoint(
         &self,
         application_id: ApplicationId,

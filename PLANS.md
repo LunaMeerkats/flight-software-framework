@@ -1,70 +1,68 @@
-# Plan: couple messaging availability to runtime lifecycle
+# Plan: dispatch one bounded application message
 
-Status: **Complete**
-Date: **2026-08-25**
+Status: **In progress**
+Date: **2026-08-26**
 
 ## Objective
 
-Implement the smallest runtime-owned lifecycle integration for the bounded
-message core: couple one fresh inbox to every registered application, derive
-delivery availability from runtime state, clear queued deliveries when an
-endpoint stops or enters terminal `Failed`, report the exact discarded count,
-and reconnect an empty inbox after a successful stopped-to-running restart.
+Implement the smallest application-facing messaging boundary: let a caller
+select one running application, move at most its oldest queued delivery into one
+in-flight callback, and let that callback publish through the same
+lifecycle-owned bounded bus.
 
 ## Context
 
-The clean pre-change baseline passes with 23 tests. ADR-0004 already defines
-unavailable endpoint reporting, queue clearing, and restart reconnection, while
-ADR-0010 deliberately stops at a detached available-endpoint routing core.
-Stage 2 cannot safely add an application work context until runtime and message
-ownership make lifecycle synchronization non-optional.
+The clean pre-change baseline passes with 33 tests. ADR-0004 already places one
+serial in-flight delivery outside configured inbox capacities. ADR-0010 proves
+FIFO and bounded routing, while ADR-0011 proves runtime ownership, lifecycle
+availability, clearing, and restart reconnection. Applications still cannot
+consume or publish messages, so the strongest remaining RFF-REQ-003 evidence is
+the borrowing and dispatch boundary that joins those completed slices.
 
-This slice records the previously implicit availability table: only `Running`
-applications are available. `Registered`, `Stopped`, and terminal `Failed`
-applications remain known subscribers but reject delivery as unavailable.
-Failed applications cannot restart under LC1; reconnection applies only to a
-successful `Stopped -> Running` restart.
+The existing context-free `Application::work` remains useful for caller-selected
+work that is not caused by a queued message. This increment will add a separate
+message callback rather than prematurely forcing all future services into one
+general context.
 
 ## Acceptance criteria
 
-- Add an owning integration type that consumes a fully composed `Runtime` and
-  builds a fresh empty bus without exposing either inner component mutably.
-- Require exactly one inbox configuration per registered application, assign
-  identities internally in registration order, and reject attachment unless
-  every runtime record is still `Registered`.
-- Preserve ownership of the supplied runtime when attachment or message-bus
-  construction fails.
-- Treat only `Running` endpoints as available during publication. Include
-  matching unavailable subscribers in the ordered report with a distinct
-  `Unavailable` status.
-- Clear only the selected inbox after successful stop or any returned callback
-  error that commits terminal `Failed`; leave queues unchanged after lifecycle
-  rejection.
-- Return the exact discarded-delivery count on successful stop and alongside
-  callback errors without losing the existing concrete error or source chain.
-- Reconnect an empty inbox only after successful restart from `Stopped`; never
-  reconnect terminal `Failed` records.
-- Test construction coupling, registered/stopped/failed outcomes, exact
-  clearing, unaffected-peer behavior, lifecycle rejection, and empty restart
-  reconnection through the public API.
-- Keep RFF-REQ-003 partial because application self-publication, one in-flight
-  dispatch, and a messaging work context remain unimplemented.
-- Add no dependency, thread, executor, dynamic topology, protocol identifier,
-  event service, time service, scheduler, or lint suppression.
+- Add a narrowly scoped application messaging trait whose callback receives
+  only the selected in-flight message and a publish-only context.
+- Add one caller-selected `MessagingRuntime` dispatch operation that validates
+  identity and `Running` state before changing an inbox.
+- Return an explicit no-message outcome without invoking application code.
+- Remove at most the oldest queued message, keep it outside inbox capacity only
+  for the synchronous callback, and expose no nested dequeue or dispatch path.
+- Derive publication availability from a preallocated state snapshot refreshed
+  immediately before the callback. The callback cannot mutate lifecycle state,
+  so the snapshot is not a second lifecycle authority.
+- Prove true self-publication can fill the slot freed by the in-flight message,
+  while saturation, peer delivery, unavailable reporting, and FIFO remain
+  explicit.
+- On callback success, retain `Running` and keep accepted publications queued.
+- On a returned callback error, preserve the concrete source, commit only the
+  selected application to terminal `Failed`, drop the attempted in-flight
+  message, clear only its queued inbox, and report the exact queued discard
+  count. Peer publications already accepted during the callback remain.
+- Reconcile the RFF-REQ-003 wording with the stronger application-consumption,
+  self-publication, and one-in-flight evidence required by the accepted ADR.
+- Add no dependency, automatic or batch dispatch, thread, executor, scheduler,
+  clock, event service, protocol boundary, dynamic topology, or lint waiver.
 
 ## Files and components
 
-- `src/messaging.rs`: runtime-ordered inbox definitions, unavailable delivery
-  outcome, state-aware internal publication, and exact queue clearing.
-- `src/messaging_runtime.rs`: ownership coupling, lifecycle delegation, and
-  discarded-delivery reporting.
-- `src/runtime.rs` and `src/lib.rs`: narrow integration support and intentional
+- `src/runtime.rs`: one crate-private running-callback primitive reused by the
+  existing context-free work operation.
+- `src/messaging.rs`: internal runtime-inbox dequeue support.
+- `src/application_messaging.rs`, `src/messaging_runtime.rs`, and `src/lib.rs`:
+  application context, callback, dispatch outcome/error, state snapshot, and
   public exports.
-- `tests/runtime_messaging.rs`: public lifecycle/message integration evidence.
-- `docs/adr/0011-runtime-owned-message-availability.md`: state table,
-  construction, operation ordering, result shape, and deferred boundaries.
-- README, architecture, ADR-0004, ADR-0010, roadmap, project state, and
-  traceability: truthful implementation status and evidence.
+- `tests/message_dispatch.rs`: public FIFO, empty/rejected dispatch,
+  self-publication, peer-delivery, and callback-error evidence.
+- `docs/adr/0012-application-message-dispatch.md`: borrowing, ownership,
+  in-flight, publication, and failure decision.
+- README, architecture, requirements, ADR-0004/0010/0011, roadmap, project
+  state, and traceability: truthful status and evidence.
 
 ## Verification approach
 
@@ -81,42 +79,23 @@ successful `Stopped -> Running` restart.
 
 ## Known risks
 
-- The integration freezes topology only after registration; future mission
-  composition may need a more direct configuration builder, but no current
-  behavior justifies one.
-- The detached `MessageBus` remains public for routing-core evidence and still
-  models all endpoints as available. Lifecycle claims apply only to the owning
-  integration type.
-- The provisional integration exposes publication and queue observation but no
-  application dispatch or service-context borrowing.
-- Clearing occurs after a synchronous callback returns and the runtime commits
-  its state. Panics, hangs, process failure, and application-internal cleanup
-  remain outside this cooperative boundary.
+- A preallocated lifecycle-state snapshot duplicates state transiently during a
+  callback. It must be refreshed before every dispatch and remain inaccessible
+  to applications except through publication availability.
+- Publications are committed as they occur. A later callback error does not
+  roll back peer deliveries; only the failed application's queued inbox is
+  cleared.
+- The in-flight message is attempted work, not a queued discard. It is dropped
+  after either callback outcome and excluded from the returned clear count.
+- The separate messaging callback expands the unpublished application surface.
+  A future common service context should replace it only when more than one
+  implemented service demonstrates a coherent shared borrowing shape.
 - Per-publication report allocation and inline payload-copy costs are unchanged
   from ADR-0010.
 
 ## Safe rollback or stopping point
 
-Stop after lifecycle-derived availability, exact clearing, restart
-reconnection, focused public tests, the ADR, and partial traceability are
-coherent and verified. Do not add application message access, automatic
-dispatch, events, time, scheduling, configuration, or protocol work in this
-run.
-
-## Result
-
-Implementation commit `65bd4fa458bb6f82fe73af291f90e90ee582e3d5`
-reached the intended ownership stopping point. `MessagingRuntime` consumes a
-fully composed still-registered runtime, constructs one fresh inbox per record,
-derives availability from lifecycle state, returns exact stop/returned-error
-clearing counts, and reconnects an empty inbox only after successful restart
-from `Stopped`. Ten focused tests bring the complete suite to 33.
-
-Independent review corrected stale standalone-bus wording, strengthened the
-clearing evidence from one to two queued deliveries, asserted registration-order
-identities and distinct positional capacities, narrowed topology guarantees,
-and restored public-first helper placement. All required Cargo checks,
-warnings-denied rustdoc, source widths, reasoned expectations, relative links,
-rendered document structure, identifiers, tables, and whitespace checks pass.
-No dependency, thread, executor, work context, dispatch, protocol boundary,
-licence change, or push was added.
+Stop after one-message dispatch, publish-only context, focused public tests,
+ADR-0012, reconciled RFF-REQ-003 traceability, and the complete baseline are
+coherent and verified. Do not add automatic dispatch, events, time, scheduling,
+configuration, command/telemetry, or protocol work in this run.

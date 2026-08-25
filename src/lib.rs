@@ -8,11 +8,15 @@ pre-v0.1 experiments and make no real-time, fault-tolerance, cFS, CCSDS, or RTOS
 compatibility claim.
 "#]
 
+mod application_messaging;
 mod lifecycle;
 mod messaging;
 mod messaging_runtime;
 mod runtime;
 
+pub use application_messaging::{
+    ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
+};
 pub use lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry,
     RegistrationError, RegistryCreateError,

@@ -8,14 +8,17 @@
 use std::error::Error;
 use std::fmt;
 
+use crate::application_messaging::{
+    ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
+};
 use crate::lifecycle::{ApplicationId, ApplicationState, LifecycleError};
 use crate::messaging::{
     InboxAccessError, Message, MessageBus, MessageBusCreateError, PublishError, PublishReport,
     RuntimeInboxConfig,
 };
 use crate::runtime::{
-    Application, Runtime, RuntimeRestartError, RuntimeStartError, RuntimeStopError,
-    RuntimeWorkError,
+    Application, RunningCallbackError, Runtime, RuntimeRestartError, RuntimeStartError,
+    RuntimeStopError, RuntimeWorkError,
 };
 
 /// The reason a runtime could not take ownership of a message topology.
@@ -37,6 +40,12 @@ pub enum MessagingRuntimeCreateErrorKind {
     },
     /// The fresh bounded message topology was invalid or could not be reserved.
     MessageBus(MessageBusCreateError),
+    /// Storage for one lifecycle-state snapshot entry per application could not
+    /// be reserved.
+    DispatchStateStorageAllocationFailed {
+        /// Requested number of application-state entries.
+        requested: usize,
+    },
 }
 
 impl fmt::Display for MessagingRuntimeCreateErrorKind {
@@ -57,6 +66,10 @@ impl fmt::Display for MessagingRuntimeCreateErrorKind {
                 "application {application_id:?} is {state:?}, not Registered"
             ),
             Self::MessageBus(error) => error.fmt(formatter),
+            Self::DispatchStateStorageAllocationFailed { requested } => write!(
+                formatter,
+                "could not reserve dispatch state storage for {requested} applications"
+            ),
         }
     }
 }
@@ -65,7 +78,9 @@ impl Error for MessagingRuntimeCreateErrorKind {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::MessageBus(error) => Some(error),
-            Self::InboxCountMismatch { .. } | Self::ApplicationNotRegistered { .. } => None,
+            Self::InboxCountMismatch { .. }
+            | Self::ApplicationNotRegistered { .. }
+            | Self::DispatchStateStorageAllocationFailed { .. } => None,
         }
     }
 }
@@ -196,6 +211,7 @@ impl MessagingStopOutcome {
 pub struct MessagingRuntime<A, Topic, const MAX_PAYLOAD_BYTES: usize> {
     runtime: Runtime<A>,
     message_bus: MessageBus<Topic, MAX_PAYLOAD_BYTES>,
+    dispatch_states: Vec<ApplicationState>,
 }
 
 impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
@@ -211,7 +227,8 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     ///
     /// Returns the owned runtime inside [`MessagingRuntimeCreateError`] when
     /// counts differ, any application is no longer `Registered`, or fresh bus
-    /// construction fails. No partial integration is returned.
+    /// or dispatch-state storage cannot be reserved. No partial integration is
+    /// returned.
     pub fn new(
         runtime: Runtime<A>,
         configurations: &[RuntimeInboxConfig<'_, Topic>],
@@ -245,9 +262,14 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
                 ));
             }
         };
+        let dispatch_states = match create_dispatch_state_storage(application_count) {
+            Ok(dispatch_states) => dispatch_states,
+            Err(kind) => return Err(Self::creation_error(runtime, kind)),
+        };
         Ok(Self {
             runtime,
             message_bus,
+            dispatch_states,
         })
     }
 
@@ -407,6 +429,65 @@ impl<A: Application, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     }
 }
 
+impl<
+    A: MessagingApplication<Topic, MAX_PAYLOAD_BYTES>,
+    Topic: Copy + Eq,
+    const MAX_PAYLOAD_BYTES: usize,
+> MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+{
+    /// Dispatches at most one oldest message to one running application.
+    ///
+    /// A running application with an empty inbox returns
+    /// [`MessageDispatchOutcome::InboxEmpty`] without invoking application
+    /// code. A dispatched message remains outside inbox capacity for the
+    /// synchronous callback, whose context can publish through this same bus.
+    ///
+    /// # Errors
+    ///
+    /// Identity or running-state rejection occurs before dequeue. A returned
+    /// application error commits terminal `Failed`, drops the attempted
+    /// in-flight message, and clears the selected application's remaining
+    /// queued deliveries. The exact clear count excludes the in-flight item.
+    /// Deliveries accepted by peers during the callback are not rolled back.
+    pub fn dispatch_one(
+        &mut self,
+        application_id: ApplicationId,
+    ) -> Result<
+        MessageDispatchOutcome,
+        MessagingOperationError<MessageDispatchError<A::MessageError>>,
+    > {
+        self.validate_dispatch_state(application_id)?;
+        self.runtime.copy_states_into(&mut self.dispatch_states);
+
+        let result = self.runtime.invoke_running(application_id, |application| {
+            let Some(message) = self.message_bus.dequeue_runtime_inbox(application_id) else {
+                return Ok(MessageDispatchOutcome::InboxEmpty);
+            };
+            let mut context = ApplicationMessageContext::new(
+                application_id,
+                &mut self.message_bus,
+                &self.dispatch_states,
+            );
+            application.handle_message(&message, &mut context)?;
+            Ok(MessageDispatchOutcome::Dispatched)
+        });
+
+        match result {
+            Ok(outcome) => Ok(outcome),
+            Err(RunningCallbackError::Lifecycle(error)) => Err(
+                MessagingOperationError::without_clearing(MessageDispatchError::Lifecycle(error)),
+            ),
+            Err(RunningCallbackError::Application(source)) => Err(self.cleared_error(
+                application_id,
+                MessageDispatchError::Application {
+                    application_id,
+                    source,
+                },
+            )),
+        }
+    }
+}
+
 impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
 {
@@ -415,6 +496,24 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
         kind: MessagingRuntimeCreateErrorKind,
     ) -> MessagingRuntimeCreateError<A> {
         MessagingRuntimeCreateError { kind, runtime }
+    }
+
+    fn validate_dispatch_state<E>(
+        &self,
+        application_id: ApplicationId,
+    ) -> Result<(), MessagingOperationError<MessageDispatchError<E>>> {
+        match self.runtime.state(application_id) {
+            Ok(ApplicationState::Running) => Ok(()),
+            Ok(state) => Err(MessagingOperationError::without_clearing(
+                MessageDispatchError::Lifecycle(LifecycleError::NotRunning {
+                    application_id,
+                    state,
+                }),
+            )),
+            Err(error) => Err(MessagingOperationError::without_clearing(
+                MessageDispatchError::Lifecycle(error),
+            )),
+        }
     }
 }
 
@@ -440,4 +539,17 @@ impl<E> MessagingOperationError<E> {
             discarded_deliveries: 0,
         }
     }
+}
+
+fn create_dispatch_state_storage(
+    application_count: usize,
+) -> Result<Vec<ApplicationState>, MessagingRuntimeCreateErrorKind> {
+    let mut states = Vec::new();
+    states.try_reserve_exact(application_count).map_err(|_| {
+        MessagingRuntimeCreateErrorKind::DispatchStateStorageAllocationFailed {
+            requested: application_count,
+        }
+    })?;
+    states.resize(application_count, ApplicationState::Registered);
+    Ok(states)
 }
