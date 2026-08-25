@@ -95,9 +95,11 @@ capacities plus the one in-flight delivery record.
 - Batch or automatic dispatch was deferred because ordering, fairness,
   scheduling, and due-work policy require time and scheduling evidence.
 
-## Required evidence
+## Evidence
 
-Public-API tests must demonstrate:
+Implementation commit `150b924e6391c9adcc14f23bf21138011b747313`
+adds the callback, context, preallocated state snapshot, caller-selected
+dispatch, and five focused public-API tests. They demonstrate:
 
 - non-running and unknown dispatch rejection before queue or callback mutation;
 - an explicit empty-inbox outcome without callback invocation;
@@ -112,7 +114,9 @@ Public-API tests must demonstrate:
   peer deliveries.
 
 Existing lifecycle, routing, availability, clearing, and restart tests remain
-required regression evidence.
+regression evidence. The complete suite passes 38 tests with no dependency,
+thread, executor, automatic dispatch, scheduler, clock, event service, or
+protocol boundary added by this decision.
 
 ## Consequences and risks
 

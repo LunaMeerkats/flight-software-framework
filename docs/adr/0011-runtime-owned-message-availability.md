@@ -1,6 +1,6 @@
 # ADR-0011: Runtime-owned lifecycle-aware message availability
 
-- Status: Accepted and implemented as a partial ADR-0004 integration slice
+- Status: Accepted and implemented as the ADR-0004 lifecycle integration slice
 - Date: 2026-08-25
 - Scope: Ownership and lifecycle availability for in-process application inboxes
 
@@ -135,15 +135,23 @@ routing without lifecycle integration. This slice adds no dependency, thread,
 executor, wait, retry, spill path, dynamic subscription, application dispatch,
 event service, clock, scheduler, or protocol boundary.
 
+## Subsequent application boundary
+
+[ADR-0012](0012-application-message-dispatch.md) preserves this owner and adds
+caller-selected one-message dispatch. It refreshes lifecycle states before each
+callback and supplies only a publish-capable context, so application
+self-publication cannot bypass this decision's availability or clearing rules.
+
 ## Consequences and risks
 
 - Mission composition becomes a two-step pre-v0.1 process: register every
   application, then consume the still-registered runtime into its immutable
   message topology. A future sample may provide a narrower builder if this is
   demonstrably awkward.
-- External callers can publish and inspect queue counts, but applications
-  cannot yet consume or publish through their work callback. RFF-REQ-003
-  therefore remains partial.
+- At this slice boundary, only external callers could publish and inspect queue
+  counts. ADR-0012 now adds application consumption and self-publication through
+  a separate messaging callback; ordinary `Application::work` remains
+  context-free.
 - Clearing happens only after a synchronous callback returns. Panics, hangs,
   process failure, memory exhaustion, application-internal cleanup, and secure
   payload erasure remain outside this cooperative behavior.
@@ -157,8 +165,8 @@ event service, clock, scheduler, or protocol boundary.
 
 ## Revisit conditions
 
-Revisit this wrapper when application message access defines its borrowing and
-one-in-flight rules, mission composition demonstrates a need for an atomic
+Revisit this wrapper when mission composition demonstrates a need for an atomic
 application-plus-inbox builder, message storage belongs more coherently inside
-runtime records, dynamic topology becomes justified, or concurrency changes
-the serial state and clearing order.
+runtime records, a common multi-service context becomes justified, dynamic
+topology becomes necessary, or concurrency changes the serial state and
+clearing order.

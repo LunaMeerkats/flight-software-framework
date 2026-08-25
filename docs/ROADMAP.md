@@ -66,29 +66,33 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-25)**
+Status: **In progress (2026-08-26)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
 - Add structured events without creating an unbounded side channel.
 - Add injected and simulated time, then caller-driven scheduled work.
 
-Completed partial slices: the standalone routing core uses inline const-bounded
+Completed messaging slices: the standalone routing core uses inline const-bounded
 payloads, immutable unique topic sets, pre-reserved positive-capacity inboxes,
 cross-topic FIFO, reject-newest saturation, continued partial fan-out, and
 ordered publisher-visible classifications. The owning integration constructs
 one fresh inbox per still-registered runtime application, makes only `Running`
 endpoints available, returns exact clearing counts after stop or returned
 callback error, and reconnects an empty inbox after successful restart from
-`Stopped`.
+`Stopped`. Caller-selected dispatch now removes at most one oldest message for
+a running application and supplies a publish-only context. Tests prove bounded
+self-publication, refreshed lifecycle availability, explicit empty and rejected
+dispatch, and non-transactional peer delivery when a callback later fails.
+RFF-REQ-003 is verified by the combined evidence.
 
-Next slice: select the smallest application messaging-context and one-in-flight
-dispatch boundary that proves ownership and borrowing without adding automatic
-dispatch, concurrency, or scheduling. Include true self-publication evidence
-before treating RFF-REQ-003 as verified.
+Next slice: select the smallest structured finite event-delivery boundary
+without creating a recursive or unbounded diagnostic side channel. Preserve
+caller-driven execution; defer clock and scheduling policy to their own slices.
 
-Exit evidence: exact-boundary, ordering, saturation, unavailable/clearing, and
-simulated-time integration tests for RFF-REQ-003 through RFF-REQ-005.
+Exit evidence: exact-boundary, ordering, saturation, and unavailable/clearing
+tests for RFF-REQ-003; structured-event and simulated-time integration tests
+for RFF-REQ-004 and RFF-REQ-005.
 
 ## Stage 3 — Configuration and mission boundaries
 

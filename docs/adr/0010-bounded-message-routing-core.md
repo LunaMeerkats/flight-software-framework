@@ -57,10 +57,12 @@ Direct `MessageBus::new` and `MessageBus::publish` model every configured
 endpoint as available and do not consult lifecycle state. The subsequent
 owning integration in
 [ADR-0011](0011-runtime-owned-message-availability.md) constructs a fresh bus
-internally and supplies lifecycle-derived availability and clearing. True
-self-publication from application work, service-context borrowing, and
-one-in-flight dispatch remain required. RFF-REQ-003 is therefore still
-partially implemented and not verified in full.
+internally and supplies lifecycle-derived availability and clearing.
+[ADR-0012](0012-application-message-dispatch.md) subsequently adds true
+self-publication, a publish-only application context, and one-in-flight
+caller-selected dispatch. The combined evidence verifies RFF-REQ-003; this
+standalone core still makes no lifecycle or application-dispatch claim by
+itself.
 
 ## Alternatives considered
 
@@ -105,8 +107,9 @@ ADR-0011 reuses this routing and storage core without changing its standalone
 available-endpoint behavior. `MessagingRuntime` assigns identities internally,
 requires one fresh configuration per still-registered application, derives
 availability from runtime state, and clears stopped or failed queues before
-returning exact discarded-delivery counts. It does not expose `dequeue` as
-application dispatch or add a work context.
+returning exact discarded-delivery counts. ADR-0012 then keeps `dequeue`
+internal to one running-only dispatch and lends only publication to the
+application callback.
 
 ## Consequences and risks
 
@@ -132,7 +135,7 @@ application dispatch or add a work context.
 
 ## Revisit conditions
 
-Revisit this decision when `Application::work` needs a messaging context,
-measured payloads make inline copies unsuitable, a protocol boundary requires
-a validated external identifier, independent traffic classes are required, or
+Revisit this decision when measured payloads make inline copies unsuitable, a
+protocol boundary requires a validated external identifier, independent traffic
+classes are required, a shared multi-service context becomes justified, or
 concurrency changes serial ordering and allocation assumptions.

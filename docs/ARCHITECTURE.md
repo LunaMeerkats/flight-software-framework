@@ -96,6 +96,9 @@ fault tolerance.
   complete inbox topology to a still-registered runtime, makes only `Running`
   endpoints available, and returns exact queue-clearing counts on stop and
   returned callback errors.
+- [ADR-0012](adr/0012-application-message-dispatch.md) adds caller-selected
+  one-message dispatch through a separate application callback and a
+  publish-only context backed by a refreshed lifecycle-state snapshot.
 
 ## Current implementation boundary
 
@@ -115,8 +118,8 @@ operation-specific result and commits terminal `Failed`. Public-API tests
 suppress callbacks for rejected operations and show that a returned work error
 does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The runtime
-has no automatic dispatch, service context, event emission, or sample mission,
-so RFF-REQ-008 remains partial.
+has no automatic dispatch, general service context, event emission, or sample
+mission, so RFF-REQ-008 remains partial.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -135,10 +138,22 @@ before returning the exact discarded-delivery count. Successful restart from
 `Stopped` reconnects the already-empty inbox. Public tests preserve the
 operation-specific concrete error and leave peer queues and work operable.
 
-The integration has no application message context, self-publication, dequeue
-dispatch, or one-in-flight rule. Its positional configurations also rely on
-mission composition to associate each capacity and topic set with the intended
-registration position. RFF-REQ-003 remains partial.
+Applications implementing `MessagingApplication` can now receive one oldest
+message through caller-selected `dispatch_one`. The message remains outside its
+inbox only during that synchronous callback. A publish-only
+`ApplicationMessageContext` uses lifecycle states refreshed immediately before
+each dispatch, permits true self-publication into the freed slot, and exposes no
+dequeue, nested dispatch, lifecycle operation, or raw bus access. Success keeps
+`Running`. A returned message error commits only the selected application to
+terminal `Failed`, drops the attempted in-flight record, clears its remaining
+queue exactly, and does not roll back peer deliveries already accepted.
+
+This combined routing, lifecycle-availability, and application-dispatch
+evidence verifies RFF-REQ-003. The positional configuration limitation remains:
+mission composition must associate each capacity and topic set with the intended
+registration position. There is still no automatic or batch dispatch, ordering
+or fairness policy across selected applications, event service, clock, or
+scheduler.
 
 ## Alternatives kept open
 
@@ -155,8 +170,9 @@ registration position. RFF-REQ-003 remains partial.
 
 ## Major technical risks
 
-- The pre-v0.1 public trait may freeze a context-free work shape before
-  framework services demonstrate the borrowing and error behavior they need.
+- The pre-v0.1 application surface now has separate context-free work and
+  message callbacks. A later common service context could cause API churn, but
+  combining them before another service exists would remain speculative.
 - A returned application callback error may follow partial application-internal
   cleanup or mutation; the runtime records `Failed` but provides no rollback or
   cleanup guarantee.
@@ -170,6 +186,11 @@ registration position. RFF-REQ-003 remains partial.
 - Runtime-owned inbox configurations are positional. The integration proves
   identity order and count, but cannot recognize two valid configurations that
   mission composition accidentally swaps.
+- Message dispatch copies lifecycle states into preallocated storage before
+  every callback. Serial execution and the publish-only context keep that view
+  stable, but concurrency would require a different availability design.
+- Callback publications are immediate and non-transactional. Peer deliveries
+  remain even when the publishing callback subsequently returns an error.
 - Mission-defined topic equality and per-publication report allocation are
   bounded by configured route count but are not a general non-blocking claim.
 - A returned application error is not equivalent to containing a panic, hang,

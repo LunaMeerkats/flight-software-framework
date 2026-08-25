@@ -1,6 +1,6 @@
 # Plan: dispatch one bounded application message
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-26**
 
 ## Objective
@@ -58,11 +58,13 @@ general context.
   application context, callback, dispatch outcome/error, state snapshot, and
   public exports.
 - `tests/message_dispatch.rs`: public FIFO, empty/rejected dispatch,
-  self-publication, peer-delivery, and callback-error evidence.
+  self-publication, lifecycle-availability refresh, peer-delivery, and
+  callback-error evidence.
 - `docs/adr/0012-application-message-dispatch.md`: borrowing, ownership,
   in-flight, publication, and failure decision.
-- README, architecture, requirements, ADR-0004/0010/0011, roadmap, project
-  state, and traceability: truthful status and evidence.
+- `AGENTS.md`, this plan, README, architecture, requirements,
+  ADR-0004/0009/0010/0011, roadmap, project state, and traceability: truthful
+  status and evidence.
 
 ## Verification approach
 
@@ -99,3 +101,24 @@ Stop after one-message dispatch, publish-only context, focused public tests,
 ADR-0012, reconciled RFF-REQ-003 traceability, and the complete baseline are
 coherent and verified. Do not add automatic dispatch, events, time, scheduling,
 configuration, command/telemetry, or protocol work in this run.
+
+## Result
+
+Implementation commit `150b924e6391c9adcc14f23bf21138011b747313`
+reached the intended dispatch stopping point. `MessagingRuntime::dispatch_one`
+validates `Running`, refreshes lifecycle state, moves at most one oldest message
+outside the inbox, and calls a separate `MessagingApplication` with a
+publish-only context. Five focused tests bring the complete suite to 38 and
+verify empty and rejected dispatch, FIFO one-at-a-time handling, bounded
+self-publication and saturation, running-to-stopped availability refresh, and
+exact selected-queue clearing with retained peer delivery after callback error.
+
+Independent reviews corrected the public outcome name, stopped-peer evidence,
+file mapping, comment width, peer-publication API documentation, and the
+snapshot-length invariant. The RFF-REQ-003 wording and traceability now match
+the demonstrated behavior. All required Cargo checks, warnings-denied rustdoc,
+source widths, reasoned expectations, 49 relative links across 23 Markdown
+files, rendered structure for all 13 changed documents, requirement/source
+identifiers, tables, and whitespace checks pass. No dependency, thread,
+executor, automatic dispatch, event, time, scheduling, protocol, licence
+change, or push was added.

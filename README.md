@@ -14,8 +14,8 @@ fit Rust's ownership, type, error, and testing models.
 ## Current status
 
 The repository contains an initial research and architecture baseline, five
-bounded Rust lifecycle/work increments, and two Stage 2 messaging increments. A
-no-dependency `LifecycleRegistry` verifies the logical LC1 transition table. A
+bounded Rust lifecycle/work increments, and three Stage 2 messaging increments.
+A no-dependency `LifecycleRegistry` verifies the logical LC1 transition table. A
 finite-capacity `Runtime<A>` owns statically composed application values and
 executes start, caller-selected work, stop, and in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
@@ -31,18 +31,22 @@ owning `MessagingRuntime` now consumes a fully composed still-registered
 runtime, constructs exactly one fresh inbox per application, derives delivery
 availability from lifecycle state, clears queues after successful stop or a
 returned callback error with an exact discarded-delivery count, and reconnects
-an empty inbox after successful restart. Seven routing-core tests and ten
-runtime-messaging tests cover these boundaries.
+an empty inbox after successful restart. A separate `MessagingApplication`
+callback now receives one oldest in-flight delivery plus a publish-only context.
+It can self-publish through the same bounded bus without gaining lifecycle,
+dequeue, or nested-dispatch access. Seven routing-core, ten runtime-messaging,
+and five message-dispatch tests cover these boundaries.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
-RFF-REQ-002 lifecycle evidence. RFF-REQ-003 remains partial: applications do
-not yet consume or publish messages through a work context, and the runtime has
-no one-in-flight dispatch rule or automatic dispatch. It is not yet a sample
-mission. Time, events, configuration, and command/telemetry boundaries remain
-unimplemented. Traceability distinguishes this evidence from broader v0.1
-requirements and from containment of panics, hangs, cleanup failures, or other
-arbitrary faults.
+RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
+and caller-selected dispatch evidence now verifies RFF-REQ-003, including
+capacity-one self-publication, per-dispatch availability refresh, and exact
+selected-queue clearing after a returned message error. The runtime still has
+no automatic or batch dispatch. It is not yet a sample mission. Time, events,
+configuration, and command/telemetry boundaries remain unimplemented.
+Traceability distinguishes this evidence from containment of panics, hangs,
+cleanup failures, or other arbitrary faults.
 
 The first source-quality checkpoint tracks stable rustfmt at 100 columns and
 denies Clippy functions over a 60-line review threshold across all targets.
@@ -86,6 +90,7 @@ guidance records the remaining structural and document checks.
 - [Caller-driven owned work decision](docs/adr/0009-caller-driven-owned-work.md)
 - [Bounded message-routing core decision](docs/adr/0010-bounded-message-routing-core.md)
 - [Runtime-owned message availability decision](docs/adr/0011-runtime-owned-message-availability.md)
+- [One-message application dispatch decision](docs/adr/0012-application-message-dispatch.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

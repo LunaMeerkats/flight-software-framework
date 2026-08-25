@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-08-25**
+Last reviewed: **2026-08-26**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -46,10 +46,16 @@ an integration test observes both applications completing the scenario.
 Publish/subscribe storage shall enforce configured finite capacity. Routing,
 FIFO ordering, successful delivery, saturation, and known-but-unavailable
 subscriber outcomes shall be explicit. The chosen backpressure or overflow
-policy shall not silently depend on a library default.
+policy shall not silently depend on a library default. One caller-selected
+dispatch shall present at most the oldest queued delivery to a running
+application. The framework-supplied callback context shall expose message
+publication only through the same bounded, lifecycle-aware mechanism.
 
 Acceptance: tests fill each relevant queue to its exact limit and assert the
-publisher-visible result and unaffected-subscriber behavior.
+publisher-visible result and unaffected-subscriber behavior. Dispatch tests
+assert oldest-only consumption, capacity-one self-publication, refreshed peer
+availability, and explicit empty, lifecycle-rejected, and returned-error
+outcomes.
 
 ### RFF-REQ-004 — Injected time and repeatable scheduling
 
@@ -102,12 +108,14 @@ application.
 ## Approved parameters and remaining refinement
 
 These provisional requirements define behavior without freezing unnecessary
-public APIs. Human-approved decisions now settle:
+public APIs. Accepted project decisions now settle:
 
 - RFF-REQ-002 lifecycle and identity in
   [ADR-0003](adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md);
-- RFF-REQ-003 capacity, FIFO, saturation, fan-out, and unavailable endpoints in
-  [ADR-0004](adr/0004-bounded-application-inboxes.md); and
+- RFF-REQ-003 capacity, FIFO, saturation, fan-out, unavailable endpoints, and
+  caller-selected one-message dispatch in
+  [ADR-0004](adr/0004-bounded-application-inboxes.md) and
+  [ADR-0012](adr/0012-application-message-dispatch.md); and
 - RFF-REQ-006 revision and rollback behavior in
   [ADR-0005](adr/0005-configuration-revisions-and-rollback.md).
 

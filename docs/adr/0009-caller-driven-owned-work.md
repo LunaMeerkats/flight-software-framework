@@ -106,6 +106,13 @@ different concrete associated error.
 This is a local architecture decision. No external source prescribes its Rust
 API shape, so the source register does not change.
 
+ADR-0012 later reached this decision's first-service revisit condition. It
+retains context-free `Application::work` and adds a separate
+`MessagingApplication::handle_message` callback with a narrow publish-only
+context. This avoids forcing messaging into ordinary caller-selected work or
+committing a general service context before time, events, and configuration
+exist.
+
 ## Consequences and risks
 
 - The runtime can now execute one explicit unit of application work without
@@ -124,7 +131,7 @@ API shape, so the source register does not change.
 
 ## Revisit conditions
 
-Revisit when the first framework service must cross the application boundary,
-inbox or scheduling evidence requires batch dispatch, a real mission needs
-different work capabilities, error handling benefits from a proven shared
+Revisit the separation when a second framework service crosses the application
+boundary, inbox or scheduling evidence requires batch dispatch, a real mission
+needs different work capabilities, error handling benefits from a proven shared
 shape, or concurrency introduces cancellation and isolation requirements.

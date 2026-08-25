@@ -1,6 +1,6 @@
 # ADR-0004: Bounded application inboxes and partial fan-out
 
-- Status: Accepted; routing and lifecycle-availability slices partially implemented
+- Status: Accepted and implemented through ADR-0010, ADR-0011, and ADR-0012
 - Date: 2026-08-05
 - Scope: In-process v0.1 publish/subscribe delivery
 
@@ -70,19 +70,25 @@ record, derives availability from lifecycle state, clears stopped and failed
 endpoints with exact discarded-delivery counts, and reconnects an empty inbox
 only after successful restart from `Stopped`.
 
-Applications still cannot consume or publish messages through their work
-callback, and no one-in-flight dispatch rule exists. The standalone
-`MessageBus` deliberately continues to model direct construction as
-available-endpoint routing. This ADR and RFF-REQ-003 therefore remain only
-partially implemented.
+[ADR-0012](0012-application-message-dispatch.md) adds one caller-selected
+oldest-message dispatch for a running application. A separate application
+callback receives that sole in-flight delivery and a publish-only context, so
+self-publication uses the same lifecycle-aware capacity and overflow rules. A
+returned callback error clears the selected queue but does not roll back peer
+deliveries already accepted.
+
+The standalone `MessageBus` deliberately continues to model direct construction
+as available-endpoint routing. The combined core, ownership, and dispatch
+evidence implements this ADR and verifies RFF-REQ-003 without adding automatic
+dispatch or concurrency.
 
 ## Required verification and revisit conditions
 
-Tests must preserve the exact capacity boundary, cross-topic FIFO, partial
-fan-out, all-full delivery, no subscribers, unavailable endpoints,
-clearing/reconnect, duplicate subscriptions, stable report ordering, and
-payload limits. Application self-publication and one-in-flight dispatch remain
-required evidence.
+Regression tests must preserve the exact capacity boundary, cross-topic FIFO,
+partial fan-out, all-full delivery, no subscribers, unavailable endpoints,
+clearing/reconnect, duplicate subscriptions, stable report ordering, payload
+limits, application self-publication, refreshed availability, and one-in-flight
+dispatch.
 
 Revisit when an application needs independent traffic classes, lossless or
 priority delivery, runtime subscription mutation, concurrency, or a stricter

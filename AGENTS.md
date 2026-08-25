@@ -26,10 +26,10 @@ translate NASA C source.
 - `PLANS.md`: the active or most recently completed bounded work plan.
 - `src/`: the single unpublished library package; currently logical lifecycle
   records, a synchronous start/work/stop/in-place-restart owned runtime, a
-  bounded message-routing core, and lifecycle-aware runtime ownership of one
-  inbox per registered application.
-- `tests/`: public-API lifecycle, runtime, message-routing, and runtime-messaging
-  integration tests.
+  bounded message-routing core, lifecycle-aware ownership of one inbox per
+  application, and caller-selected one-message application dispatch.
+- `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
+  application-dispatch integration tests.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -62,9 +62,10 @@ diff. Document any justified adaptation before treating it as the baseline.
 Never report a check as passing unless it completed successfully.
 
 The source-quality policy was established with rustc/cargo 1.96.1, rustfmt
-1.9.0-stable, and Clippy 0.1.96. These versions record evidence, not a minimum
-supported Rust version or a toolchain pin. Re-audit the configuration and whole
-tree when the active toolchain changes.
+1.9.0-stable, and Clippy 0.1.96. A whole-tree re-audit passed on 2026-08-26 with
+rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98. These versions
+record evidence, not a minimum supported Rust version or a toolchain pin.
+Re-audit the configuration and whole tree when the active toolchain changes.
 
 ## Engineering conventions
 
