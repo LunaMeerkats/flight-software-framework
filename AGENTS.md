@@ -27,9 +27,10 @@ translate NASA C source.
 - `src/`: the single unpublished library package; currently logical lifecycle
   records, a synchronous start/work/stop/in-place-restart owned runtime, a
   bounded message-routing core, lifecycle-aware ownership of one inbox per
-  application, and caller-selected one-message application dispatch.
+  application, caller-selected one-message application dispatch, and a
+  standalone bounded structured-event queue.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
-  application-dispatch integration tests.
+  application-dispatch and event-queue integration tests.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

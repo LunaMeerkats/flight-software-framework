@@ -54,10 +54,11 @@ initial runtime will not spawn hidden work.
 
 [ADR-0001](adr/0001-caller-driven-host-runtime.md) selects a serial,
 caller-driven host runtime for the first v0.1 slices. The current host explicitly
-selects one application work call and has no clock or scheduler. Later scheduled
-work will use an injected clock, with deterministic tests explicitly advancing
-a simulated clock. This keeps eventual event and transition ordering testable
-without adopting an async runtime or thread lifecycle early.
+selects one application work call or one message dispatch. Callers can also emit
+to and dequeue from the standalone event queue. There is no clock or scheduler.
+Later scheduled work will use an injected clock, with deterministic tests
+explicitly advancing a simulated clock. This keeps eventual event and transition
+ordering testable without adopting an async runtime or thread lifecycle early.
 
 Here, **deterministic** means that conforming, terminating applications with
 controlled external effects produce the same framework-observable ordering from
@@ -72,8 +73,9 @@ fault tolerance.
 - [ADR-0004](adr/0004-bounded-application-inboxes.md) defines one bounded inbox
   per application, reject-newest overflow without waiting for inbox capacity or
   subscriber progress, explicit partial fan-out reporting, and lifecycle-aware
-  clearing and reconnection. Its routing and ownership slices are partially
-  implemented.
+  clearing and reconnection. ADR-0010 through ADR-0012 implement its routing,
+  lifecycle ownership, and caller-selected dispatch boundaries; their combined
+  evidence verifies RFF-REQ-003.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   monotonic snapshot revisions and one consume-once rollback slot. It is not
   implemented.
@@ -99,6 +101,9 @@ fault tolerance.
 - [ADR-0012](adr/0012-application-message-dispatch.md) adds caller-selected
   one-message dispatch through a separate application callback and a
   publish-only context backed by a refreshed lifecycle-state snapshot.
+- [ADR-0013](adr/0013-bounded-structured-event-queue.md) selects structured
+  source, severity, mission identifier, and elapsed timestamp values plus a
+  positive pre-reserved FIFO queue with caller-visible reject-newest saturation.
 
 ## Current implementation boundary
 
@@ -107,8 +112,8 @@ it allocates opaque identities in registration order and enforces
 `Registered -> Running -> Stopped -> Running` without owning application
 objects. `Runtime<A>` separately owns finite-capacity application records. A
 mission-selected concrete representation, such as an enum, implements
-  synchronous `Application::start`, `Application::work`, `Application::stop`,
-  and `Application::restart` boundaries with distinct concrete error types.
+synchronous `Application::start`, `Application::work`, `Application::stop`, and
+`Application::restart` boundaries with distinct concrete error types.
 
 Runtime start, work, stop, and restart validate identity and state before
 invocation. Lifecycle success commits `Running`, `Stopped`, or `Running`, while
@@ -117,9 +122,9 @@ application value. A returned error is preserved in the caller-visible
 operation-specific result and commits terminal `Failed`. Public-API tests
 suppress callbacks for rejected operations and show that a returned work error
 does not mutate peer records or prevent subsequent peer work. A complete
-two-application lifecycle integration test now verifies RFF-REQ-002. The runtime
-has no automatic dispatch, general service context, event emission, or sample
-mission, so RFF-REQ-008 remains partial.
+two-application lifecycle integration test now verifies RFF-REQ-002. The
+lifecycle-only `Runtime<A>` has no automatic dispatch, general service context,
+event emission, or sample mission, so RFF-REQ-008 remains partial.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -148,12 +153,21 @@ dequeue, nested dispatch, lifecycle operation, or raw bus access. Success keeps
 terminal `Failed`, drops the attempted in-flight record, clears its remaining
 queue exactly, and does not roll back peer deliveries already accepted.
 
+`EventQueue<EventId>` is a separate positive-capacity FIFO for structured
+`Event` records. Each record has a framework or application source, one of three
+local severities, a mission-defined copied identifier, and an explicit elapsed
+`EventTimestamp`. Construction reserves the full record limit. Emission accepts
+through that exact limit; saturation retains older records and returns a
+must-use `QueueFull` outcome without recursive diagnostics. Dequeue frees one
+slot. The queue neither creates timestamps nor attaches to an application or
+runtime, so RFF-REQ-005 remains partial.
+
 This combined routing, lifecycle-availability, and application-dispatch
 evidence verifies RFF-REQ-003. The positional configuration limitation remains:
 mission composition must associate each capacity and topic set with the intended
 registration position. There is still no automatic or batch dispatch, ordering
-or fairness policy across selected applications, event service, clock, or
-scheduler.
+or fairness policy across selected applications, runtime-integrated event
+emission, clock, or scheduler.
 
 ## Alternatives kept open
 
@@ -162,24 +176,31 @@ scheduler.
   explicit evidence first.
 - An async runtime may later suit many concurrent I/O sources, but no current
   workload justifies its dependency, executor, cancellation, or timing model.
-- `no_std` or RTOS adapters may later be explored after the host interfaces are
-  proven and a concrete target supplies constraints.
+- Future embedded work belongs in a separate concrete-target fork after the
+  host v0.1 architecture review. This repository will not grow speculative
+  `no_std`, RTOS, hardware, or shared-core adapters in preparation for it.
 - Standard-library bounded channels are a future option, but publish/subscribe
   fan-out and overflow policy still require framework behavior; selecting a
   primitive is not the same as designing the bus. (`SRC-RUST-CHANNEL`)
 
 ## Major technical risks
 
-- The pre-v0.1 application surface now has separate context-free work and
-  message callbacks. A later common service context could cause API churn, but
-  combining them before another service exists would remain speculative.
+- The pre-v0.1 application surface has separate context-free work and message
+  callbacks. The standalone event queue does not yet cross that boundary, so it
+  provides no evidence for a common service-context borrowing shape. A later
+  shared context could still cause API churn.
 - A returned application callback error may follow partial application-internal
   cleanup or mutation; the runtime records `Failed` but provides no rollback or
   cleanup guarantee.
 - “Deterministic” may be overstated unless every input and ordering source is
   controlled and the claim remains limited to repeatability.
-- Bounded bus queues can coexist with unbounded event, telemetry, or diagnostic
-  accumulation unless every operational path is reviewed.
+- The event queue bounds only retained records. Rejected or dequeued events,
+  future telemetry, and any caller bypass diagnostic path remain outside that
+  bound.
+- Reject-newest event saturation can omit a later high-severity record. The
+  must-use outcome is explicit but does not provide guaranteed delivery.
+- Caller-supplied event timestamps can be non-monotonic until an injected clock
+  owns their production; FIFO is emission order rather than timestamp sorting.
 - Direct standalone routing-core construction can still be paired with a
   same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
   guarantees apply only to `MessagingRuntime`.

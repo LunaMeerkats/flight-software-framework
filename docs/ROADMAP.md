@@ -66,7 +66,7 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-26)**
+Status: **In progress (2026-08-27)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
@@ -86,9 +86,15 @@ self-publication, refreshed lifecycle availability, explicit empty and rejected
 dispatch, and non-transactional peer delivery when a callback later fails.
 RFF-REQ-003 is verified by the combined evidence.
 
-Next slice: select the smallest structured finite event-delivery boundary
-without creating a recursive or unbounded diagnostic side channel. Preserve
-caller-driven execution; defer clock and scheduling policy to their own slices.
+Completed first event slice: machine-inspectable records enter a standalone
+positive-capacity FIFO queue with direct reject-newest saturation reporting.
+The slice defines the timestamp consumer but neither produces timestamps from a
+framework clock nor emits runtime or application events, so RFF-REQ-005 remains
+partial.
+
+Next slice: select and implement the smallest injected manual clock that owns
+elapsed `EventTimestamp` production. Preserve caller-driven execution and defer
+scheduling and runtime failure emission to separate increments.
 
 Exit evidence: exact-boundary, ordering, saturation, and unavailable/clearing
 tests for RFF-REQ-003; structured-event and simulated-time integration tests

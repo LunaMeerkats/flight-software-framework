@@ -1,6 +1,6 @@
 # Plan: add a bounded structured-event queue
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-27**
 
 ## Objective
@@ -114,4 +114,25 @@ this run.
 
 ## Result
 
-Pending implementation and verification.
+Implemented the standalone `EventQueue<EventId>` and its structured event
+vocabulary in commit `cc0e453`. The queue has a separate positive logical
+capacity, reserves record storage during construction, preserves FIFO emission
+order, rejects the newest event with a `#[must_use]` typed outcome when full,
+and accepts an explicit retry after one dequeue. Four public integration tests
+cover field access, invalid construction, the exact boundary, non-monotonic
+timestamps, saturation preservation, and retry behavior.
+
+The required format, check, Clippy, 42-test, warnings-denied rustdoc, and diff
+checks passed. The final source-form audit found no Rust physical lines over
+100 columns, no comment-only lines over 80 columns, and three narrow reasoned
+Clippy expectations across 13 handwritten Rust files. The repository document
+audit found 24 Markdown files, 57 resolving relative links, eight matched
+requirement and traceability identifiers, 13 unique ADR identifiers, and 21
+defined source identifiers. All nine changed documents rendered to nonempty
+HTML with the expected structural elements; interactive browser inspection was
+unavailable because the selected browser rejected the local rendered document
+URL, so no visual-browser pass is claimed.
+
+RFF-REQ-005 and RFF-REQ-008 remain explicitly partial. No dependency, thread,
+executor, runtime integration, application service context, clock, scheduler,
+protocol, persistence mechanism, or compatibility claim was added.

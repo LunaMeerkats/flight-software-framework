@@ -14,10 +14,11 @@ fit Rust's ownership, type, error, and testing models.
 ## Current status
 
 The repository contains an initial research and architecture baseline, five
-bounded Rust lifecycle/work increments, and three Stage 2 messaging increments.
-A no-dependency `LifecycleRegistry` verifies the logical LC1 transition table. A
-finite-capacity `Runtime<A>` owns statically composed application values and
-executes start, caller-selected work, stop, and in-place restart synchronously.
+bounded Rust lifecycle/work increments, three Stage 2 messaging increments, and
+one standalone structured-event increment. A no-dependency `LifecycleRegistry`
+verifies the logical LC1 transition table. A finite-capacity `Runtime<A>` owns
+statically composed application values and executes start, caller-selected work,
+stop, and in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
 successful work retains `Running`. Restart and work retain application-owned
 state, while a returned concrete operation error enters terminal `Failed`
@@ -37,14 +38,23 @@ It can self-publish through the same bounded bus without gaining lifecycle,
 dequeue, or nested-dispatch access. Seven routing-core, ten runtime-messaging,
 and five message-dispatch tests cover these boundaries.
 
+A standalone `EventQueue<EventId>` stores typed source, severity,
+mission-defined copied identifier, and explicit elapsed `EventTimestamp`
+values. It pre-reserves a positive record limit, preserves emission-order FIFO,
+rejects the newest event at saturation with a caller-visible outcome, and frees
+one slot on dequeue. Four public tests cover its fields and exact storage
+boundary. Callers still supply timestamps explicitly; the queue is not attached
+to either runtime.
+
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
 RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
 and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
-no automatic or batch dispatch. It is not yet a sample mission. Time, events,
-configuration, and command/telemetry boundaries remain unimplemented.
+no automatic or batch dispatch. It is not yet a sample mission. Injected time,
+framework-owned event emission, configuration, and command/telemetry boundaries
+remain unimplemented, so RFF-REQ-005 and RFF-REQ-008 remain partial.
 Traceability distinguishes this evidence from containment of panics, hangs,
 cleanup failures, or other arbitrary faults.
 
@@ -91,6 +101,7 @@ guidance records the remaining structural and document checks.
 - [Bounded message-routing core decision](docs/adr/0010-bounded-message-routing-core.md)
 - [Runtime-owned message availability decision](docs/adr/0011-runtime-owned-message-availability.md)
 - [One-message application dispatch decision](docs/adr/0012-application-message-dispatch.md)
+- [Bounded structured-event queue decision](docs/adr/0013-bounded-structured-event-queue.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)
