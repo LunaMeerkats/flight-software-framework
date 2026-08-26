@@ -28,6 +28,10 @@ injected time and scheduling.
   `150b924e6391c9adcc14f23bf21138011b747313` adds the separate message
   callback, publish-only context, preallocated per-dispatch lifecycle snapshot,
   one-in-flight dispatch, and five focused public tests.
+- Repository content is available under `MIT OR Apache-2.0` with the confirmed
+  notice `Copyright 2026 Daniel Smith`. Both canonical licence files, Cargo
+  metadata, predicted package inventory, and the generated package archive have
+  been verified while `publish = false` remains in force.
 - Formatting, all-target checking, warnings-denied Clippy, all 38 tests, and
   warnings-denied all-feature documentation generation pass with rustc/cargo
   1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
@@ -89,9 +93,9 @@ to separate measured increments.
 
 ## Work in progress
 
-No implementation work is in progress. The application-dispatch slice reached
-its intended stopping point before automatic dispatch, structured events, time,
-or scheduling.
+No implementation work is in progress. The approved dual licence has been
+applied without changing Rust behavior or enabling Cargo publication. The next
+technical slice remains structured events.
 
 ## Highest risks and uncertainties
 
@@ -116,8 +120,6 @@ or scheduling.
 
 ## Important unresolved decisions
 
-- The exact copyright-holder text is required before adding the approved MIT
-  and Apache-2.0 licence files and Cargo licence expression.
 - No structured event representation, event queue bound, or overflow policy is
   selected.
 - No mission payload limit, external topic identifier, or wire representation
@@ -139,15 +141,11 @@ or scheduling.
 
 ## Latest run
 
-2026-08-26: Added caller-selected one-message dispatch. A separate
-`MessagingApplication` callback receives one oldest in-flight message and a
-publish-only context backed by lifecycle states refreshed immediately before
-each dispatch. Five tests prove lifecycle and empty-inbox suppression, FIFO
-one-at-a-time consumption, capacity-one self-publication and saturation,
-running-to-stopped peer availability refresh, and exact selected-queue clearing
-with retained peer delivery after a returned callback error. The suite now has
-38 tests and verifies RFF-REQ-003. Independent reviews corrected the outcome
-name, stopped-peer evidence, source width, file mapping, non-transactional API
-documentation, and snapshot-length invariant. No dependency, thread, executor,
-automatic dispatch, event, time, scheduling, protocol, licence change, or push
-was added.
+2026-08-26: Applied the human-approved recipient-choice `MIT OR Apache-2.0`
+licence after Daniel Smith confirmed the exact notice and his authority to
+license all current content. The canonical MIT and Apache files match their
+audited byte counts and SHA-256 hashes. Cargo metadata and the actual generated
+package retain the SPDX expression, both licence files, and `publish = false`.
+The complete baseline still passes 38 tests with warnings denied. No Rust source,
+dependency, NOTICE, per-file header, name or trademark claim, publication,
+release, protocol, technical behavior, or push changed.

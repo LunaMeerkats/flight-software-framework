@@ -1,124 +1,103 @@
-# Plan: dispatch one bounded application message
+# Plan: apply the approved dual licence
 
 Status: **Complete**
 Date: **2026-08-26**
 
 ## Objective
 
-Implement the smallest application-facing messaging boundary: let a caller
-select one running application, move at most its oldest queued delivery into one
-in-flight callback, and let that callback publish through the same
-lifecycle-owned bounded bus.
+Apply the human-approved `MIT OR Apache-2.0` licence using the confirmed exact
+notice `Copyright 2026 Daniel Smith`, while preserving `publish = false` and
+all project safety, non-affiliation, namespace, and trademark limitations.
 
 ## Context
 
-The clean pre-change baseline passes with 33 tests. ADR-0004 already places one
-serial in-flight delivery outside configured inbox capacities. ADR-0010 proves
-FIFO and bounded routing, while ADR-0011 proves runtime ownership, lifecycle
-availability, clearing, and restart reconnection. Applications still cannot
-consume or publish messages, so the strongest remaining RFF-REQ-003 evidence is
-the borrowing and dispatch boundary that joins those completed slices.
+ADR-0002 already selected recipient-choice dual licensing but deliberately
+withheld the licence files and Cargo expression until the copyright holder was
+confirmed. Daniel Smith has now confirmed both the exact notice and his authority
+to license all current repository content.
 
-The existing context-free `Application::work` remains useful for caller-selected
-work that is not caused by a queued message. This increment will add a separate
-message callback rather than prematurely forcing all future services into one
-general context.
+Licensing the repository grants permissions under the selected terms. It does
+not publish the crate, register the project name, clear a trademark, authorize a
+push or release, or change any technical behavior.
 
 ## Acceptance criteria
 
-- Add a narrowly scoped application messaging trait whose callback receives
-  only the selected in-flight message and a publish-only context.
-- Add one caller-selected `MessagingRuntime` dispatch operation that validates
-  identity and `Running` state before changing an inbox.
-- Return an explicit no-message outcome without invoking application code.
-- Remove at most the oldest queued message, keep it outside inbox capacity only
-  for the synchronous callback, and expose no nested dequeue or dispatch path.
-- Derive publication availability from a preallocated state snapshot refreshed
-  immediately before the callback. The callback cannot mutate lifecycle state,
-  so the snapshot is not a second lifecycle authority.
-- Prove true self-publication can fill the slot freed by the in-flight message,
-  while saturation, peer delivery, unavailable reporting, and FIFO remain
-  explicit.
-- On callback success, retain `Running` and keep accepted publications queued.
-- On a returned callback error, preserve the concrete source, commit only the
-  selected application to terminal `Failed`, drop the attempted in-flight
-  message, clear only its queued inbox, and report the exact queued discard
-  count. Peer publications already accepted during the callback remain.
-- Reconcile the RFF-REQ-003 wording with the stronger application-consumption,
-  self-publication, and one-in-flight evidence required by the accepted ADR.
-- Add no dependency, automatic or batch dispatch, thread, executor, scheduler,
-  clock, event service, protocol boundary, dynamic topology, or lint waiver.
+- Root `LICENSE-MIT` contains the confirmed notice exactly once plus the
+  canonical MIT terms.
+- Root `LICENSE-APACHE` matches the unmodified Apache License 2.0 text from the
+  Apache Software Foundation.
+- Narrow Git attributes preserve both canonical licence files as UTF-8/LF on
+  checkout without changing the repository's broader line-ending policy.
+- Cargo exposes `license = "MIT OR Apache-2.0"`, no `license-file`, and the
+  existing non-publication setting remains explicit.
+- Cargo package inventory and the actual crate archive contain both licence
+  files and the normalized manifest retains the expression and
+  `publish = false`.
+- README, AGENTS, the charter, ADR-0002, source provenance, and project state
+  describe the applied licence without implying publication, trademark
+  clearance, NASA affiliation, certification, or compatibility.
+- No unnecessary NOTICE file, mass source headers, dependency, toolchain change,
+  technical API change, release, push, or publication is added.
+- The complete documented baseline and repository document audits pass.
 
 ## Files and components
 
-- `src/runtime.rs`: one crate-private running-callback primitive reused by the
-  existing context-free work operation.
-- `src/messaging.rs`: internal runtime-inbox dequeue support.
-- `src/application_messaging.rs`, `src/messaging_runtime.rs`, and `src/lib.rs`:
-  application context, callback, dispatch outcome/error, state snapshot, and
-  public exports.
-- `tests/message_dispatch.rs`: public FIFO, empty/rejected dispatch,
-  self-publication, lifecycle-availability refresh, peer-delivery, and
-  callback-error evidence.
-- `docs/adr/0012-application-message-dispatch.md`: borrowing, ownership,
-  in-flight, publication, and failure decision.
-- `AGENTS.md`, this plan, README, architecture, requirements,
-  ADR-0004/0009/0010/0011, roadmap, project state, and traceability: truthful
-  status and evidence.
+- `LICENSE-MIT`, `LICENSE-APACHE`, and `.gitattributes`: canonical
+  recipient-choice licence terms with reproducible LF checkout bytes.
+- `Cargo.toml`: SPDX licence metadata while retaining `publish = false`.
+- `AGENTS.md`, `README.md`, and `docs/CHARTER.md`: contributor and
+  user-facing applied-licence status.
+- `docs/adr/0002-project-name-and-licensing-intent.md`: confirmed holder,
+  exact notice, completed application, and retained restrictions.
+- `docs/research/SOURCES.md`: rechecked primary-source provenance and applied
+  local treatment.
+- `docs/PROJECT_STATE.md`: verified licence state, resolved blocker, and latest
+  run.
+- `PLANS.md`: this bounded plan and final verification result.
 
 ## Verification approach
 
-- Run `cargo fmt --all -- --check`.
-- Run `cargo check --workspace --all-targets --all-features`.
-- Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
-- Run `cargo test --workspace --all-features`.
-- Run warnings-denied all-feature rustdoc generation.
-- Audit handwritten Rust physical and comment-only widths and all reasoned
-  expectations.
-- Resolve relative Markdown links; render changed documents; check requirement
-  and source identifiers and table shapes.
-- Run `git diff --check` and review the complete diff.
+- Compare `LICENSE-APACHE` to the current canonical ASF text and
+  `LICENSE-MIT` to the OSI terms after substituting the confirmed notice.
+- Assert the exact MIT notice occurs once.
+- Inspect `cargo metadata --no-deps --format-version 1`.
+- Run `cargo package --allow-dirty --locked --list` and
+  `cargo package --allow-dirty --locked`; inspect the resulting archive.
+- Run the repository's full format, check, Clippy, test, warnings-denied rustdoc,
+  and Git whitespace baseline.
+- Re-audit handwritten Rust widths and expectations even though Rust source is
+  unchanged.
+- Verify relative Markdown links, changed rendered documents, source identifiers,
+  tables, headings, and stale pending-licence wording.
+- Review the complete diff and confirm no unrelated file changed.
 
-## Known risks
+## Risks and safe stopping point
 
-- A preallocated lifecycle-state snapshot duplicates state transiently during a
-  callback. It must be refreshed before every dispatch and remain inaccessible
-  to applications except through publication availability.
-- Publications are committed as they occur. A later callback error does not
-  roll back peer deliveries; only the failed application's queued inbox is
-  cleared.
-- The in-flight message is attempted work, not a queued discard. It is dropped
-  after either callback outcome and excluded from the returned clear count.
-- The separate messaging callback expands the unpublished application surface.
-  A future common service context should replace it only when more than one
-  implemented service demonstrates a coherent shared borrowing shape.
-- Per-publication report allocation and inline payload-copy costs are unchanged
-  from ADR-0010.
+The principal risks are altering canonical legal text, changing the confirmed
+notice, conflating licensing with publication, or overstating namespace and
+trademark clearance. Exact source comparison, Cargo metadata/package inspection,
+and durable-document review address those risks.
 
-## Safe rollback or stopping point
-
-Stop after one-message dispatch, publish-only context, focused public tests,
-ADR-0012, reconciled RFF-REQ-003 traceability, and the complete baseline are
-coherent and verified. Do not add automatic dispatch, events, time, scheduling,
-configuration, command/telemetry, or protocol work in this run.
+Stop after the approved terms, metadata, documentation, and verification are
+coherent. Do not publish, push, create a release, add NOTICE or per-file headers,
+or proceed into structured events or any other technical objective.
 
 ## Result
 
-Implementation commit `150b924e6391c9adcc14f23bf21138011b747313`
-reached the intended dispatch stopping point. `MessagingRuntime::dispatch_one`
-validates `Running`, refreshes lifecycle state, moves at most one oldest message
-outside the inbox, and calls a separate `MessagingApplication` with a
-publish-only context. Five focused tests bring the complete suite to 38 and
-verify empty and rejected dispatch, FIFO one-at-a-time handling, bounded
-self-publication and saturation, running-to-stopped availability refresh, and
-exact selected-queue clearing with retained peer delivery after callback error.
+The confirmed notice and approved dual licence are applied. `LICENSE-MIT` is
+1,052 UTF-8/LF bytes with SHA-256
+`ead0c047b719d7911306382a6a203a2bc0a7261f73f4fbc22b1fbbcca6bf328e`;
+`LICENSE-APACHE` is 11,357 bytes with SHA-256
+`c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`.
+The exact MIT notice occurs once, and narrow Git attributes preserve both files
+with LF endings across checkouts.
 
-Independent reviews corrected the public outcome name, stopped-peer evidence,
-file mapping, comment width, peer-publication API documentation, and the
-snapshot-length invariant. The RFF-REQ-003 wording and traceability now match
-the demonstrated behavior. All required Cargo checks, warnings-denied rustdoc,
-source widths, reasoned expectations, 49 relative links across 23 Markdown
-files, rendered structure for all 13 changed documents, requirement/source
-identifiers, tables, and whitespace checks pass. No dependency, thread,
-executor, automatic dispatch, event, time, scheduling, protocol, licence
-change, or push was added.
+Cargo metadata reports `MIT OR Apache-2.0`, no `license-file`, and an empty
+publication allow-list representing the retained `publish = false`. Both files
+appear in the 44-entry predicted package and actual archive; the normalized
+manifest retains the expression and disabled publication, and the packaged
+crate verifies successfully. The complete 38-test Rust baseline, warnings-denied
+Clippy and rustdoc, document links and rendering, provenance identifiers, source
+form, and whitespace checks pass. No Rust source, dependency, NOTICE, per-file
+header, package name, namespace claim, trademark claim, publication setting,
+release, push, or unrelated technical behavior changed.

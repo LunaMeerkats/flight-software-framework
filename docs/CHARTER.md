@@ -61,10 +61,11 @@ sources take priority. Facts observed upstream must be distinguished from this
 project's design choices. Substantial reused material would require explicit
 provenance and licence analysis; none is currently planned.
 
-The project name and `MIT OR Apache-2.0` licensing intent have human approval in
-[ADR-0002](adr/0002-project-name-and-licensing-intent.md). Licence application
-remains incomplete until the exact copyright holder is confirmed and both
-licence texts are added. Public namespace or trademark clearance is not claimed.
+The project name and recipient-choice `MIT OR Apache-2.0` licence have human
+approval in [ADR-0002](adr/0002-project-name-and-licensing-intent.md). Repository
+content is available under the [MIT licence](../LICENSE-MIT) or the
+[Apache License, Version 2.0](../LICENSE-APACHE), at the recipient's option.
+Public namespace or trademark clearance is not claimed.
 
 ## Success for v0.1
 

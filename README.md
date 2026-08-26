@@ -80,7 +80,7 @@ guidance records the remaining structural and document checks.
 - [Roadmap](docs/ROADMAP.md)
 - [Current project state](docs/PROJECT_STATE.md)
 - [Caller-driven runtime decision](docs/adr/0001-caller-driven-host-runtime.md)
-- [Project identity and licensing intent](docs/adr/0002-project-name-and-licensing-intent.md)
+- [Project identity and dual licensing](docs/adr/0002-project-name-and-licensing-intent.md)
 - [Lifecycle and identity decision](docs/adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md)
 - [Bounded inbox decision](docs/adr/0004-bounded-application-inboxes.md)
 - [Configuration rollback decision](docs/adr/0005-configuration-revisions-and-rollback.md)
@@ -96,9 +96,9 @@ guidance records the remaining structural and document checks.
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)
 - [Contributor and automation guidance](AGENTS.md)
 
-## Licence status
+## Licence
 
-The approved intent is dual licensing under `MIT OR Apache-2.0`, but the exact
-copyright holder has not yet been confirmed and licence files have not been
-added. Until that is completed, do not assume permission to redistribute or
-reuse repository content. Cargo publication remains disabled.
+This repository is licensed under either the
+[MIT licence](LICENSE-MIT) or the
+[Apache License, Version 2.0](LICENSE-APACHE), at your option. The confirmed
+notice is `Copyright 2026 Daniel Smith`. Cargo publication remains disabled.

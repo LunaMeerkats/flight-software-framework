@@ -1,8 +1,8 @@
-# ADR-0002: Project name and licensing intent
+# ADR-0002: Project name and dual licensing
 
-- Status: Accepted; licence application pending copyright-holder confirmation
+- Status: Accepted; licence applied 2026-08-26
 - Date: 2026-08-05
-- Scope: Repository identity and intended open-source licence
+- Scope: Repository identity and open-source licence
 
 ## Context
 
@@ -19,12 +19,16 @@ must not be selected by automation alone.
   or imply flight readiness, certification, endorsement, or compatibility.
 - No namespace or trademark clearance is claimed. Perform current searches
   before public release or registration of public package names.
-- The approved licensing intent is **MIT OR Apache-2.0**, allowing recipients to
-  choose either licence once the licence is applied.
-- Until the exact copyright holder is confirmed and both licence texts are
-  added, the repository remains unpublished, Cargo metadata omits a licence
-  expression, and no redistribution permission is implied.
-- Initial Cargo packages use `publish = false`.
+- Repository content is licensed under **MIT OR Apache-2.0**, allowing each
+  recipient to choose either licence.
+- Daniel Smith confirmed his authority to license all current repository
+  content and approved the exact notice `Copyright 2026 Daniel Smith` on
+  2026-08-26.
+- The canonical terms are stored in [LICENSE-MIT](../../LICENSE-MIT) and
+  [LICENSE-APACHE](../../LICENSE-APACHE), and Cargo records the SPDX expression
+  `MIT OR Apache-2.0`.
+- Cargo packages retain `publish = false`; applying the licence does not publish
+  or authorize automation to publish the crate.
 
 ## Alternatives considered
 
@@ -34,21 +38,22 @@ must not be selected by automation alone.
   choice to Rust ecosystem users than the approved dual licence.
 - MPL-2.0: provides file-level reciprocity, but that additional obligation was
   not selected.
-- Remain unlicensed permanently: incompatible with the intended open Rust
-  project, though it remains the accurate temporary state until licence files
-  are complete.
+- Remain unlicensed permanently: rejected as incompatible with the intended open
+  Rust project. This was the accurate temporary state until the holder and exact
+  notice were confirmed.
 
 ## Evidence
 
 - Cargo defines `OR` in an SPDX expression as allowing the recipient to choose
   either licence. (`SRC-RUST-CARGO-LICENCE`)
 - The canonical MIT and Apache-2.0 terms and obligations are recorded in the
-  source register. (`SRC-OSI-MIT`, `SRC-OSI-APACHE-2.0`)
+  source register. (`SRC-OSI-MIT`, `SRC-ASF-APACHE-2.0`)
 
 ## Consequences and follow-up
 
 - README, crate documentation, and generated user-facing material use the
   approved name while retaining the safety and non-affiliation notices.
-- The exact copyright holder remains the only blocker to applying the approved
-  licence files and Cargo expression.
-- Changing the name or licence requires a new human-approved decision record.
+- The confirmed notice, both licence files, and Cargo expression resolve the
+  temporary unlicensed state without changing `publish = false`.
+- Changing the name, licence, or confirmed notice requires a new human-approved
+  decision record.

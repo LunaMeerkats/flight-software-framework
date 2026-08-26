@@ -115,34 +115,33 @@ code. Any future source reuse must record provenance and licence obligations.
 - Title: The Manifest Format — licence and licence-file fields
 - Organisation: The Rust Project
 - Source: <https://doc.rust-lang.org/cargo/reference/manifest.html#the-license-and-license-file-fields>
-- Version: stable documentation accessed 2026-08-05
+- Version: stable documentation accessed 2026-08-26
 - Informed: Cargo uses SPDX expressions, and `OR` permits recipients to choose
   either listed licence.
-- Local treatment: adopt `MIT OR Apache-2.0` only after the approved licence
-  files and copyright holder are complete; keep publication disabled meanwhile.
+- Local treatment: use `MIT OR Apache-2.0` as the Cargo expression now that the
+  holder and files are complete; keep publication disabled as a separate policy.
 
 ## SRC-OSI-MIT — The MIT License
 
 - Title: The MIT License
 - Organisation: Open Source Initiative
 - Source: <https://opensource.org/license/mit>
-- Version: SPDX identifier `MIT`, accessed 2026-08-05
+- Version: SPDX identifier `MIT`, accessed 2026-08-26
 - Informed: permissive use and redistribution terms, required notice retention,
   and warranty/liability disclaimer.
-- Local treatment: approved as one recipient-selectable branch of the intended
-  dual licence; not yet applied to repository content.
+- Local treatment: apply as one recipient-selectable branch of the repository's
+  dual licence, using the exact confirmed copyright notice.
 
-## SRC-OSI-APACHE-2.0 — Apache License, Version 2.0
+## SRC-ASF-APACHE-2.0 — Apache License, Version 2.0
 
 - Title: Apache License, Version 2.0
-- Organisation: Apache Software Foundation; canonical text published by the
-  Open Source Initiative
-- Source: <https://opensource.org/license/apache-2.0>
-- Version: SPDX identifier `Apache-2.0`, accessed 2026-08-05
+- Organisation: Apache Software Foundation
+- Source: <https://www.apache.org/licenses/LICENSE-2.0.txt>
+- Version: Apache License 2.0, January 2004; accessed 2026-08-26
 - Informed: copyright and patent grants, redistribution conditions, trademark
   limitation, and warranty/liability disclaimer.
-- Local treatment: approved as one recipient-selectable branch of the intended
-  dual licence; not yet applied to repository content.
+- Local treatment: apply the unmodified terms as one recipient-selectable branch
+  of the repository's dual licence.
 
 ## SRC-RUST-STYLE — Rust Style Guide
 

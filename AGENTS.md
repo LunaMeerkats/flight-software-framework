@@ -34,6 +34,8 @@ translate NASA C source.
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
   locked dependency graph.
+- `LICENSE-MIT` and `LICENSE-APACHE`: recipient-choice dual-licence terms;
+  `.gitattributes` preserves their canonical LF bytes on every checkout.
 
 The root contains one unpublished package and workspace. Add another crate only
 when a demonstrated boundary cannot remain coherent in the existing package.
@@ -175,9 +177,9 @@ warnings.
 - Do not push unless this file is explicitly updated to authorize pushing.
 - Never force-push, merge into the default branch, tag, release, publish a
   crate, deploy, or commit secrets.
-- The approved licensing intent is `MIT OR Apache-2.0`; do not add licence
-  files until the exact copyright holder is confirmed, and do not change the
-  intent without explicit human approval.
+- Repository content is licensed under `MIT OR Apache-2.0` with the confirmed
+  notice `Copyright 2026 Daniel Smith`; do not change the licence or notice
+  without explicit human approval.
 
 ## Completion
 
