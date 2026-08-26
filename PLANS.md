@@ -1,103 +1,117 @@
-# Plan: apply the approved dual licence
+# Plan: add a bounded structured-event queue
 
-Status: **Complete**
-Date: **2026-08-26**
+Status: **In progress**
+Date: **2026-08-27**
 
 ## Objective
 
-Apply the human-approved `MIT OR Apache-2.0` licence using the confirmed exact
-notice `Copyright 2026 Daniel Smith`, while preserving `publish = false` and
-all project safety, non-affiliation, namespace, and trademark limitations.
+Record and implement the smallest standalone structured-event path needed for
+Stage 2: fixed structured metadata, explicit framework timestamps, a positive
+pre-reserved queue bound, FIFO consumption, and caller-visible reject-newest
+saturation.
+
+This is the highest-value next step because the roadmap and project state both
+select finite events before injected time and scheduling. A standalone queue
+defines the timestamp consumer and overflow contract without prematurely
+changing application callbacks or coupling diagnostics to the lifecycle-gated
+message bus.
 
 ## Context
 
-ADR-0002 already selected recipient-choice dual licensing but deliberately
-withheld the licence files and Cargo expression until the copyright holder was
-confirmed. Daniel Smith has now confirmed both the exact notice and his authority
-to license all current repository content.
+RFF-REQ-005 requires machine-inspectable source, severity, identifier, and
+framework timestamp fields plus a finite storage or delivery policy. No event
+representation, event bound, or overflow behavior currently exists. RFF-REQ-008
+also remains partial until a returned application error produces a structured
+event, but that integration requires a framework-owned timestamp source that is
+outside this increment.
 
-Licensing the repository grants permissions under the selected terms. It does
-not publish the crate, register the project name, clear a trademark, authorize a
-push or release, or change any technical behavior.
+The existing message bus is not an event transport. It routes by application
+subscriptions and lifecycle availability, while diagnostics must remain
+observable without recursively publishing onto a saturated or unavailable
+application path.
 
 ## Acceptance criteria
 
-- Root `LICENSE-MIT` contains the confirmed notice exactly once plus the
-  canonical MIT terms.
-- Root `LICENSE-APACHE` matches the unmodified Apache License 2.0 text from the
-  Apache Software Foundation.
-- Narrow Git attributes preserve both canonical licence files as UTF-8/LF on
-  checkout without changing the repository's broader line-ending policy.
-- Cargo exposes `license = "MIT OR Apache-2.0"`, no `license-file`, and the
-  existing non-publication setting remains explicit.
-- Cargo package inventory and the actual crate archive contain both licence
-  files and the normalized manifest retains the expression and
-  `publish = false`.
-- README, AGENTS, the charter, ADR-0002, source provenance, and project state
-  describe the applied licence without implying publication, trademark
-  clearance, NASA affiliation, certification, or compatibility.
-- No unnecessary NOTICE file, mass source headers, dependency, toolchain change,
-  technical API change, release, push, or publication is added.
-- The complete documented baseline and repository document audits pass.
+- `Event<Identifier>` stores an `EventSource`, severity, mission-defined copied
+  identifier, and explicit `EventTimestamp` without requiring free-form log
+  parsing.
+- `EventTimestamp` represents elapsed duration from a framework clock origin.
+  This slice accepts it explicitly and adds no clock, wall-clock access,
+  scheduling behavior, or monotonicity claim.
+- `EventQueue` requires a positive event-record capacity, reserves that storage
+  during construction, and never treats allocator capacity as its logical
+  bound.
+- Emission accepts events through the exact configured capacity in FIFO order.
+  When full, it retains every older event, rejects the newest event, and returns
+  a direct typed outcome containing the configured capacity.
+- Saturation emits no recursive diagnostic, retries nothing, spills nowhere,
+  and creates no hidden work.
+- Dequeue frees one logical slot so a later event can be accepted.
+- Public tests assert every structured field, zero-capacity rejection,
+  exact-capacity acceptance, one-over-capacity rejection, retained FIFO order,
+  and acceptance after dequeue.
+- No dependency, thread, executor, runtime integration, application service
+  context, event text payload, filter, fan-out, clock, scheduler, protocol, or
+  compatibility claim is added.
+- RFF-REQ-005 is recorded as partially implemented and partially verified,
+  never fully verified. RFF-REQ-008 remains partial until a later runtime
+  failure emits an event with framework-supplied time.
+- The complete documented baseline and repository document/source-form audits
+  pass, and the complete diff contains no unrelated implementation change.
 
 ## Files and components
 
-- `LICENSE-MIT`, `LICENSE-APACHE`, and `.gitattributes`: canonical
-  recipient-choice licence terms with reproducible LF checkout bytes.
-- `Cargo.toml`: SPDX licence metadata while retaining `publish = false`.
-- `AGENTS.md`, `README.md`, and `docs/CHARTER.md`: contributor and
-  user-facing applied-licence status.
-- `docs/adr/0002-project-name-and-licensing-intent.md`: confirmed holder,
-  exact notice, completed application, and retained restrictions.
-- `docs/research/SOURCES.md`: rechecked primary-source provenance and applied
-  local treatment.
-- `docs/PROJECT_STATE.md`: verified licence state, resolved blocker, and latest
-  run.
-- `PLANS.md`: this bounded plan and final verification result.
+- `src/events.rs`: structured event vocabulary and bounded FIFO queue.
+- `src/lib.rs`: narrow public re-exports.
+- `tests/event_queue.rs`: public-API field, boundary, overflow, and FIFO
+  evidence.
+- `docs/adr/0013-bounded-structured-event-queue.md`: representation, timestamp
+  boundary, reject-newest policy, alternatives, risks, and revisit conditions.
+- `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`,
+  `docs/PROJECT_STATE.md`, and `docs/verification/TRACEABILITY.md`: truthful
+  current behavior, limits, evidence, and next step.
+- `PLANS.md`: this bounded plan and final result.
+
+No new external source is required. The slice uses the event-service
+responsibility already recorded under `SRC-NASA-CFE`; the representation and
+overflow policy are independent local decisions.
 
 ## Verification approach
 
-- Compare `LICENSE-APACHE` to the current canonical ASF text and
-  `LICENSE-MIT` to the OSI terms after substituting the confirmed notice.
-- Assert the exact MIT notice occurs once.
-- Inspect `cargo metadata --no-deps --format-version 1`.
-- Run `cargo package --allow-dirty --locked --list` and
-  `cargo package --allow-dirty --locked`; inspect the resulting archive.
-- Run the repository's full format, check, Clippy, test, warnings-denied rustdoc,
-  and Git whitespace baseline.
-- Re-audit handwritten Rust widths and expectations even though Rust source is
-  unchanged.
-- Verify relative Markdown links, changed rendered documents, source identifiers,
-  tables, headings, and stale pending-licence wording.
-- Review the complete diff and confirm no unrelated file changed.
+- Run focused public event-queue tests while implementing.
+- Run `cargo fmt --all -- --check`.
+- Run `cargo check --workspace --all-targets --all-features`.
+- Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
+- Run `cargo test --workspace --all-features`.
+- Run `cargo doc --workspace --all-features --no-deps` with
+  `RUSTDOCFLAGS=-D warnings`.
+- Run `git diff --check`.
+- Re-audit handwritten Rust physical and comment-only widths and every reasoned
+  Clippy expectation.
+- Verify relative Markdown links, headings, tables, requirement rows, ADR and
+  source identifiers, and changed-document structure.
+- Review the complete diff for accidental API commitments, unbounded storage,
+  hidden allocation after construction, stale claims, and changes outside the
+  objective.
 
 ## Risks and safe stopping point
 
-The principal risks are altering canonical legal text, changing the confirmed
-notice, conflating licensing with publication, or overstating namespace and
-trademark clearance. Exact source comparison, Cargo metadata/package inspection,
-and durable-document review address those risks.
+Reject-newest can omit a later high-severity event when the queue is saturated;
+the explicit outcome makes that loss visible, while preserving the earlier
+causal trace. A caller can still ignore the outcome, so this is not a durable
+audit log or guaranteed delivery mechanism.
 
-Stop after the approved terms, metadata, documentation, and verification are
-coherent. Do not publish, push, create a release, add NOTICE or per-file headers,
-or proceed into structured events or any other technical objective.
+The timestamp type defines only elapsed framework time. Until an injected clock
+owns its production, callers can supply non-monotonic values and RFF-REQ-005
+remains partial. Mission identifiers are copied in-process values, not protocol
+or cFS identifiers. Events removed from the queue become caller-owned and fall
+outside the framework storage bound.
+
+Stop after the standalone queue, tests, decision record, and durable state are
+coherent. Do not add runtime failure emission, an application context, injected
+time, filtering, fan-out, persistence, automatic draining, or scheduling in
+this run.
 
 ## Result
 
-The confirmed notice and approved dual licence are applied. `LICENSE-MIT` is
-1,052 UTF-8/LF bytes with SHA-256
-`ead0c047b719d7911306382a6a203a2bc0a7261f73f4fbc22b1fbbcca6bf328e`;
-`LICENSE-APACHE` is 11,357 bytes with SHA-256
-`c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4`.
-The exact MIT notice occurs once, and narrow Git attributes preserve both files
-with LF endings across checkouts.
-
-Cargo metadata reports `MIT OR Apache-2.0`, no `license-file`, and an empty
-publication allow-list representing the retained `publish = false`. Both files
-appear in the 44-entry predicted package and actual archive; the normalized
-manifest retains the expression and disabled publication, and the packaged
-crate verifies successfully. The complete 38-test Rust baseline, warnings-denied
-Clippy and rustdoc, document links and rendering, provenance identifiers, source
-form, and whitespace checks pass. No Rust source, dependency, NOTICE, per-file
-header, package name, namespace claim, trademark claim, publication setting,
-release, push, or unrelated technical behavior changed.
+Pending implementation and verification.

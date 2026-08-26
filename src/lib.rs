@@ -9,6 +9,7 @@ compatibility claim.
 "#]
 
 mod application_messaging;
+mod events;
 mod lifecycle;
 mod messaging;
 mod messaging_runtime;
@@ -16,6 +17,10 @@ mod runtime;
 
 pub use application_messaging::{
     ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
+};
+pub use events::{
+    Event, EventEmitOutcome, EventQueue, EventQueueCreateError, EventSeverity, EventSource,
+    EventTimestamp,
 };
 pub use lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry,
