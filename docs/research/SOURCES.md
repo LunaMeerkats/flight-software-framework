@@ -86,16 +86,21 @@ code. Any future source reuse must record provenance and licence obligations.
 
 ## SRC-RUST-TIME — Rust standard-library time types
 
-- Title: `std::time::Instant` and `std::time::SystemTime`
+- Title: `std::time::Duration`, `std::time::Instant`, and
+  `std::time::SystemTime`
 - Organisation: The Rust Project
-- Sources: <https://doc.rust-lang.org/std/time/struct.Instant.html> and
+- Sources: <https://doc.rust-lang.org/std/time/struct.Duration.html>,
+  <https://doc.rust-lang.org/std/time/struct.Instant.html>, and
   <https://doc.rust-lang.org/std/time/struct.SystemTime.html>
-- Version: stable documentation accessed 2026-08-05
+- Version: Rust 1.98.0 documentation; `Duration` details accessed 2026-08-28,
+  other pages accessed 2026-08-05
 - Informed: monotonic and non-monotonic system-clock behavior have different
   semantics and platform considerations; wall-clock access is not a
-  deterministic test clock.
+  deterministic test clock. `Duration` provides a maximum value and checked
+  addition suitable for an explicit non-panicking manual-clock boundary.
 - Local treatment: inject framework time and use manual simulated time in tests;
-  do not infer real-time guarantees.
+  reject hidden time movement, return a typed non-mutating error on manual
+  advancement overflow, and do not infer real-time guarantees.
 
 ## SRC-RUST-CARGO — Cargo workspaces
 

@@ -3,14 +3,15 @@
 //! This module defines the first standalone event path for RFF-REQ-005. It
 //! stores only structured metadata, reserves a positive record bound during
 //! construction, and reports saturation directly instead of recursively
-//! emitting another event. Clock generation and runtime integration remain
-//! outside this slice.
+//! emitting another event. An injected clock can now supply a timestamp, but
+//! runtime integration remains outside this slice.
 
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
 use std::time::Duration;
 
+use crate::clock::{Clock, FrameworkInstant};
 use crate::lifecycle::ApplicationId;
 
 /// The producer represented by one structured event.
@@ -40,24 +41,42 @@ pub enum EventSeverity {
 
 /// Elapsed framework time captured for one event.
 ///
-/// The duration is measured from the origin selected by a framework clock. No
-/// clock exists in this slice, so event producers supply this value explicitly.
-/// It is not a wall-clock timestamp, and the event queue does not enforce
-/// monotonicity.
+/// The duration is measured from the origin selected by a framework clock. It
+/// is not a wall-clock timestamp, and the event queue does not enforce
+/// monotonicity. Standalone callers may supply an explicit value, while an
+/// integrated producer can capture an injected [`Clock`] reading.
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct EventTimestamp(Duration);
+pub struct EventTimestamp(FrameworkInstant);
 
 impl EventTimestamp {
     /// Creates a timestamp from elapsed time since the framework clock origin.
     #[must_use]
     pub const fn from_elapsed(elapsed: Duration) -> Self {
-        Self(elapsed)
+        Self(FrameworkInstant::from_elapsed(elapsed))
+    }
+
+    /// Creates an event timestamp from an elapsed framework instant.
+    #[must_use]
+    pub const fn from_instant(instant: FrameworkInstant) -> Self {
+        Self(instant)
+    }
+
+    /// Captures the current reading from an injected framework clock.
+    #[must_use]
+    pub fn from_clock<C: Clock + ?Sized>(clock: &C) -> Self {
+        Self::from_instant(clock.now())
+    }
+
+    /// Returns the captured framework instant.
+    #[must_use]
+    pub const fn instant(self) -> FrameworkInstant {
+        self.0
     }
 
     /// Returns elapsed time since the framework clock origin.
     #[must_use]
     pub const fn elapsed(self) -> Duration {
-        self.0
+        self.0.elapsed()
     }
 }
 
