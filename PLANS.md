@@ -1,6 +1,6 @@
 # Plan: add an injected manual framework clock
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-28**
 
 ## Objective
@@ -19,8 +19,8 @@ this increment.
 
 RFF-REQ-004 requires injected framework time and repeatable simulated-time
 behavior. RFF-REQ-005 requires framework timestamps on structured events. The
-current `EventTimestamp` wraps an explicit caller-supplied `Duration`, and no
-clock exists.
+starting implementation had `EventTimestamp` wrap an explicit caller-supplied
+`Duration`, and no clock existed.
 
 The clock should not return event-specific vocabulary because scheduled work is
 the next recorded time consumer. A distinct `FrameworkInstant` will represent
@@ -111,4 +111,30 @@ this run.
 
 ## Result
 
-Pending implementation and verification.
+Implemented the injected manual-time boundary in commit `0ec684f`.
+`FrameworkInstant` separates general elapsed clock readings from the event-field
+wrapper. The object-safe `Clock` trait exposes observation without hidden
+movement, while `ManualClock` starts at zero or an explicit controlled instant,
+advances by checked caller-supplied durations, treats zero as a successful
+no-op, and returns exact overflow context without mutation.
+
+Five public integration tests prove repeated zero reads, exact cumulative
+advancement, zero-duration behavior, `Duration::MAX` overflow preservation, an
+actual `&dyn Clock` injection, identical traces from identical manual sequences,
+and clock-captured event timestamps through the unchanged bounded FIFO queue.
+RFF-REQ-004 and RFF-REQ-005 remain partially verified because no scheduled work
+or runtime/host-owned event path exists.
+
+The required format, all-target check, warnings-denied Clippy, 47-test,
+warnings-denied rustdoc, and diff checks passed. The final source-form audit
+found no Rust physical lines over 100 columns, no comment-only lines over 80,
+three existing narrow reasoned Clippy expectations across 15 handwritten Rust
+files, and no allow attributes. The document audit found 25 Markdown files, 60
+resolving relative links, eight matched requirement and traceability identifiers,
+14 matching ADR identifiers, and 21 defined source identifiers with no undefined
+reference. All ten changed Markdown documents rendered to nonempty HTML with one
+top-level heading and consistent table shapes.
+
+No dependency, wall-clock read, sleep, thread, executor, scheduler, runtime
+integration, application context, automatic time movement, protocol behavior,
+compatibility claim, release, or push was added.

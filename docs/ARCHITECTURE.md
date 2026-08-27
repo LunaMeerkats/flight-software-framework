@@ -55,10 +55,12 @@ initial runtime will not spawn hidden work.
 [ADR-0001](adr/0001-caller-driven-host-runtime.md) selects a serial,
 caller-driven host runtime for the first v0.1 slices. The current host explicitly
 selects one application work call or one message dispatch. Callers can also emit
-to and dequeue from the standalone event queue. There is no clock or scheduler.
-Later scheduled work will use an injected clock, with deterministic tests
-explicitly advancing a simulated clock. This keeps eventual event and transition
-ordering testable without adopting an async runtime or thread lifecycle early.
+to and dequeue from the standalone event queue. An injected `Clock` now exposes
+elapsed `FrameworkInstant` readings, and its manual implementation advances only
+on explicit caller requests. There is no scheduler. Later scheduled work will
+use this boundary with tests explicitly advancing manual time. This keeps event
+and transition ordering testable without adopting an async runtime or thread
+lifecycle early.
 
 Here, **deterministic** means that conforming, terminating applications with
 controlled external effects produce the same framework-observable ordering from
@@ -104,6 +106,9 @@ fault tolerance.
 - [ADR-0013](adr/0013-bounded-structured-event-queue.md) selects structured
   source, severity, mission identifier, and elapsed timestamp values plus a
   positive pre-reserved FIFO queue with caller-visible reject-newest saturation.
+- [ADR-0014](adr/0014-injected-manual-framework-clock.md) selects a general
+  elapsed instant, an object-safe injected clock read, checked manual
+  advancement, and explicit conversion into the event timestamp field.
 
 ## Current implementation boundary
 
@@ -160,14 +165,22 @@ local severities, a mission-defined copied identifier, and an explicit elapsed
 through that exact limit; saturation retains older records and returns a
 must-use `QueueFull` outcome without recursive diagnostics. Dequeue frees one
 slot. The queue neither creates timestamps nor attaches to an application or
-runtime, so RFF-REQ-005 remains partial.
+runtime.
+
+`Clock` separately exposes read-only elapsed `FrameworkInstant` values. The
+`ManualClock` implementation starts at zero or one explicit controlled instant,
+moves only through checked nonnegative duration advances, and returns a typed
+non-mutating error on overflow. `EventTimestamp` can capture this injected
+reading, but callers can still construct explicit timestamps and no runtime or
+host path owns the clock/event composition. RFF-REQ-004 and RFF-REQ-005 remain
+partial.
 
 This combined routing, lifecycle-availability, and application-dispatch
 evidence verifies RFF-REQ-003. The positional configuration limitation remains:
 mission composition must associate each capacity and topic set with the intended
 registration position. There is still no automatic or batch dispatch, ordering
 or fairness policy across selected applications, runtime-integrated event
-emission, clock, or scheduler.
+emission, or scheduler.
 
 ## Alternatives kept open
 
@@ -199,8 +212,10 @@ emission, clock, or scheduler.
   bound.
 - Reject-newest event saturation can omit a later high-severity record. The
   must-use outcome is explicit but does not provide guaranteed delivery.
-- Caller-supplied event timestamps can be non-monotonic until an injected clock
-  owns their production; FIFO is emission order rather than timestamp sorting.
+- Explicit event timestamps and readings from unrelated clock origins can still
+  be non-monotonic when combined. The injected capture seam does not yet give a
+  runtime or host ownership of timestamp production; FIFO remains emission
+  order rather than timestamp sorting.
 - Direct standalone routing-core construction can still be paired with a
   same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
   guarantees apply only to `MessagingRuntime`.

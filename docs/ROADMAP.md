@@ -66,7 +66,7 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-27)**
+Status: **In progress (2026-08-28)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
@@ -88,13 +88,19 @@ RFF-REQ-003 is verified by the combined evidence.
 
 Completed first event slice: machine-inspectable records enter a standalone
 positive-capacity FIFO queue with direct reject-newest saturation reporting.
-The slice defines the timestamp consumer but neither produces timestamps from a
-framework clock nor emits runtime or application events, so RFF-REQ-005 remains
-partial.
+The queue remains separate from runtime or application emission.
 
-Next slice: select and implement the smallest injected manual clock that owns
-elapsed `EventTimestamp` production. Preserve caller-driven execution and defer
-scheduling and runtime failure emission to separate increments.
+Completed first time slice: a general `FrameworkInstant` and injected `Clock`
+boundary now have one manually advanced implementation. Reads never move time;
+checked overflow is typed and non-mutating; identical manual sequences produce
+identical instant traces; and `EventTimestamp` can capture the injected reading.
+RFF-REQ-004 and RFF-REQ-005 remain partial because no scheduled work or
+runtime/host-owned event path exists.
+
+Next slice: record and implement the smallest caller-driven scheduled-work
+behavior under the manual clock, including stable equal-deadline order and a
+replayed observable trace. Preserve serial caller control and defer runtime
+failure-event integration.
 
 Exit evidence: exact-boundary, ordering, saturation, and unavailable/clearing
 tests for RFF-REQ-003; structured-event and simulated-time integration tests

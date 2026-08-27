@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-08-27**
+Last reviewed: **2026-08-28**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -115,7 +115,11 @@ public APIs. Accepted project decisions now settle:
 - RFF-REQ-003 capacity, FIFO, saturation, fan-out, unavailable endpoints, and
   caller-selected one-message dispatch in
   [ADR-0004](adr/0004-bounded-application-inboxes.md) and
-  [ADR-0012](adr/0012-application-message-dispatch.md); and
+  [ADR-0012](adr/0012-application-message-dispatch.md);
+- the first RFF-REQ-004 elapsed-instant, injected-read, and manual-advance
+  boundary in
+  [ADR-0014](adr/0014-injected-manual-framework-clock.md), while scheduling
+  remains unresolved; and
 - RFF-REQ-006 revision and rollback behavior in
   [ADR-0005](adr/0005-configuration-revisions-and-rollback.md).
 

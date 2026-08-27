@@ -1,16 +1,21 @@
 # Project state
 
-Last updated: **2026-08-27**
+Last updated: **2026-08-28**
 
 ## Current milestone
 
 Stage 1 and the first source-quality checkpoint are complete. Stage 2 has
-completed bounded application messaging for RFF-REQ-003 and its first standalone
-structured-event storage slice. The event queue proves fixed fields, a positive
-record bound, emission-order FIFO, and explicit reject-newest saturation, but it
-does not produce framework-owned timestamps or receive runtime/application
-events. RFF-REQ-005 and RFF-REQ-008 therefore remain partial. The next Stage 2
-responsibility is injected manual time.
+verified bounded application messaging for RFF-REQ-003 and completed its first
+structured-event and injected-time slices. The event queue proves fixed fields,
+a positive record bound, emission-order FIFO, and explicit reject-newest
+saturation. The manual clock proves explicit nondecreasing advancement,
+non-mutating overflow, repeatable instant traces, and an object-safe clock
+capture seam for event timestamps.
+
+No scheduled work or runtime/host-owned event path exists, so RFF-REQ-004 and
+RFF-REQ-005 remain partial. RFF-REQ-008 also remains partial because returned
+application errors do not emit structured events. Caller-driven scheduling is
+the next Stage 2 responsibility.
 
 ## Verified baseline
 
@@ -27,18 +32,22 @@ responsibility is injected manual time.
   dispatch evidence that verifies RFF-REQ-003.
 - Event implementation commit `cc0e453431588a1f39e147249af701c21c1e1b1d`
   adds structured `Event` records, `EventTimestamp`, the bounded `EventQueue`,
-  ADR-0013, and four focused public tests. RFF-REQ-005 is partially verified.
+  ADR-0013, and four focused public tests.
+- Manual-time implementation commit
+  `0ec684f6d50505aea67acef27e54d7175f0a11ee` adds `FrameworkInstant`, the
+  injected `Clock` boundary, `ManualClock`, checked advancement, ADR-0014, and
+  five focused public tests. RFF-REQ-004 and RFF-REQ-005 are partially verified.
 - Repository content is available under `MIT OR Apache-2.0` with the confirmed
   notice `Copyright 2026 Daniel Smith`. Both canonical licence files, Cargo
   metadata, predicted package inventory, and generated package archive have
   been verified while `publish = false` remains in force.
-- Formatting, all-target checking, warnings-denied Clippy, all 42 tests, and
+- Formatting, all-target checking, warnings-denied Clippy, all 47 tests, and
   warnings-denied all-feature documentation generation pass with rustc/cargo
   1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
-- Thirteen handwritten Rust files have no physical line over 100 columns and no
+- Fifteen handwritten Rust files have no physical line over 100 columns and no
   comment-only line over the 80-column review default. The three existing
   reasoned chronological test expectations remain fulfilled; production,
-  messaging, and event code need none.
+  messaging, event, and clock code need none.
 
 The active toolchain changed from the 1.96.1 policy-establishment evidence. The
 whole-tree re-audit passes; this records evidence rather than a minimum supported
@@ -55,8 +64,10 @@ Rust version or toolchain pin.
 - ADR-0004 defines bounded application inbox behavior. ADR-0010 implements its
   routing core, ADR-0011 its lifecycle owner, and ADR-0012 its one-message
   application dispatch boundary.
-- ADR-0013 defines the standalone bounded structured-event queue and its
-  explicit elapsed timestamp consumer.
+- ADR-0013 defines the standalone bounded structured-event queue and explicit
+  elapsed event timestamp field.
+- ADR-0014 defines general elapsed framework instants, an object-safe injected
+  clock read, and checked manual advancement.
 - ADR-0005 defines configuration revision and rollback behavior; that service
   is not implemented.
 
@@ -75,17 +86,21 @@ item, fails only the selected record, clears its remaining queue, and retains
 peer deliveries already accepted.
 
 `EventQueue<EventId>` separately stores copied structured records with framework
-or application source, local severity, mission-defined identifier, and explicit
-elapsed `EventTimestamp`. Construction reserves a positive record limit.
-Emission accepts through the exact limit; saturation preserves older records and
-returns a must-use `QueueFull` outcome. FIFO follows emission order even when
-timestamps are non-monotonic, and one dequeue immediately frees one slot.
+or application source, local severity, mission-defined identifier, and elapsed
+`EventTimestamp`. It reserves a positive record limit, preserves emission-order
+FIFO, rejects newest at saturation, and frees one slot on dequeue.
+
+`Clock` separately returns `FrameworkInstant` without moving time. `ManualClock`
+starts at zero or one explicit controlled instant, advances only by caller-
+supplied `Duration`, and preserves its reading on checked overflow. An
+`EventTimestamp` can capture a reading through either a concrete or trait-object
+clock reference. The clock and event queue are not attached to a runtime.
 
 The runtime creates no thread or executor and has no automatic or batch
-dispatch, multi-application fairness rule, schedule, clock, configuration
-access, or event integration. The standalone queue has no filter, fan-out,
-persistence, host drain adapter, or timestamp source. RFF-REQ-003 is verified;
-RFF-REQ-005 and RFF-REQ-008 remain partial.
+dispatch, multi-application fairness rule, schedule, configuration access, or
+event integration. The event queue has no filter, fan-out, persistence, or host
+drain adapter. RFF-REQ-003 is verified; RFF-REQ-004, RFF-REQ-005, and
+RFF-REQ-008 remain partial.
 
 ## Source-quality policy
 
@@ -102,29 +117,26 @@ separate measured increments.
 
 ## Work in progress
 
-No implementation work is in progress. The standalone event queue is complete
-at its recorded boundary. Injected manual time is the next technical slice; it
-must remain separate from scheduling and runtime failure emission.
+No implementation work is in progress. The injected manual-clock slice is
+complete at its recorded boundary. Caller-driven scheduled work is the next
+technical slice; runtime failure-event integration remains separate.
 
 ## Highest risks and uncertainties
 
+- `FrameworkInstant` carries no clock identity, so unrelated clock domains can
+  be compared accidentally. `EventTimestamp::from_elapsed` also preserves an
+  explicit path for arbitrary standalone timestamps.
+- Scheduling has no due-work, equal-deadline, overdue, lifecycle, or replay
+  policy. Repeatable manual readings do not prove repeatable scheduled work.
+- Reject-newest event saturation can omit a later high-severity record. The
+  must-use outcome is explicit, but callers can still handle it inadequately.
+- `EventSource::Application` cannot validate which runtime issued an identity
+  until a runtime-owned integration constructs the event.
 - Runtime-owned inbox configurations are positional. Count and identity order
   are proven, but two valid capacity/topic configurations can still be swapped
   by mission composition.
-- Dispatch refreshes a preallocated lifecycle-state snapshot before every
-  callback. The serial publish-only context keeps it stable; concurrency would
-  require a different design.
 - Callback publication is immediate and non-transactional. Peer deliveries
   remain even when the publisher later returns an error.
-- Inline message payload slots occupy and copy the configured maximum for short
-  payloads. No mission payload size has been measured or selected.
-- Reject-newest event saturation can omit a later high-severity record. The
-  must-use outcome is explicit, but callers can still handle it inadequately.
-- Explicit event timestamps can be non-monotonic until an injected clock owns
-  production. Rejected, dequeued, and caller-retained events are outside the
-  queue's storage bound.
-- `EventSource::Application` cannot validate which runtime issued an identity
-  until a runtime-owned integration constructs the event.
 - A returned callback error may follow partial application mutation. The
   runtime proves no rollback, cleanup, reinitialisation, panic containment,
   hang containment, or fault tolerance.
@@ -132,31 +144,34 @@ must remain separate from scheduling and runtime failure emission.
 
 ## Important unresolved decisions
 
-- No framework-owned clock, runtime/application event emission, or host event
-  drain boundary is selected.
+- No caller-driven scheduling contract, equal-deadline ordering, missed-work
+  policy, or runtime clock owner is selected.
+- No runtime/application event emission, framework failure-event identifier, or
+  host event drain boundary is selected.
 - No mission message payload limit, external topic identifier, or wire
   representation is selected; current messages are in-process values only.
 - RFF-REQ-007 still needs a host-adapter grammar and validation boundary.
 - The v0.1 runtime explicitly does not catch application panics; no future
   containment mechanism or minimum supported Rust version is selected.
-- A shared application service context, automatic dispatch order, fairness,
-  event filtering, and scheduling remain unselected.
+- A shared application service context, automatic dispatch order, fairness, and
+  event filtering remain unselected.
 
 ## Most likely next tasks
 
-1. Add the smallest injected manual clock that owns elapsed
-   `EventTimestamp` production without adding scheduling.
-2. Integrate one framework-timestamped returned-error event while preserving
-   the original error, explicit event-queue saturation, and peer progress.
-3. Add caller-driven scheduled work only after clock and event ordering are
-   independently verified.
+1. Add the smallest caller-driven scheduled-work slice with stable equal-
+   deadline order and a replayed trace under `ManualClock`.
+2. Integrate one clock-captured returned-error event while preserving the
+   original error, explicit event-queue saturation, and peer progress.
+3. Implement the accepted configuration activation, rejection, revision, and
+   rollback behavior after Stage 2 has a coherent stopping point.
 
 ## Latest run
 
-2026-08-27: Added the standalone bounded structured-event queue in commit
-`cc0e453431588a1f39e147249af701c21c1e1b1d`. Four public tests prove exact
-structured fields, positive capacity, non-timestamp-sorted FIFO, reject-newest
-saturation, retained older records, and immediate one-slot reuse. The complete
-baseline passes 42 tests with warnings denied. No dependency, clock, wall-time
-read, runtime/application integration, event text, filter, fan-out, persistence,
-protocol behavior, or release was added. Nothing was pushed.
+2026-08-28: Added the injected manual framework clock in commit
+`0ec684f6d50505aea67acef27e54d7175f0a11ee`. Five public tests prove zero and
+repeated reads, exact cumulative advancement, zero-duration no-op behavior,
+typed non-mutating overflow, object-safe injection, identical manual traces,
+and exact event timestamp capture through the existing FIFO queue. The complete
+baseline passes 47 tests with warnings denied. No dependency, wall-clock read,
+scheduler, runtime/application integration, thread, executor, protocol behavior,
+release, or push was added.
