@@ -1,6 +1,6 @@
 # Plan: add caller-driven scheduled work
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-29**
 
 ## Objective
@@ -10,10 +10,10 @@ ordered agenda of explicit application work instants and one caller-driven
 runtime operation that attempts at most the next due item under an injected
 clock.
 
-This is the highest-value next step because the manual clock is verified but
-RFF-REQ-004 still has no scheduled application work, equal-time ordering, or
-replayed scheduled trace. A finite one-shot agenda can establish those
-behaviors without prematurely choosing recurrence, missed-period recovery,
+This was the highest-value next step because, when selected, the manual clock
+was verified but RFF-REQ-004 had no scheduled application work, equal-time
+ordering, or replayed scheduled trace. A finite one-shot agenda could establish
+those behaviors without prematurely choosing recurrence, missed-period recovery,
 automatic dispatch, or concurrency.
 
 ## Context and decision boundary
@@ -123,3 +123,39 @@ Stop after the finite agenda, one-item runtime operation, focused replay and
 error evidence, decision record, and durable state are coherent. Do not add
 periodic generation, automatic looping, runtime-owned events, failure events,
 message dispatch, a shared service context, or concurrency in this run.
+
+## Result
+
+Implemented the finite caller-driven scheduling boundary in commit `63654d5`.
+`ScheduledWork` pairs one runtime-local identity with one elapsed scheduled
+instant. `WorkSchedule` copies a fixed nondecreasing agenda, preserves caller
+order for equal times, rejects descending input, and advances only a private
+cursor. `Runtime::run_next_scheduled_work` reads the injected clock zero times
+when complete and once otherwise, waits without mutation, or consumes and
+attempts at most one due or overdue item through the existing running-only work
+boundary.
+
+Seven public integration tests prove construction order, exact clock-read
+counts, waiting and inclusive release, stable equal-time order, one-item caller
+control, overdue work, final consumption after lifecycle and returned-work
+errors, exact error/state preservation, subsequent due-peer progress, and an
+identical replayed work, lifecycle-state, and clock-captured event-timestamp
+trace. The combined manual-clock and scheduled replay evidence verifies
+RFF-REQ-004. RFF-REQ-005 and RFF-REQ-008 remain partial because event creation
+is still test-owned and no returned-error path emits an event.
+
+The required formatting, all-target checking, warnings-denied Clippy, 54-test,
+warnings-denied rustdoc, and Git whitespace checks passed. The source-form audit
+found 17 handwritten Rust files and 6,259 lines, no physical line over 100
+columns, no comment-only line over 80, three existing narrow reasoned
+expectations, no allow attributes, and no unsafe occurrence. The document audit
+found 26 Markdown files, 64 resolving relative links, eight matched requirement
+and traceability rows, 15 matching ADR identifiers, 21 source definitions with
+nine referenced identifiers and no undefined reference, all exact traceability
+test names resolving to source, consistent table shapes, and one top-level
+heading per document.
+All ten changed Markdown documents rendered to nonempty HTML.
+
+No dependency, wall-clock read, periodic generation, automatic draining,
+messaging integration, runtime-owned event path, thread, executor, protocol,
+compatibility claim, release, or push was added.

@@ -109,6 +109,15 @@ Public-API tests demonstrate:
 The implementation uses safe stable Rust and adds no dependency or ambient time
 read.
 
+## Subsequent scheduling boundary
+
+[ADR-0015](0015-caller-driven-scheduled-work.md) later composes this clock with
+a finite one-shot work agenda. Its equal-time ordering and replay evidence
+verify RFF-REQ-004. Statements above that RFF-REQ-004 remained partial describe
+this decision's original checkpoint. RFF-REQ-005 remains partial because the
+replay's events are test-owned observations rather than runtime/application
+event emission.
+
 ## Consequences and risks
 
 - A caller can compare `FrameworkInstant` values from unrelated clock origins;
@@ -120,9 +129,9 @@ read.
 - `EventTimestamp::from_elapsed` still permits arbitrary explicit values.
   Framework-owned event integration must use the injected capture path before
   RFF-REQ-005 can claim framework timestamp production in a host scenario.
-- Repeatable clock traces do not prove repeatable scheduled work. Scheduling
-  still needs due-work selection, equal-deadline ordering, replay, and lifecycle
-  evidence.
+- At this decision's checkpoint, repeatable clock traces did not prove
+  repeatable scheduled work. ADR-0015 later supplies due-work selection,
+  equal-time ordering, replay, and lifecycle evidence.
 - No elapsed duration corresponds to UTC, mission epoch, oscillator accuracy,
   leap seconds, host suspend behavior, or a real-time guarantee in this slice.
 

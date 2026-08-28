@@ -66,7 +66,7 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-28)**
+Status: **In progress (2026-08-29)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
@@ -90,17 +90,19 @@ Completed first event slice: machine-inspectable records enter a standalone
 positive-capacity FIFO queue with direct reject-newest saturation reporting.
 The queue remains separate from runtime or application emission.
 
-Completed first time slice: a general `FrameworkInstant` and injected `Clock`
-boundary now have one manually advanced implementation. Reads never move time;
-checked overflow is typed and non-mutating; identical manual sequences produce
-identical instant traces; and `EventTimestamp` can capture the injected reading.
-RFF-REQ-004 and RFF-REQ-005 remain partial because no scheduled work or
-runtime/host-owned event path exists.
+Completed time and scheduling slices: a general `FrameworkInstant` and injected
+`Clock` boundary have one manually advanced implementation. Reads never move
+time; checked overflow is typed and non-mutating; and `EventTimestamp` can
+capture the injected reading. A finite `WorkSchedule` now preserves configured
+order for equal elapsed instants, and one caller request attempts at most one
+due or overdue item through the running-only work boundary. Identical manual
+scenarios reproduce scheduled outcomes, application work order, lifecycle
+states, and clock-captured event timestamps. RFF-REQ-004 is verified. RFF-REQ-005
+remains partial because no runtime/application path owns event emission.
 
-Next slice: record and implement the smallest caller-driven scheduled-work
-behavior under the manual clock, including stable equal-deadline order and a
-replayed observable trace. Preserve serial caller control and defer runtime
-failure-event integration.
+Next slice: integrate one clock-captured returned-error event while preserving
+the original application error, explicit event-queue saturation, and subsequent
+peer progress. Keep event delivery separate from application messaging.
 
 Exit evidence: exact-boundary, ordering, saturation, and unavailable/clearing
 tests for RFF-REQ-003; structured-event and simulated-time integration tests

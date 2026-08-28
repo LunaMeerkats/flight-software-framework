@@ -15,11 +15,11 @@ fit Rust's ownership, type, error, and testing models.
 
 The repository contains an initial research and architecture baseline, five
 bounded Rust lifecycle/work increments, three Stage 2 messaging increments, and
-one standalone structured-event increment plus an injected manual-time
-increment. A no-dependency `LifecycleRegistry` verifies the logical LC1
-transition table. A finite-capacity `Runtime<A>` owns statically composed
-application values and executes start, caller-selected work, stop, and in-place
-restart synchronously.
+one standalone structured-event increment, an injected manual-time increment,
+and a finite scheduled-work increment. A no-dependency `LifecycleRegistry`
+verifies the logical LC1 transition table. A finite-capacity `Runtime<A>` owns
+statically composed application values and executes start, caller-selected
+work, stop, and in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
 successful work retains `Running`. Restart and work retain application-owned
 state, while a returned concrete operation error enters terminal `Failed`
@@ -49,8 +49,20 @@ manually advanced implementation starts at zero by default or at one explicit
 controlled instant, changes only on explicit nonnegative advances, and rejects
 representational overflow without mutation. Five public tests prove zero and
 repeated reads, cumulative and replayed traces, typed overflow, object-safe
-injection, and event timestamp capture. The queue and clock remain separate from
-both runtimes.
+injection, and event timestamp capture. Neither runtime owns the clock or event
+queue; scheduled work borrows the clock, while event composition remains
+external.
+
+A `WorkSchedule` copies a finite agenda of one-shot application work items in
+nondecreasing elapsed-time order. `Runtime::run_next_scheduled_work` reads an
+injected clock once while an item remains, waits without mutation before its
+instant, and consumes at most one due or overdue item per caller request. Equal-
+time items retain configuration order. Success returns the lifecycle state;
+lifecycle rejection or a returned work error preserves the exact runtime error
+and consumes only the attempted item so a due peer can still progress. Seven
+public tests cover order validation, exact clock-read counts, inclusive and
+overdue work, lifecycle/error handling, and replay-equivalent work, lifecycle,
+and structured-event timestamp traces under manual time.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
@@ -58,11 +70,12 @@ RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
 and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
-no automatic or batch dispatch. It is not yet a sample mission. Scheduled work,
-runtime-owned event emission, configuration, and command/telemetry boundaries
-remain unimplemented. RFF-REQ-004 and RFF-REQ-005 are partial; RFF-REQ-008 also
-remains partial. Traceability distinguishes this evidence from containment of
-panics, hangs, cleanup failures, or other arbitrary faults.
+no automatic or batch dispatch. It is not yet a sample mission. Periodic or
+messaging-aware scheduling, runtime-owned event emission, configuration, and
+command/telemetry boundaries remain unimplemented. The finite scheduling and
+manual-time evidence verifies RFF-REQ-004. RFF-REQ-005 and RFF-REQ-008 remain
+partial. Traceability distinguishes this evidence from containment of panics,
+hangs, cleanup failures, or other arbitrary faults.
 
 The first source-quality checkpoint tracks stable rustfmt at 100 columns and
 denies Clippy functions over a 60-line review threshold across all targets.
@@ -109,6 +122,7 @@ guidance records the remaining structural and document checks.
 - [One-message application dispatch decision](docs/adr/0012-application-message-dispatch.md)
 - [Bounded structured-event queue decision](docs/adr/0013-bounded-structured-event-queue.md)
 - [Injected manual framework clock decision](docs/adr/0014-injected-manual-framework-clock.md)
+- [Finite caller-driven scheduling decision](docs/adr/0015-caller-driven-scheduled-work.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

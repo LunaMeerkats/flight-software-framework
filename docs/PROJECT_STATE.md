@@ -1,21 +1,23 @@
 # Project state
 
-Last updated: **2026-08-28**
+Last updated: **2026-08-29**
 
 ## Current milestone
 
 Stage 1 and the first source-quality checkpoint are complete. Stage 2 has
 verified bounded application messaging for RFF-REQ-003 and completed its first
-structured-event and injected-time slices. The event queue proves fixed fields,
-a positive record bound, emission-order FIFO, and explicit reject-newest
-saturation. The manual clock proves explicit nondecreasing advancement,
-non-mutating overflow, repeatable instant traces, and an object-safe clock
-capture seam for event timestamps.
+structured-event, injected-time, and finite scheduling slices. The event queue
+proves fixed fields, a positive record bound, emission-order FIFO, and explicit
+reject-newest saturation. The manual clock proves explicit nondecreasing
+advancement and non-mutating overflow. A fixed one-shot work agenda now proves
+one-item caller-driven due work, stable equal-time order, explicit overdue and
+error behavior, exact clock reads, and a replayed work/lifecycle/timestamp trace.
 
-No scheduled work or runtime/host-owned event path exists, so RFF-REQ-004 and
-RFF-REQ-005 remain partial. RFF-REQ-008 also remains partial because returned
-application errors do not emit structured events. Caller-driven scheduling is
-the next Stage 2 responsibility.
+RFF-REQ-004 is verified at this finite scheduling boundary. RFF-REQ-005 remains
+partial because no runtime/application path owns clock-captured event emission.
+RFF-REQ-008 also remains partial because returned application errors do not emit
+structured events. Returned-error event integration is the next Stage 2
+responsibility.
 
 ## Verified baseline
 
@@ -36,18 +38,22 @@ the next Stage 2 responsibility.
 - Manual-time implementation commit
   `0ec684f6d50505aea67acef27e54d7175f0a11ee` adds `FrameworkInstant`, the
   injected `Clock` boundary, `ManualClock`, checked advancement, ADR-0014, and
-  five focused public tests. RFF-REQ-004 and RFF-REQ-005 are partially verified.
+  five focused public tests.
+- Scheduling implementation commit
+  `63654d57936617e63731a906a049777420f91913` adds `ScheduledWork`, a fixed
+  `WorkSchedule`, one-item due-work execution, ADR-0015, and seven public tests.
+  Combined manual-time and replay evidence verifies RFF-REQ-004.
 - Repository content is available under `MIT OR Apache-2.0` with the confirmed
   notice `Copyright 2026 Daniel Smith`. Both canonical licence files, Cargo
   metadata, predicted package inventory, and generated package archive have
   been verified while `publish = false` remains in force.
-- Formatting, all-target checking, warnings-denied Clippy, all 47 tests, and
+- Formatting, all-target checking, warnings-denied Clippy, all 54 tests, and
   warnings-denied all-feature documentation generation pass with rustc/cargo
   1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
-- Fifteen handwritten Rust files have no physical line over 100 columns and no
+- Seventeen handwritten Rust files have no physical line over 100 columns and no
   comment-only line over the 80-column review default. The three existing
   reasoned chronological test expectations remain fulfilled; production,
-  messaging, event, and clock code need none.
+  messaging, event, clock, and scheduling code need none.
 
 The active toolchain changed from the 1.96.1 policy-establishment evidence. The
 whole-tree re-audit passes; this records evidence rather than a minimum supported
@@ -68,6 +74,9 @@ Rust version or toolchain pin.
   elapsed event timestamp field.
 - ADR-0014 defines general elapsed framework instants, an object-safe injected
   clock read, and checked manual advancement.
+- ADR-0015 defines a finite nondecreasing one-shot work agenda, stable
+  equal-time order, one attempted item per caller request, and final consumption
+  after success, lifecycle rejection, or returned work failure.
 - ADR-0005 defines configuration revision and rollback behavior; that service
   is not implemented.
 
@@ -94,13 +103,23 @@ FIFO, rejects newest at saturation, and frees one slot on dequeue.
 starts at zero or one explicit controlled instant, advances only by caller-
 supplied `Duration`, and preserves its reading on checked overflow. An
 `EventTimestamp` can capture a reading through either a concrete or trait-object
-clock reference. The clock and event queue are not attached to a runtime.
+clock reference. Neither runtime owns the clock or event queue; scheduled work
+borrows the clock, while event composition remains external.
+
+`WorkSchedule` owns an immutable finite sequence of one-shot `ScheduledWork`
+items. Nondecreasing instants preserve caller order for equal times.
+`Runtime::run_next_scheduled_work` reads an injected clock once while an item
+remains, waits without mutation, or consumes and attempts at most one due or
+overdue item through `Runtime::work`. Success reports `Running`; lifecycle and
+application errors retain exact schedule and runtime context. Consumed failures
+do not block later due peers.
 
 The runtime creates no thread or executor and has no automatic or batch
-dispatch, multi-application fairness rule, schedule, configuration access, or
-event integration. The event queue has no filter, fan-out, persistence, or host
-drain adapter. RFF-REQ-003 is verified; RFF-REQ-004, RFF-REQ-005, and
-RFF-REQ-008 remain partial.
+dispatch, periodic or dynamic work generation, multi-application fairness rule,
+configuration access, or event integration. Scheduled work currently applies
+only to the lifecycle-only runtime, not `MessagingRuntime`. The event queue has
+no filter, fan-out, persistence, or host drain adapter. RFF-REQ-003 and
+RFF-REQ-004 are verified; RFF-REQ-005 and RFF-REQ-008 remain partial.
 
 ## Source-quality policy
 
@@ -117,17 +136,23 @@ separate measured increments.
 
 ## Work in progress
 
-No implementation work is in progress. The injected manual-clock slice is
-complete at its recorded boundary. Caller-driven scheduled work is the next
-technical slice; runtime failure-event integration remains separate.
+No implementation work is in progress. The finite caller-driven scheduling
+slice is complete at its recorded boundary. Runtime returned-error event
+integration remains the next separate technical slice.
 
 ## Highest risks and uncertainties
 
-- `FrameworkInstant` carries no clock identity, so unrelated clock domains can
-  be compared accidentally. `EventTimestamp::from_elapsed` also preserves an
-  explicit path for arbitrary standalone timestamps.
-- Scheduling has no due-work, equal-deadline, overdue, lifecycle, or replay
-  policy. Repeatable manual readings do not prove repeatable scheduled work.
+- `FrameworkInstant` carries no clock identity, so a schedule can compare an
+  instant from an unrelated clock domain. `ApplicationId` likewise cannot
+  detect a same-position identity from another runtime.
+  `EventTimestamp::from_elapsed` also preserves an explicit path for arbitrary
+  standalone timestamps.
+- The schedule is a fixed one-shot agenda. It has no periodic phase, drift,
+  missed-release catch-up or coalescing, reconfiguration, priority, or fairness
+  policy, and retains consumed items in its fixed allocation until drop.
+- Scheduled work is exposed only on bare `Runtime`. A future messaging-aware
+  operation must delegate through `MessagingRuntime::work` to preserve its
+  failed-endpoint inbox clearing.
 - Reject-newest event saturation can omit a later high-severity record. The
   must-use outcome is explicit, but callers can still handle it inadequately.
 - `EventSource::Application` cannot validate which runtime issued an identity
@@ -144,8 +169,8 @@ technical slice; runtime failure-event integration remains separate.
 
 ## Important unresolved decisions
 
-- No caller-driven scheduling contract, equal-deadline ordering, missed-work
-  policy, or runtime clock owner is selected.
+- No periodic scheduling contract, missed-release policy, runtime clock owner,
+  or messaging-aware scheduled-work composition is selected.
 - No runtime/application event emission, framework failure-event identifier, or
   host event drain boundary is selected.
 - No mission message payload limit, external topic identifier, or wire
@@ -158,20 +183,21 @@ technical slice; runtime failure-event integration remains separate.
 
 ## Most likely next tasks
 
-1. Add the smallest caller-driven scheduled-work slice with stable equal-
-   deadline order and a replayed trace under `ManualClock`.
-2. Integrate one clock-captured returned-error event while preserving the
+1. Integrate one clock-captured returned-error event while preserving the
    original error, explicit event-queue saturation, and peer progress.
-3. Implement the accepted configuration activation, rejection, revision, and
+2. Implement the accepted configuration activation, rejection, revision, and
    rollback behavior after Stage 2 has a coherent stopping point.
+3. Record the command/telemetry host grammar and validation boundary before
+   beginning RFF-REQ-007 implementation.
 
 ## Latest run
 
-2026-08-28: Added the injected manual framework clock in commit
-`0ec684f6d50505aea67acef27e54d7175f0a11ee`. Five public tests prove zero and
-repeated reads, exact cumulative advancement, zero-duration no-op behavior,
-typed non-mutating overflow, object-safe injection, identical manual traces,
-and exact event timestamp capture through the existing FIFO queue. The complete
-baseline passes 47 tests with warnings denied. No dependency, wall-clock read,
-scheduler, runtime/application integration, thread, executor, protocol behavior,
+2026-08-29: Added finite caller-driven scheduled work in commit
+`63654d57936617e63731a906a049777420f91913`. Seven public tests prove order
+validation, zero/one clock-read behavior, waiting and inclusive due work, stable
+equal-time order, overdue execution, final consumption after lifecycle or
+returned errors, peer progress, and an identical replayed work, lifecycle, and
+event-timestamp trace. The complete implementation baseline passes 54 tests
+with warnings denied. No dependency, wall-clock read, periodic schedule,
+automatic draining, messaging integration, thread, executor, protocol behavior,
 release, or push was added.

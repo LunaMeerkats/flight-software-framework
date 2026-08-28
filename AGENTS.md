@@ -28,9 +28,11 @@ translate NASA C source.
   records, a synchronous start/work/stop/in-place-restart owned runtime, a
   bounded message-routing core, lifecycle-aware ownership of one inbox per
   application, caller-selected one-message application dispatch, and a
-  standalone bounded structured-event queue plus an injected manual clock.
+  standalone bounded structured-event queue, an injected manual clock, and a
+  finite caller-driven one-shot work schedule.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
-  application-dispatch, event-queue, and manual-clock integration tests.
+  application-dispatch, event-queue, manual-clock, and scheduled-work
+  integration tests.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

@@ -54,13 +54,13 @@ initial runtime will not spawn hidden work.
 
 [ADR-0001](adr/0001-caller-driven-host-runtime.md) selects a serial,
 caller-driven host runtime for the first v0.1 slices. The current host explicitly
-selects one application work call or one message dispatch. Callers can also emit
-to and dequeue from the standalone event queue. An injected `Clock` now exposes
-elapsed `FrameworkInstant` readings, and its manual implementation advances only
-on explicit caller requests. There is no scheduler. Later scheduled work will
-use this boundary with tests explicitly advancing manual time. This keeps event
-and transition ordering testable without adopting an async runtime or thread
-lifecycle early.
+selects one application work call, one message dispatch, or at most the next due
+item in a finite one-shot work agenda. Callers can also emit to and dequeue from
+the standalone event queue. An injected `Clock` exposes elapsed
+`FrameworkInstant` readings, and its manual implementation advances only on
+explicit caller requests. The schedule borrows that clock and never advances it.
+This keeps work, event, and transition ordering testable without adopting an
+async runtime or thread lifecycle early.
 
 Here, **deterministic** means that conforming, terminating applications with
 controlled external effects produce the same framework-observable ordering from
@@ -109,6 +109,9 @@ fault tolerance.
 - [ADR-0014](adr/0014-injected-manual-framework-clock.md) selects a general
   elapsed instant, an object-safe injected clock read, checked manual
   advancement, and explicit conversion into the event timestamp field.
+- [ADR-0015](adr/0015-caller-driven-scheduled-work.md) selects a finite
+  nondecreasing one-shot work agenda, stable equal-time order, final consumption
+  after each due attempt, and at most one attempted item per caller request.
 
 ## Current implementation boundary
 
@@ -172,15 +175,25 @@ runtime.
 moves only through checked nonnegative duration advances, and returns a typed
 non-mutating error on overflow. `EventTimestamp` can capture this injected
 reading, but callers can still construct explicit timestamps and no runtime or
-host path owns the clock/event composition. RFF-REQ-004 and RFF-REQ-005 remain
+application event path owns the clock/event composition. RFF-REQ-005 remains
 partial.
+
+`WorkSchedule` separately owns a fixed finite sequence of one-shot
+`ScheduledWork` items. Construction requires nondecreasing elapsed instants, so
+equal-time items retain configuration order. `Runtime::run_next_scheduled_work`
+reads an injected clock once while an item remains, returns without mutation
+before that instant, and consumes at most one due or overdue item before
+delegating to `Runtime::work`. Success includes the resulting lifecycle state;
+an error includes the exact lifecycle or application work error. Identical
+manual scenarios reproduce work order, lifecycle outcomes, and clock-captured
+event timestamps, verifying RFF-REQ-004 at this finite boundary.
 
 This combined routing, lifecycle-availability, and application-dispatch
 evidence verifies RFF-REQ-003. The positional configuration limitation remains:
 mission composition must associate each capacity and topic set with the intended
-registration position. There is still no automatic or batch dispatch, ordering
-or fairness policy across selected applications, runtime-integrated event
-emission, or scheduler.
+registration position. There is still no automatic or batch message dispatch,
+periodic or dynamic work generation, multi-application fairness policy,
+messaging-aware scheduled work, or runtime-integrated event emission.
 
 ## Alternatives kept open
 
@@ -214,8 +227,13 @@ emission, or scheduler.
   must-use outcome is explicit but does not provide guaranteed delivery.
 - Explicit event timestamps and readings from unrelated clock origins can still
   be non-monotonic when combined. The injected capture seam does not yet give a
-  runtime or host ownership of timestamp production; FIFO remains emission
-  order rather than timestamp sorting.
+  framework runtime or application ownership of timestamp production; FIFO
+  remains emission order rather than timestamp sorting.
+- A work schedule cannot detect an identity from another same-shaped runtime or
+  an instant from another clock origin. It retains consumed one-shot items until
+  drop, has no periodic or reconfiguration policy, and currently schedules only
+  the lifecycle-only `Runtime`; messaging-aware work must preserve inbox
+  clearing through `MessagingRuntime`.
 - Direct standalone routing-core construction can still be paired with a
   same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
   guarantees apply only to `MessagingRuntime`.
