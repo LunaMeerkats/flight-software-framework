@@ -1,81 +1,92 @@
-# Plan: add an injected manual framework clock
+# Plan: add caller-driven scheduled work
 
-Status: **Complete**
-Date: **2026-08-28**
+Status: **In progress**
+Date: **2026-08-29**
 
 ## Objective
 
-Record and implement the smallest injected-time slice for Stage 2: a general
-elapsed framework instant, an object-safe clock boundary, and a manually
-advanced clock whose readings can produce event timestamps repeatably.
+Record and implement the smallest scheduled-work slice for Stage 2: a finite
+ordered agenda of explicit application work instants and one caller-driven
+runtime operation that attempts at most the next due item under an injected
+clock.
 
-This is the highest-value next step because the bounded event queue now has a
-timestamp consumer but still accepts caller-invented elapsed values. The clock
-reduces that integrity gap and establishes the time seam needed by later
-scheduling without combining either scheduling or runtime event emission into
-this increment.
+This is the highest-value next step because the manual clock is verified but
+RFF-REQ-004 still has no scheduled application work, equal-time ordering, or
+replayed scheduled trace. A finite one-shot agenda can establish those
+behaviors without prematurely choosing recurrence, missed-period recovery,
+automatic dispatch, or concurrency.
 
 ## Context and decision boundary
 
-RFF-REQ-004 requires injected framework time and repeatable simulated-time
-behavior. RFF-REQ-005 requires framework timestamps on structured events. The
-starting implementation had `EventTimestamp` wrap an explicit caller-supplied
-`Duration`, and no clock existed.
+ADR-0001 requires serial caller control and stable observable ordering.
+ADR-0009 provides running-only `Runtime::work` with exact returned-error
+behavior. ADR-0014 provides an injected read-only clock whose manual
+implementation advances only on explicit caller requests.
 
-The clock should not return event-specific vocabulary because scheduled work is
-the next recorded time consumer. A distinct `FrameworkInstant` will represent
-elapsed time from one clock origin. `EventTimestamp` remains the event-field
-type and captures one instant explicitly. This keeps the provider independent
-of the first consumer without adding a scheduler abstraction.
+The schedule will contain copied `(ApplicationId, FrameworkInstant)` work
+items in nondecreasing scheduled-time order. Equal-time items retain caller
+configuration order. One runtime call observes the clock once and either
+reports completion, waits without mutation, or consumes and attempts exactly
+one due or overdue item through the existing work boundary.
+
+A due item is consumed before its callback result is returned. That applies to
+successful work, a lifecycle rejection, and a returned application error, so a
+stopped or failed application cannot indefinitely block later equal-time work.
+The result retains the scheduled instant, observed instant, identity, and exact
+runtime work error where applicable.
 
 ## Acceptance criteria
 
-- `FrameworkInstant` is an ordered copied value containing elapsed `Duration`
-  from one framework-clock origin; it carries no wall-clock or cross-clock
-  comparison claim.
-- `Clock::now` returns the current instant without advancing or causing a
-  hidden effect, and remains usable as an injected trait boundary.
-- `ManualClock` starts at zero by default, may start at an explicit elapsed
-  instant for a controlled scenario, and advances only when the caller supplies
-  a nonnegative `Duration`.
-- Zero advancement and repeated reads preserve the current instant.
-- Addition overflow returns a typed error containing the current instant and
-  requested advance, and leaves the clock unchanged.
-- `EventTimestamp` can capture an injected clock reading while retaining its
-  existing explicit elapsed constructor for standalone and replayed records.
-- Public tests prove zero and repeated reads, cumulative advancement, typed
-  non-mutating overflow, identical replay traces, and exact event timestamps
-  from an injected manual clock through the existing bounded FIFO queue.
-- RFF-REQ-004 and RFF-REQ-005 remain partially verified. Equal-deadline work,
-  scheduled dispatch, runtime failure events, and a complete host scenario are
-  not claimed.
-- No wall-clock implementation, sleep, thread, executor, scheduler, runtime
-  integration, application context, dependency, protocol, or compatibility
-  claim is added.
+- `ScheduledWork` identifies one runtime-local application and one absolute
+  elapsed `FrameworkInstant`; it is a one-shot release, not a wall-clock or
+  completion-deadline guarantee.
+- `WorkSchedule` owns a fixed finite agenda copied at construction. It accepts
+  an empty agenda, rejects descending scheduled instants before construction,
+  reserves storage for the full configured item count, and has no mutation API
+  that can grow the agenda.
+- Equal-time work retains configuration order. An overdue item remains due, and
+  every call attempts at most one item.
+- Before the next scheduled instant, the runtime reports the item and observed
+  instant without consuming it, invoking application code, or advancing time.
+- A due item delegates to `Runtime::work`. Success, lifecycle rejection, and a
+  returned application error preserve the existing lifecycle behavior and all
+  consume that one item before returning exact schedule metadata.
+- A consumed rejected or failed item does not block a later due peer.
+- Two fresh runtimes and manual clocks given identical configuration, explicit
+  advances, and ordered calls produce identical work results, application work
+  order, lifecycle-state outcomes, and clock-captured structured-event
+  timestamp traces without sleeps.
+- RFF-REQ-004 becomes verified by the combined clock and scheduled replay
+  evidence. RFF-REQ-005 and RFF-REQ-008 remain partial because no runtime-owned
+  event or returned-error event path is added.
+- No periodic policy, dynamic scheduling, automatic draining, priority,
+  fairness promise, execution-time bound, wall-clock adapter, application
+  context, message dispatch, event integration, thread, executor, dependency,
+  protocol, or real-time claim is added.
 - The complete documented baseline and repository document/source-form audits
   pass, and the complete diff contains no unrelated implementation change.
 
 ## Files and components
 
-- `src/clock.rs`: framework instant, clock boundary, manual implementation, and
-  checked advancement error.
-- `src/events.rs`: event timestamp conversion from an injected clock reading.
-- `src/lib.rs`: narrow clock and timestamp re-exports.
-- `tests/manual_clock.rs`: public API and injected event-timestamp evidence.
-- `docs/adr/0014-injected-manual-framework-clock.md`: time semantics,
-  alternatives, risks, and revisit conditions.
-- `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`,
-  `docs/PROJECT_STATE.md`, `docs/verification/TRACEABILITY.md`: truthful
-  current behavior, limits, evidence, and next step.
+- `src/scheduling.rs`: finite agenda, creation errors, scheduled outcomes and
+  errors, and the caller-driven `Runtime` operation.
+- `src/lib.rs`: narrow scheduling re-exports.
+- `tests/scheduled_work.rs`: public API, lifecycle/error, equal-time, overdue,
+  and replay evidence.
+- `docs/adr/0015-caller-driven-scheduled-work.md`: due-work, ordering,
+  consumption, clock-domain, and deferred recurrence decisions.
+- `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/REQUIREMENTS.md`,
+  `docs/ROADMAP.md`, `docs/PROJECT_STATE.md`, and
+  `docs/verification/TRACEABILITY.md`: truthful current behavior, limits,
+  evidence, and next step.
 - `PLANS.md`: this bounded plan and final result.
 
-No new external source is required. The slice implements the injected-time
-direction already recorded in RFF-REQ-004 and ADR-0001 using stable standard
-library `Duration` behavior on the repository's audited toolchain.
+No external research is required. The slice composes already recorded local
+runtime and clock decisions using stable standard-library storage.
 
 ## Verification approach
 
-- Run the focused manual-clock integration tests while implementing.
+- Run the focused scheduled-work integration tests while implementing.
 - Run `cargo fmt --all -- --check`.
 - Run `cargo check --workspace --all-targets --all-features`.
 - Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
@@ -87,54 +98,28 @@ library `Duration` behavior on the repository's audited toolchain.
   Clippy expectation.
 - Verify relative Markdown links, headings, tables, requirement rows, ADR and
   source identifiers, and changed-document structure.
-- Review the complete diff for accidental clock-domain comparisons, hidden time
-  movement, unchecked overflow, public API commitments, stale claims, and
-  changes outside the objective.
+- Review the complete diff for hidden time movement, multiple-work dispatch,
+  unstable equal-time order, schedule head-of-line blocking, accidental
+  recurrence or real-time claims, public API commitments, and scope drift.
 
 ## Risks and safe stopping point
 
-`FrameworkInstant` values do not encode clock identity, so values from different
-clock instances can be compared accidentally. The manual clock also permits an
-explicit nonzero starting point for controlled tests. Documentation must limit
-ordering claims to readings from one clock origin.
+`FrameworkInstant` and `ApplicationId` carry no owner identity. The schedule
+cannot detect a work item or instant from another same-shaped runtime or clock;
+their existing caller-scoped contracts continue to apply.
 
-Retaining `EventTimestamp::from_elapsed` means standalone callers can still
-construct arbitrary event timestamps. Only the new capture path is
-framework-clock-produced; RFF-REQ-005 therefore remains partial until a host or
-runtime integration owns that path.
+A finite one-shot agenda is intentionally not a periodic scheduler. It retains
+all configured items until the agenda is dropped, including already consumed
+items, so its allocation stays fixed and bounded by construction. A later
+periodic design must separately decide phase, drift, missed-release catch-up or
+coalescing, arithmetic overflow, and reconfiguration.
 
-Stop after the clock vocabulary, checked manual implementation, injected event
-timestamp evidence, decision record, and durable state are coherent. Do not add
-scheduled work, equal-deadline policy, runtime error events, an application
-service context, wall-clock access, automatic progression, or concurrency in
-this run.
+Consuming a due item before returning an error prevents head-of-line blocking
+but means retry is never implicit. Applications may still mutate internally
+before returning an error, and panics or non-returning callbacks remain outside
+the cooperative boundary.
 
-## Result
-
-Implemented the injected manual-time boundary in commit `0ec684f`.
-`FrameworkInstant` separates general elapsed clock readings from the event-field
-wrapper. The object-safe `Clock` trait exposes observation without hidden
-movement, while `ManualClock` starts at zero or an explicit controlled instant,
-advances by checked caller-supplied durations, treats zero as a successful
-no-op, and returns exact overflow context without mutation.
-
-Five public integration tests prove repeated zero reads, exact cumulative
-advancement, zero-duration behavior, `Duration::MAX` overflow preservation, an
-actual `&dyn Clock` injection, identical traces from identical manual sequences,
-and clock-captured event timestamps through the unchanged bounded FIFO queue.
-RFF-REQ-004 and RFF-REQ-005 remain partially verified because no scheduled work
-or runtime/host-owned event path exists.
-
-The required format, all-target check, warnings-denied Clippy, 47-test,
-warnings-denied rustdoc, and diff checks passed. The final source-form audit
-found no Rust physical lines over 100 columns, no comment-only lines over 80,
-three existing narrow reasoned Clippy expectations across 15 handwritten Rust
-files, and no allow attributes. The document audit found 25 Markdown files, 60
-resolving relative links, eight matched requirement and traceability identifiers,
-14 matching ADR identifiers, and 21 defined source identifiers with no undefined
-reference. All ten changed Markdown documents rendered to nonempty HTML with one
-top-level heading and consistent table shapes.
-
-No dependency, wall-clock read, sleep, thread, executor, scheduler, runtime
-integration, application context, automatic time movement, protocol behavior,
-compatibility claim, release, or push was added.
+Stop after the finite agenda, one-item runtime operation, focused replay and
+error evidence, decision record, and durable state are coherent. Do not add
+periodic generation, automatic looping, runtime-owned events, failure events,
+message dispatch, a shared service context, or concurrency in this run.
