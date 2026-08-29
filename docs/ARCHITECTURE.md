@@ -112,6 +112,9 @@ fault tolerance.
 - [ADR-0015](adr/0015-caller-driven-scheduled-work.md) selects a finite
   nondecreasing one-shot work agenda, stable equal-time order, final consumption
   after each due attempt, and at most one attempted item per caller request.
+- [ADR-0016](adr/0016-returned-work-failure-events.md) composes direct work,
+  injected time, and bounded event storage for one returned-error event attempt
+  that never replaces the original application error.
 
 ## Current implementation boundary
 
@@ -132,7 +135,8 @@ suppress callbacks for rejected operations and show that a returned work error
 does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The
 lifecycle-only `Runtime<A>` has no automatic dispatch, general service context,
-event emission, or sample mission, so RFF-REQ-008 remains partial.
+or sample mission. Its ordinary lifecycle/work operations emit no events; the
+opt-in returned-work integration below is the only event-reporting operation.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -174,9 +178,19 @@ runtime.
 `ManualClock` implementation starts at zero or one explicit controlled instant,
 moves only through checked nonnegative duration advances, and returns a typed
 non-mutating error on overflow. `EventTimestamp` can capture this injected
-reading, but callers can still construct explicit timestamps and no runtime or
-application event path owns the clock/event composition. RFF-REQ-005 remains
-partial.
+reading, while callers can still construct explicit timestamps.
+
+`Runtime::work_with_failure_event` delegates first to the existing direct work
+operation. Success and lifecycle rejection read no clock and attempt no event.
+After a returned application error commits only the selected record to
+`Failed`, the integration captures one injected reading, constructs one
+application-sourced error event with a mission-supplied identifier, and calls
+the existing bounded queue once. `RuntimeWorkEventError` retains the complete
+work error and an optional `FailureEventAttempt` containing the exact event and
+`Recorded` or `QueueFull` result. Saturation preserves older records and returns
+the rejected event for explicit caller handling; it neither retries nor
+prevents later peer work once the operation returns. The runtime borrows rather
+than permanently owns the clock and queue.
 
 `WorkSchedule` separately owns a fixed finite sequence of one-shot
 `ScheduledWork` items. Construction requires nondecreasing elapsed instants, so
@@ -191,9 +205,12 @@ event timestamps, verifying RFF-REQ-004 at this finite boundary.
 This combined routing, lifecycle-availability, and application-dispatch
 evidence verifies RFF-REQ-003. The positional configuration limitation remains:
 mission composition must associate each capacity and topic set with the intended
-registration position. There is still no automatic or batch message dispatch,
+registration position. The runtime-event integration plus existing bounded
+queue evidence verifies RFF-REQ-005 and RFF-REQ-008 only for direct cooperative
+returned work errors. There is still no automatic or batch message dispatch,
 periodic or dynamic work generation, multi-application fairness policy,
-messaging-aware scheduled work, or runtime-integrated event emission.
+messaging-aware scheduled work, application-authored event API, other callback
+event path, or host event drain adapter.
 
 ## Alternatives kept open
 
@@ -212,9 +229,9 @@ messaging-aware scheduled work, or runtime-integrated event emission.
 ## Major technical risks
 
 - The pre-v0.1 application surface has separate context-free work and message
-  callbacks. The standalone event queue does not yet cross that boundary, so it
-  provides no evidence for a common service-context borrowing shape. A later
-  shared context could still cause API churn.
+  callbacks. The opt-in failure-event method borrows services for one direct
+  work operation but provides no general application service-context shape. A
+  later shared context could still cause API churn.
 - A returned application callback error may follow partial application-internal
   cleanup or mutation; the runtime records `Failed` but provides no rollback or
   cleanup guarantee.
@@ -226,9 +243,13 @@ messaging-aware scheduled work, or runtime-integrated event emission.
 - Reject-newest event saturation can omit a later high-severity record. The
   must-use outcome is explicit but does not provide guaranteed delivery.
 - Explicit event timestamps and readings from unrelated clock origins can still
-  be non-monotonic when combined. The injected capture seam does not yet give a
-  framework runtime or application ownership of timestamp production; FIFO
-  remains emission order rather than timestamp sorting.
+  be non-monotonic when combined. The direct failure path captures one supplied
+  clock, but explicit standalone events can still use arbitrary timestamps;
+  FIFO remains emission order rather than timestamp sorting.
+- Direct failure-event reporting is opt-in and applies only to returned work
+  errors. Its timestamp is captured after `Failed` is committed, represents
+  framework observation rather than an application-internal fault instant, and
+  leaves a caller-owned event copy outside the queue's retained-record bound.
 - A work schedule cannot detect an identity from another same-shaped runtime or
   an instant from another clock origin. It retains consumed one-shot items until
   drop, has no periodic or reconfiguration policy, and currently schedules only

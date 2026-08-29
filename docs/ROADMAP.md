@@ -66,7 +66,7 @@ separate measured increments.
 
 ## Stage 2 — Bounded interaction under controlled time
 
-Status: **In progress (2026-08-29)**
+Status: **Complete (2026-08-30)**
 
 - Add publish/subscribe fan-out with an explicit finite capacity and overflow
   contract.
@@ -86,9 +86,13 @@ self-publication, refreshed lifecycle availability, explicit empty and rejected
 dispatch, and non-transactional peer delivery when a callback later fails.
 RFF-REQ-003 is verified by the combined evidence.
 
-Completed first event slice: machine-inspectable records enter a standalone
-positive-capacity FIFO queue with direct reject-newest saturation reporting.
-The queue remains separate from runtime or application emission.
+Completed event slices: machine-inspectable records enter a standalone positive-
+capacity FIFO queue with direct reject-newest saturation reporting. An opt-in
+direct runtime work operation now constructs one clock-captured application
+error event after a cooperative returned work error, preserves the complete
+original error and exact event attempt under saturation, and leaves a peer able
+to complete later work. Ordinary work, lifecycle rejection, and other callback
+paths emit no event.
 
 Completed time and scheduling slices: a general `FrameworkInstant` and injected
 `Clock` boundary have one manually advanced implementation. Reads never move
@@ -98,24 +102,29 @@ order for equal elapsed instants, and one caller request attempts at most one
 due or overdue item through the running-only work boundary. Identical manual
 scenarios reproduce scheduled outcomes, application work order, lifecycle
 states, and clock-captured event timestamps. RFF-REQ-004 is verified. RFF-REQ-005
-remains partial because no runtime/application path owns event emission.
-
-Next slice: integrate one clock-captured returned-error event while preserving
-the original application error, explicit event-queue saturation, and subsequent
-peer progress. Keep event delivery separate from application messaging.
+is verified at the direct cooperative returned-work failure boundary. The same
+failed-state, event, original-error, saturation, and peer-progress scenario
+verifies RFF-REQ-008 at that narrow boundary.
 
 Exit evidence: exact-boundary, ordering, saturation, and unavailable/clearing
 tests for RFF-REQ-003; structured-event and simulated-time integration tests
-for RFF-REQ-004 and RFF-REQ-005.
+for RFF-REQ-004 and RFF-REQ-005; and direct cooperative fault-injection evidence
+for RFF-REQ-008. No application-authored events, other callback event path,
+panic or hang containment, guaranteed event delivery, thread, or executor was
+added.
 
 ## Stage 3 — Configuration and mission boundaries
 
+Status: **Next**
+
 - Add validated, versioned configuration activation and rollback.
 - Add one command-ingest and telemetry-output host adapter pair.
-- Demonstrate defined application-error containment in the sample mission.
+- Integrate and re-demonstrate the already verified direct cooperative
+  application-error behavior in the sample mission.
 
-Exit evidence: hostile-input, rollback, and fault-injection tests for
-RFF-REQ-006 through RFF-REQ-008.
+Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
+command/telemetry adapter tests for RFF-REQ-007, and sample-mission
+re-demonstration of the narrow RFF-REQ-008 behavior.
 
 ## Stage 4 — v0.1 integration and review
 

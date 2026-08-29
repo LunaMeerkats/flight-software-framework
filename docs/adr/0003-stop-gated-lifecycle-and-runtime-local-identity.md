@@ -60,8 +60,10 @@ stop, and in-place restart. Lifecycle success enters `Running`, `Stopped`, or
 error enters terminal `Failed`. Restart and work mutably borrow the retained
 application value. A public integration test observes two independently defined
 applications completing the full LC1 sequence with work before and after
-restart, so RFF-REQ-002 is verified. RFF-REQ-008 remains partial until returned
-failure produces a structured event.
+restart, so RFF-REQ-002 is verified. At this lifecycle checkpoint RFF-REQ-008
+remained partial because returned failure produced no structured event.
+[ADR-0016](0016-returned-work-failure-events.md) later verifies it at the direct
+cooperative returned-work boundary.
 
 ## Alternatives considered
 

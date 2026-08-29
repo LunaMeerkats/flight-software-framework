@@ -64,9 +64,10 @@ storage policy.
 
 This slice does not attach the queue to `Runtime` or `MessagingRuntime`, add an
 application service context, or emit runtime failures. RFF-REQ-005 therefore
-remains partial until a framework-owned injected clock and host integration
-produce the timestamps. RFF-REQ-008 remains partial until a returned
-application error attempts a structured event while a peer remains operable.
+remains partial until a framework event path uses an injected clock and host
+integration produces the timestamps. RFF-REQ-008 remains partial until a
+returned application error attempts a structured event while a peer remains
+operable.
 
 ## Alternatives considered
 
@@ -121,6 +122,16 @@ runtime mutation, application callback change, recursive diagnostic, text
 payload, filter, fan-out, persistence, protocol boundary, or compatibility
 claim.
 
+## Subsequent returned-work integration
+
+[ADR-0016](0016-returned-work-failure-events.md) later composes this queue with
+an injected clock and direct runtime work. One cooperative returned work error
+now attempts a structured event while retaining the complete original error and
+exact `Recorded` or `QueueFull` outcome. Statements above that RFF-REQ-005 and
+RFF-REQ-008 remained partial describe this decision's original standalone
+checkpoint; both are now verified only at ADR-0016's narrow returned-work
+boundary.
+
 ## Consequences and risks
 
 - Queue storage and event metadata are bounded by the configured record count
@@ -129,8 +140,9 @@ claim.
 - Reject-newest can omit a later high-severity event while saturated. The
   outcome is explicit, but a caller can ignore it; this is not guaranteed
   delivery or a durable audit log.
-- Explicit timestamps can arrive out of order until a framework-owned clock
-  supplies them. FIFO represents emission-call order, not timestamp sorting.
+- Explicit timestamps can arrive out of order because standalone callers and
+  integrated runtime paths can use different injected clocks. FIFO represents
+  emission-call order, not timestamp sorting.
 - `EventSource::Application` carries the existing runtime-local identity risk:
   equal-position keys from separate issuers are indistinguishable here.
 - The fixed severity set may be revised before v0.1 if filtering or a sample

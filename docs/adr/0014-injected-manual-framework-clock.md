@@ -118,6 +118,14 @@ this decision's original checkpoint. RFF-REQ-005 remains partial because the
 replay's events are test-owned observations rather than runtime/application
 event emission.
 
+## Subsequent returned-work event boundary
+
+[ADR-0016](0016-returned-work-failure-events.md) later uses one injected clock
+read after a cooperative returned work error and attempts the resulting event
+through the bounded queue. This verifies RFF-REQ-005 and RFF-REQ-008 only at
+that direct returned-work boundary. It does not make the runtime a permanent
+clock owner or add general application event emission.
+
 ## Consequences and risks
 
 - A caller can compare `FrameworkInstant` values from unrelated clock origins;

@@ -133,6 +133,13 @@ No external source prescribes this local scheduling policy. The decision
 composes already recorded project behavior and uses only stable standard-
 library storage.
 
+## Subsequent direct failure-event boundary
+
+[ADR-0016](0016-returned-work-failure-events.md) later verifies RFF-REQ-005 and
+RFF-REQ-008 for an opt-in direct `Runtime::work` error. Scheduled errors still
+follow this ADR's exact final-consumption behavior and do not emit an event;
+messaging-aware or scheduled event integration remains a separate decision.
+
 ## Consequences and risks
 
 - The agenda is bounded by its immutable configured item count, but retaining

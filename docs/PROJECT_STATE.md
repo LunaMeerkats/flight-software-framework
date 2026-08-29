@@ -1,23 +1,21 @@
 # Project state
 
-Last updated: **2026-08-29**
+Last updated: **2026-08-30**
 
 ## Current milestone
 
-Stage 1 and the first source-quality checkpoint are complete. Stage 2 has
-verified bounded application messaging for RFF-REQ-003 and completed its first
-structured-event, injected-time, and finite scheduling slices. The event queue
-proves fixed fields, a positive record bound, emission-order FIFO, and explicit
-reject-newest saturation. The manual clock proves explicit nondecreasing
-advancement and non-mutating overflow. A fixed one-shot work agenda now proves
-one-item caller-driven due work, stable equal-time order, explicit overdue and
-error behavior, exact clock reads, and a replayed work/lifecycle/timestamp trace.
+Stages 1 and 2 and the first source-quality checkpoint are complete. Bounded
+application messaging verifies RFF-REQ-003. Injected manual time and a fixed
+one-shot work agenda verify RFF-REQ-004 through stable equal-time order, explicit
+overdue/error behavior, exact clock reads, and a replayed trace.
 
-RFF-REQ-004 is verified at this finite scheduling boundary. RFF-REQ-005 remains
-partial because no runtime/application path owns clock-captured event emission.
-RFF-REQ-008 also remains partial because returned application errors do not emit
-structured events. Returned-error event integration is the next Stage 2
-responsibility.
+The standalone event queue proves structured fields, a positive record bound,
+emission-order FIFO, and explicit reject-newest saturation. An opt-in direct
+runtime work operation now constructs one clock-captured application error event
+after a cooperative returned work error, preserves the complete original error
+and exact event attempt under saturation, and leaves a healthy peer operable.
+That combined evidence verifies RFF-REQ-005 and RFF-REQ-008 only at this direct
+cooperative returned-work boundary. Stage 3 configuration behavior is next.
 
 ## Verified baseline
 
@@ -43,17 +41,22 @@ responsibility.
   `63654d57936617e63731a906a049777420f91913` adds `ScheduledWork`, a fixed
   `WorkSchedule`, one-item due-work execution, ADR-0015, and seven public tests.
   Combined manual-time and replay evidence verifies RFF-REQ-004.
+- Runtime-event implementation commit
+  `a04c5bd3f929934b7578b14f181138ae0be56e9b` adds
+  `Runtime::work_with_failure_event`, preserved error/event-attempt context,
+  ADR-0016, and four public tests. Together with the bounded queue evidence it
+  verifies RFF-REQ-005 and RFF-REQ-008 at the direct returned-work boundary.
 - Repository content is available under `MIT OR Apache-2.0` with the confirmed
   notice `Copyright 2026 Daniel Smith`. Both canonical licence files, Cargo
   metadata, predicted package inventory, and generated package archive have
   been verified while `publish = false` remains in force.
-- Formatting, all-target checking, warnings-denied Clippy, all 54 tests, and
+- Formatting, all-target checking, warnings-denied Clippy, all 58 tests, and
   warnings-denied all-feature documentation generation pass with rustc/cargo
   1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
-- Seventeen handwritten Rust files have no physical line over 100 columns and no
+- Nineteen handwritten Rust files have no physical line over 100 columns and no
   comment-only line over the 80-column review default. The three existing
   reasoned chronological test expectations remain fulfilled; production,
-  messaging, event, clock, and scheduling code need none.
+  messaging, event, clock, scheduling, and runtime-event code need none.
 
 The active toolchain changed from the 1.96.1 policy-establishment evidence. The
 whole-tree re-audit passes; this records evidence rather than a minimum supported
@@ -77,6 +80,8 @@ Rust version or toolchain pin.
 - ADR-0015 defines a finite nondecreasing one-shot work agenda, stable
   equal-time order, one attempted item per caller request, and final consumption
   after success, lifecycle rejection, or returned work failure.
+- ADR-0016 defines an opt-in direct returned-work failure-event attempt that
+  preserves the complete work error and exact queue outcome.
 - ADR-0005 defines configuration revision and rollback behavior; that service
   is not implemented.
 
@@ -103,8 +108,16 @@ FIFO, rejects newest at saturation, and frees one slot on dequeue.
 starts at zero or one explicit controlled instant, advances only by caller-
 supplied `Duration`, and preserves its reading on checked overflow. An
 `EventTimestamp` can capture a reading through either a concrete or trait-object
-clock reference. Neither runtime owns the clock or event queue; scheduled work
-borrows the clock, while event composition remains external.
+clock reference. Neither runtime permanently owns the clock or event queue.
+
+`Runtime::work_with_failure_event` borrows both services and delegates first to
+ordinary direct work. Success and lifecycle rejection read no clock and emit no
+event. After a returned application work error commits only that record to
+`Failed`, it captures one reading, constructs one application-sourced error
+event with a mission-supplied identifier, and attempts the bounded queue once.
+The returned integration error retains the complete `RuntimeWorkError`, exact
+event, and `Recorded` or `QueueFull` outcome. Saturation retains older events and
+the rejected event remains available for explicit caller retry.
 
 `WorkSchedule` owns an immutable finite sequence of one-shot `ScheduledWork`
 items. Nondecreasing instants preserve caller order for equal times.
@@ -116,10 +129,11 @@ do not block later due peers.
 
 The runtime creates no thread or executor and has no automatic or batch
 dispatch, periodic or dynamic work generation, multi-application fairness rule,
-configuration access, or event integration. Scheduled work currently applies
-only to the lifecycle-only runtime, not `MessagingRuntime`. The event queue has
-no filter, fan-out, persistence, or host drain adapter. RFF-REQ-003 and
-RFF-REQ-004 are verified; RFF-REQ-005 and RFF-REQ-008 remain partial.
+or configuration access. Scheduled work currently applies only to the
+lifecycle-only runtime, not `MessagingRuntime`. Event integration is limited to
+the opt-in direct returned-work path; the queue has no filter, fan-out,
+persistence, or host drain adapter. RFF-REQ-003, RFF-REQ-004, RFF-REQ-005, and
+RFF-REQ-008 are verified only at their recorded boundaries.
 
 ## Source-quality policy
 
@@ -136,9 +150,9 @@ separate measured increments.
 
 ## Work in progress
 
-No implementation work is in progress. The finite caller-driven scheduling
-slice is complete at its recorded boundary. Runtime returned-error event
-integration remains the next separate technical slice.
+No implementation work is in progress. Stage 2 is complete at its recorded
+messaging, event, time, scheduling, and direct cooperative failure boundaries.
+The accepted configuration lifecycle is the next Stage 3 technical slice.
 
 ## Highest risks and uncertainties
 
@@ -154,9 +168,12 @@ integration remains the next separate technical slice.
   operation must delegate through `MessagingRuntime::work` to preserve its
   failed-endpoint inbox clearing.
 - Reject-newest event saturation can omit a later high-severity record. The
-  must-use outcome is explicit, but callers can still handle it inadequately.
-- `EventSource::Application` cannot validate which runtime issued an identity
-  until a runtime-owned integration constructs the event.
+  must-use outcome and rejected event are explicit, but callers can still handle
+  them inadequately; there is no delivery guarantee.
+- Direct failure-event reporting is opt-in and applies only to returned work
+  errors. Its timestamp is captured after `Failed` is committed and represents
+  framework observation rather than an application-internal fault instant. The
+  returned caller-owned event copy is outside the queue's retained-record bound.
 - Runtime-owned inbox configurations are positional. Count and identity order
   are proven, but two valid capacity/topic configurations can still be swapped
   by mission composition.
@@ -171,8 +188,8 @@ integration remains the next separate technical slice.
 
 - No periodic scheduling contract, missed-release policy, runtime clock owner,
   or messaging-aware scheduled-work composition is selected.
-- No runtime/application event emission, framework failure-event identifier, or
-  host event drain boundary is selected.
+- No application-authored event API, other callback failure-event policy,
+  persistent runtime event/clock owner, or host event drain boundary is selected.
 - No mission message payload limit, external topic identifier, or wire
   representation is selected; current messages are in-process values only.
 - RFF-REQ-007 still needs a host-adapter grammar and validation boundary.
@@ -183,21 +200,21 @@ integration remains the next separate technical slice.
 
 ## Most likely next tasks
 
-1. Integrate one clock-captured returned-error event while preserving the
-   original error, explicit event-queue saturation, and peer progress.
-2. Implement the accepted configuration activation, rejection, revision, and
-   rollback behavior after Stage 2 has a coherent stopping point.
-3. Record the command/telemetry host grammar and validation boundary before
+1. Implement the accepted configuration activation, rejection, revision, and
+   rollback behavior as the first Stage 3 slice.
+2. Record the command/telemetry host grammar and validation boundary before
    beginning RFF-REQ-007 implementation.
+3. Compose the verified services into a small sample mission without widening
+   the event, scheduling, messaging, or containment claims.
 
 ## Latest run
 
-2026-08-29: Added finite caller-driven scheduled work in commit
-`63654d57936617e63731a906a049777420f91913`. Seven public tests prove order
-validation, zero/one clock-read behavior, waiting and inclusive due work, stable
-equal-time order, overdue execution, final consumption after lifecycle or
-returned errors, peer progress, and an identical replayed work, lifecycle, and
-event-timestamp trace. The complete implementation baseline passes 54 tests
-with warnings denied. No dependency, wall-clock read, periodic schedule,
-automatic draining, messaging integration, thread, executor, protocol behavior,
-release, or push was added.
+2026-08-30: Added direct returned-work failure-event reporting in commit
+`a04c5bd3f929934b7578b14f181138ae0be56e9b`. Four public tests prove exact
+structured fields, one injected timestamp read and event attempt, complete error
+and source-chain preservation, no event on success/lifecycle rejection,
+saturation retention and explicit retry, failed state, and later peer work. The
+complete implementation baseline passes 58 tests with warnings denied. No
+dependency, permanent runtime clock/event owner, other callback event path,
+application event API, host drain, thread, executor, protocol behavior, release,
+or push was added.

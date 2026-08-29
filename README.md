@@ -14,12 +14,12 @@ fit Rust's ownership, type, error, and testing models.
 ## Current status
 
 The repository contains an initial research and architecture baseline, five
-bounded Rust lifecycle/work increments, three Stage 2 messaging increments, and
-one standalone structured-event increment, an injected manual-time increment,
-and a finite scheduled-work increment. A no-dependency `LifecycleRegistry`
-verifies the logical LC1 transition table. A finite-capacity `Runtime<A>` owns
-statically composed application values and executes start, caller-selected
-work, stop, and in-place restart synchronously.
+bounded Rust lifecycle/work increments, three Stage 2 messaging increments,
+two structured-event increments, an injected manual-time increment, and a
+finite scheduled-work increment. A no-dependency `LifecycleRegistry` verifies
+the logical LC1 transition table. A finite-capacity `Runtime<A>` owns statically
+composed application values and executes start, caller-selected work, stop, and
+in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
 successful work retains `Running`. Restart and work retain application-owned
 state, while a returned concrete operation error enters terminal `Failed`
@@ -49,9 +49,19 @@ manually advanced implementation starts at zero by default or at one explicit
 controlled instant, changes only on explicit nonnegative advances, and rejects
 representational overflow without mutation. Five public tests prove zero and
 repeated reads, cumulative and replayed traces, typed overflow, object-safe
-injection, and event timestamp capture. Neither runtime owns the clock or event
-queue; scheduled work borrows the clock, while event composition remains
-external.
+injection, and event timestamp capture.
+
+`Runtime::work_with_failure_event` now composes those boundaries for one opt-in
+direct work operation. Success and lifecycle rejection read no clock and emit
+nothing. After an application returns a work error and its record enters
+terminal `Failed`, the operation reads the injected clock once and attempts one
+application-sourced error event. Its returned error retains the complete
+`RuntimeWorkError`, exact event, and `Recorded` or `QueueFull` outcome. A full
+queue preserves its older event and returns the rejected event for explicit
+retry while leaving a healthy peer operable for later work. Four public tests
+cover exact fields, the error-source chain, single emission, lifecycle
+suppression, saturation, retry, and peer progress. `Runtime` still does not
+permanently own the clock or event queue.
 
 A `WorkSchedule` copies a finite agenda of one-shot application work items in
 nondecreasing elapsed-time order. `Runtime::run_next_scheduled_work` reads an
@@ -71,11 +81,13 @@ and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
 no automatic or batch dispatch. It is not yet a sample mission. Periodic or
-messaging-aware scheduling, runtime-owned event emission, configuration, and
-command/telemetry boundaries remain unimplemented. The finite scheduling and
-manual-time evidence verifies RFF-REQ-004. RFF-REQ-005 and RFF-REQ-008 remain
-partial. Traceability distinguishes this evidence from containment of panics,
-hangs, cleanup failures, or other arbitrary faults.
+messaging-aware scheduling, application-authored events, other callback event
+paths, configuration, and command/telemetry boundaries remain unimplemented.
+The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
+returned-work event and peer-progress evidence verifies RFF-REQ-005 and
+RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
+evidence from event delivery guarantees or containment of panics, hangs,
+cleanup failures, and other arbitrary faults.
 
 The first source-quality checkpoint tracks stable rustfmt at 100 columns and
 denies Clippy functions over a 60-line review threshold across all targets.

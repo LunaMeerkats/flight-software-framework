@@ -1,6 +1,6 @@
 # Plan: report returned work errors as bounded events
 
-Status: **In progress**
+Status: **Complete**
 Date: **2026-08-30**
 
 ## Objective
@@ -120,3 +120,42 @@ Stop after the direct work-error event path, focused fault-injection and
 saturation evidence, ADR, durable state, and complete verification are
 coherent. Do not add other callback events, application event APIs, host
 adapters, configuration, or command/telemetry behavior in this run.
+
+## Result
+
+Implemented the direct returned-work failure-event boundary in commit
+`a04c5bd3f929934b7578b14f181138ae0be56e9b`.
+`Runtime::work_with_failure_event` delegates to the established work operation.
+Success and lifecycle rejection read no clock and attempt no event. After a
+cooperative application error commits only the selected record to `Failed`, the
+integration captures one injected reading, constructs one application-sourced
+error event, and calls the bounded queue exactly once.
+
+`RuntimeWorkEventError` retains the complete original `RuntimeWorkError` and an
+optional `FailureEventAttempt` containing the exact event and `Recorded` or
+`QueueFull` outcome. A full queue preserves its older record and returns the
+rejected event with its original timestamp for explicit retry. Nothing retries
+implicitly, and event reporting leaves a healthy peer operable for later work
+once the operation returns.
+
+Four public integration tests prove exact fields and source chaining, one clock
+read and queue insertion, no event on successful or lifecycle-rejected work,
+unknown-identity and post-`Failed` suppression, exact saturation retention and
+explicit retry, failed state, and later peer progress. The combined runtime and
+existing bounded-queue evidence verifies RFF-REQ-005 and RFF-REQ-008 only at the
+direct cooperative returned-work boundary. Stage 2 is recorded complete.
+
+The required formatting, all-target checking, warnings-denied Clippy, 58-test,
+warnings-denied rustdoc, and Git whitespace checks passed. The source-form audit
+found 19 handwritten Rust files and 6,803 lines, no physical line over 100
+columns, no comment-only line over 80, three existing narrow reasoned
+expectations, no allow attributes, and no unsafe code use. The document audit
+found 27 Markdown files, 71 resolving relative links, eight matched requirement
+and traceability rows, 16 matching ADR identifiers, 21 source definitions with
+no undefined reference, 39 exact traceability test names resolving to source,
+consistent table shapes, and one top-level heading per document. All documents
+rendered structurally.
+
+No dependency, permanent runtime clock/event owner, other callback event path,
+application-authored event API, host drain, automatic retry, thread, executor,
+protocol, compatibility claim, release, or push was added.
