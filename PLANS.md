@@ -1,92 +1,86 @@
-# Plan: add caller-driven scheduled work
+# Plan: report returned work errors as bounded events
 
-Status: **Complete**
-Date: **2026-08-29**
+Status: **In progress**
+Date: **2026-08-30**
 
 ## Objective
 
-Record and implement the smallest scheduled-work slice for Stage 2: a finite
-ordered agenda of explicit application work instants and one caller-driven
-runtime operation that attempts at most the next due item under an injected
-clock.
+Integrate one runtime-owned, clock-captured structured-event attempt for a
+cooperative error returned by `Application::work`, while preserving the
+complete original work error, the existing event-queue saturation policy, and
+successful subsequent work by a healthy peer.
 
-This was the highest-value next step because, when selected, the manual clock
-was verified but RFF-REQ-004 had no scheduled application work, equal-time
-ordering, or replayed scheduled trace. A finite one-shot agenda could establish
-those behaviors without prematurely choosing recurrence, missed-period recovery,
-automatic dispatch, or concurrency.
+This is the highest-value next step because the standalone event queue, manual
+clock, and returned-error lifecycle behavior are already verified, but
+RFF-REQ-005 and RFF-REQ-008 still lack one composed runtime path that proves the
+failed state, structured event, and peer progress together.
 
 ## Context and decision boundary
 
-ADR-0001 requires serial caller control and stable observable ordering.
-ADR-0009 provides running-only `Runtime::work` with exact returned-error
-behavior. ADR-0014 provides an injected read-only clock whose manual
-implementation advances only on explicit caller requests.
+`Runtime::work` already validates `Running`, invokes exactly one synchronous
+callback, preserves a concrete returned error, and commits only that record to
+terminal `Failed`. ADR-0013 supplies a positive-capacity FIFO event queue with
+caller-visible reject-newest saturation. ADR-0014 supplies injected elapsed
+time and clock-captured event timestamps.
 
-The schedule will contain copied `(ApplicationId, FrameworkInstant)` work
-items in nondecreasing scheduled-time order. Equal-time items retain caller
-configuration order. One runtime call observes the clock once and either
-reports completion, waits without mutation, or consumes and attempts exactly
-one due or overdue item through the existing work boundary.
+Add an opt-in `Runtime::work_with_failure_event` operation. It will delegate to
+the existing work boundary. Success and lifecycle rejection will not read the
+clock or attempt an event. A returned application work error will leave the
+existing failed state in place, capture the injected clock once, construct one
+application-sourced error event with a caller-supplied copied identifier, and
+attempt to append it once to the supplied bounded event queue.
 
-A due item is consumed before its callback result is returned. That applies to
-successful work, a lifecycle rejection, and a returned application error, so a
-stopped or failed application cannot indefinitely block later equal-time work.
-The result retains the scheduled instant, observed instant, identity, and exact
-runtime work error where applicable.
+The returned error will retain the complete `RuntimeWorkError` plus the exact
+event and `EventEmitOutcome`. This makes a rejected event available for
+explicit caller handling or retry without replacing or hiding the application
+error. The operation will not attach event storage or a clock permanently to
+the runtime.
 
 ## Acceptance criteria
 
-- `ScheduledWork` identifies one runtime-local application and one absolute
-  elapsed `FrameworkInstant`; it is a one-shot release, not a wall-clock or
-  completion-deadline guarantee.
-- `WorkSchedule` owns a fixed finite agenda copied at construction. It accepts
-  an empty agenda, rejects descending scheduled instants before construction,
-  reserves storage for the full configured item count, and has no mutation API
-  that can grow the agenda.
-- Equal-time work retains configuration order. An overdue item remains due, and
-  every call attempts at most one item.
-- Before the next scheduled instant, the runtime reports the item and observed
-  instant without consuming it, invoking application code, or advancing time.
-- A due item delegates to `Runtime::work`. Success, lifecycle rejection, and a
-  returned application error preserve the existing lifecycle behavior and all
-  consume that one item before returning exact schedule metadata.
-- A consumed rejected or failed item does not block a later due peer.
-- Two fresh runtimes and manual clocks given identical configuration, explicit
-  advances, and ordered calls produce identical work results, application work
-  order, lifecycle-state outcomes, and clock-captured structured-event
-  timestamp traces without sleeps.
-- RFF-REQ-004 becomes verified by the combined clock and scheduled replay
-  evidence. RFF-REQ-005 and RFF-REQ-008 remain partial because no runtime-owned
-  event or returned-error event path is added.
-- No periodic policy, dynamic scheduling, automatic draining, priority,
-  fairness promise, execution-time bound, wall-clock adapter, application
-  context, message dispatch, event integration, thread, executor, dependency,
-  protocol, or real-time claim is added.
-- The complete documented baseline and repository document/source-form audits
-  pass, and the complete diff contains no unrelated implementation change.
+- Successful work retains `Running`, reads no clock, and emits no event.
+- Unknown or non-running work is rejected through the existing lifecycle error,
+  reads no clock, and emits no event.
+- A cooperative returned work error commits only the selected application to
+  `Failed` before one event timestamp is captured.
+- The runtime-generated event contains `EventSource::Application` with the
+  selected runtime-local identity, `EventSeverity::Error`, the caller-supplied
+  copied identifier, and exactly one injected clock reading.
+- The returned integration error retains the complete original
+  `RuntimeWorkError`, event record, and event emission outcome.
+- A queue with room records the event. A full queue retains its older event,
+  reports `QueueFull`, and returns the rejected event for explicit retry.
+- Event recording or saturation does not prevent a healthy running peer from
+  completing later work.
+- RFF-REQ-005 and RFF-REQ-008 become verified only at this cooperative returned-
+  work-error boundary. No claim is made for application-authored events,
+  start/stop/restart/message callback event emission, panic or hang containment,
+  guaranteed diagnostic delivery, or fault tolerance.
+- No event filter, fan-out, host drain adapter, shared service context, runtime
+  clock owner, messaging integration, scheduled-event integration, thread,
+  executor, dependency, protocol, or automatic dispatch is added.
 
 ## Files and components
 
-- `src/scheduling.rs`: finite agenda, creation errors, scheduled outcomes and
-  errors, and the caller-driven `Runtime` operation.
-- `src/lib.rs`: narrow scheduling re-exports.
-- `tests/scheduled_work.rs`: public API, lifecycle/error, equal-time, overdue,
-  and replay evidence.
-- `docs/adr/0015-caller-driven-scheduled-work.md`: due-work, ordering,
-  consumption, clock-domain, and deferred recurrence decisions.
+- `src/runtime_events.rs`: failure-event attempt vocabulary and the integrated
+  runtime work operation.
+- `src/lib.rs`: narrow re-exports.
+- `tests/runtime_events.rs`: recorded, saturated, retry, no-event, and peer-
+  progress evidence.
+- `docs/adr/0016-returned-work-failure-events.md`: operation ordering, ownership,
+  saturation, and scope decision.
 - `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/REQUIREMENTS.md`,
   `docs/ROADMAP.md`, `docs/PROJECT_STATE.md`, and
-  `docs/verification/TRACEABILITY.md`: truthful current behavior, limits,
-  evidence, and next step.
+  `docs/verification/TRACEABILITY.md`: current behavior, evidence, limits, and
+  next milestone.
 - `PLANS.md`: this bounded plan and final result.
 
-No external research is required. The slice composes already recorded local
-runtime and clock decisions using stable standard-library storage.
+No external research is required. This slice composes only previously recorded
+local runtime, event-queue, and injected-clock decisions.
 
 ## Verification approach
 
-- Run the focused scheduled-work integration tests while implementing.
+- Run the focused runtime-event integration tests while implementing.
 - Run `cargo fmt --all -- --check`.
 - Run `cargo check --workspace --all-targets --all-features`.
 - Run `cargo clippy --workspace --all-targets --all-features -- -D warnings`.
@@ -97,65 +91,32 @@ runtime and clock decisions using stable standard-library storage.
 - Re-audit handwritten Rust physical and comment-only widths and every reasoned
   Clippy expectation.
 - Verify relative Markdown links, headings, tables, requirement rows, ADR and
-  source identifiers, and changed-document structure.
-- Review the complete diff for hidden time movement, multiple-work dispatch,
-  unstable equal-time order, schedule head-of-line blocking, accidental
-  recurrence or real-time claims, public API commitments, and scope drift.
+  source identifiers, exact traceability test names, and changed-document
+  structure.
+- Review the complete diff for error replacement, duplicate clock reads or
+  event attempts, events on lifecycle misuse, hidden retry, queue mutation on
+  saturation, peer-state mutation, accidental API breadth, and scope drift.
 
 ## Risks and safe stopping point
 
-`FrameworkInstant` and `ApplicationId` carry no owner identity. The schedule
-cannot detect a work item or instant from another same-shaped runtime or clock;
-their existing caller-scoped contracts continue to apply.
+Reject-newest saturation can omit the failure event from bounded storage. The
+caller-visible attempt retains the rejected event, but this does not guarantee
+delivery or require retry. The returned error also carries a caller-owned event
+copy outside the queue bound, just as other caller-owned values are outside the
+queue's retained-record limit.
 
-A finite one-shot agenda is intentionally not a periodic scheduler. It retains
-all configured items until the agenda is dropped, including already consumed
-items, so its allocation stays fixed and bounded by construction. A later
-periodic design must separately decide phase, drift, missed-release catch-up or
-coalescing, arithmetic overflow, and reconfiguration.
+`ApplicationId` and `FrameworkInstant` still carry no runtime or clock origin.
+This operation constructs the event source from the selected record and reads
+the supplied clock, but the caller remains responsible for supplying the
+intended queue, identifier, and clock.
 
-Consuming a due item before returning an error prevents head-of-line blocking
-but means retry is never implicit. Applications may still mutate internally
-before returning an error, and panics or non-returning callbacks remain outside
-the cooperative boundary.
+The application may mutate its own state before returning an error. This slice
+adds no rollback, cleanup, panic containment, hang containment, or recovery
+policy. It reports only direct `Runtime::work` errors; scheduled work and
+`MessagingRuntime` require separate integration that preserves their existing
+consumption and inbox-clearing semantics.
 
-Stop after the finite agenda, one-item runtime operation, focused replay and
-error evidence, decision record, and durable state are coherent. Do not add
-periodic generation, automatic looping, runtime-owned events, failure events,
-message dispatch, a shared service context, or concurrency in this run.
-
-## Result
-
-Implemented the finite caller-driven scheduling boundary in commit `63654d5`.
-`ScheduledWork` pairs one runtime-local identity with one elapsed scheduled
-instant. `WorkSchedule` copies a fixed nondecreasing agenda, preserves caller
-order for equal times, rejects descending input, and advances only a private
-cursor. `Runtime::run_next_scheduled_work` reads the injected clock zero times
-when complete and once otherwise, waits without mutation, or consumes and
-attempts at most one due or overdue item through the existing running-only work
-boundary.
-
-Seven public integration tests prove construction order, exact clock-read
-counts, waiting and inclusive release, stable equal-time order, one-item caller
-control, overdue work, final consumption after lifecycle and returned-work
-errors, exact error/state preservation, subsequent due-peer progress, and an
-identical replayed work, lifecycle-state, and clock-captured event-timestamp
-trace. The combined manual-clock and scheduled replay evidence verifies
-RFF-REQ-004. RFF-REQ-005 and RFF-REQ-008 remain partial because event creation
-is still test-owned and no returned-error path emits an event.
-
-The required formatting, all-target checking, warnings-denied Clippy, 54-test,
-warnings-denied rustdoc, and Git whitespace checks passed. The source-form audit
-found 17 handwritten Rust files and 6,259 lines, no physical line over 100
-columns, no comment-only line over 80, three existing narrow reasoned
-expectations, no allow attributes, and no unsafe occurrence. The document audit
-found 26 Markdown files, 64 resolving relative links, eight matched requirement
-and traceability rows, 15 matching ADR identifiers, 21 source definitions with
-nine referenced identifiers and no undefined reference, all exact traceability
-test names resolving to source, consistent table shapes, and one top-level
-heading per document.
-All ten changed Markdown documents rendered to nonempty HTML.
-
-No dependency, wall-clock read, periodic generation, automatic draining,
-messaging integration, runtime-owned event path, thread, executor, protocol,
-compatibility claim, release, or push was added.
+Stop after the direct work-error event path, focused fault-injection and
+saturation evidence, ADR, durable state, and complete verification are
+coherent. Do not add other callback events, application event APIs, host
+adapters, configuration, or command/telemetry behavior in this run.

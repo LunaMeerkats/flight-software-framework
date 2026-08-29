@@ -123,6 +123,7 @@ guidance records the remaining structural and document checks.
 - [Bounded structured-event queue decision](docs/adr/0013-bounded-structured-event-queue.md)
 - [Injected manual framework clock decision](docs/adr/0014-injected-manual-framework-clock.md)
 - [Finite caller-driven scheduling decision](docs/adr/0015-caller-driven-scheduled-work.md)
+- [Returned-work failure-event decision](docs/adr/0016-returned-work-failure-events.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

@@ -15,6 +15,7 @@ mod lifecycle;
 mod messaging;
 mod messaging_runtime;
 mod runtime;
+mod runtime_events;
 mod scheduling;
 
 pub use application_messaging::{
@@ -42,6 +43,7 @@ pub use runtime::{
     Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,
     RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
+pub use runtime_events::{FailureEventAttempt, RuntimeWorkEventError};
 pub use scheduling::{
     ScheduledWork, ScheduledWorkError, ScheduledWorkOutcome, WorkSchedule, WorkScheduleCreateError,
 };
