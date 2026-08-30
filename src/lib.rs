@@ -10,6 +10,7 @@ compatibility claim.
 
 mod application_messaging;
 mod clock;
+mod configuration;
 mod events;
 mod lifecycle;
 mod messaging;
@@ -22,6 +23,7 @@ pub use application_messaging::{
     ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
 };
 pub use clock::{Clock, FrameworkInstant, ManualClock, ManualClockAdvanceError};
+pub use configuration::{ConfigurationError, ConfigurationSnapshot, ConfigurationTable};
 pub use events::{
     Event, EventEmitOutcome, EventQueue, EventQueueCreateError, EventSeverity, EventSource,
     EventTimestamp,

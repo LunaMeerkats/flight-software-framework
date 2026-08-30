@@ -16,8 +16,9 @@ fit Rust's ownership, type, error, and testing models.
 The repository contains an initial research and architecture baseline, five
 bounded Rust lifecycle/work increments, three Stage 2 messaging increments,
 two structured-event increments, an injected manual-time increment, and a
-finite scheduled-work increment. A no-dependency `LifecycleRegistry` verifies
-the logical LC1 transition table. A finite-capacity `Runtime<A>` owns statically
+finite scheduled-work increment, plus a standalone configuration lifecycle core.
+A no-dependency `LifecycleRegistry` verifies the logical LC1 transition table.
+A finite-capacity `Runtime<A>` owns statically
 composed application values and executes start, caller-selected work, stop, and
 in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
@@ -74,6 +75,16 @@ public tests cover order validation, exact clock-read counts, inclusive and
 overdue work, lifecycle/error handling, and replay-equivalent work, lifecycle,
 and structured-event timestamp traces under manual time.
 
+`ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
+through one retained mission function. It exposes immutable active snapshots,
+assigns fresh revisions even to equal content, and retains only the former
+active snapshot for consume-once rollback. Rejection preserves active content,
+rollback history, and revision high-water; rollback restores the original
+revision without reusing numbers. Exact byte bounds, semantic rejection,
+ownership, history replacement, and checked revision exhaustion have tests.
+This standalone core does not yet provide runtime ownership or application
+visibility; RFF-REQ-006 remains partial. No schema or wire format is selected.
+
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
 RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
@@ -82,7 +93,8 @@ capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
 no automatic or batch dispatch. It is not yet a sample mission. Periodic or
 messaging-aware scheduling, application-authored events, other callback event
-paths, configuration, and command/telemetry boundaries remain unimplemented.
+paths, runtime configuration access, and command/telemetry boundaries remain
+unimplemented.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
 returned-work event and peer-progress evidence verifies RFF-REQ-005 and
 RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
@@ -136,6 +148,7 @@ guidance records the remaining structural and document checks.
 - [Injected manual framework clock decision](docs/adr/0014-injected-manual-framework-clock.md)
 - [Finite caller-driven scheduling decision](docs/adr/0015-caller-driven-scheduled-work.md)
 - [Returned-work failure-event decision](docs/adr/0016-returned-work-failure-events.md)
+- [Bounded configuration snapshot decision](docs/adr/0017-bounded-configuration-snapshots.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

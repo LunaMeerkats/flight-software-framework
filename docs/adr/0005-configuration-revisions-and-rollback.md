@@ -1,6 +1,6 @@
 # ADR-0005: Configuration revisions and consume-once rollback
 
-- Status: Accepted; not implemented
+- Status: Accepted; standalone core implemented in ADR-0017, runtime integration pending
 - Date: 2026-08-05
 - Scope: One in-memory validated v0.1 runtime configuration
 
@@ -52,6 +52,12 @@ project's revision or rollback rules. (`SRC-NASA-CFE`)
   with bounded-resource direction.
 
 ## Required verification and revisit conditions
+
+[ADR-0017](0017-bounded-configuration-snapshots.md) implements standalone bounded
+snapshots, validation, revisions, and consume-once rollback. Runtime ownership,
+application visibility at safe points, restart retention, and behavior following
+application errors remain unimplemented. The contract above is unchanged;
+RFF-REQ-006 remains partial until those integration boundaries are exercised.
 
 Tests must cover initial revision, successive replacement, rejection without any
 mutation or revision consumption, replacement of older history, consume-once

@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-08-30**
+Last reviewed: **2026-08-31**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -124,7 +124,11 @@ public APIs. Accepted project decisions now settle:
   boundary in
   [ADR-0016](adr/0016-returned-work-failure-events.md); and
 - RFF-REQ-006 revision and rollback behavior in
-  [ADR-0005](adr/0005-configuration-revisions-and-rollback.md).
+  [ADR-0005](adr/0005-configuration-revisions-and-rollback.md), with its
+  standalone bounded snapshot core in
+  [ADR-0017](adr/0017-bounded-configuration-snapshots.md). Runtime ownership,
+  application-visible safe points, restart retention, and no automatic rollback
+  after application errors remain unimplemented; the requirement is partial.
 
 Before implementing RFF-REQ-007, record the selected host adapter's input
 grammar and validation boundary. The approved ADRs define observable behavior,

@@ -115,12 +115,20 @@ added.
 
 ## Stage 3 — Configuration and mission boundaries
 
-Status: **Next**
+Status: **In progress**
 
 - Add validated, versioned configuration activation and rollback.
 - Add one command-ingest and telemetry-output host adapter pair.
 - Integrate and re-demonstrate the already verified direct cooperative
   application-error behavior in the sample mission.
+
+The standalone configuration core now validates const-bounded byte snapshots,
+preserves state on rejection, assigns never-reused revisions, and restores one
+consume-once rollback snapshot. Public transition tests and private exhaustion
+tests cover that core. RFF-REQ-006 remains partial until runtime ownership,
+application-visible safe points, restart retention, and explicit no-automatic-
+rollback behavior after application errors are integrated. No schema, host
+loading adapter, or wire format has been selected.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission

@@ -79,8 +79,9 @@ fault tolerance.
   lifecycle ownership, and caller-selected dispatch boundaries; their combined
   evidence verifies RFF-REQ-003.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
-  monotonic snapshot revisions and one consume-once rollback slot. It is not
-  implemented.
+  snapshots, monotonic revision assignment, and one consume-once rollback slot.
+  It is not yet integrated with runtime work; ADR-0017 implements its standalone
+  core.
 - [ADR-0006](adr/0006-static-application-ownership-for-initial-runtime.md)
   selects a finite-capacity generic runtime, explicit static mission
   composition, and concrete returned start errors for the first owned slice.
@@ -115,6 +116,9 @@ fault tolerance.
 - [ADR-0016](adr/0016-returned-work-failure-events.md) composes direct work,
   injected time, and bounded event storage for one returned-error event attempt
   that never replaces the original application error.
+- [ADR-0017](adr/0017-bounded-configuration-snapshots.md) implements immutable
+  byte-bounded configuration snapshots, one retained validator, revision
+  assignment, and consume-once rollback without runtime integration.
 
 ## Current implementation boundary
 
@@ -211,6 +215,20 @@ returned work errors. There is still no automatic or batch message dispatch,
 periodic or dynamic work generation, multi-application fairness policy,
 messaging-aware scheduled work, application-authored event API, other callback
 event path, or host event drain adapter.
+
+`ConfigurationTable<E, MAX_BYTES>` separately owns an active immutable byte
+snapshot, at most one rollback snapshot, a revision high-water mark, and a
+retained mission validation function. Length rejection precedes validation;
+validation precedes revision exhaustion; all complete before retained state
+changes. Successful replacement assigns a fresh revision and replaces old
+history. Rollback consumes the slot and restores its original revision without
+revalidation or revision reuse. It performs no heap allocation itself, but
+candidate storage, caller-owned copies, and validator effects need their own
+resource budgets. A large inline bound is not a stack-usage guarantee.
+
+This core does not select a schema or typed application view. Runtime ownership,
+work safe-point visibility, restart retention, and no automatic rollback after
+application errors remain pending, so RFF-REQ-006 remains partial.
 
 ## Alternatives kept open
 
