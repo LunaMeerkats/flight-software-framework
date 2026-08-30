@@ -24,6 +24,9 @@ application visibility are integrated. No sample mission exists yet.
 - Configuration-focused verification passed: 12 public integration tests and
   three private boundary tests. The complete format/check/Clippy/test/rustdoc
   and Git whitespace baseline passes with 73 tests and warnings denied.
+- Configuration implementation commit
+  `7dd237626f6a1207b6abffe3bee98830e8a9ada7` contains the core, tests, ADR-0017,
+  and scope reconciliation. The evidence checkpoint reruns the same baseline.
 - All 21 Rust files meet the physical/comment width review limits. All 75
   relative links resolve across 28 Markdown documents; source/requirement/test
   references and generated-HTML structure/content pass review. Browser visual
@@ -129,6 +132,6 @@ explicitly partial. All 73 tests and required Cargo/whitespace checks pass.
 Browser visual inspection was blocked by local-file URL policy; no workaround
 was attempted. This run uses generated-HTML structure and content inspection as
 the documented document-review adaptation, without claiming browser visual QA.
-The local implementation hash is recorded in the next evidence checkpoint.
-No push, dependency, runtime context, parser, schema, or protocol behavior was
-added.
+Implementation commit `7dd237626f6a1207b6abffe3bee98830e8a9ada7` and its
+evidence checkpoint remain local on `codex/nightly`. No push, dependency,
+runtime context, parser, schema, or protocol behavior was added.

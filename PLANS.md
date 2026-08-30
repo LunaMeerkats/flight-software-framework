@@ -82,7 +82,8 @@ remove only this run's incomplete implementation. Commit only on
 
 ## Result
 
-Implemented the standalone core with immutable inline byte snapshots, one
+Implementation commit `7dd237626f6a1207b6abffe3bee98830e8a9ada7` adds the
+standalone core with immutable inline byte snapshots, one
 retained validator, exact rejection errors, checked revisions, and consume-once
 rollback. Twelve public tests and three private boundary tests cover the
 selected contract, including exhaustion and validation suppression.
@@ -101,4 +102,5 @@ exact traceability test references. All documents rendered structurally; the
 ten changed documents retained their headings, lists, code, table cells, and
 content. Independent code and documentation review found no remaining defect.
 Browser visual QA remains blocked as documented above. The complete diff was
-reviewed; the next evidence checkpoint records the local implementation hash.
+reviewed. The implementation and this evidence checkpoint are local only on
+`codex/nightly`; nothing was pushed.
