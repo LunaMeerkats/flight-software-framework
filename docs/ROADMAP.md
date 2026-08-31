@@ -130,6 +130,13 @@ application-visible safe points, restart retention, and explicit no-automatic-
 rollback behavior after application errors are integrated. No schema, host
 loading adapter, or wire format has been selected.
 
+The 2026-09-01 decision checkpoint in
+[ADR-0018](adr/0018-configuration-aware-work-context.md) selects construction
+with an owned optional table and one read-only ordinary work context. The next
+implementation must preserve direct, scheduled, failure-event, and
+messaging-owned work through that callback. Isolated borrowing probes support
+the ownership shape only; no configuration runtime behavior is added yet.
+
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission
 re-demonstration of the narrow RFF-REQ-008 behavior.

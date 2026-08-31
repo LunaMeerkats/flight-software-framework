@@ -17,11 +17,24 @@ or application visibility at safe points.
 Implementation and verification state remain separate so planned evidence is
 not represented as completed behavior.
 
-The 2026-08-31 full local baseline passes 73 tests at implementation commit
-`7dd237626f6a1207b6abffe3bee98830e8a9ada7`. The evidence checkpoint reruns the
-same baseline. Browser visual inspection is blocked by local-file URL policy;
-generated HTML structure/content is reviewed under the documented adaptation
-in `PLANS.md`, without claiming browser visual QA.
+The configuration implementation remains
+`7dd237626f6a1207b6abffe3bee98830e8a9ada7`, with evidence checkpoint
+`5b3a677c0e13a65387819b59490a0cd198d033fb`. The 2026-09-01 run revalidates
+the unchanged 73-test production baseline. Requirement rows retain their exact
+implementation evidence; no production behavior is added by this design run.
+
+## Configuration integration decision evidence
+
+[ADR-0018](../adr/0018-configuration-aware-work-context.md) selects one ordinary
+work context and configuration owned at construction. The separately invoked
+[borrowing experiment](CONFIGURATION_CONTEXT_EXPERIMENT.md) exercises one
+positive owner/view probe and three intended compiler rejections. Its commands,
+diagnostics, and limits are recorded there. This supports the next design, not
+runtime ownership, lifecycle, messaging, scheduling, or event integration;
+RFF-REQ-006 remains partial. The next implementation must meet ADR-0018's
+integration acceptance criteria as well as preserve the tests below.
+
+## Requirement evidence
 
 | Requirement | Implementation state | Planned verification | Exact verification evidence | Last verified commit | Verification state |
 | --- | --- | --- | --- | --- | --- |

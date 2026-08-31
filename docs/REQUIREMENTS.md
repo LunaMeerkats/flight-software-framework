@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-08-31**
+Last reviewed: **2026-09-01**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -126,7 +126,9 @@ public APIs. Accepted project decisions now settle:
 - RFF-REQ-006 revision and rollback behavior in
   [ADR-0005](adr/0005-configuration-revisions-and-rollback.md), with its
   standalone bounded snapshot core in
-  [ADR-0017](adr/0017-bounded-configuration-snapshots.md). Runtime ownership,
+  [ADR-0017](adr/0017-bounded-configuration-snapshots.md) and the next runtime
+  ownership/work-context design in
+  [ADR-0018](adr/0018-configuration-aware-work-context.md). Runtime ownership,
   application-visible safe points, restart retention, and no automatic rollback
   after application errors remain unimplemented; the requirement is partial.
 

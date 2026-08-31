@@ -69,6 +69,12 @@ handwritten Rust physical and comment-only line widths, and review the complete
 diff. Document any justified adaptation before treating it as the baseline.
 Never report a check as passing unless it completed successfully.
 
+When changing ADR-0018 or its borrowing experiment, also run the explicit
+build and standalone Markdown `rustdoc --test` commands in
+[the experiment](docs/verification/CONFIGURATION_CONTEXT_EXPERIMENT.md).
+Cargo does not discover these probes; they are design evidence, not runtime
+integration tests. Inspect negative diagnostics and source form separately.
+
 The source-quality policy was established with rustc/cargo 1.96.1, rustfmt
 1.9.0-stable, and Clippy 0.1.96. A whole-tree re-audit passed on 2026-08-26 with
 rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98. These versions

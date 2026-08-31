@@ -85,6 +85,11 @@ ownership, history replacement, and checked revision exhaustion have tests.
 This standalone core does not yet provide runtime ownership or application
 visibility; RFF-REQ-006 remains partial. No schema or wire format is selected.
 
+[ADR-0018](docs/adr/0018-configuration-aware-work-context.md) now selects a
+runtime-owned optional table at construction and one read-only work context.
+Its borrowing probes support the design only; the runtime API and existing
+work paths remain unchanged until the integration and its tests are complete.
+
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
 RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,

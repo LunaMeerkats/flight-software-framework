@@ -102,6 +102,33 @@ code. Any future source reuse must record provenance and licence obligations.
   reject hidden time movement, return a typed non-mutating error on manual
   advancement overflow, and do not infer real-time guarantees.
 
+## SRC-RUST-FIELD-BORROWS — Separate struct-field borrowing
+
+- Title: Field access expressions — The Rust Reference
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/reference/expressions/field-expr.html#borrowing>
+- Version: stable documentation accessed 2026-09-01; probes use Rust 1.98.0
+- Informed: Rust treats struct fields as separate entities when borrowing.
+- Local treatment: adopt split field borrows for the proposed immutable
+  configuration view and mutable application callback. Test the shape using
+  the real snapshot type before production integration. This language rule
+  does not select runtime ownership, lifecycle policy, or a service context.
+
+## SRC-RUSTDOC-TESTS — Executable and negative Markdown probes
+
+- Titles: Documentation tests; Command-line arguments — The rustdoc book
+- Organisation: The Rust Project
+- Sources:
+  <https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html>
+  and <https://doc.rust-lang.org/rustdoc/command-line-arguments.html>
+- Version: stable documentation accessed 2026-09-01; rustdoc 1.98.0
+- Informed: rustdoc tests fenced Rust examples, including expected compile
+  failures, and supports Markdown inputs, explicit editions, and extern paths.
+- Local treatment: use one separately invoked, executable Markdown experiment
+  for ADR-0018. Review negative compiler diagnostics as well as test results;
+  any compilation error alone is insufficient evidence of the intended borrow
+  rejection. Do not count these probes as production integration tests.
+
 ## SRC-RUST-CARGO — Cargo workspaces
 
 - Title: Workspaces — The Cargo Book

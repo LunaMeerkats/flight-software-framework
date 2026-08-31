@@ -81,7 +81,8 @@ fault tolerance.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   snapshots, monotonic revision assignment, and one consume-once rollback slot.
   It is not yet integrated with runtime work; ADR-0017 implements its standalone
-  core.
+  core. ADR-0018 selects the next ownership and ordinary-work context design;
+  that integration remains unimplemented.
 - [ADR-0006](adr/0006-static-application-ownership-for-initial-runtime.md)
   selects a finite-capacity generic runtime, explicit static mission
   composition, and concrete returned start errors for the first owned slice.
@@ -226,9 +227,16 @@ revalidation or revision reuse. It performs no heap allocation itself, but
 candidate storage, caller-owned copies, and validator effects need their own
 resource budgets. A large inline bound is not a stack-usage guarantee.
 
-This core does not select a schema or typed application view. Runtime ownership,
-work safe-point visibility, restart retention, and no automatic rollback after
-application errors remain pending, so RFF-REQ-006 remains partial.
+This core does not select a schema or typed decoded application value.
+[ADR-0018](adr/0018-configuration-aware-work-context.md) selects a concrete
+optional table owned at runtime construction and an immutable revision/bytes
+view through one ordinary work context. All existing ordinary work paths must
+migrate together without bypassing lifecycle checks, inbox cleanup, or event
+reporting. Message and lifecycle callbacks remain outside the selected access
+boundary. Runtime ownership, safe-point visibility, restart retention, and no
+automatic rollback after application errors remain unimplemented, so
+RFF-REQ-006 remains partial. Isolated borrowing probes are not integration
+evidence.
 
 ## Alternatives kept open
 
