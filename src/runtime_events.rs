@@ -108,7 +108,9 @@ where
     }
 }
 
-impl<A: Application> Runtime<A> {
+impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
+    Runtime<A, E, MAX_CONFIGURATION_BYTES>
+{
     /// Invokes one work callback and reports a returned application error once.
     ///
     /// This delegates lifecycle and callback behavior to [`Runtime::work`]. On

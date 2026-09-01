@@ -7,10 +7,11 @@ use std::fmt;
 use std::rc::Rc;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationMessageContext, ApplicationState, DeliveryStatus,
-    LifecycleError, LifecycleRegistry, Message, MessageDispatchError, MessageDispatchOutcome,
-    MessagingApplication, MessagingOperationError, MessagingRuntime, PublishClassification,
-    PublishError, PublishReport, Runtime, RuntimeInboxConfig,
+    Application, ApplicationId, ApplicationMessageContext, ApplicationState,
+    ApplicationWorkContext, DeliveryStatus, LifecycleError, LifecycleRegistry, Message,
+    MessageDispatchError, MessageDispatchOutcome, MessagingApplication, MessagingOperationError,
+    MessagingRuntime, PublishClassification, PublishError, PublishReport, Runtime,
+    RuntimeInboxConfig,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -119,7 +120,7 @@ impl Application for DispatchApplication {
 
     type WorkError = Infallible;
 
-    fn work(&mut self) -> Result<(), Self::WorkError> {
+    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
         Ok(())
     }
 

@@ -5,6 +5,7 @@
 //! Stop and returned callback errors clear the selected inbox before returning,
 //! while successful stopped-to-running restart exposes the already-empty inbox.
 
+use std::convert::Infallible;
 use std::error::Error;
 use std::fmt;
 
@@ -17,8 +18,8 @@ use crate::messaging::{
     RuntimeInboxConfig,
 };
 use crate::runtime::{
-    Application, RunningCallbackError, Runtime, RuntimeRestartError, RuntimeStartError,
-    RuntimeStopError, RuntimeWorkError,
+    Application, RunningCallbackError, Runtime, RuntimeConfigurationError, RuntimeRestartError,
+    RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
 
 /// The reason a runtime could not take ownership of a message topology.
@@ -86,12 +87,15 @@ impl Error for MessagingRuntimeCreateErrorKind {
 }
 
 /// Failed lifecycle-aware messaging construction with the runtime preserved.
-pub struct MessagingRuntimeCreateError<A> {
+pub struct MessagingRuntimeCreateError<A, E = Infallible, const MAX_CONFIGURATION_BYTES: usize = 0>
+{
     kind: MessagingRuntimeCreateErrorKind,
-    runtime: Runtime<A>,
+    runtime: Runtime<A, E, MAX_CONFIGURATION_BYTES>,
 }
 
-impl<A> MessagingRuntimeCreateError<A> {
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize>
+    MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES>
+{
     /// Returns the construction failure without exposing owned applications.
     #[must_use]
     pub const fn kind(&self) -> MessagingRuntimeCreateErrorKind {
@@ -100,18 +104,20 @@ impl<A> MessagingRuntimeCreateError<A> {
 
     /// Borrows the unchanged runtime that could not be attached.
     #[must_use]
-    pub const fn runtime(&self) -> &Runtime<A> {
+    pub const fn runtime(&self) -> &Runtime<A, E, MAX_CONFIGURATION_BYTES> {
         &self.runtime
     }
 
     /// Returns ownership of the unchanged runtime.
     #[must_use]
-    pub fn into_runtime(self) -> Runtime<A> {
+    pub fn into_runtime(self) -> Runtime<A, E, MAX_CONFIGURATION_BYTES> {
         self.runtime
     }
 }
 
-impl<A> fmt::Debug for MessagingRuntimeCreateError<A> {
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize> fmt::Debug
+    for MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES>
+{
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter
             .debug_struct("MessagingRuntimeCreateError")
@@ -121,13 +127,17 @@ impl<A> fmt::Debug for MessagingRuntimeCreateError<A> {
     }
 }
 
-impl<A> fmt::Display for MessagingRuntimeCreateError<A> {
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize> fmt::Display
+    for MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES>
+{
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.kind.fmt(formatter)
     }
 }
 
-impl<A> Error for MessagingRuntimeCreateError<A> {
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize> Error
+    for MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES>
+{
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         Some(&self.kind)
     }
@@ -208,14 +218,20 @@ impl MessagingStopOutcome {
 /// exposed mutably. Publication derives availability from runtime state:
 /// only `Running` endpoints accept deliveries.
 #[derive(Debug)]
-pub struct MessagingRuntime<A, Topic, const MAX_PAYLOAD_BYTES: usize> {
-    runtime: Runtime<A>,
+pub struct MessagingRuntime<
+    A,
+    Topic,
+    const MAX_PAYLOAD_BYTES: usize,
+    E = Infallible,
+    const MAX_CONFIGURATION_BYTES: usize = 0,
+> {
+    runtime: Runtime<A, E, MAX_CONFIGURATION_BYTES>,
     message_bus: MessageBus<Topic, MAX_PAYLOAD_BYTES>,
     dispatch_states: Vec<ApplicationState>,
 }
 
-impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
-    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize, E, const MAX_CONFIGURATION_BYTES: usize>
+    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES, E, MAX_CONFIGURATION_BYTES>
 {
     /// Couples a fully composed registered runtime to one fresh inbox per app.
     ///
@@ -230,9 +246,9 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     /// or dispatch-state storage cannot be reserved. No partial integration is
     /// returned.
     pub fn new(
-        runtime: Runtime<A>,
+        runtime: Runtime<A, E, MAX_CONFIGURATION_BYTES>,
         configurations: &[RuntimeInboxConfig<'_, Topic>],
-    ) -> Result<Self, MessagingRuntimeCreateError<A>> {
+    ) -> Result<Self, MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES>> {
         let application_count = runtime.len();
         if application_count != configurations.len() {
             return Err(Self::creation_error(
@@ -289,6 +305,27 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
         self.runtime.state(application_id)
     }
 
+    /// Validates and activates runtime configuration between callbacks.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the inner runtime's typed unconfigured or table rejection.
+    pub fn replace_configuration(
+        &mut self,
+        candidate: &[u8],
+    ) -> Result<u64, RuntimeConfigurationError<E>> {
+        self.runtime.replace_configuration(candidate)
+    }
+
+    /// Restores and consumes the runtime's retained rollback snapshot.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the inner runtime's typed unconfigured or no-history outcome.
+    pub fn rollback_configuration(&mut self) -> Result<u64, RuntimeConfigurationError<E>> {
+        self.runtime.rollback_configuration()
+    }
+
     /// Publishes to matching endpoints using current runtime state.
     ///
     /// Matching `Registered`, `Stopped`, and `Failed` applications remain in
@@ -331,8 +368,13 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     }
 }
 
-impl<A: Application, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
-    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+impl<
+    A: Application,
+    Topic: Copy + Eq,
+    const MAX_PAYLOAD_BYTES: usize,
+    E,
+    const MAX_CONFIGURATION_BYTES: usize,
+> MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES, E, MAX_CONFIGURATION_BYTES>
 {
     /// Starts a registered application and exposes its empty inbox on success.
     ///
@@ -433,7 +475,9 @@ impl<
     A: MessagingApplication<Topic, MAX_PAYLOAD_BYTES>,
     Topic: Copy + Eq,
     const MAX_PAYLOAD_BYTES: usize,
-> MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+    E,
+    const MAX_CONFIGURATION_BYTES: usize,
+> MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES, E, MAX_CONFIGURATION_BYTES>
 {
     /// Dispatches at most one oldest message to one running application.
     ///
@@ -488,20 +532,20 @@ impl<
     }
 }
 
-impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
-    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize, E, const MAX_CONFIGURATION_BYTES: usize>
+    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES, E, MAX_CONFIGURATION_BYTES>
 {
     fn creation_error(
-        runtime: Runtime<A>,
+        runtime: Runtime<A, E, MAX_CONFIGURATION_BYTES>,
         kind: MessagingRuntimeCreateErrorKind,
-    ) -> MessagingRuntimeCreateError<A> {
+    ) -> MessagingRuntimeCreateError<A, E, MAX_CONFIGURATION_BYTES> {
         MessagingRuntimeCreateError { kind, runtime }
     }
 
-    fn validate_dispatch_state<E>(
+    fn validate_dispatch_state<CallbackError>(
         &self,
         application_id: ApplicationId,
-    ) -> Result<(), MessagingOperationError<MessageDispatchError<E>>> {
+    ) -> Result<(), MessagingOperationError<MessageDispatchError<CallbackError>>> {
         match self.runtime.state(application_id) {
             Ok(ApplicationState::Running) => Ok(()),
             Ok(state) => Err(MessagingOperationError::without_clearing(
@@ -517,14 +561,19 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
     }
 }
 
-impl<A: Application, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
-    MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>
+impl<
+    A: Application,
+    Topic: Copy + Eq,
+    const MAX_PAYLOAD_BYTES: usize,
+    ConfigurationErrorType,
+    const MAX_CONFIGURATION_BYTES: usize,
+> MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES, ConfigurationErrorType, MAX_CONFIGURATION_BYTES>
 {
-    fn cleared_error<E>(
+    fn cleared_error<OperationError>(
         &mut self,
         application_id: ApplicationId,
-        operation_error: E,
-    ) -> MessagingOperationError<E> {
+        operation_error: OperationError,
+    ) -> MessagingOperationError<OperationError> {
         MessagingOperationError {
             operation_error,
             discarded_deliveries: self.message_bus.clear_runtime_inbox(application_id),

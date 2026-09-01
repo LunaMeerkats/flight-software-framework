@@ -226,7 +226,9 @@ impl WorkSchedule {
     }
 }
 
-impl<A: Application> Runtime<A> {
+impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
+    Runtime<A, E, MAX_CONFIGURATION_BYTES>
+{
     /// Attempts at most the next due work item under an injected clock.
     ///
     /// An empty schedule returns [`ScheduledWorkOutcome::Complete`] without

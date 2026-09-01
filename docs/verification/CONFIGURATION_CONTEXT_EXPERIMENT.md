@@ -1,7 +1,7 @@
 # Configuration work-context borrowing experiment
 
-Date: **2026-09-01**
-Status: **Probes verified; production integration unimplemented**
+Date: **2026-09-02**
+Status: **Probes verified; production integration implemented separately**
 
 ## Question and limits
 
@@ -9,14 +9,14 @@ Can a host owner mutably invoke one application while lending it immutable
 configuration bytes and the original acceptance revision from a separate
 field? Can the callback vocabulary omit the table's error type and const bound?
 
-These executable Markdown snippets support
-[ADR-0018](../adr/0018-configuration-aware-work-context.md). They use the actual
-`ConfigurationTable` but a deliberately minimal one-application probe owner,
-not `Runtime` or a new framework API. They do not exercise lifecycle gates,
-fallible callbacks, scheduling, events, or messaging. They cannot complete
-RFF-REQ-006. No production source or public callback changes in this checkpoint.
-This is experimental host-only evidence, with no flight-readiness, safety,
-real-time, or compatibility claim.
+These executable Markdown snippets supported
+[ADR-0018](../adr/0018-configuration-aware-work-context.md). The original probes
+use the actual `ConfigurationTable` but a deliberately minimal one-application
+owner. A later compile-fail probe uses the production work-context API. These
+remain language-shape evidence: they do not exercise lifecycle gates, fallible
+callbacks, scheduling, events, or messaging and cannot replace the production
+integration tests that now verify RFF-REQ-006. This is host-only evidence, with
+no flight-readiness, safety, real-time, or compatibility claim.
 
 The Rust Reference describes struct fields as separately borrowable; the
 rustdoc book describes executable and compile-fail examples. Those language
@@ -180,18 +180,63 @@ fn main() {
 }
 ```
 
+## Borrowed work configuration cannot escape its callback
+
+Expected rejection: the callback-scoped byte borrow cannot be stored as a
+static application reference. Applications may instead retain explicit copies,
+as the production integration tests demonstrate.
+
+```compile_fail
+use std::convert::Infallible;
+
+use rust_flight_framework::{Application, ApplicationWorkContext};
+
+struct EscapingApplication {
+    retained: Option<&'static [u8]>,
+}
+
+impl Application for EscapingApplication {
+    type StartError = Infallible;
+    type WorkError = Infallible;
+    type StopError = Infallible;
+    type RestartError = Infallible;
+
+    fn start(&mut self) -> Result<(), Self::StartError> {
+        Ok(())
+    }
+
+    fn work(&mut self, context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
+        self.retained = context
+            .configuration()
+            .map(|configuration| configuration.bytes());
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), Self::StopError> {
+        Ok(())
+    }
+
+    fn restart(&mut self) -> Result<(), Self::RestartError> {
+        Ok(())
+    }
+}
+
+fn main() {}
+```
+
 ## Outcome and implementation gate
 
-On Rust/rustdoc 1.98.0, all four rustdoc probes passed: one executable case and
+On Rust/rustdoc 1.98.0, the original four probes passed: one executable case and
 three expected compile failures. Independently compiling extracted snippets
 confirmed E0594 for mutation, E0502 for conflicting replacement, and the
-diagnostic `lifetime may not live long enough` for static escape, without
-unrelated errors. The positive probe also compiled and ran directly with
-warnings denied and unsafe code forbidden, and passed Clippy with the existing
-60-line threshold. This adds no production tests to the unchanged suite of 73.
+diagnostic `lifetime may not live long enough` for static table-view escape,
+without unrelated errors. The positive probe also compiled and ran directly
+with warnings denied and unsafe code forbidden, and passed Clippy with the
+existing 60-line threshold.
 
-The production integration must separately verify configured and absent
-contexts, rejection and rollback visibility, restart retention, original
-errors, peer progress, clock/event counts, schedule consumption, and messaging
-inbox cleanup. The unchanged
-production suite alone cannot establish any new configuration access.
+The production-API escape probe was added with the runtime integration. Its
+intended lifetime diagnostic must be inspected separately from the passing
+standalone rustdoc result. Runtime tests, rather than these probes, verify
+configured and absent contexts, rejection and rollback visibility, restart
+retention, original errors, peer progress, clock/event counts, schedule
+consumption, and messaging inbox cleanup.

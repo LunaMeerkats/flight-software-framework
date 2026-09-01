@@ -42,8 +42,10 @@ pub use messaging_runtime::{
     MessagingRuntimeCreateErrorKind, MessagingStopOutcome,
 };
 pub use runtime::{
-    Application, Runtime, RuntimeCreateError, RuntimeRegistrationError, RuntimeRestartError,
-    RuntimeStartError, RuntimeStopError, RuntimeWorkError,
+    Application, ApplicationConfigurationView, ApplicationWorkContext, Runtime,
+    RuntimeConfigurationCreateError, RuntimeConfigurationError, RuntimeCreateError,
+    RuntimeRegistrationError, RuntimeRestartError, RuntimeStartError, RuntimeStopError,
+    RuntimeWorkError,
 };
 pub use runtime_events::{FailureEventAttempt, RuntimeWorkEventError};
 pub use scheduling::{

@@ -7,10 +7,10 @@ use std::rc::Rc;
 use std::time::Duration;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationState, Clock, Event, EventEmitOutcome, EventQueue,
-    EventSeverity, EventSource, EventTimestamp, FrameworkInstant, LifecycleError, ManualClock,
-    Runtime, RuntimeWorkError, ScheduledWork, ScheduledWorkOutcome, WorkSchedule,
-    WorkScheduleCreateError,
+    Application, ApplicationId, ApplicationState, ApplicationWorkContext, Clock, Event,
+    EventEmitOutcome, EventQueue, EventSeverity, EventSource, EventTimestamp, FrameworkInstant,
+    LifecycleError, ManualClock, Runtime, RuntimeWorkError, ScheduledWork, ScheduledWorkOutcome,
+    WorkSchedule, WorkScheduleCreateError,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -81,7 +81,7 @@ impl Application for RecordingApplication {
 
     type WorkError = TestApplicationError;
 
-    fn work(&mut self) -> Result<(), Self::WorkError> {
+    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
         self.work_trace.borrow_mut().push(self.name);
         if self.reject_work {
             return Err(TestApplicationError::WorkRejected(self.name));

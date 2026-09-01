@@ -6,9 +6,9 @@ use std::rc::Rc;
 use std::time::Duration;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationState, Clock, Event, EventEmitOutcome, EventQueue,
-    EventSeverity, EventSource, EventTimestamp, FrameworkInstant, LifecycleError,
-    LifecycleRegistry, Runtime, RuntimeWorkError, RuntimeWorkEventError,
+    Application, ApplicationId, ApplicationState, ApplicationWorkContext, Clock, Event,
+    EventEmitOutcome, EventQueue, EventSeverity, EventSource, EventTimestamp, FrameworkInstant,
+    LifecycleError, LifecycleRegistry, Runtime, RuntimeWorkError, RuntimeWorkEventError,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -51,7 +51,7 @@ impl Application for MissionApplication {
         Ok(())
     }
 
-    fn work(&mut self) -> Result<(), Self::WorkError> {
+    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
         match self {
             Self::Healthy { work_calls } => {
                 work_calls.set(work_calls.get() + 1);

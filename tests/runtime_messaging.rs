@@ -4,8 +4,8 @@ use std::error::Error;
 use std::fmt;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationState, DeliveryStatus, LifecycleError,
-    LifecycleOperation, Message, MessageBusCreateError, MessagingRuntime,
+    Application, ApplicationId, ApplicationState, ApplicationWorkContext, DeliveryStatus,
+    LifecycleError, LifecycleOperation, Message, MessageBusCreateError, MessagingRuntime,
     MessagingRuntimeCreateErrorKind, PublishClassification, PublishReport, Runtime,
     RuntimeInboxConfig, RuntimeRestartError, RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
@@ -59,7 +59,7 @@ impl Application for MissionApplication {
 
     type WorkError = MissionFailure;
 
-    fn work(&mut self) -> Result<(), Self::WorkError> {
+    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
         self.run(FailurePoint::Work)
     }
 

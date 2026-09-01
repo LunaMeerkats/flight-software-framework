@@ -2,8 +2,8 @@
 //!
 //! One retained function validates opaque bytes before initial acceptance or
 //! replacement. The table retains an active snapshot, at most one rollback
-//! snapshot, and a monotonic revision high-water mark. Runtime ownership and
-//! application access remain separate integration work.
+//! snapshot, and a monotonic revision high-water mark. Runtime integration owns
+//! this table without changing its standalone transition rules.
 
 use std::error::Error;
 use std::fmt;

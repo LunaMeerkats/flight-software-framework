@@ -4,8 +4,9 @@ use std::fmt;
 use std::rc::Rc;
 
 use rust_flight_framework::{
-    Application, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry, Runtime,
-    RuntimeCreateError, RuntimeRestartError, RuntimeStartError, RuntimeStopError, RuntimeWorkError,
+    Application, ApplicationState, ApplicationWorkContext, LifecycleError, LifecycleOperation,
+    LifecycleRegistry, Runtime, RuntimeCreateError, RuntimeRestartError, RuntimeStartError,
+    RuntimeStopError, RuntimeWorkError,
 };
 
 #[derive(Debug)]
@@ -218,7 +219,7 @@ impl Application for MissionApplication {
         }
     }
 
-    fn work(&mut self) -> Result<(), Self::WorkError> {
+    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
         match self {
             Self::Healthy(application) => application.work(),
             Self::StartFaulting(_)

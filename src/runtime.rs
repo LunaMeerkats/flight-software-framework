@@ -1,22 +1,73 @@
-//! Owned application lifecycle and work execution.
+//! Owned application lifecycle, configuration, and work execution.
 //!
 //! This module adds synchronous start, caller-selected work, stop, and in-place
-//! restart boundaries over the LC1 lifecycle vocabulary. It deliberately omits
-//! automatic dispatch, scheduling, service contexts, factories, threads,
-//! executors, panic containment, and recovery policy.
+//! restart boundaries over the LC1 lifecycle vocabulary. Ordinary work receives
+//! one narrow immutable view of optional runtime-owned configuration. This
+//! module deliberately omits automatic dispatch, a general service context,
+//! factories, threads, executors, panic containment, and recovery policy.
 
+use std::convert::Infallible;
 use std::error::Error;
 use std::fmt;
 
+use crate::configuration::{ConfigurationError, ConfigurationTable};
 use crate::lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, next_state,
 };
 
+/// Immutable application-facing view of the active runtime configuration.
+///
+/// The view exposes one table-local acceptance revision and only the used
+/// bytes, without exposing the table's validator error type or inline bound.
+/// Applications may copy either value; such copies are application-owned and do
+/// not change when the runtime later replaces or rolls back configuration.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ApplicationConfigurationView<'a> {
+    revision: u64,
+    bytes: &'a [u8],
+}
+
+impl<'a> ApplicationConfigurationView<'a> {
+    /// Returns the original acceptance revision of this snapshot.
+    #[must_use]
+    pub const fn revision(self) -> u64 {
+        self.revision
+    }
+
+    /// Borrows the accepted bytes for the callback lifetime.
+    #[must_use]
+    pub const fn bytes(self) -> &'a [u8] {
+        self.bytes
+    }
+}
+
+/// Framework access available during one ordinary application work callback.
+///
+/// Configuration is absent when the runtime was constructed with
+/// [`Runtime::new`]. This context exposes no activation, rollback, lifecycle,
+/// nested-work, clock, event, or messaging capability.
+#[derive(Debug)]
+pub struct ApplicationWorkContext<'a> {
+    configuration: Option<ApplicationConfigurationView<'a>>,
+}
+
+impl<'a> ApplicationWorkContext<'a> {
+    /// Returns the active immutable configuration view, when one is owned.
+    #[must_use]
+    pub const fn configuration(&self) -> Option<ApplicationConfigurationView<'a>> {
+        self.configuration
+    }
+
+    const fn new(configuration: Option<ApplicationConfigurationView<'a>>) -> Self {
+        Self { configuration }
+    }
+}
+
 /// The lifecycle and work behavior currently required by the owned runtime.
 ///
 /// The runtime invokes these methods synchronously and starts no hidden work.
-/// Service context and recovery behaviors are deliberately absent until later
-/// slices can define and verify them.
+/// Only ordinary work receives a narrow configuration context. Broader service
+/// and recovery behaviors remain deliberately absent.
 pub trait Application {
     /// The concrete error returned by this application's start operation.
     type StartError: Error + 'static;
@@ -47,7 +98,7 @@ pub trait Application {
     /// Returns an application-defined error when the cooperative work attempt
     /// fails. The runtime retains that error in [`RuntimeWorkError`] and moves
     /// the runtime record to terminal [`ApplicationState::Failed`].
-    fn work(&mut self) -> Result<(), Self::WorkError>;
+    fn work(&mut self, context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError>;
 
     /// The concrete error returned by this application's stop operation.
     type StopError: Error + 'static;
@@ -108,6 +159,89 @@ impl fmt::Display for RuntimeCreateError {
 }
 
 impl Error for RuntimeCreateError {}
+
+/// Failed configured-runtime construction with the validated table preserved.
+pub struct RuntimeConfigurationCreateError<E, const MAX_CONFIGURATION_BYTES: usize> {
+    kind: RuntimeCreateError,
+    configuration: ConfigurationTable<E, MAX_CONFIGURATION_BYTES>,
+}
+
+impl<E, const MAX_CONFIGURATION_BYTES: usize>
+    RuntimeConfigurationCreateError<E, MAX_CONFIGURATION_BYTES>
+{
+    /// Returns the runtime storage failure without exposing table internals.
+    #[must_use]
+    pub const fn kind(&self) -> RuntimeCreateError {
+        self.kind
+    }
+
+    /// Borrows the unchanged table that the runtime could not own.
+    #[must_use]
+    pub const fn configuration(&self) -> &ConfigurationTable<E, MAX_CONFIGURATION_BYTES> {
+        &self.configuration
+    }
+
+    /// Returns ownership of the unchanged validated table.
+    #[must_use]
+    pub fn into_configuration(self) -> ConfigurationTable<E, MAX_CONFIGURATION_BYTES> {
+        self.configuration
+    }
+}
+
+impl<E, const MAX_CONFIGURATION_BYTES: usize> fmt::Debug
+    for RuntimeConfigurationCreateError<E, MAX_CONFIGURATION_BYTES>
+{
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("RuntimeConfigurationCreateError")
+            .field("kind", &self.kind)
+            .field("configuration", &"<preserved>")
+            .finish()
+    }
+}
+
+impl<E, const MAX_CONFIGURATION_BYTES: usize> fmt::Display
+    for RuntimeConfigurationCreateError<E, MAX_CONFIGURATION_BYTES>
+{
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.kind.fmt(formatter)
+    }
+}
+
+impl<E, const MAX_CONFIGURATION_BYTES: usize> Error
+    for RuntimeConfigurationCreateError<E, MAX_CONFIGURATION_BYTES>
+{
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.kind)
+    }
+}
+
+/// A runtime configuration operation rejected before changing retained state.
+#[derive(Debug, Eq, PartialEq)]
+pub enum RuntimeConfigurationError<E> {
+    /// This runtime was constructed without a configuration table.
+    NotConfigured,
+    /// The owned table rejected replacement or rollback.
+    Table(ConfigurationError<E>),
+}
+
+impl<E: fmt::Display> fmt::Display for RuntimeConfigurationError<E> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::NotConfigured => formatter.write_str("runtime has no configuration table"),
+            Self::Table(error) => error.fmt(formatter),
+        }
+    }
+}
+
+impl<E: Error + 'static> Error for RuntimeConfigurationError<E> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::NotConfigured => None,
+            Self::Table(error) => Some(error),
+        }
+    }
+}
 
 /// A full runtime rejected an application while preserving caller ownership.
 pub struct RuntimeRegistrationError<A> {
@@ -333,9 +467,10 @@ pub(crate) enum RunningCallbackError<E> {
 /// the number of runtime records, not memory allocated inside application or
 /// error values.
 #[derive(Debug)]
-pub struct Runtime<A> {
+pub struct Runtime<A, E = Infallible, const MAX_CONFIGURATION_BYTES: usize = 0> {
     records: Vec<RuntimeRecord<A>>,
     max_applications: usize,
+    configuration: Option<ConfigurationTable<E, MAX_CONFIGURATION_BYTES>>,
 }
 
 impl<A> Runtime<A> {
@@ -346,20 +481,44 @@ impl<A> Runtime<A> {
     /// Returns an error when capacity is zero or record storage cannot be
     /// reserved without panicking.
     pub fn new(max_applications: usize) -> Result<Self, RuntimeCreateError> {
-        if max_applications == 0 {
-            return Err(RuntimeCreateError::ZeroCapacity);
-        }
-
-        let mut records = Vec::new();
-        records.try_reserve_exact(max_applications).map_err(|_| {
-            RuntimeCreateError::CapacityAllocationFailed {
-                requested: max_applications,
-            }
-        })?;
-
+        let records = create_record_storage(max_applications)?;
         Ok(Self {
             records,
             max_applications,
+            configuration: None,
+        })
+    }
+}
+
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize> Runtime<A, E, MAX_CONFIGURATION_BYTES> {
+    /// Creates bounded runtime storage that owns an already validated table.
+    ///
+    /// The complete table lineage, including rollback history and revision
+    /// high-water mark, is moved unchanged. Configuration can be supplied only
+    /// at construction; this runtime exposes no later attachment or detachment.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RuntimeConfigurationCreateError`] when application-record
+    /// storage cannot be created. The error preserves ownership of the
+    /// unchanged table for explicit caller recovery.
+    pub fn with_configuration(
+        max_applications: usize,
+        configuration: ConfigurationTable<E, MAX_CONFIGURATION_BYTES>,
+    ) -> Result<Self, RuntimeConfigurationCreateError<E, MAX_CONFIGURATION_BYTES>> {
+        let records = match create_record_storage(max_applications) {
+            Ok(records) => records,
+            Err(kind) => {
+                return Err(RuntimeConfigurationCreateError {
+                    kind,
+                    configuration,
+                });
+            }
+        };
+        Ok(Self {
+            records,
+            max_applications,
+            configuration: Some(configuration),
         })
     }
 
@@ -417,9 +576,50 @@ impl<A> Runtime<A> {
         let record = self.record(application_id)?;
         Ok(record.state)
     }
+
+    /// Validates and activates a replacement at a caller-selected safe point.
+    ///
+    /// The retained table applies its byte bound, validator, revision, and
+    /// rollback rules before mutation. The next ordinary work callback observes
+    /// the accepted snapshot.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RuntimeConfigurationError::NotConfigured`] when this runtime
+    /// owns no table. Otherwise preserves the exact [`ConfigurationError`] and
+    /// the table's rejection-without-mutation behavior.
+    pub fn replace_configuration(
+        &mut self,
+        candidate: &[u8],
+    ) -> Result<u64, RuntimeConfigurationError<E>> {
+        self.configuration
+            .as_mut()
+            .ok_or(RuntimeConfigurationError::NotConfigured)?
+            .replace(candidate)
+            .map_err(RuntimeConfigurationError::Table)
+    }
+
+    /// Restores and consumes the retained rollback snapshot at a safe point.
+    ///
+    /// The restored snapshot keeps its original revision. Later replacement
+    /// continues above the table's unchanged revision high-water mark.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`RuntimeConfigurationError::NotConfigured`] when this runtime
+    /// owns no table, or the table's exact no-history error otherwise.
+    pub fn rollback_configuration(&mut self) -> Result<u64, RuntimeConfigurationError<E>> {
+        self.configuration
+            .as_mut()
+            .ok_or(RuntimeConfigurationError::NotConfigured)?
+            .rollback()
+            .map_err(RuntimeConfigurationError::Table)
+    }
 }
 
-impl<A: Application> Runtime<A> {
+impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
+    Runtime<A, E, MAX_CONFIGURATION_BYTES>
+{
     /// Invokes application start after validating `Registered -> Running`.
     ///
     /// Success commits [`ApplicationState::Running`]. A returned application
@@ -482,8 +682,18 @@ impl<A: Application> Runtime<A> {
         &mut self,
         application_id: ApplicationId,
     ) -> Result<ApplicationState, RuntimeWorkError<A::WorkError>> {
-        match self.invoke_running(application_id, |application| {
-            application.work()?;
+        let (records, configuration) = (&mut self.records, &self.configuration);
+        let configuration = configuration.as_ref().map(|table| {
+            let snapshot = table.active();
+            ApplicationConfigurationView {
+                revision: snapshot.revision(),
+                bytes: snapshot.bytes(),
+            }
+        });
+        let context = ApplicationWorkContext::new(configuration);
+
+        match invoke_running_record(records, application_id, |application| {
+            application.work(context)?;
             Ok(ApplicationState::Running)
         }) {
             Ok(state) => Ok(state),
@@ -590,7 +800,7 @@ impl<A: Application> Runtime<A> {
     }
 }
 
-impl<A> Runtime<A> {
+impl<A, E, const MAX_CONFIGURATION_BYTES: usize> Runtime<A, E, MAX_CONFIGURATION_BYTES> {
     pub(crate) fn copy_states_into(&self, destination: &mut [ApplicationState]) {
         assert_eq!(
             destination.len(),
@@ -602,34 +812,12 @@ impl<A> Runtime<A> {
         }
     }
 
-    pub(crate) fn invoke_running<T, E>(
+    pub(crate) fn invoke_running<T, CallbackError>(
         &mut self,
         application_id: ApplicationId,
-        callback: impl FnOnce(&mut A) -> Result<T, E>,
-    ) -> Result<T, RunningCallbackError<E>> {
-        let record = self
-            .record_mut(application_id)
-            .map_err(RunningCallbackError::Lifecycle)?;
-        let current = record.state;
-        if current != ApplicationState::Running {
-            return Err(RunningCallbackError::Lifecycle(
-                LifecycleError::NotRunning {
-                    application_id,
-                    state: current,
-                },
-            ));
-        }
-
-        match callback(&mut record.application) {
-            Ok(value) => {
-                record.state = ApplicationState::Running;
-                Ok(value)
-            }
-            Err(source) => {
-                record.state = ApplicationState::Failed;
-                Err(RunningCallbackError::Application(source))
-            }
-        }
+        callback: impl FnOnce(&mut A) -> Result<T, CallbackError>,
+    ) -> Result<T, RunningCallbackError<CallbackError>> {
+        invoke_running_record(&mut self.records, application_id, callback)
     }
 
     pub(crate) fn first_non_registered(&self) -> Option<(ApplicationId, ApplicationState)> {
@@ -653,5 +841,52 @@ impl<A> Runtime<A> {
         self.records
             .get_mut(application_id.index())
             .ok_or(LifecycleError::UnknownApplication { application_id })
+    }
+}
+
+fn create_record_storage<A>(
+    max_applications: usize,
+) -> Result<Vec<RuntimeRecord<A>>, RuntimeCreateError> {
+    if max_applications == 0 {
+        return Err(RuntimeCreateError::ZeroCapacity);
+    }
+
+    let mut records = Vec::new();
+    records.try_reserve_exact(max_applications).map_err(|_| {
+        RuntimeCreateError::CapacityAllocationFailed {
+            requested: max_applications,
+        }
+    })?;
+    Ok(records)
+}
+
+fn invoke_running_record<A, T, E>(
+    records: &mut [RuntimeRecord<A>],
+    application_id: ApplicationId,
+    callback: impl FnOnce(&mut A) -> Result<T, E>,
+) -> Result<T, RunningCallbackError<E>> {
+    let record = records
+        .get_mut(application_id.index())
+        .ok_or(LifecycleError::UnknownApplication { application_id })
+        .map_err(RunningCallbackError::Lifecycle)?;
+    let current = record.state;
+    if current != ApplicationState::Running {
+        return Err(RunningCallbackError::Lifecycle(
+            LifecycleError::NotRunning {
+                application_id,
+                state: current,
+            },
+        ));
+    }
+
+    match callback(&mut record.application) {
+        Ok(value) => {
+            record.state = ApplicationState::Running;
+            Ok(value)
+        }
+        Err(source) => {
+            record.state = ApplicationState::Failed;
+            Err(RunningCallbackError::Application(source))
+        }
     }
 }
