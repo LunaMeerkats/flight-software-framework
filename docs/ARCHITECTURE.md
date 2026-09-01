@@ -80,9 +80,9 @@ fault tolerance.
   evidence verifies RFF-REQ-003.
 - [ADR-0005](adr/0005-configuration-revisions-and-rollback.md) defines immutable
   snapshots, monotonic revision assignment, and one consume-once rollback slot.
-  It is not yet integrated with runtime work; ADR-0017 implements its standalone
-  core. ADR-0018 selects the next ownership and ordinary-work context design;
-  that integration remains unimplemented.
+  ADR-0017 implements the bounded table, and ADR-0018 integrates constructor
+  ownership plus read-only visibility through the ordinary-work context. Their
+  combined evidence verifies RFF-REQ-006.
 - [ADR-0006](adr/0006-static-application-ownership-for-initial-runtime.md)
   selects a finite-capacity generic runtime, explicit static mission
   composition, and concrete returned start errors for the first owned slice.
@@ -119,15 +119,19 @@ fault tolerance.
   that never replaces the original application error.
 - [ADR-0017](adr/0017-bounded-configuration-snapshots.md) implements immutable
   byte-bounded configuration snapshots, one retained validator, revision
-  assignment, and consume-once rollback without runtime integration.
+  assignment, and consume-once rollback.
+- [ADR-0018](adr/0018-configuration-aware-work-context.md) integrates one
+  optional table owned at runtime construction with immutable configuration
+  visibility through every existing ordinary-work path.
 
 ## Current implementation boundary
 
 The bounded `LifecycleRegistry` remains the standalone logical LC1 state model:
 it allocates opaque identities in registration order and enforces
 `Registered -> Running -> Stopped -> Running` without owning application
-objects. `Runtime<A>` separately owns finite-capacity application records. A
-mission-selected concrete representation, such as an enum, implements
+objects. `Runtime<A, E, MAX_CONFIGURATION_BYTES>` separately owns
+finite-capacity application records and optionally one bounded configuration
+table. A mission-selected concrete representation, such as an enum, implements
 synchronous `Application::start`, `Application::work`, `Application::stop`, and
 `Application::restart` boundaries with distinct concrete error types.
 
@@ -139,9 +143,9 @@ operation-specific result and commits terminal `Failed`. Public-API tests
 suppress callbacks for rejected operations and show that a returned work error
 does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The
-lifecycle-only `Runtime<A>` has no automatic dispatch, general service context,
-or sample mission. Its ordinary lifecycle/work operations emit no events; the
-opt-in returned-work integration below is the only event-reporting operation.
+runtime has no automatic dispatch, general service context, or sample mission.
+Its ordinary lifecycle/work operations emit no events; the opt-in returned-work
+integration below is the only event-reporting operation.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -150,9 +154,9 @@ registration order, preserves FIFO across topics, rejects the newest delivery
 at saturation, and reports every matching destination in order. Inline payload
 storage enforces the selected maximum for each bus type.
 
-`MessagingRuntime<A, Topic, MAX_PAYLOAD_BYTES>` consumes a fully composed
-`Runtime<A>` whose records are still `Registered`, assigns one fresh inbox to
-each record internally, and freezes both owners behind one API. Publication
+`MessagingRuntime` consumes a fully composed runtime whose records are still
+`Registered`, assigns one fresh inbox to each record internally, and freezes
+both owners behind one API. Publication
 derives availability from runtime state: only `Running` accepts delivery;
 `Registered`, `Stopped`, and terminal `Failed` remain known but unavailable.
 Successful stop and returned callback errors clear only the selected inbox
@@ -228,15 +232,18 @@ candidate storage, caller-owned copies, and validator effects need their own
 resource budgets. A large inline bound is not a stack-usage guarantee.
 
 This core does not select a schema or typed decoded application value.
-[ADR-0018](adr/0018-configuration-aware-work-context.md) selects a concrete
-optional table owned at runtime construction and an immutable revision/bytes
-view through one ordinary work context. All existing ordinary work paths must
-migrate together without bypassing lifecycle checks, inbox cleanup, or event
-reporting. Message and lifecycle callbacks remain outside the selected access
-boundary. Runtime ownership, safe-point visibility, restart retention, and no
-automatic rollback after application errors remain unimplemented, so
-RFF-REQ-006 remains partial. Isolated borrowing probes are not integration
-evidence.
+ADR-0018 adds a private optional table to `Runtime` only at construction.
+`Application::work` receives one `ApplicationWorkContext` whose optional view
+exposes the active revision and used bytes but not the validator error type,
+inline bound, or mutation. Replacement and rollback remain caller-selected
+safe-point operations. Direct, scheduled, failure-event, and messaging-owned
+work all delegate through `Runtime::work`; message and lifecycle callbacks
+remain outside the access boundary. Tests prove absent and configured contexts,
+construction ownership recovery, activation/rejection/rollback visibility,
+revision non-reuse, restart retention, no automatic error rollback, peer
+progress, event behavior, and inbox cleanup. This combined evidence verifies
+RFF-REQ-006. The borrowing probes remain language-shape evidence rather than
+runtime integration evidence.
 
 ## Alternatives kept open
 
@@ -254,10 +261,12 @@ evidence.
 
 ## Major technical risks
 
-- The pre-v0.1 application surface has separate context-free work and message
-  callbacks. The opt-in failure-event method borrows services for one direct
-  work operation but provides no general application service-context shape. A
-  later shared context could still cause API churn.
+- The pre-v0.1 application surface has separate narrow contexts: ordinary work
+  sees optional configuration, while message dispatch sees publication only.
+  Lifecycle callbacks remain context-free. The opt-in failure-event method
+  borrows services for one direct work operation but provides no general
+  application service-context shape. A later shared context could still cause
+  API churn.
 - A returned application callback error may follow partial application-internal
   cleanup or mutation; the runtime records `Failed` but provides no rollback or
   cleanup guarantee.
@@ -279,8 +288,8 @@ evidence.
 - A work schedule cannot detect an identity from another same-shaped runtime or
   an instant from another clock origin. It retains consumed one-shot items until
   drop, has no periodic or reconfiguration policy, and currently schedules only
-  the lifecycle-only `Runtime`; messaging-aware work must preserve inbox
-  clearing through `MessagingRuntime`.
+  through `Runtime::work`; messaging-aware scheduling would need to preserve
+  inbox clearing through `MessagingRuntime`.
 - Direct standalone routing-core construction can still be paired with a
   same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
   guarantees apply only to `MessagingRuntime`.

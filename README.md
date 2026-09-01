@@ -16,11 +16,11 @@ fit Rust's ownership, type, error, and testing models.
 The repository contains an initial research and architecture baseline, five
 bounded Rust lifecycle/work increments, three Stage 2 messaging increments,
 two structured-event increments, an injected manual-time increment, and a
-finite scheduled-work increment, plus a standalone configuration lifecycle core.
-A no-dependency `LifecycleRegistry` verifies the logical LC1 transition table.
-A finite-capacity `Runtime<A>` owns statically
-composed application values and executes start, caller-selected work, stop, and
-in-place restart synchronously.
+finite scheduled-work increment, plus standalone and runtime-integrated
+configuration lifecycle increments. A no-dependency `LifecycleRegistry`
+verifies the logical LC1 transition table. A finite-capacity `Runtime` owns
+statically composed application values and executes start, caller-selected
+work, stop, and in-place restart synchronously.
 Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
 successful work retains `Running`. Restart and work retain application-owned
 state, while a returned concrete operation error enters terminal `Failed`
@@ -82,13 +82,17 @@ active snapshot for consume-once rollback. Rejection preserves active content,
 rollback history, and revision high-water; rollback restores the original
 revision without reusing numbers. Exact byte bounds, semantic rejection,
 ownership, history replacement, and checked revision exhaustion have tests.
-This standalone core does not yet provide runtime ownership or application
-visibility; RFF-REQ-006 remains partial. No schema or wire format is selected.
-
-[ADR-0018](docs/adr/0018-configuration-aware-work-context.md) now selects a
-runtime-owned optional table at construction and one read-only work context.
-Its borrowing probes support the design only; the runtime API and existing
-work paths remain unchanged until the integration and its tests are complete.
+`Runtime<A, E, MAX_CONFIGURATION_BYTES>` can now take ownership of a complete
+validated table at construction. Ordinary work receives an
+`ApplicationWorkContext` with an optional immutable revision/bytes view;
+unconfigured work sees explicit absence. Narrow replacement and rollback
+operations retain the table's validation and revision rules, while construction
+failure returns the unchanged table. The same configured runtime composes with
+scheduled work, failure-event reporting, and `MessagingRuntime` work without a
+parallel callback. Returned work errors do not roll configuration back, and
+stop/restart retains the full lineage. Ten focused runtime tests plus the
+standalone table tests verify RFF-REQ-006. No schema, wire format, host loader,
+or message/lifecycle callback access is selected.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
@@ -98,8 +102,8 @@ capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
 no automatic or batch dispatch. It is not yet a sample mission. Periodic or
 messaging-aware scheduling, application-authored events, other callback event
-paths, runtime configuration access, and command/telemetry boundaries remain
-unimplemented.
+paths, command/telemetry boundaries, and application configuration access
+outside ordinary work remain unimplemented.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
 returned-work event and peer-progress evidence verifies RFF-REQ-005 and
 RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
@@ -154,6 +158,7 @@ guidance records the remaining structural and document checks.
 - [Finite caller-driven scheduling decision](docs/adr/0015-caller-driven-scheduled-work.md)
 - [Returned-work failure-event decision](docs/adr/0016-returned-work-failure-events.md)
 - [Bounded configuration snapshot decision](docs/adr/0017-bounded-configuration-snapshots.md)
+- [Configuration-aware work-context decision](docs/adr/0018-configuration-aware-work-context.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

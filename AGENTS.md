@@ -26,16 +26,18 @@ translate NASA C source.
 - `PLANS.md`: the active or most recently completed bounded work plan.
 - `src/`: the single unpublished library package; currently logical lifecycle
   records, a synchronous start/work/stop/in-place-restart owned runtime, a
+  constructor-owned optional bounded configuration table with immutable
+  ordinary-work visibility,
   bounded message-routing core, lifecycle-aware ownership of one inbox per
   application, caller-selected one-message application dispatch, and a
   standalone bounded structured-event queue, an injected manual clock, and a
   finite caller-driven one-shot work schedule, plus direct returned-work
-  failure-event integration that borrows the clock and event queue, and a
-  standalone bounded configuration snapshot lifecycle core.
+  failure-event integration that borrows the clock and event queue.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
   application-dispatch, event-queue, manual-clock, and scheduled-work
   integration tests, including returned-work event reporting and saturation,
-  plus configuration validation, revision, and consume-once rollback tests.
+  plus standalone and runtime-integrated configuration validation, revision,
+  visibility, retention, and consume-once rollback tests.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

@@ -1,7 +1,8 @@
 # ADR-0018: Runtime-owned configuration and one ordinary work context
 
-- Status: Accepted design checkpoint; production implementation pending
+- Status: Accepted and implemented
 - Date: 2026-09-01
+- Implemented: 2026-09-02
 - Scope: Configuration ownership and read-only ordinary-work visibility
 
 ## Context
@@ -9,7 +10,8 @@
 [ADR-0017](0017-bounded-configuration-snapshots.md) implements the standalone
 table selected by [ADR-0005](0005-configuration-revisions-and-rollback.md).
 Runtime ownership, application-visible safe points, restart retention, and
-behavior after application errors remain unimplemented under RFF-REQ-006.
+behavior after application errors were the remaining RFF-REQ-006 boundaries at
+the decision checkpoint.
 
 Ordinary work already feeds direct, scheduled, event-reporting, and messaging
 runtime paths. A second configuration-only callback would create another work
@@ -22,22 +24,22 @@ provides that concrete reason; it does not justify a general service framework.
 
 ### One ordinary callback
 
-The next implementation will change the single `Application::work` callback to
-receive an `ApplicationWorkContext<'_>` by value. Its only service access will be
-an optional immutable configuration view containing the accepted revision and
-borrowed bytes. The view hides the storage capacity and validator error type
-from the application trait. It exposes no mutable table, activation, rollback,
-lifecycle control, nested work, or other runtime services.
+The implementation changes the single `Application::work` callback to receive
+an `ApplicationWorkContext<'_>` by value. Its only service access is an optional
+immutable configuration view containing the accepted revision and borrowed
+bytes. The view hides the storage capacity and validator error type from the
+application trait. It exposes no mutable table, activation, rollback, lifecycle
+control, nested work, or other runtime services.
 
 `None` means that the runtime was constructed without configuration. Applications
 that require configuration must handle absence explicitly through their ordinary
-work-error contract. There will be no default callback that silently redirects
+work-error contract. There is no default callback that silently redirects
 configuration-aware work into the former context-free callback.
 
 All ordinary direct, scheduled, failure-event-reporting, and messaging-owned work
-will invoke this same callback through `Runtime::work`. Existing application
-implementations must migrate explicitly, including applications that ignore the
-context. No parallel `work_with_configuration` operation will be introduced.
+invokes this same callback through `Runtime::work`. Existing application
+implementations migrated explicitly, including applications that ignore the
+context. No parallel `work_with_configuration` operation is introduced.
 
 The separate `MessagingApplication::handle_message` callback remains unchanged
 and receives no configuration view in this increment. Start, stop, and restart
@@ -127,11 +129,10 @@ records the Rust borrowing checks for this decision. Its isolated rustdoc probes
 are language-shape evidence only, not production runtime integration tests or
 RFF-REQ-006 completion evidence. (`SRC-RUSTDOC-TESTS`)
 
-The first production implementation must migrate the concrete runtime parameters
-through scheduling, direct failure-event reporting, and the messaging owner in
-the same coherent increment. The messaging owner must expose the narrow
-configuration operations without exposing its inner runtime mutably. Acceptance
-requires:
+The production implementation migrates the concrete runtime parameters through
+scheduling, direct failure-event reporting, and the messaging owner in one
+coherent increment. The messaging owner exposes the narrow configuration
+operations without exposing its inner runtime mutably. Evidence covers:
 
 - unconfigured and configured ordinary work using the one callback;
 - runtime-construction failure preserving the caller's validated table;
@@ -147,6 +148,16 @@ requires:
   remain possible and are documented as application-owned;
 - all existing verification, full-diff/source review, and traceability updates.
 
+Ten public integration tests cover the runtime-behavior bullets across
+unconfigured, zero-byte configured, direct, scheduled, failure-event, and
+messaging-owned work. They also exercise zero-capacity and allocation-overflow
+construction failure, exact returned errors, lifecycle state, event fields,
+clock reads, schedule consumption, selected-inbox clearing, and peer progress.
+The existing standalone table tests remain the storage-transition evidence. A
+production-API compile-fail probe rejects callback-borrow escape with the
+intended lifetime diagnostic; copied observations succeed in the integration
+tests. Together this verifies RFF-REQ-006.
+
 ## Risks and revisit conditions
 
 This changes the unpublished application work trait and expands concrete runtime
@@ -157,5 +168,5 @@ revision identity, and caller-owned copies retain ADR-0017's limitations.
 
 Revisit if a concrete mission requires typed decoding, message or lifecycle
 configuration access, attachment of an already composed runtime, additional
-owned services, or concurrency. RFF-REQ-006 remains partial until production
-integration and its required verification actually complete.
+owned services, or concurrency. RFF-REQ-006 is verified only at the bounded
+in-memory runtime and ordinary-work boundary described here.

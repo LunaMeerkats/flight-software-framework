@@ -1,15 +1,16 @@
 # ADR-0017: Bounded configuration snapshot lifecycle core
 
-- Status: Accepted and implemented as a partial ADR-0005 slice
+- Status: Accepted and implemented as the standalone ADR-0005 core
 - Date: 2026-08-31
 - Scope: Standalone in-memory validation, revision assignment, and rollback
 
 ## Context
 
-Stage 2 is complete. ADR-0005 already defines RFF-REQ-006 revision and rollback
-rules, but current work callbacks have no configuration access. Combining
-storage, a general application context, runtime ownership, and a host parser in
-one increment would make several unrelated API choices at once.
+At this decision checkpoint, Stage 2 was complete and ADR-0005 already defined
+RFF-REQ-006 revision and rollback rules, but work callbacks had no configuration
+access. Combining storage, a general application context, runtime ownership,
+and a host parser in one increment would have made several unrelated API choices
+at once.
 
 The core must preserve immutable accepted values and bounded history without
 requiring a generic value's interior mutability or heap use to be trusted.
@@ -78,12 +79,11 @@ consume-once rollback, revision non-reuse, and concrete errors. Private tests
 exercise final revision assignment, checked exhaustion, rejection precedence,
 and callback suppression without exposing revision or validator overrides.
 
-RFF-REQ-006 remains **partial**. The table proves standalone transitions only.
-Runtime ownership, application-visible safe points, restart retention, and no
-automatic rollback following an application error remain to be integrated and
-tested. Existing runtime, message, clock, event, and schedule behavior is
-unchanged. No persistence, schema migration, host loading, redo, automatic
-rollback, or event emission is added.
+This ADR alone proves standalone transitions only. ADR-0018 later integrates
+runtime ownership, application-visible safe points, restart retention, and no
+automatic rollback following a returned application error. Their combined
+evidence verifies RFF-REQ-006. This core still adds no persistence, schema
+migration, host loading, redo, automatic rollback, or event emission.
 
 ## Risks and revisit conditions
 

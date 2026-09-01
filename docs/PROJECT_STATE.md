@@ -1,123 +1,124 @@
 # Project state
 
-Last updated: **2026-09-01**
+Last updated: **2026-09-02**
 
 ## Current milestone
 
 Stages 1 and 2 and the first source-quality checkpoint are complete. Stage 3
-has a standalone configuration snapshot core. ADR-0018 now selects how runtime
-ownership and read-only ordinary work access will compose; that production
-integration remains unimplemented and RFF-REQ-006 remains partial. No sample
-mission exists yet.
+now has a verified bounded in-memory configuration lifecycle: a standalone
+table plus optional constructor ownership and immutable ordinary-work visibility
+through every existing work entry path. RFF-REQ-006 is verified at that boundary.
+No command/telemetry adapter or sample mission exists yet.
 
 ## Verified baseline
 
-- The clean starting commit `5b3a677c0e13a65387819b59490a0cd198d033fb`
+- The clean starting commit `5251f65784e0676f242158752894c9728ffebe6d`
   passed formatting, all-target check, warnings-denied Clippy, all 73 tests,
-  warnings-denied rustdoc, and Git whitespace before this decision checkpoint.
-- The source-quality policy remains stable rustfmt at 100 columns, the
-  individual Clippy `too_many_lines` lint at 60, and forbidden unsafe code.
-  Active rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98 are
-  evidence versions, not an MSRV or toolchain pin.
-- ADR-0017's configuration implementation remains `7dd2376`; the existing
-  traceability register retains exact implementation evidence for all slices.
-- The separate configuration-context experiment passes one executable probe
-  and three intended compiler-rejection probes. Direct diagnostic inspection
-  confirms immutable mutation, conflicting table replacement, and lifetime
-  escape rejection. This proves the isolated borrow shape, not runtime access.
-- No production Rust, Cargo configuration, dependency, or licence changes are
-  part of this run. The full baseline passes again with 73 tests, and all four
-  separate Markdown probes pass. All 21 Rust files and four snippets meet
-  physical/comment width limits; the snippets also pass rustfmt review.
-- All 87 relative links resolve across 30 Markdown documents; 8 requirement
-  rows, 23 source identifiers, and 54 exact test references are consistent.
-  All 11 changed documents pass generated-HTML content/structure review.
-  Browser visual QA was not completed; see the precise adaptation below.
+  warnings-denied rustdoc, and Git whitespace before this increment.
+- Implementation commit `9afc85686de192d66e36af950b1b63a29ca541ca`
+  adds runtime-owned optional configuration, the work context, forwarding
+  generics, ten focused integration tests, and the production lifetime probe.
+- The post-implementation baseline passes formatting, all-target/all-feature
+  check, warnings-denied Clippy, all 83 tests, warnings-denied rustdoc, and Git
+  whitespace on rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+  These versions are evidence, not an MSRV or toolchain pin.
+- The separate configuration-context experiment passes one executable and four
+  intended compiler-rejection probes. Direct diagnostic inspection confirms
+  E0594, E0502, table-view lifetime escape, and production work-context lifetime
+  escape. The new production probe fails only because its callback borrow cannot
+  outlive `'static`.
+- All 22 handwritten Rust files and 8,208 lines satisfy the 100-column physical
+  and 80-column comment-only review limits. Three unchanged reasoned function
+  expectations remain; there are no `allow` attributes or unsafe-code tokens.
+- The Markdown audit covers all 30 documents, 87 relative links, eight
+  requirement definitions and trace rows, and 53 exact test references without
+  findings. All 11 changed pages render without horizontal overflow, skipped
+  heading levels, table overflow, or browser console warnings at the inspected
+  1,265-pixel viewport. Browser screenshot capture timed out, so no
+  screenshot-based visual QA is claimed.
 
 ## Current architecture
 
 One unpublished, dependency-free safe-Rust package provides:
 
-- A bounded LC1 registry and finite-capacity `Runtime<A>` owning statically
+- A bounded LC1 registry and finite-capacity `Runtime` owning statically
   composed applications with synchronous start, ordinary work, stop, and
   in-place restart. Returned errors fail only the selected record.
+- An optional `ConfigurationTable` moved into `Runtime` only at construction.
+  `Application::work` receives one `ApplicationWorkContext` with an optional
+  immutable revision/bytes view. Narrow replacement and consume-once rollback
+  operations delegate to the table; unconfigured operations return a typed
+  absence error. Start, stop, restart, and message callbacks remain context-free.
 - Bounded FIFO publish/subscribe with explicit partial fan-out and reject-newest
   saturation. `MessagingRuntime` owns one inbox per application, couples
-  availability and clearing to lifecycle, and dispatches one oldest delivery
-  through a separate publish-only application context.
+  availability and clearing to lifecycle, delegates ordinary work through the
+  configured runtime, and exposes only narrow configuration operations.
 - A bounded structured-event queue and injected manual clock. Opt-in direct
-  work failure reporting borrows them and preserves the original work error
-  and exact event attempt, including queue saturation.
+  work failure reporting borrows them and preserves the original work error and
+  exact event attempt, including queue saturation.
 - A finite one-shot schedule with stable equal-time order and one due/overdue
-  attempt per caller request. Its existing evidence is on bare `Runtime`.
-- A standalone `ConfigurationTable<E, MAX_BYTES>` with immutable bounded byte
-  snapshots, one retained validator, fresh revisions, and consume-once rollback.
+  attempt per caller request. Scheduled and failure-event work both delegate
+  through the same configuration-aware `Runtime::work` callback.
 
-Neither runtime permanently owns a clock, event queue, or configuration table.
-ADR-0018 is a selected future design, not implemented architecture. It chooses
-configuration at construction and one context on ordinary work; it does not add
-configuration access to message, start, stop, or restart callbacks.
+The runtime still does not permanently own a clock or event queue. Configuration
+has no schema, wire format, persistence, host loader, lifecycle/message access,
+automatic error rollback, or attachment after runtime construction.
 
 ## Work in progress
 
-The configuration-context decision checkpoint is complete; no production
-implementation has begun. Its next migration must preserve all existing
-ordinary work paths through one callback without bypassing inbox
-cleanup, event reporting, or lifecycle gates.
+The ADR-0018 production increment is complete. No next implementation has begun.
+The next run should reorient before selecting the command/telemetry boundary;
+repository evidence, not this ordering alone, remains authoritative.
 
 ## Highest risks and uncertainties
 
-- Optional configuration expands concrete runtime and messaging-owner type
-  parameters. Constructor inference and composition require production tests;
-  the small borrowing probe does not validate the entire proposed API.
-- Construction must preserve the caller's table on failure and transfer its
-  history unchanged on success. No mutable table exposure or reattachment may
-  permit revision reset, including the valid zero-byte configuration case.
-- Large inline byte capacities can exhaust stack resources. Caller copies,
-  compiler temporaries, and validator effects/errors need separate budgets.
+- Large inline configuration capacities can exhaust stack resources. Caller
+  copies, compiler temporaries, and validator effects/errors need separate
+  budgets.
 - Validators need not be pure or terminating; rollback does not revalidate.
   Revisions, application IDs, and instants carry no owner origin.
+- Optional configuration expands concrete runtime and messaging-owner generic
+  parameters. These APIs remain pre-v0.1 and are not frozen.
 - A returned error can follow partial app mutation or peer publication. No
   cleanup, arbitrary panic/hang containment, or general fault tolerance exists.
 - Scheduling has no recurrence, fairness, or deadline guarantee. Failure-event
   reporting is opt-in and saturation offers no guaranteed delivery or retry.
-- No CI currently executes the local baseline. Browser review is subject to
-  the precise environment limitation recorded in the latest-run evidence.
+- No CI currently executes the local baseline.
 
 ## Important unresolved decisions
 
-- Production configuration integration must satisfy ADR-0018 before claiming
-  RFF-REQ-006; concrete API names remain pre-v0.1 and unfrozen.
-- No RFF-REQ-007 host command/telemetry grammar or input boundary is selected.
+- No RFF-REQ-007 host command/telemetry grammar or validation boundary is
+  selected.
 - Message/lifecycle configuration access, application-authored events, event
   filtering/drain, persistent clock/event owners, messaging-aware scheduling,
-  and a broader service context remain outside the selected design.
+  and a broader service context remain outside the implemented boundary.
 - Mission payload limits, external identifiers, wire representations, and MSRV
-  remain open. No hardware, RTOS, or no_std commitment is made.
+  remain open. No hardware, RTOS, or `no_std` commitment is made.
 
 ## Most likely next tasks
 
-1. Implement ADR-0018 runtime configuration ownership and ordinary work context,
-   with direct/scheduled/event/messaging regression evidence in one increment.
-2. Select the command/telemetry host grammar and validation boundary.
+1. Select the smallest host command-ingest and telemetry-output grammar and
+   validation boundary for RFF-REQ-007.
+2. Implement one bounded adapter pair after the decision is recorded.
 3. Compose a small sample mission and establish CI without widening claims.
 
 ## Latest run
 
-2026-09-01: Selected the configuration ownership/work-context design checkpoint
-because a separate configured wrapper would fragment existing work paths.
-Compared concrete optional ownership, a provider abstraction, and wrapper/
-parallel-callback alternatives. Recorded constructor-only ownership and the
-zero-byte reattachment hazard. Added reproducible borrowing probes and primary
-Rust/rustdoc source entries. Production behavior is unchanged; 73 production
-tests and four separate probes pass, along with all required Cargo checks.
-Independent design, source-form, and document reviews found no remaining issue.
+2026-09-02: Implemented ADR-0018 as one cross-cutting ordinary-work increment.
+`Runtime` now owns an optional complete table from construction and passes a
+validator- and capacity-independent immutable active view to
+`Application::work`. Construction failure returns the unchanged table;
+unconfigured mutation is typed; replacement and rollback retain ADR-0005
+semantics. Direct, scheduled, failure-event, and messaging-owned work share the
+same callback. Returned errors retain the exact error and `Failed` state without
+automatic rollback; existing event and inbox behavior remains intact and a peer
+can continue.
 
-Browser connection setup returned `js execution timed out; kernel reset` before
-a page could be inspected. Generated-HTML source hashes, normalized text,
-headings, lists, code, and tables were inspected as a narrow document-review
-adaptation, consistent with the previous run's nonvisual review. Browser visual
-QA is not claimed. No alternate browser-control mechanism was used.
-
-The checkpoint is local-only on `codex/nightly`; its commit identity is
-discoverable from Git history. Nothing has been pushed.
+Ten focused tests cover absence, the valid zero-byte/default-type distinction,
+used-prefix visibility, construction recovery, activation/rejection/rollback,
+revision non-reuse, lifecycle suppression and restart, returned errors and peer
+progress, schedule/event behavior, and messaging cleanup. Independent code and
+acceptance reviews found no remaining defect after stale source wording,
+comment widths, used-prefix evidence, and one overstrong documentation phrase
+were corrected. The implementation is local-only on `codex/nightly`; nothing
+was pushed.

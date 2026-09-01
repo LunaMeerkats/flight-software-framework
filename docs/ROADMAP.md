@@ -122,20 +122,20 @@ Status: **In progress**
 - Integrate and re-demonstrate the already verified direct cooperative
   application-error behavior in the sample mission.
 
-The standalone configuration core now validates const-bounded byte snapshots,
-preserves state on rejection, assigns never-reused revisions, and restores one
-consume-once rollback snapshot. Public transition tests and private exhaustion
-tests cover that core. RFF-REQ-006 remains partial until runtime ownership,
-application-visible safe points, restart retention, and explicit no-automatic-
-rollback behavior after application errors are integrated. No schema, host
-loading adapter, or wire format has been selected.
+The configuration core validates const-bounded byte snapshots, preserves state
+on rejection, assigns never-reused revisions, and restores one consume-once
+rollback snapshot. ADR-0018 now integrates that table as optional
+constructor-owned runtime state. One immutable ordinary-work context exposes
+the active revision and bytes through direct, scheduled, failure-event, and
+messaging-owned work. Tests cover construction ownership recovery, absence,
+safe-point activation/rejection/rollback visibility, restart retention, no
+automatic error rollback, peer progress, event behavior, and inbox cleanup.
+Together with the standalone transition and exhaustion tests, this verifies
+RFF-REQ-006. No schema, host loading adapter, or wire format has been selected.
 
-The 2026-09-01 decision checkpoint in
-[ADR-0018](adr/0018-configuration-aware-work-context.md) selects construction
-with an owned optional table and one read-only ordinary work context. The next
-implementation must preserve direct, scheduled, failure-event, and
-messaging-owned work through that callback. Isolated borrowing probes support
-the ownership shape only; no configuration runtime behavior is added yet.
+The next Stage 3 boundary is the command-ingest and telemetry-output host
+adapter pair. Its grammar and validation policy still require a recorded
+decision before implementation.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission
