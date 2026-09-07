@@ -1,124 +1,98 @@
 # Project state
 
-Last updated: **2026-09-02**
+Last updated: **2026-09-08**
 
 ## Current milestone
 
 Stages 1 and 2 and the first source-quality checkpoint are complete. Stage 3
-now has a verified bounded in-memory configuration lifecycle: a standalone
-table plus optional constructor ownership and immutable ordinary-work visibility
-through every existing work entry path. RFF-REQ-006 is verified at that boundary.
-No command/telemetry adapter or sample mission exists yet.
+has verified in-memory configuration ownership and ordinary-work visibility.
+ADR-0019 now selects the host command/telemetry boundary. Its borrowed output
+mailbox has executable design evidence; no codec, adapter pair, or sample
+mission exists yet. RFF-REQ-007 remains not verified.
 
 ## Verified baseline
 
-- The clean starting commit `5251f65784e0676f242158752894c9728ffebe6d`
-  passed formatting, all-target check, warnings-denied Clippy, all 73 tests,
-  warnings-denied rustdoc, and Git whitespace before this increment.
-- Implementation commit `9afc85686de192d66e36af950b1b63a29ca541ca`
-  adds runtime-owned optional configuration, the work context, forwarding
-  generics, ten focused integration tests, and the production lifetime probe.
-- The post-implementation baseline passes formatting, all-target/all-feature
-  check, warnings-denied Clippy, all 83 tests, warnings-denied rustdoc, and Git
-  whitespace on rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
-  These versions are evidence, not an MSRV or toolchain pin.
-- The separate configuration-context experiment passes one executable and four
-  intended compiler-rejection probes. Direct diagnostic inspection confirms
-  E0594, E0502, table-view lifetime escape, and production work-context lifetime
-  escape. The new production probe fails only because its callback borrow cannot
-  outlive `'static`.
-- All 22 handwritten Rust files and 8,208 lines satisfy the 100-column physical
-  and 80-column comment-only review limits. Three unchanged reasoned function
-  expectations remain; there are no `allow` attributes or unsafe-code tokens.
-- The Markdown audit covers all 30 documents, 87 relative links, eight
-  requirement definitions and trace rows, and 53 exact test references without
-  findings. All 11 changed pages render without horizontal overflow, skipped
-  heading levels, table overflow, or browser console warnings at the inspected
-  1,265-pixel viewport. Browser screenshot capture timed out, so no
-  screenshot-based visual QA is claimed.
+- Starting commit `0ddf2b40e0bd4f7ae52e099ac9d9ec3be8c70428` is clean on
+  `codex/nightly`; its format, all-target/all-feature check, warnings-denied
+  Clippy, 83 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98 are unchanged.
+  These versions record evidence, not an MSRV or toolchain pin.
+- Runtime configuration integration remains at
+  `9afc85686de192d66e36af950b1b63a29ca541ca`; exact requirement evidence is in
+  the traceability register. The ADR-0018 borrowing probes are unchanged.
+- The explicit host-mailbox build and standalone rustdoc probe pass: one
+  executable containing three scenarios. It proves live borrowed-mailbox reuse,
+  retained output under full storage, terminal selected-app failure with exact
+  queue clearing, and internal validation before capacity handling. It does not
+  prove the external codec, complete mission topology, or physical I/O.
+- The extracted 185-line probe passes rustfmt and warnings-denied Clippy with
+  the repository's 60-line threshold. All 22 handwritten Rust files and the
+  probe have no physical/comment-only width findings. Three existing function
+  expectations remain unchanged; no new waiver or dependency is introduced.
+- The final Cargo/Git baseline passes with the same 83 tests. The document audit
+  covers 32 Markdown files, 95 resolving links, eight requirement/trace rows,
+  25 source entries, and 53 exact test references. All 11 changed pages match
+  generated HTML content. Browser review at 1,280 pixels finds no page/table
+  overflow or heading skips; decision and experiment screenshots were inspected.
 
 ## Current architecture
 
-One unpublished, dependency-free safe-Rust package provides:
+One unpublished, dependency-free safe-Rust library provides a finite LC1
+runtime with synchronous owned lifecycle/work callbacks; bounded FIFO routing
+and lifecycle-owned inbox dispatch; injected manual time and finite one-shot
+scheduling; bounded structured events and opt-in direct returned-work failure
+reporting; and constructor-owned optional configuration with immutable
+ordinary-work visibility and consume-once rollback.
 
-- A bounded LC1 registry and finite-capacity `Runtime` owning statically
-  composed applications with synchronous start, ordinary work, stop, and
-  in-place restart. Returned errors fail only the selected record.
-- An optional `ConfigurationTable` moved into `Runtime` only at construction.
-  `Application::work` receives one `ApplicationWorkContext` with an optional
-  immutable revision/bytes view. Narrow replacement and consume-once rollback
-  operations delegate to the table; unconfigured operations return a typed
-  absence error. Start, stop, restart, and message callbacks remain context-free.
-- Bounded FIFO publish/subscribe with explicit partial fan-out and reject-newest
-  saturation. `MessagingRuntime` owns one inbox per application, couples
-  availability and clearing to lifecycle, delegates ordinary work through the
-  configured runtime, and exposes only narrow configuration operations.
-- A bounded structured-event queue and injected manual clock. Opt-in direct
-  work failure reporting borrows them and preserves the original work error and
-  exact event attempt, including queue saturation.
-- A finite one-shot schedule with stable equal-time order and one due/overdue
-  attempt per caller request. Scheduled and failure-event work both delegate
-  through the same configuration-aware `Runtime::work` callback.
-
-The runtime still does not permanently own a clock or event queue. Configuration
-has no schema, wire format, persistence, host loader, lifecycle/message access,
-automatic error rollback, or attachment after runtime construction.
+ADR-0019 selects mission-local two-byte EchoPercent input and matching output,
+validated before business logic. Two applications use existing messaging APIs.
+A telemetry subscriber borrows a capacity-one host mailbox, and host drain
+returns encoded bytes outside callbacks. This design has not changed library
+APIs or implemented the adapter pair.
 
 ## Work in progress
 
-The ADR-0018 production increment is complete. No next implementation has begun.
-The next run should reorient before selecting the command/telemetry boundary;
-repository evidence, not this ordering alone, remains authoritative.
+The host boundary decision and mailbox probe are complete with final baseline,
+source/document, and independent diff review. No adapter implementation has
+begun. The next run should reorient before implementing ADR-0019.
 
 ## Highest risks and uncertainties
 
-- Large inline configuration capacities can exhaust stack resources. Caller
-  copies, compiler temporaries, and validator effects/errors need separate
-  budgets.
-- Validators need not be pure or terminating; rollback does not revalidate.
-  Revisions, application IDs, and instants carry no owner origin.
-- Optional configuration expands concrete runtime and messaging-owner generic
-  parameters. These APIs remain pre-v0.1 and are not frozen.
-- A returned error can follow partial app mutation or peer publication. No
-  cleanup, arbitrary panic/hang containment, or general fault tolerance exists.
+- Full host output returned as a message error means terminal telemetry-app
+  failure. Draining older output does not recover the app; no retry or delivery
+  guarantee is selected. Physical I/O and caller framing need separate budgets.
+- Large inline configuration capacities can exhaust stack resources; validator
+  effects and caller copies are outside retained snapshot bounds.
+- Application IDs, revisions, and instants carry no owner origin. Callbacks and
+  validators need not terminate; returned failure can follow partial mutation
+  or publication. Panic/hang containment and general fault tolerance are absent.
 - Scheduling has no recurrence, fairness, or deadline guarantee. Failure-event
-  reporting is opt-in and saturation offers no guaranteed delivery or retry.
+  delivery can saturate, and the runtime does not permanently own clock/events.
 - No CI currently executes the local baseline.
 
 ## Important unresolved decisions
 
-- No RFF-REQ-007 host command/telemetry grammar or validation boundary is
-  selected.
-- Message/lifecycle configuration access, application-authored events, event
-  filtering/drain, persistent clock/event owners, messaging-aware scheduling,
-  and a broader service context remain outside the implemented boundary.
-- Mission payload limits, external identifiers, wire representations, and MSRV
-  remain open. No hardware, RTOS, or `no_std` commitment is made.
+- The adapter implementation must select a small shared-source example/test
+  arrangement. The local grammar and pre-v0.1 APIs remain unfrozen.
+- Message/lifecycle configuration access, application-authored events, host
+  event drain, persistent clock/event owners, and messaging-aware scheduling
+  remain outside the implemented boundary.
+- Physical input/output, protocol evolution, MSRV, and any hardware, RTOS, or
+  `no_std` commitment remain open.
 
 ## Most likely next tasks
 
-1. Select the smallest host command-ingest and telemetry-output grammar and
-   validation boundary for RFF-REQ-007.
-2. Implement one bounded adapter pair after the decision is recorded.
-3. Compose a small sample mission and establish CI without widening claims.
+1. Implement the ADR-0019 mission-local codec and adapter pair with exact
+   malformed-input, publication, output-saturation, and end-to-end evidence.
+2. Compose a small sample mission demonstrating the existing service boundaries.
+3. Establish CI and perform the v0.1 architecture review without widening claims.
 
 ## Latest run
 
-2026-09-02: Implemented ADR-0018 as one cross-cutting ordinary-work increment.
-`Runtime` now owns an optional complete table from construction and passes a
-validator- and capacity-independent immutable active view to
-`Application::work`. Construction failure returns the unchanged table;
-unconfigured mutation is typed; replacement and rollback retain ADR-0005
-semantics. Direct, scheduled, failure-event, and messaging-owned work share the
-same callback. Returned errors retain the exact error and `Failed` state without
-automatic rollback; existing event and inbox behavior remains intact and a peer
-can continue.
-
-Ten focused tests cover absence, the valid zero-byte/default-type distinction,
-used-prefix visibility, construction recovery, activation/rejection/rollback,
-revision non-reuse, lifecycle suppression and restart, returned errors and peer
-progress, schedule/event behavior, and messaging cleanup. Independent code and
-acceptance reviews found no remaining defect after stale source wording,
-comment widths, used-prefix evidence, and one overstrong documentation phrase
-were corrected. The implementation is local-only on `codex/nightly`; nothing
-was pushed.
+2026-09-08: Selected the host boundary decision because it resolves grammar and
+output ownership before the next Stage 3 implementation. Compared fixed byte
+records with strict ASCII and borrowed mailbox ownership with other sinks.
+The real-runtime probe validates borrowing and the full-output consequence;
+RFF-REQ-007 remains unverified. Initial/final baselines, explicit experiment,
+source-form, document, and independent complete-diff reviews pass. This is one
+local decision checkpoint on `codex/nightly`; nothing was pushed.

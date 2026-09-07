@@ -4,10 +4,39 @@ Access date for this initial register: **2026-08-05**.
 
 Access date for the source-quality policy checkpoint: **2026-08-23**.
 
+Access date for the host command/telemetry decision: **2026-09-08**.
+
 Only public primary sources are used below. “Adopt” means adopting a problem
 boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
+
+## SRC-RUST-CELL — Rust standard-library copied interior state
+
+- Title: `std::cell::Cell`
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/std/cell/struct.Cell.html>
+- Version: stable documentation displayed 1.98.1, accessed 2026-09-08;
+  local ownership probe compiled on rustc 1.98.0
+- Informed: `get` copies contained `Copy` values, `set` replaces a value through
+  shared access, and `take` leaves the default value; `Cell` is not `Sync`.
+- Local treatment: adopt safe copied interior state for the mission-owned
+  one-record output mailbox borrowed by a serial telemetry application. The
+  reject-newest policy and host-only drain boundary are local decisions, not
+  guarantees supplied by `Cell`. Reject interpreting this as a concurrent
+  channel, runtime borrow-guard abstraction, or delivery guarantee.
+
+## SRC-RUST-RC — Rust standard-library reference-counted ownership
+
+- Title: `std::rc`
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/std/rc/index.html>
+- Version: stable documentation accessed 2026-09-08
+- Informed: `Rc` provides single-threaded shared ownership of a heap allocation;
+  cloning its pointer shares that allocation.
+- Local treatment: considered for host/application mailbox ownership and
+  rejected for this slice because a host-owned borrowed `Cell` suffices. Do not
+  add allocation or reference-counted ownership without a lifetime need.
 
 ## SRC-NASA-CFS — Core Flight System bundle v7.0.1
 

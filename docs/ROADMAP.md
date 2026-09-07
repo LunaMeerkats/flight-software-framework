@@ -134,8 +134,11 @@ Together with the standalone transition and exhaustion tests, this verifies
 RFF-REQ-006. No schema, host loading adapter, or wire format has been selected.
 
 The next Stage 3 boundary is the command-ingest and telemetry-output host
-adapter pair. Its grammar and validation policy still require a recorded
-decision before implementation.
+adapter pair. ADR-0019 selects a two-byte validated echo command and matching
+telemetry, with a borrowed capacity-one host mailbox drained outside callbacks.
+The executable mailbox probe checks ownership and full-output behavior; the
+codec, adapter pair, and sample mission remain unimplemented. Next implement
+one shared mission source with malformed-input and end-to-end evidence.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission

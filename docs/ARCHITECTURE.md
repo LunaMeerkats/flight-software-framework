@@ -123,6 +123,10 @@ fault tolerance.
 - [ADR-0018](adr/0018-configuration-aware-work-context.md) integrates one
   optional table owned at runtime construction with immutable configuration
   visibility through every existing ordinary-work path.
+- [ADR-0019](adr/0019-host-command-telemetry-boundary.md) selects the next
+  mission-local host adapter pair: a validated two-byte echo command, matching
+  telemetry, and a borrowed capacity-one host mailbox drained outside dispatch.
+  This is a decision with ownership-probe evidence, not implemented adapters.
 
 ## Current implementation boundary
 

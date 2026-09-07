@@ -1,102 +1,81 @@
-# Configuration-aware ordinary work integration
+# Host command and telemetry boundary decision
 
-Date: **2026-09-02**
+Date: **2026-09-08**
 Status: **Complete**
 
 ## Objective and context
 
-Implement the production boundary selected by ADR-0018: one optional validated
-configuration table owned by `Runtime` from construction and one immutable
-configuration view passed through the existing ordinary-work callback. Migrate
-direct, scheduled, failure-event-reporting, and messaging-owned work together so
-none bypasses the existing lifecycle, event, or inbox-cleanup behavior.
+Select the smallest concrete RFF-REQ-007 grammar, validation boundary, and
+observable telemetry path before implementing the adapter pair. The clean
+starting commit is `0ddf2b40e0bd4f7ae52e099ac9d9ec3be8c70428` on
+`codex/nightly`. The documented baseline passes with 83 tests on unchanged
+rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98. Source-quality
+policy is already encoded; no adoption cleanup is needed.
 
-The run starts clean on `codex/nightly` at `5251f657`. The complete documented
-baseline passes with 73 tests on rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and
-Clippy 0.1.98. ADR-0005, ADR-0017, and ADR-0018 already settle the behavior; no
-new external research, dependency, concurrency model, schema, or wire format is
-needed.
+The highest-value uncertainty is how telemetry leaves the owned messaging
+runtime without exposing applications or performing blocking callback I/O.
+ADR-0001 and the message callback/error contract constrain the answer. This
+is a decision checkpoint, not an implementation of RFF-REQ-007.
 
 ## Acceptance criteria
 
-- Keep `Runtime::new` specialized for an unconfigured default runtime. Add a
-  configured constructor that transfers a complete validated table and returns
-  that table unchanged if runtime storage construction fails.
-- Give `Application::work` one `ApplicationWorkContext` whose optional immutable
-  view exposes only active bytes and the original acceptance revision.
-- Provide narrow replacement and consume-once rollback operations. An
-  unconfigured runtime returns a typed absence error; no table attachment,
-  detachment, wholesale replacement, or mutable table access is exposed.
-- Preserve initial, replacement, rejection, rollback, and non-reused revision
-  behavior as observed by later work callbacks.
-- Prove stop/restart retention, lifecycle-rejected callback suppression, and no
-  automatic rollback after a returned application error. Preserve the original
-  error, terminal `Failed` state, and later peer progress.
-- Keep all direct, scheduled, failure-event, and messaging-owned ordinary work
-  delegated through `Runtime::work`. Preserve exact schedule consumption,
-  clock/event attempts, and messaging inbox clearing on returned errors.
-- Expose the same narrow replacement and rollback operations through
-  `MessagingRuntime` without exposing its inner runtime.
-- Keep start, stop, restart, and `MessagingApplication::handle_message`
-  context-free. Add no general service context, messaging-aware scheduler,
-  persistent clock/event owner, parser, schema, or dependency.
-- Verify that borrowed configuration cannot escape its callback lifetime while
-  explicitly copied observations remain application-owned.
-- Rerun the full Cargo/Git baseline, the standalone ADR-0018 rustdoc probes,
-  source-width and Markdown audits, rendered-content review, and complete diff
-  review before local commits.
+- Compare fixed byte records with strict ASCII; specify grammar, bounds,
+  validation precedence, and caller framing separately from stream acquisition.
+- Trace validated ingress through publication and caller-selected dispatch to
+  a telemetry subscriber and explicit host drain.
+- Specify retained-record bounds, reject-newest outcomes, and the current
+  terminal lifecycle consequence of returned message errors.
+- Validate a borrowed capacity-one output mailbox against the real runtime in
+  an executable probe; distinguish it from codec or sample integration tests.
+- Record primary sources and decisions. Add no library API, production adapter,
+  dependency, unsafe code, thread, or blocking callback I/O.
+- Keep requirement status truthful and record future integration acceptance.
+- Pass the Cargo/Git baseline, mailbox probe, source-form review, link audit,
+  changed-document rendering, and complete diff review.
 
-## Proposed files and verification approach
+## Components and verification
 
-Production changes are limited to `src/runtime.rs`, the generic forwarding
-layers in `src/scheduling.rs`, `src/runtime_events.rs`, and
-`src/messaging_runtime.rs`, public exports in `src/lib.rs`, and explicit
-callback migrations in existing tests. Focused configuration-runtime tests may
-use a new integration-test module when that keeps the service interaction
-scenarios coherent.
+ADR-0019 and the standalone mailbox experiment record the decision and
+reproducible evidence. README, architecture, requirements, roadmap, source
+register, traceability, project state, AGENTS.md, and this plan keep it usable
+by the next run.
 
-Durable evidence updates include README, architecture, requirements, roadmap,
-project state, ADR-0005, ADR-0017, ADR-0018, the borrowing experiment,
-traceability, contributor layout descriptions, and this plan. The source
-register changes only if new research becomes necessary.
-
-Required commands are the six existing Cargo/Git checks from AGENTS.md, with
-`RUSTDOCFLAGS=-D warnings`, plus the explicit build and standalone Markdown
-`rustdoc --test` commands in the configuration-context experiment. Focused test
-targets run before the final suite. Ad hoc source/document audit scripts remain
-under the ignored `target/nightly-2026-09-01` review directory and are not
-repository gates.
+Use the six Cargo/Git commands in AGENTS.md with rustdoc warnings denied, plus
+build and standalone rustdoc commands in the experiment. Review extracted Rust
+with rustfmt and warnings-denied Clippy at the existing 60-line threshold.
+Review aids stay under ignored `target/nightly-2026-09-08`; no new checker gate
+is being adopted.
 
 ## Risks and safe stopping point
 
-The concrete configuration error type and const byte bound propagate through
-the runtime and messaging owner. Default generic parameters must preserve the
-existing unconfigured call sites, including the distinct valid zero-byte
-configured case. The split mutable-record/immutable-configuration borrow must
-remain safe Rust and keep one lifecycle validation/state-commit path.
+The grammar is a local demonstration choice, not an external protocol or API
+freeze. Full output returned as a callback error fails the telemetry app under
+current semantics. Caller framing and later I/O have separate resource costs.
 
-If generic composition fragments an existing work path or requires unsafe code,
-application removal, duplicated lifecycle logic, a new dependency, or broad API
-scope, stop with the existing decision and evidence intact. The successful
-stopping point is one reviewed production integration with truthful RFF-REQ-006
-traceability, a clean baseline, and local commits only. No push is authorized.
+Stop after this documented and verified decision checkpoint. RFF-REQ-007 stays
+unverified until real adapters and integration evidence exist. Commit locally
+only after applicable checks pass; no push is authorized.
 
 ## Outcome
 
-The production increment is complete in local commit `9afc8568`. Runtime-owned
-optional configuration now reaches one immutable ordinary-work context through
-direct, scheduled, failure-event, and messaging-owned work without changing
-lifecycle gating, error identity, schedule consumption, event attempts, or
-inbox cleanup. Ten focused integration tests cover the accepted behavior,
-including used-prefix visibility and the distinct zero-byte configured case.
+ADR-0019 selects a two-byte EchoPercent command and matching telemetry with
+length/identifier/value validation before publication or business logic. A
+borrowed capacity-one mailbox lets host drain occur outside message callbacks.
+The executable real-runtime probe confirms live reuse, full-output retention,
+terminal failure with exact inbox clearing, and internal validation precedence.
+It supplies ownership evidence only; RFF-REQ-007 remains not verified.
 
-The full documented Cargo/Git baseline passes with 83 tests. The standalone
-ADR-0018 experiment passes one executable and four intended compiler-rejection
-probes, including production work-context lifetime escape. Source-form and
-Markdown audits report no findings; all 11 changed Markdown pages render
-without horizontal overflow, skipped heading levels, table overflow, or browser
-console warnings at the inspected 1,265-pixel viewport. The browser screenshot
-channel timed out, so this run does not claim screenshot-based visual QA.
+The initial and final Cargo/Git baselines pass with 83 tests. The explicit build,
+standalone rustdoc probe (one executable, three scenarios), extracted rustfmt,
+and warnings-denied Clippy checks pass. The 22 Rust files and 185-line snippet
+have no width findings or new lint exceptions. The audit covers 32 Markdown
+documents, 95 resolving links, eight requirement/traceability rows, 25 source
+entries, and 53 exact test references. Changed documents match rendered HTML;
+browser inspection at 1,280 pixels finds no page/table overflow or heading
+skips. Screenshot spot checks cover the decision and experiment.
 
-No new external research, dependency, unsafe code, push, or next-feature work
-was needed. The repository remains at the safe stopping point selected above.
+Independent decision and complete-diff reviews found no remaining actionable
+defect. Allocation-failure injection remains explicitly unverified, and the
+probe's two-slot clearing fixture is distinguished from the selected one-slot
+mission inboxes. Library APIs, dependencies, and production behavior are
+unchanged. The stopping point is this local decision checkpoint; no push.

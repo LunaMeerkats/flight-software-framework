@@ -104,6 +104,10 @@ no automatic or batch dispatch. It is not yet a sample mission. Periodic or
 messaging-aware scheduling, application-authored events, other callback event
 paths, command/telemetry boundaries, and application configuration access
 outside ordinary work remain unimplemented.
+ADR-0019 now selects a local two-byte validated echo command and matching
+telemetry, with a borrowed capacity-one host mailbox drained outside dispatch.
+The mailbox experiment checks ownership and failure behavior only; no adapter
+pair or sample mission is implemented by that decision.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
 returned-work event and peer-progress evidence verifies RFF-REQ-005 and
 RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
@@ -159,6 +163,7 @@ guidance records the remaining structural and document checks.
 - [Returned-work failure-event decision](docs/adr/0016-returned-work-failure-events.md)
 - [Bounded configuration snapshot decision](docs/adr/0017-bounded-configuration-snapshots.md)
 - [Configuration-aware work-context decision](docs/adr/0018-configuration-aware-work-context.md)
+- [Host command/telemetry boundary decision](docs/adr/0019-host-command-telemetry-boundary.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

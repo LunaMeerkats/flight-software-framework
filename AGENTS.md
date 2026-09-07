@@ -77,6 +77,12 @@ build and standalone Markdown `rustdoc --test` commands in
 Cargo does not discover these probes; they are design evidence, not runtime
 integration tests. Inspect negative diagnostics and source form separately.
 
+When changing ADR-0019 or its mailbox experiment, also run the explicit build,
+standalone Markdown `rustdoc --test`, and extracted-source rustfmt/Clippy
+commands in [the experiment](docs/verification/HOST_MAILBOX_EXPERIMENT.md).
+Cargo does not discover this probe; it demonstrates borrowed host-output
+ownership and saturation, not a complete command/telemetry adapter pair.
+
 The source-quality policy was established with rustc/cargo 1.96.1, rustfmt
 1.9.0-stable, and Clippy 0.1.96. A whole-tree re-audit passed on 2026-08-26 with
 rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98. These versions
