@@ -100,6 +100,8 @@ overflow. Screenshot capture failed through both documented APIs with
 generated-content comparison plus browser DOM/layout inspection; screenshot
 visual QA is not claimed. No browser safety policy was bypassed.
 
-The stopping point is this verified adapter pair. The local implementation
-commit reference is recorded in traceability after commit; full service sample,
-CI, and v0.1 architecture review remain separate. Nothing is pushed.
+The stopping point is this verified adapter pair, implemented and tested in
+local commit `2c337f311da7d62230d626bd10c7fbe1383b586e`. The final audit covers
+32 Markdown files, 99 resolving links, eight requirement rows, 26 sources,
+60 exact test references, and 11 changed rendered documents. The full service
+sample, CI, and v0.1 architecture review remain separate. Nothing is pushed.

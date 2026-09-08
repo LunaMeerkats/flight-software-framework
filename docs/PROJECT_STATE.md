@@ -13,6 +13,9 @@ The full v0.1 service sample, CI, and architecture review remain outstanding.
 
 - Started clean at `3674863865d68ced666a1fc0b3e478b672fc79c3` on `codex/nightly`.
   All six required pre-change commands passed with 83 tests.
+- Adapter implementation and test evidence are committed locally at
+  `2c337f311da7d62230d626bd10c7fbe1383b586e`; RFF-REQ-007 is verified only at
+  the selected caller-framed slice/returned-array boundary.
 - rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98 are unchanged.
   They record evidence, not an MSRV or toolchain pin.
 - Final formatting, all-target/all-feature check, warnings-denied Clippy,
@@ -28,6 +31,8 @@ The full v0.1 service sample, CI, and architecture review remain outstanding.
 - Generated document content, link/source/test-name audits, and browser layout
   inspection pass. Screenshot capture timed out; the recorded narrow review
   adaptation uses content comparison and DOM/layout inspection, not visual QA.
+  Audits cover 32 Markdown files, 99 links, eight requirement rows, 26 sources,
+  60 exact test references, and all 11 changed documents at 1,280 pixels.
 
 ## Current architecture
 
@@ -47,8 +52,8 @@ host selects each dispatch and drains exact telemetry bytes separately.
 ## Work in progress
 
 No unfinished implementation remains. The adapter pair reached its tested,
-documented, and reviewed stopping point. Local evidence references are recorded
-with the commits; the next run should reorient before composing the full sample.
+documented, reviewed, and locally committed stopping point. The next run should
+reorient before composing the full sample.
 
 ## Highest risks and uncertainties
 
