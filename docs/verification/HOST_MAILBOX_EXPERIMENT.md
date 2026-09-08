@@ -1,7 +1,7 @@
 # Borrowed host telemetry mailbox experiment
 
 Date: **2026-09-08**
-Status: **Ownership and backpressure probe verified; adapters not implemented**
+Status: **Ownership probe verified; adapter evidence recorded separately**
 
 ## Question and limits
 
@@ -279,7 +279,7 @@ fn publish_payload(runtime: &mut TelemetryRuntime<'_>, payload: &[u8]) {
 }
 ```
 
-## Outcome and implementation gate
+## Outcome and evidence boundary
 
 On Rust/rustdoc 1.98.0, the standalone rustdoc command passed one executable
 probe containing all three scenarios:
@@ -297,8 +297,10 @@ The extracted 185-line Rust snippet passed rustfmt 1.9.0-stable and Clippy
 60-line threshold. Its physical-line audit found zero lines above 100 columns
 and zero comment-only lines above 80 columns. No lint exception was added.
 
-Production acceptance still requires the selected external grammar, typed
-validation before publication, the echo business operation, telemetry encoding,
-complete publication-result handling, and the two-application command/telemetry
-integration cases in ADR-0019. This probe is ownership and backpressure evidence
-only.
+This probe alone does not establish the selected external grammar, validation
+before publication, echo business operation, telemetry encoding, or complete
+two-application path. Those behaviors are now exercised by the shared-source
+`host_adapters` integration target added on 2026-09-09; see the
+[traceability register](TRACEABILITY.md). This unchanged Rust probe remains
+ownership and backpressure evidence with its deliberately larger clearing
+fixture, not a replacement for adapter integration tests.

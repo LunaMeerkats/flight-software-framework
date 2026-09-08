@@ -1,98 +1,93 @@
 # Project state
 
-Last updated: **2026-09-08**
+Last updated: **2026-09-09**
 
 ## Current milestone
 
 Stages 1 and 2 and the first source-quality checkpoint are complete. Stage 3
-has verified in-memory configuration ownership and ordinary-work visibility.
-ADR-0019 now selects the host command/telemetry boundary. Its borrowed output
-mailbox has executable design evidence; no codec, adapter pair, or sample
-mission exists yet. RFF-REQ-007 remains not verified.
+has verified in-memory configuration ownership and ordinary-work visibility,
+plus a private host command/telemetry adapter pair implementing ADR-0019.
+The full v0.1 service sample, CI, and architecture review remain outstanding.
 
 ## Verified baseline
 
-- Starting commit `0ddf2b40e0bd4f7ae52e099ac9d9ec3be8c70428` is clean on
-  `codex/nightly`; its format, all-target/all-feature check, warnings-denied
-  Clippy, 83 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- Started clean at `3674863865d68ced666a1fc0b3e478b672fc79c3` on `codex/nightly`.
+  All six required pre-change commands passed with 83 tests.
 - rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98 are unchanged.
-  These versions record evidence, not an MSRV or toolchain pin.
-- Runtime configuration integration remains at
-  `9afc85686de192d66e36af950b1b63a29ca541ca`; exact requirement evidence is in
-  the traceability register. The ADR-0018 borrowing probes are unchanged.
-- The explicit host-mailbox build and standalone rustdoc probe pass: one
-  executable containing three scenarios. It proves live borrowed-mailbox reuse,
-  retained output under full storage, terminal selected-app failure with exact
-  queue clearing, and internal validation before capacity handling. It does not
-  prove the external codec, complete mission topology, or physical I/O.
-- The extracted 185-line probe passes rustfmt and warnings-denied Clippy with
-  the repository's 60-line threshold. All 22 handwritten Rust files and the
-  probe have no physical/comment-only width findings. Three existing function
-  expectations remain unchanged; no new waiver or dependency is introduced.
-- The final Cargo/Git baseline passes with the same 83 tests. The document audit
-  covers 32 Markdown files, 95 resolving links, eight requirement/trace rows,
-  25 source entries, and 53 exact test references. All 11 changed pages match
-  generated HTML content. Browser review at 1,280 pixels finds no page/table
-  overflow or heading skips; decision and experiment screenshots were inspected.
+  They record evidence, not an MSRV or toolchain pin.
+- Final formatting, all-target/all-feature check, warnings-denied Clippy,
+  96 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- The focused adapter target passes 13 tests. The executable `host-echo`
+  example prints exact command/telemetry pairs for 0, 42, and 100 percent.
+- The explicit library build, standalone mailbox rustdoc probe (one executable,
+  three scenarios), and extracted rustfmt/Clippy commands pass. Its 185-line
+  source has no physical/comment-only width findings.
+- All 27 handwritten Rust files have no width findings; three existing
+  expectations remain fulfilled. No library API, dependency, unsafe code,
+  or lint exception was added. Independent complete-diff review passed.
+- Generated document content, link/source/test-name audits, and browser layout
+  inspection pass. Screenshot capture timed out; the recorded narrow review
+  adaptation uses content comparison and DOM/layout inspection, not visual QA.
 
 ## Current architecture
 
 One unpublished, dependency-free safe-Rust library provides a finite LC1
 runtime with synchronous owned lifecycle/work callbacks; bounded FIFO routing
 and lifecycle-owned inbox dispatch; injected manual time and finite one-shot
-scheduling; bounded structured events and opt-in direct returned-work failure
-reporting; and constructor-owned optional configuration with immutable
-ordinary-work visibility and consume-once rollback.
+scheduling; bounded events and direct returned-work failure reporting; and
+constructor-owned optional configuration with immutable ordinary-work
+visibility and consume-once rollback.
 
-ADR-0019 selects mission-local two-byte EchoPercent input and matching output,
-validated before business logic. Two applications use existing messaging APIs.
-A telemetry subscriber borrows a capacity-one host mailbox, and host drain
-returns encoded bytes outside callbacks. This design has not changed library
-APIs or implemented the adapter pair.
+The private `examples/host-echo` target adds a validated two-byte command codec,
+echo and telemetry applications, two one-slot inboxes, and a host-owned borrowed
+one-record output mailbox. Ingress returns the original delivery report; the
+host selects each dispatch and drains exact telemetry bytes separately.
+`tests/host_adapters.rs` loads the same mission source. No callback performs I/O.
 
 ## Work in progress
 
-The host boundary decision and mailbox probe are complete with final baseline,
-source/document, and independent diff review. No adapter implementation has
-begun. The next run should reorient before implementing ADR-0019.
+No unfinished implementation remains. The adapter pair reached its tested,
+documented, and reviewed stopping point. Local evidence references are recorded
+with the commits; the next run should reorient before composing the full sample.
 
 ## Highest risks and uncertainties
 
-- Full host output returned as a message error means terminal telemetry-app
-  failure. Draining older output does not recover the app; no retry or delivery
-  guarantee is selected. Physical I/O and caller framing need separate budgets.
-- Large inline configuration capacities can exhaust stack resources; validator
-  effects and caller copies are outside retained snapshot bounds.
+- Full host output returns a message error and terminally fails telemetry.
+  Older output remains drainable; draining does not recover the application.
+  No retry, execution rollback, physical delivery, or stream framing is promised.
+- Report-allocation failures are preserved by source-reviewed typed paths;
+  no reproducible allocator-injection seam exists for the fixed mission.
+- Callback cardinality combines one-call source review and exact runtime/output
+  tests, not a separately instrumented business-call counter.
 - Application IDs, revisions, and instants carry no owner origin. Callbacks and
-  validators need not terminate; returned failure can follow partial mutation
-  or publication. Panic/hang containment and general fault tolerance are absent.
-- Scheduling has no recurrence, fairness, or deadline guarantee. Failure-event
-  delivery can saturate, and the runtime does not permanently own clock/events.
+  validators need not terminate; returned errors can follow partial effects.
+  Panic/hang containment and general fault tolerance remain absent.
+- Large inline configuration bounds can exhaust stack resources. Scheduling
+  offers no fairness or deadline guarantee; failure-event storage can saturate.
 - No CI currently executes the local baseline.
 
 ## Important unresolved decisions
 
-- The adapter implementation must select a small shared-source example/test
-  arrangement. The local grammar and pre-v0.1 APIs remain unfrozen.
-- Message/lifecycle configuration access, application-authored events, host
-  event drain, persistent clock/event owners, and messaging-aware scheduling
-  remain outside the implemented boundary.
-- Physical input/output, protocol evolution, MSRV, and any hardware, RTOS, or
-  `no_std` commitment remain open.
+The full sample must compose existing services with explicit owners and driver
+order. Message/lifecycle configuration access, application-authored events,
+host event drain, and messaging-aware scheduling remain outside this slice.
+Physical I/O, format evolution, MSRV, hardware, RTOS, and no_std commitments
+remain open; the local grammar and pre-v0.1 APIs are unfrozen.
 
 ## Most likely next tasks
 
-1. Implement the ADR-0019 mission-local codec and adapter pair with exact
-   malformed-input, publication, output-saturation, and end-to-end evidence.
-2. Compose a small sample mission demonstrating the existing service boundaries.
-3. Establish CI and perform the v0.1 architecture review without widening claims.
+1. Compose a documented sample mission with existing service boundaries and
+   re-demonstrate the narrow returned-work failure/event and peer-progress path.
+2. Establish CI for the baseline and executable sample.
+3. Record the v0.1 architecture review without widening unsupported claims.
 
 ## Latest run
 
-2026-09-08: Selected the host boundary decision because it resolves grammar and
-output ownership before the next Stage 3 implementation. Compared fixed byte
-records with strict ASCII and borrowed mailbox ownership with other sinks.
-The real-runtime probe validates borrowing and the full-output consequence;
-RFF-REQ-007 remains unverified. Initial/final baselines, explicit experiment,
-source-form, document, and independent complete-diff reviews pass. This is one
-local decision checkpoint on `codex/nightly`; nothing was pushed.
+2026-09-09: Implemented one bounded ADR-0019 adapter pair. Tests cover exhaustive
+percentage and identifier domains, malformed-input preservation, publication
+reports, explicit dispatch/drain, output saturation, lifecycle retention, and
+replay. Corrected shared-module child lookup after the first test build; both
+targets now compile the same source. Initial/final baselines, explicit probe,
+source-form, document-content/layout, and independent complete-diff review pass.
+Screenshot visual QA was unavailable and is not claimed. This is one bounded
+local increment; no push is authorized or performed.

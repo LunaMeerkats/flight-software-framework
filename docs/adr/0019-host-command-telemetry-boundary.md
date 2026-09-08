@@ -1,13 +1,13 @@
 # ADR-0019: Mission-local host command and telemetry boundary
 
-- Status: Accepted for the next host adapter experiment; not implemented
+- Status: Accepted; private host adapter pair implemented 2026-09-09
 - Date: 2026-09-08
 - Scope: RFF-REQ-007 grammar, validation, composition, and output ownership
 
 ## Context
 
-Stage 3 has a verified in-memory configuration boundary but no command adapter,
-telemetry adapter, or sample mission. RFF-REQ-007 requires a selected grammar
+At decision time, Stage 3 had a verified configuration boundary but no command
+adapter, telemetry adapter, or sample mission. RFF-REQ-007 requires a selected grammar
 before implementation. The first pair should exercise existing messaging
 without adding a protocol framework.
 
@@ -122,12 +122,17 @@ An I/O error after drain cannot be called a rollback of execution or delivery.
 
 ### Source placement
 
-Keep the eventual codec, applications, and composition private to one Cargo
-example under `examples/`, with descriptive child modules only for coherent
-separate responsibilities. Public-runtime integration tests under `tests/`
-must exercise the same mission source, not copied adapter implementations.
-Record the smallest explicit shared-source arrangement in the implementation
-plan. Add no library exports or new crate solely for this example.
+Keep the codec, applications, and composition private to one Cargo example.
+The implementation uses `examples/host-echo/main.rs` and `mission.rs`, with
+`mission/codec.rs` and `mission/applications.rs` separating validation from
+application/output behavior. `tests/host_adapters.rs` loads the same mission
+through one relative `#[path]` attribute. Explicit child paths in `mission.rs`
+keep ordinary example and attributed test loading on the same files; the first
+test compilation identified this lookup difference. This follows Cargo's
+multi-file target layout and Rust's module path rule. (`SRC-RUST-CARGO-LAYOUT`,
+`SRC-RUST-MODULE-PATH`) A copied test adapter could drift; moving mission code
+into the library would add an unsupported API commitment. Neither is needed.
+Add no library exports or new crate solely for this example.
 
 ## Alternatives considered
 
@@ -156,7 +161,7 @@ upstream cFS behavior is asserted. The
 host output against the existing library. It does not implement the command
 codec, two-application path, or sample mission.
 
-The next implementation must prove:
+The implementation acceptance criteria are:
 
 - exact output for percentages 0, a middle value, and 100; one business
   invocation and telemetry observation per selected command;
@@ -184,8 +189,18 @@ error in the fixed two-record mission; do not claim an injected allocation
 failure test without a separate reproducible mechanism. Full and unavailable
 destinations provide controlled publication-failure scenarios for this slice.
 
-RFF-REQ-007 remains not verified. An adapter-pair test alone will not prove the
-integrated v0.1 sample, CI, or architecture review.
+The real adapter evidence is recorded in the
+[traceability register](../verification/TRACEABILITY.md). The pure business
+function has one call site after internal validation; source review and exact
+one-message/output tests establish its cardinality without an instrumented
+business-call counter. The fixed mission's wrong-topic and no-subscriber tests
+use explicitly different topology. Existing framework fan-out tests retain
+the evidence for non-transactional partial publication; the fixed mission has
+one telemetry destination and cannot produce partial delivery itself.
+
+RFF-REQ-007 is covered at the selected caller-framed slice and returned-array
+boundary. Adapter evidence does not prove the integrated v0.1 service sample,
+CI, physical output delivery, or architecture review.
 
 ## Consequences, risks, and revisit conditions
 

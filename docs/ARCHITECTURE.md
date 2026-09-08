@@ -123,10 +123,10 @@ fault tolerance.
 - [ADR-0018](adr/0018-configuration-aware-work-context.md) integrates one
   optional table owned at runtime construction with immutable configuration
   visibility through every existing ordinary-work path.
-- [ADR-0019](adr/0019-host-command-telemetry-boundary.md) selects the next
+- [ADR-0019](adr/0019-host-command-telemetry-boundary.md) implements the private
   mission-local host adapter pair: a validated two-byte echo command, matching
   telemetry, and a borrowed capacity-one host mailbox drained outside dispatch.
-  This is a decision with ownership-probe evidence, not implemented adapters.
+  The executable example and integration tests use the same mission source.
 
 ## Current implementation boundary
 
@@ -248,6 +248,23 @@ revision non-reuse, restart retention, no automatic error rollback, peer
 progress, event behavior, and inbox cleanup. This combined evidence verifies
 RFF-REQ-006. The borrowing probes remain language-shape evidence rather than
 runtime integration evidence.
+
+The private `examples/host-echo` mission composes two independently defined
+message applications through a static enum, with one capacity-one inbox for
+each. Its codec rejects host length, identifier, then percentage before
+publication; both application boundaries revalidate topic, used payload length,
+then value. Only a privately constructed validated percentage reaches the pure
+echo function. Ingress returns the original ordered publication report without
+dispatch. The echo callback attempts one telemetry publication and returns its
+original allocation error or incomplete report on failure.
+
+The telemetry application borrows a host-owned mailbox containing at most one
+validated percentage. Host drain returns one two-byte array outside callbacks.
+Full output retains the older record, returns a concrete rejected-value error,
+and causes terminal selected-app failure with zero remaining queued discards
+in the selected one-slot topology. Stop/restart and failure retain host output;
+drain cannot recover a failed application. The example has no callback I/O,
+automatic retry, additional library surface, or full-service sample integration.
 
 ## Alternatives kept open
 

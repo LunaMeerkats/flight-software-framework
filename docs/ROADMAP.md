@@ -133,12 +133,14 @@ automatic error rollback, peer progress, event behavior, and inbox cleanup.
 Together with the standalone transition and exhaustion tests, this verifies
 RFF-REQ-006. No schema, host loading adapter, or wire format has been selected.
 
-The next Stage 3 boundary is the command-ingest and telemetry-output host
-adapter pair. ADR-0019 selects a two-byte validated echo command and matching
-telemetry, with a borrowed capacity-one host mailbox drained outside callbacks.
-The executable mailbox probe checks ownership and full-output behavior; the
-codec, adapter pair, and sample mission remain unimplemented. Next implement
-one shared mission source with malformed-input and end-to-end evidence.
+ADR-0019 now implements the command-ingest and telemetry-output host adapter
+pair in the private `host-echo` example. The codec and two applications share
+source with integration tests covering malformed records, explicit dispatch,
+publication diagnostics, bounded host output, terminal saturation failure,
+lifecycle retention, and replay. The host-owned borrowed mailbox is drained
+outside callbacks. RFF-REQ-007 has adapter-boundary evidence; the original
+ownership probe remains separate. Next compose and document the complete
+service sample, including the narrow returned-work failure/event scenario.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission

@@ -100,14 +100,14 @@ RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
 and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
-no automatic or batch dispatch. It is not yet a sample mission. Periodic or
-messaging-aware scheduling, application-authored events, other callback event
-paths, command/telemetry boundaries, and application configuration access
-outside ordinary work remain unimplemented.
-ADR-0019 now selects a local two-byte validated echo command and matching
-telemetry, with a borrowed capacity-one host mailbox drained outside dispatch.
-The mailbox experiment checks ownership and failure behavior only; no adapter
-pair or sample mission is implemented by that decision.
+no automatic or batch dispatch. It is not yet the full v0.1 sample mission.
+Periodic or messaging-aware scheduling, application-authored events, other
+callback event paths, and application configuration access outside ordinary
+work remain unimplemented.
+The private `host-echo` example implements ADR-0019's two-byte validated echo
+command and matching telemetry. Its two applications use capacity-one inboxes
+and a borrowed capacity-one host mailbox drained outside dispatch. The same
+mission source is exercised by integration tests; no library API is added.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
 returned-work event and peer-progress evidence verifies RFF-REQ-005 and
 RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
@@ -137,6 +137,39 @@ cargo doc --workspace --all-features --no-deps
 Run rustdoc with warnings denied; in PowerShell, set
 `$env:RUSTDOCFLAGS = "-D warnings"` before the documentation command. Contributor
 guidance records the remaining structural and document checks.
+
+## Host command and telemetry example
+
+Run `cargo run --example host-echo` from the repository root. The
+[example entry point](examples/host-echo/main.rs) prints the experimental scope
+notice and processes percentages 0, 42, and 100 through the
+[shared mission source](examples/host-echo/mission.rs):
+
+```text
+command [01, 00] -> telemetry [81, 00]
+command [01, 2A] -> telemetry [81, 2A]
+command [01, 64] -> telemetry [81, 64]
+```
+
+Each input is one complete caller-framed two-byte slice: identifier `0x01`,
+then a percentage in `0..=100`. Length, identifier, and value validation precede
+publication. The host inspects the returned delivery report, explicitly
+dispatches the echo application once and the telemetry application once, then
+drains one exact `[0x81, percentage]` array. Ingress does not execute work or
+drain output. The local identifiers have no external protocol meaning.
+
+Full inboxes reject the newest delivery and preserve older messages. Full host
+output preserves the older record but returns a callback error: the telemetry
+application becomes terminal `Failed`. Draining that output does not recover
+the application. Normal example execution drains between commands. No retry,
+physical delivery, stream framing, authentication, or execution rollback is
+promised. Diagnostic stdout writes occur after drain and outside callbacks;
+a write error ends the host example without undoing execution.
+
+`cargo test --test host_adapters` exercises these adapters through the public
+runtime. This bounded command/telemetry demonstration does not integrate time,
+configuration, scheduling, or failure events into the full v0.1 sample. The
+sample, CI, and architecture review remain separate release gates.
 
 ## Start here
 

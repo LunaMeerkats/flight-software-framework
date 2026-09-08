@@ -38,6 +38,12 @@ translate NASA C source.
   integration tests, including returned-work event reporting and saturation,
   plus standalone and runtime-integrated configuration validation, revision,
   visibility, retention, and consume-once rollback tests.
+- `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
+  `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
+  children own validation and application/output behavior. The integration
+  target `tests/host_adapters.rs` loads that same mission through one explicit
+  `#[path]`; explicit child paths keep both target forms identical, avoiding
+  copied adapters or new library exports.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -70,6 +76,11 @@ relative Markdown links resolve, inspect changed rendered documents, audit
 handwritten Rust physical and comment-only line widths, and review the complete
 diff. Document any justified adaptation before treating it as the baseline.
 Never report a check as passing unless it completed successfully.
+
+When changing the host adapters, also run `cargo test --test host_adapters`
+and `cargo run --example host-echo`. The former exercises the exact shared
+mission source; the latter checks the host entry point and observable output.
+The example is not the full v0.1 service sample or a physical delivery guarantee.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

@@ -6,10 +6,26 @@ Access date for the source-quality policy checkpoint: **2026-08-23**.
 
 Access date for the host command/telemetry decision: **2026-09-08**.
 
+Access date for shared example/test source placement: **2026-09-09**.
+
 Only public primary sources are used below. “Adopt” means adopting a problem
 boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
+
+## SRC-RUST-MODULE-PATH — Explicit shared module source
+
+- Title: Modules — The Rust Reference, module source filenames and path attribute
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/reference/items/modules.html#the-path-attribute>
+- Version: stable documentation accessed 2026-09-09; compiled on rustc 1.98.0
+- Informed: an out-of-line module's explicit path is relative to the containing
+  source file; descriptive module files can have children without `mod.rs`.
+- Local treatment: adopt one explicit integration-test path to the private
+  example mission and explicit child paths to preserve lookup in both targets.
+  Compile both forms; the first test build exposed implicit child lookup drift.
+  Reject a copied adapter, generated source, new library export, or extra crate
+  solely for sharing this mission. This is source placement, not a runtime layer.
 
 ## SRC-RUST-CELL — Rust standard-library copied interior state
 
@@ -254,13 +270,14 @@ code. Any future source reuse must record provenance and licence obligations.
 - Title: Package Layout — The Cargo Book
 - Organisation: The Rust Project
 - Source: <https://doc.rust-lang.org/cargo/guide/project-layout.html>
-- Version: stable Cargo documentation accessed 2026-08-23
+- Version: stable Cargo documentation accessed 2026-08-23; multi-file example
+  placement rechecked 2026-09-09
 - Informed: Cargo assigns conventional locations to library, binary, example,
   benchmark, and integration-test targets and documents target/module naming
   conventions.
-- Local treatment: adopt the standard single-package layout already present;
-  add no crate or directory until an independently coherent boundary requires
-  it.
+- Local treatment: adopt the standard single-package layout and the multi-file
+  `examples/host-echo/main.rs` target with descriptive `snake_case` modules.
+  Retain existing test target names; add no crate solely for mission sharing.
 
 ## SRC-RUST-API-GUIDELINES — Rust API naming and documentation guidance
 

@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-09-08**
+Last reviewed: **2026-09-09**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -137,9 +137,11 @@ and percentage `0..=100`, checked in length/identifier/value order before
 publication or business logic. Matching telemetry uses identifier `0x81` and
 the same percentage. A capacity-one host mailbox separates application
 dispatch from host drain/encoding. Its returned full error uses existing
-terminal failure semantics. The decision and ownership probe do not implement
-the adapter pair or verify RFF-REQ-007. The requirement and v0.1 sample gate
-remain unchanged; the ADR defines a local experiment, not a broad Rust API.
+terminal failure semantics. The private `host-echo` example now implements
+these adapters with shared-source integration evidence for RFF-REQ-007 at the
+selected local slice/returned-array boundary. The full v0.1 sample gate remains
+unchanged: it must still compose all required services in one demonstration.
+The original ownership probe alone does not establish adapter correctness.
 
 Do not use an implementation's accidental behavior to settle these parameters
 after the fact.
