@@ -127,6 +127,9 @@ fault tolerance.
   mission-local host adapter pair: a validated two-byte echo command, matching
   telemetry, and a borrowed capacity-one host mailbox drained outside dispatch.
   The executable example and integration tests use the same mission source.
+- [ADR-0020](adr/0020-messaging-work-failure-events.md) adds opt-in failure
+  reporting after messaging-owned ordinary work finishes lifecycle commitment
+  and selected-inbox clearing, retaining the exact error and discard count.
 
 ## Current implementation boundary
 
@@ -149,7 +152,7 @@ does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The
 runtime has no automatic dispatch, general service context, or sample mission.
 Its ordinary lifecycle/work operations emit no events; the opt-in returned-work
-integration below is the only event-reporting operation.
+operations below provide failure reporting.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -204,6 +207,18 @@ work error and an optional `FailureEventAttempt` containing the exact event and
 the rejected event for explicit caller handling; it neither retries nor
 prevents later peer work once the operation returns. The runtime borrows rather
 than permanently owns the clock and queue.
+
+`MessagingRuntime::work_with_failure_event` first delegates through its own
+`work` operation. A returned application error commits `Failed` and clears the
+selected inbox before event reporting reads the clock. The existing
+`MessagingOperationError<RuntimeWorkEventError<...>>` preserves the exact
+discard count, original work error, and optional event attempt. A shared private
+constructor keeps direct and messaging-owned event fields and saturation
+semantics identical; it does not own lifecycle or queue cleanup. Successful
+work and lifecycle rejection produce no event or clock read. Configuration
+and peer queues retain ordinary messaging-work behavior. The clock and event
+queue remain caller-owned, and neither inner runtime nor bus gains mutable
+public access.
 
 `WorkSchedule` separately owns a fixed finite sequence of one-shot
 `ScheduledWork` items. Construction requires nondecreasing elapsed instants, so
@@ -284,8 +299,8 @@ automatic retry, additional library surface, or full-service sample integration.
 
 - The pre-v0.1 application surface has separate narrow contexts: ordinary work
   sees optional configuration, while message dispatch sees publication only.
-  Lifecycle callbacks remain context-free. The opt-in failure-event method
-  borrows services for one direct work operation but provides no general
+  Lifecycle callbacks remain context-free. The opt-in failure-event methods
+  borrow services for one ordinary work operation but provide no general
   application service-context shape. A later shared context could still cause
   API churn.
 - A returned application callback error may follow partial application-internal
@@ -302,10 +317,12 @@ automatic retry, additional library surface, or full-service sample integration.
   be non-monotonic when combined. The direct failure path captures one supplied
   clock, but explicit standalone events can still use arbitrary timestamps;
   FIFO remains emission order rather than timestamp sorting.
-- Direct failure-event reporting is opt-in and applies only to returned work
+- Failure-event reporting is opt-in and applies only to returned ordinary-work
   errors. Its timestamp is captured after `Failed` is committed, represents
   framework observation rather than an application-internal fault instant, and
   leaves a caller-owned event copy outside the queue's retained-record bound.
+  The messaging-owned path also finishes selected-inbox clearing before that
+  observation. Message dispatch and scheduled work do not emit failure events.
 - A work schedule cannot detect an identity from another same-shaped runtime or
   an instant from another clock origin. It retains consumed one-shot items until
   drop, has no periodic or reconfiguration policy, and currently schedules only

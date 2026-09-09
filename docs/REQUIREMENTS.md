@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-09-09**
+Last reviewed: **2026-09-10**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -121,8 +121,9 @@ public APIs. Accepted project decisions now settle:
   one-shot scheduled-work, equal-time ordering, and replay boundary in
   [ADR-0015](adr/0015-caller-driven-scheduled-work.md);
 - the RFF-REQ-005 and RFF-REQ-008 direct cooperative returned-work failure-event
-  boundary in
-  [ADR-0016](adr/0016-returned-work-failure-events.md); and
+  boundary in [ADR-0016](adr/0016-returned-work-failure-events.md), extended to
+  messaging-owned ordinary work with exact inbox cleanup in
+  [ADR-0020](adr/0020-messaging-work-failure-events.md); and
 - RFF-REQ-006 revision and rollback behavior in
   [ADR-0005](adr/0005-configuration-revisions-and-rollback.md), with its
   standalone bounded snapshot core in

@@ -142,6 +142,13 @@ outside callbacks. RFF-REQ-007 has adapter-boundary evidence; the original
 ownership probe remains separate. Next compose and document the complete
 service sample, including the narrow returned-work failure/event scenario.
 
+ADR-0020 adds the prerequisite opt-in failure-event operation through the
+messaging owner. It completes ordinary-work lifecycle commitment and exact
+selected-inbox clearing before reading the borrowed clock and attempting one
+event, retaining the existing nested error types. The full sample still
+needs explicit service ownership and driver order; messaging-aware scheduling
+remains a separate bounded integration.
+
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission
 re-demonstration of the narrow RFF-REQ-008 behavior.

@@ -12,6 +12,8 @@ use std::fmt;
 use crate::application_messaging::{
     ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
 };
+use crate::clock::Clock;
+use crate::events::EventQueue;
 use crate::lifecycle::{ApplicationId, ApplicationState, LifecycleError};
 use crate::messaging::{
     InboxAccessError, Message, MessageBus, MessageBusCreateError, PublishError, PublishReport,
@@ -21,6 +23,7 @@ use crate::runtime::{
     Application, RunningCallbackError, Runtime, RuntimeConfigurationError, RuntimeRestartError,
     RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
+use crate::runtime_events::RuntimeWorkEventError;
 
 /// The reason a runtime could not take ownership of a message topology.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -418,6 +421,49 @@ impl<
                 Err(MessagingOperationError::without_clearing(error))
             }
         }
+    }
+
+    /// Runs one work callback with inbox cleanup and opt-in failure reporting.
+    ///
+    /// Delegates first to [`Self::work`]. A returned application error commits
+    /// terminal [`ApplicationState::Failed`] and clears only the selected
+    /// inbox before reading `clock` once and attempting one bounded event.
+    /// The event has the same source, severity, identifier, and timestamp
+    /// semantics as [`Runtime::work_with_failure_event`].
+    ///
+    /// Success and lifecycle rejection read no clock and emit nothing. Queue
+    /// saturation retains older events and returns the rejected event without
+    /// retry. The caller retains ownership of the clock and event queue.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the exact work error, discarded-delivery count, and optional
+    /// failure-event attempt inside [`MessagingOperationError`]. Only a
+    /// returned application error clears deliveries or attempts an event.
+    pub fn work_with_failure_event<EventId, C>(
+        &mut self,
+        application_id: ApplicationId,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Result<
+        ApplicationState,
+        MessagingOperationError<RuntimeWorkEventError<A::WorkError, EventId>>,
+    >
+    where
+        EventId: Copy,
+        C: Clock + ?Sized,
+    {
+        self.work(application_id)
+            .map_err(|error| MessagingOperationError {
+                operation_error: RuntimeWorkEventError::from_work_error(
+                    error.operation_error,
+                    failure_event_identifier,
+                    clock,
+                    event_queue,
+                ),
+                discarded_deliveries: error.discarded_deliveries,
+            })
     }
 
     /// Stops a running application and clears its inbox before returning.

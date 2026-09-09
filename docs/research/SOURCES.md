@@ -13,6 +13,13 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+The **2026-09-10** messaging-owned work failure-event checkpoint uses only
+existing repository contracts: ADR-0011's inbox cleanup, ADR-0016's event
+attempt, and ADR-0018's ordinary-work configuration visibility.
+[ADR-0020](../adr/0020-messaging-work-failure-events.md) records their composition
+through the existing messaging owner. No new external research, source reuse,
+or upstream behavior claim is introduced.
+
 ## SRC-RUST-MODULE-PATH — Explicit shared module source
 
 - Title: Modules — The Rust Reference, module source filenames and path attribute

@@ -1,107 +1,92 @@
-# Bounded host command and telemetry adapters
+# Messaging-owned work failure events
 
-Date: **2026-09-09**
+Date: **2026-09-10**
 Status: **Complete**
 
 ## Objective and context
 
-Implement the ADR-0019 two-byte echo command and telemetry adapter pair using
-the existing messaging runtime. Its grammar and borrowed output ownership
-already have a decision and executable probe. The clean starting commit is
-`3674863865d68ced666a1fc0b3e478b672fc79c3` on `codex/nightly`. All six baseline
-commands pass with 83 tests on unchanged rustc/cargo 1.98.0, rustfmt
-1.9.0-stable, and Clippy 0.1.98. Existing source policy needs no cleanup.
+Expose the existing cooperative returned-work failure event through the
+messaging owner while preserving exact selected-inbox clearing. The full
+service sample cannot currently reach `Runtime::work_with_failure_event` or
+scheduled work after the runtime moves into `MessagingRuntime`. Its private
+owner is deliberate: mutable escape would bypass lifecycle/inbox coordination.
+This run implements only the event prerequisite; scheduling and the combined
+sample remain separate bounded work.
+
+The starting tree is clean on `codex/nightly` at
+`4cb621aa50708fbc823dd50f110db7404a461889`. All six required baseline commands
+pass with 96 tests on unchanged rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and
+Clippy 0.1.98. The source-quality policy is already encoded.
 
 ## Acceptance criteria
 
-- Decode exact command length, identifier, and percentage in that order before
-  publication; reject malformed input without changing retained state.
-- Revalidate internal topic, one-byte length, and percentage before business
-  logic or output occupancy; preserve concrete errors and ordered reports.
-- Compose independently defined echo and telemetry applications with two
-  capacity-one inboxes and a borrowed capacity-one host output mailbox.
-- Keep ingress, each dispatch, and consume-once host drain separate; prove
-  exact output, slot reuse, saturation, lifecycle retention, and replay.
-- Keep full-output failure terminal with exact selected-inbox clearing and
-  old host output retained. Do not retry implicitly or claim execution rollback.
-- Share actual mission source between the executable example and integration
-  tests. Add no library API, dependency, unsafe code, callback I/O, thread,
-  general protocol, or complete v0.1 sample claim.
-- Pass the baseline, focused tests, example execution, ADR-0019 experiment,
-  source-form and complete diff review, link audit, and document rendering.
+- Add one opt-in `MessagingRuntime::work_with_failure_event` that delegates to
+  the existing messaging work operation before reporting an application error.
+- Preserve the order: callback return, terminal `Failed`, selected-inbox
+  clearing, one clock read, one bounded event attempt. Preserve peer queues.
+- Reuse `RuntimeWorkEventError` inside `MessagingOperationError`, retaining the
+  complete work error, optional event attempt, and exact discarded count.
+- Share the internal event construction with the direct runtime method, with
+  no new public constructor, error type, mutable runtime escape, or dependency.
+- Success and lifecycle rejection read no clock and emit nothing. Saturation
+  retains old events and returns the rejected event without retry or recovery.
+- Verify later peer work and dispatch, configuration visibility/history,
+  unknown/registered/stopped/failed suppression, and original error sources.
+- Pass baseline checks, focused integration tests, source/diff review, link and
+  traceability audits, and changed rendered-document review.
 
-## Components and source placement
+## Components and verification
 
-Use Cargo's multi-file example convention at `examples/host-echo/main.rs`.
-`mission.rs` owns composition and ingress; its `codec.rs` and `applications.rs`
-children separate record validation from application/output behavior. Mission
-items remain private to their target, with crate visibility where needed.
-`tests/host_adapters.rs` loads `mission.rs` with one explicit relative `#[path]`,
-exercising the same code without a library export, copied implementation,
-generated source, or extra crate. The Rust Reference documents the relative
-path rule; Cargo documents multi-file targets. An initial test compilation
-exposed different child lookup under the attributed parent. Explicit child
-paths in `mission.rs` keep both target forms on the same two child files.
+`src/messaging_runtime.rs` owns the new operation because it owns inbox
+cleanup. `src/runtime_events.rs` keeps the single crate-private event-reporting
+implementation. `tests/messaging_work_events.rs` provides public-API service
+interaction evidence. ADR-0020 records alternatives and exact operation order;
+README, architecture, roadmap, traceability, project state, source register,
+and contributor guidance record the resulting scope.
 
-Update ADR-0019, README, architecture, requirements, roadmap, traceability,
-project state, source register, and AGENTS.md. Review aids stay under ignored
-`target/nightly-2026-09-09`; no new checker gate is adopted.
-
-## Verification and limits
-
-Run the six AGENTS.md baseline commands serially with rustdoc warnings denied,
-plus `cargo test --test host_adapters`, `cargo run --example host-echo`, and
-the explicit build, standalone rustdoc, extracted rustfmt and Clippy commands
-in the host-mailbox experiment. Audit all handwritten Rust widths and inspect
-changed rendered documents.
-
-The normal topology cannot deliver a wrong topic or have an absent command
-subscriber; tests may explicitly compose alternate topology for those cases.
-The one-byte message bound rejects oversized internal payloads at construction.
-No allocator-injection seam exists: review error preservation in source and
-exercise full/unavailable reports; do not claim injected allocation failure.
-Business-call cardinality combines the single-call source path with exact
-one-message/output tests, without adding operational instrumentation.
+Run all six AGENTS.md baseline commands with rustdoc warnings denied and
+`cargo test --test messaging_work_events`. Host adapters and ADR-0018/0019
+experiments are unchanged, so their extra commands are not required. Review
+aids remain ignored under `target/nightly-2026-09-10`; no checker gate is added.
 
 ## Risks and safe stopping point
 
-The returned two-byte array is the verified output boundary. Printing it in
-the host example is a diagnostic outside callbacks, with no retry or delivery
-guarantee. The grammar is local and unfrozen. The full service sample, CI, and
-v0.1 architecture review remain separate work.
+Only cooperative returned work errors are covered. Panics, hangs, clock
+failures, message-callback events, scheduled events, and physical delivery are
+outside this increment. Event storage can saturate. Existing owner-origin and
+application partial-effect limitations remain. The full sample still needs
+messaging-aware scheduling and an explicit mission driver.
 
-Stop after the adapter pair is tested, documented, reviewed, and committed
-locally. If implementation cannot preserve the baseline, remove only this
-run's incomplete implementation safely and retain useful findings. No push.
+Stop at one tested, documented, reviewed local commit on `codex/nightly`.
+Preserve unexpected changes; if the implementation cannot pass, remove only
+this run's incomplete edits safely and retain useful evidence. Do not push.
 
 ## Outcome
 
-Implemented the private codec, echo and telemetry applications, fixed mission
-composition, ingress adapter, and host drain. Thirteen integration tests share
-the example source and cover every valid percentage, all unsupported command
-identifiers, all out-of-range percentages, validation precedence and retained
-state, explicit dispatch, original reports, saturation, lifecycle retention,
-and replay. The first test build exposed child-module lookup under `#[path]`;
-explicit child paths resolved it without changing the runtime library.
+Implemented the one opt-in messaging-owned work event operation. It delegates
+through existing work before the shared event policy, preserving exact inbox
+cleanup, concrete errors, configuration history, and peer progress. Six focused
+integration tests pass. The full baseline passes 102 tests, warnings-denied
+Clippy/rustdoc, formatting, all-target check, and Git whitespace inspection.
+The host adapters and ADR-0018/0019 probes are unchanged and were not separately
+rerun; the full test suite includes all 13 existing adapter tests.
 
-The required baseline passes with 96 tests. Focused adapter tests, example
-execution, library build, standalone mailbox rustdoc, extracted rustfmt and
-warnings-denied Clippy pass. The unchanged 185-line probe passes its source
-width audit. All 27 handwritten Rust files have no physical/comment-only width
-findings; the three existing expectations remain unchanged and fulfilled.
-Independent full implementation/test/diff review found no remaining defect.
-One stale experiment status was corrected during the document review.
+Independent complete-diff review found no actionable defect. All 28 handwritten
+Rust files meet physical/comment-only width limits; the three existing reasoned
+expectations remain unchanged and fulfilled. The document audit passes for
+33 Markdown files, 107 relative links, eight requirement rows, 26 sources, and
+66 exact test references. A temporary audit initially misclassified a method
+name as a test reference; explicit invocation notation corrected the document
+ambiguity without changing the checker or adopting a new gate.
 
-Generated-HTML source hashes, complete normalized content, headings, lists,
-code, and tables match changed documents. The link/source/traceability audit
-passes. Browser inspection at 1,280 pixels checks headings and page/table
-overflow. Screenshot capture failed through both documented APIs with
-`Page.captureScreenshot` timeouts. The narrow document-review adaptation is
-generated-content comparison plus browser DOM/layout inspection; screenshot
-visual QA is not claimed. No browser safety policy was bypassed.
+All ten changed documents match generated content, heading/list/code/table
+structure, and source hashes. Browser layout inspection at 1,280 pixels found
+no page/table overflow, heading gaps, or console warnings. A screenshot of the
+new decision's opening viewport was also inspected successfully; complete-page
+screenshot coverage is not claimed. Review aids remain ignored under the run
+directory. No document-review adaptation or browser policy bypass was needed.
 
-The stopping point is this verified adapter pair, implemented and tested in
-local commit `2c337f311da7d62230d626bd10c7fbe1383b586e`. The final audit covers
-32 Markdown files, 99 resolving links, eight requirement rows, 26 sources,
-60 exact test references, and 11 changed rendered documents. The full service
-sample, CI, and v0.1 architecture review remain separate. Nothing is pushed.
+The implementation reaches its tested and reviewed stopping point. The local
+commit hash is recorded in the subsequent evidence update. Scheduling through
+the messaging owner remains the likely next bounded increment. Nothing is
+pushed.

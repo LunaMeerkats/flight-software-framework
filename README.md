@@ -64,6 +64,15 @@ cover exact fields, the error-source chain, single emission, lifecycle
 suppression, saturation, retry, and peer progress. `Runtime` still does not
 permanently own the clock or event queue.
 
+`MessagingRuntime::work_with_failure_event` adds the same opt-in reporting to
+ordinary work under the inbox owner. It delegates to `MessagingRuntime::work`
+first, so terminal failure and exact selected-inbox clearing finish before the
+single clock read and event attempt. The existing `MessagingOperationError`
+retains the discard count around the existing `RuntimeWorkEventError`; success
+and lifecycle rejection emit nothing. Direct and messaging-owned operations
+share event construction while preserving separate ownership responsibilities.
+This does not add events to message dispatch or scheduled work.
+
 A `WorkSchedule` copies a finite agenda of one-shot application work items in
 nondecreasing elapsed-time order. `Runtime::run_next_scheduled_work` reads an
 injected clock once while an item remains, waits without mutation before its
@@ -197,6 +206,7 @@ sample, CI, and architecture review remain separate release gates.
 - [Bounded configuration snapshot decision](docs/adr/0017-bounded-configuration-snapshots.md)
 - [Configuration-aware work-context decision](docs/adr/0018-configuration-aware-work-context.md)
 - [Host command/telemetry boundary decision](docs/adr/0019-host-command-telemetry-boundary.md)
+- [Messaging-owned work failure-event decision](docs/adr/0020-messaging-work-failure-events.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

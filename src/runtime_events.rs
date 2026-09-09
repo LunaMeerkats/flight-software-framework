@@ -140,11 +140,26 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
         EventId: Copy,
         C: Clock + ?Sized,
     {
-        let work_error = match self.work(application_id) {
-            Ok(state) => return Ok(state),
-            Err(error) => error,
-        };
+        self.work(application_id).map_err(|work_error| {
+            RuntimeWorkEventError::from_work_error(
+                work_error,
+                failure_event_identifier,
+                clock,
+                event_queue,
+            )
+        })
+    }
+}
 
+impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
+    // Owners finish their lifecycle and queue cleanup before reporting here.
+    // Keeping construction shared prevents event semantics drifting by owner.
+    pub(crate) fn from_work_error<C: Clock + ?Sized>(
+        work_error: RuntimeWorkError<E>,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Self {
         let failure_event_attempt = match &work_error {
             RuntimeWorkError::Lifecycle(_) => None,
             RuntimeWorkError::Application { application_id, .. } => {
@@ -159,9 +174,9 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
             }
         };
 
-        Err(RuntimeWorkEventError {
+        Self {
             work_error,
             failure_event_attempt,
-        })
+        }
     }
 }

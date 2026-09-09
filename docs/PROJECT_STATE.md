@@ -1,98 +1,90 @@
 # Project state
 
-Last updated: **2026-09-09**
+Last updated: **2026-09-10**
 
 ## Current milestone
 
 Stages 1 and 2 and the first source-quality checkpoint are complete. Stage 3
-has verified in-memory configuration ownership and ordinary-work visibility,
-plus a private host command/telemetry adapter pair implementing ADR-0019.
-The full v0.1 service sample, CI, and architecture review remain outstanding.
+has verified configuration and host adapters. ADR-0020 now adds cooperative
+failure-event reporting through the messaging owner as one prerequisite for
+the combined service sample. Messaging-aware scheduling, the full sample, CI,
+and the v0.1 architecture review remain outstanding.
 
 ## Verified baseline
 
-- Started clean at `3674863865d68ced666a1fc0b3e478b672fc79c3` on `codex/nightly`.
-  All six required pre-change commands passed with 83 tests.
-- Adapter implementation and test evidence are committed locally at
-  `2c337f311da7d62230d626bd10c7fbe1383b586e`; RFF-REQ-007 is verified only at
-  the selected caller-framed slice/returned-array boundary.
-- rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98 are unchanged.
-  They record evidence, not an MSRV or toolchain pin.
+- Started clean on `codex/nightly` at
+  `4cb621aa50708fbc823dd50f110db7404a461889`; all six initial checks passed
+  with 96 tests. Toolchain unchanged: rustc/cargo 1.98.0, rustfmt
+  1.9.0-stable, Clippy 0.1.98. These are evidence, not an MSRV or pin.
 - Final formatting, all-target/all-feature check, warnings-denied Clippy,
-  96 tests, warnings-denied rustdoc, and Git whitespace checks pass.
-- The focused adapter target passes 13 tests. The executable `host-echo`
-  example prints exact command/telemetry pairs for 0, 42, and 100 percent.
-- The explicit library build, standalone mailbox rustdoc probe (one executable,
-  three scenarios), and extracted rustfmt/Clippy commands pass. Its 185-line
-  source has no physical/comment-only width findings.
-- All 27 handwritten Rust files have no width findings; three existing
-  expectations remain fulfilled. No library API, dependency, unsafe code,
-  or lint exception was added. Independent complete-diff review passed.
-- Generated document content, link/source/test-name audits, and browser layout
-  inspection pass. Screenshot capture timed out; the recorded narrow review
-  adaptation uses content comparison and DOM/layout inspection, not visual QA.
-  Audits cover 32 Markdown files, 99 links, eight requirement rows, 26 sources,
-  60 exact test references, and all 11 changed documents at 1,280 pixels.
+  102 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- `cargo test --test messaging_work_events` passes six new tests for exact
+  clearing/errors/events, lifecycle suppression, saturation, configuration
+  history, and later peer work/dispatch. Existing direct-runtime event tests
+  continue to pass after sharing the private reporting implementation.
+- Independent complete-diff review found no actionable defect. All 28 Rust
+  files meet physical/comment-only width limits; three existing expectations
+  remain fulfilled. No dependency, unsafe code, public error type, or lint
+  waiver was added. Unchanged host adapters and ADR-0018/0019 experiments were not
+  separately rerun; workspace tests still include all 13 adapter tests.
+- Document audits pass: 33 Markdown files, 107 links, eight requirement rows,
+  26 sources, 66 exact test references, and ten changed content comparisons.
+  Browser heading/overflow inspection passes at 1,280 pixels with no console
+  warnings; the new decision's opening screenshot was inspected successfully.
 
 ## Current architecture
 
 One unpublished, dependency-free safe-Rust library provides a finite LC1
-runtime with synchronous owned lifecycle/work callbacks; bounded FIFO routing
-and lifecycle-owned inbox dispatch; injected manual time and finite one-shot
-scheduling; bounded events and direct returned-work failure reporting; and
-constructor-owned optional configuration with immutable ordinary-work
-visibility and consume-once rollback.
+runtime with synchronous lifecycle/work callbacks, bounded lifecycle-owned
+inbox dispatch, injected manual time and finite one-shot scheduling, bounded
+events, and constructor-owned optional configuration with immutable
+ordinary-work visibility and consume-once rollback. The private `host-echo`
+example provides the validated caller-framed command/telemetry adapter pair.
 
-The private `examples/host-echo` target adds a validated two-byte command codec,
-echo and telemetry applications, two one-slot inboxes, and a host-owned borrowed
-one-record output mailbox. Ingress returns the original delivery report; the
-host selects each dispatch and drains exact telemetry bytes separately.
-`tests/host_adapters.rs` loads the same mission source. No callback performs I/O.
+`MessagingRuntime::work_with_failure_event` delegates through its existing
+work operation. Terminal failure and exact selected-inbox clearing complete
+before one clock read and bounded event attempt. The nested existing errors
+retain the work error, discard count, event, and emission outcome. Both work
+owners share event construction; no mutable owner escape is exposed.
 
 ## Work in progress
 
-No unfinished implementation remains. The adapter pair reached its tested,
-documented, reviewed, and locally committed stopping point. The next run should
-reorient before composing the full sample.
+No unfinished implementation remains. The messaging-owned work event operation
+has reached its tested, documented, reviewed stopping point. The local commit
+hash is recorded in the subsequent evidence update.
 
 ## Highest risks and uncertainties
 
-- Full host output returns a message error and terminally fails telemetry.
-  Older output remains drainable; draining does not recover the application.
-  No retry, execution rollback, physical delivery, or stream framing is promised.
-- Report-allocation failures are preserved by source-reviewed typed paths;
-  no reproducible allocator-injection seam exists for the fixed mission.
-- Callback cardinality combines one-call source review and exact runtime/output
-  tests, not a separately instrumented business-call counter.
-- Application IDs, revisions, and instants carry no owner origin. Callbacks and
-  validators need not terminate; returned errors can follow partial effects.
-  Panic/hang containment and general fault tolerance remain absent.
-- Large inline configuration bounds can exhaust stack resources. Scheduling
-  offers no fairness or deadline guarantee; failure-event storage can saturate.
+- Events can saturate; the caller receives the exact rejected event. Reporting
+  remains opt-in and ordinary-work-only. No callback panic/hang containment,
+  execution rollback, recovery, or guaranteed diagnostic delivery is added.
+- The full sample cannot yet use the existing finite schedule through the
+  messaging owner. Preserve inbox clearing in that separate integration.
+- Host output saturation terminally fails telemetry while retaining old output;
+  drain cannot recover it. Physical delivery and stream framing remain absent.
+- IDs, revisions, and instants do not encode owner origin; callbacks/validators
+  need not terminate. Large inline bounds can exhaust stack resources.
 - No CI currently executes the local baseline.
 
 ## Important unresolved decisions
 
-The full sample must compose existing services with explicit owners and driver
-order. Message/lifecycle configuration access, application-authored events,
-host event drain, and messaging-aware scheduling remain outside this slice.
-Physical I/O, format evolution, MSRV, hardware, RTOS, and no_std commitments
-remain open; the local grammar and pre-v0.1 APIs are unfrozen.
+Messaging-aware schedule consumption and error representation need a bounded
+decision before implementing the full sample driver. Message/lifecycle
+configuration access, application-authored events, scheduled event reporting,
+host event drain, physical I/O, MSRV, hardware, RTOS, and no_std remain open.
+The local grammar and pre-v0.1 APIs are unfrozen.
 
 ## Most likely next tasks
 
-1. Compose a documented sample mission with existing service boundaries and
-   re-demonstrate the narrow returned-work failure/event and peer-progress path.
-2. Establish CI for the baseline and executable sample.
-3. Record the v0.1 architecture review without widening unsupported claims.
+1. Integrate one-shot scheduled ordinary work through the messaging owner,
+   preserving final item consumption, original errors, and exact inbox clearing.
+2. Compose the documented combined sample with explicit ownership/driver order.
+3. Establish CI and then record the v0.1 architecture review.
 
 ## Latest run
 
-2026-09-09: Implemented one bounded ADR-0019 adapter pair. Tests cover exhaustive
-percentage and identifier domains, malformed-input preservation, publication
-reports, explicit dispatch/drain, output saturation, lifecycle retention, and
-replay. Corrected shared-module child lookup after the first test build; both
-targets now compile the same source. Initial/final baselines, explicit probe,
-source-form, document-content/layout, and independent complete-diff review pass.
-Screenshot visual QA was unavailable and is not claimed. This is one bounded
-local increment; no push is authorized or performed.
+2026-09-10: Added one opt-in messaging-owned failure-event operation and six
+public integration tests. Both initial and final Cargo baselines pass. The
+increment resolves one concrete service-composition gap and leaves scheduling
+separate. Source-form, document-content/layout, and independent complete-diff
+reviews pass. No push is authorized or performed.

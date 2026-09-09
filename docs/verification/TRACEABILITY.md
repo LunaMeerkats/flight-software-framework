@@ -72,6 +72,39 @@ CI, physical delivery, or architecture review.
 | RFF-REQ-007 | Implemented at the local caller-framed slice/returned-array boundary: private validated codec, explicit ingress report, two message applications, separate dispatch, and capacity-one host output | Preserve exact command/telemetry, malformed-input, publication, bounded-output, lifecycle, and replay evidence; integrate into the full service sample separately | `every_valid_percentage_requires_separate_dispatch_and_consume_once_drain`; `malformed_host_records_preserve_occupied_inbox_and_output_with_exact_precedence`; `internal_payload_validation_precedes_business_logic_and_full_mailbox`; `full_telemetry_destination_preserves_report_and_older_peer_delivery`; `full_host_output_preserves_older_record_and_drain_does_not_recover_failure`; `host_output_survives_stop_restart_while_queued_telemetry_is_cleared`; `identical_ordered_inputs_dispatches_and_drains_replay_identically`; `cargo test --test host_adapters` (13 passed); `cargo test --workspace --all-features` (96 passed); `cargo run --example host-echo` (documented output matched) | `2c337f311da7d62230d626bd10c7fbe1383b586e` | Verified at selected adapter boundary |
 | RFF-REQ-008 | Implemented at the selected cooperative returned-work fault boundary: the complete concrete error is preserved through its source chain, only the selected application enters terminal `Failed`, one clock-captured bounded event is attempted with explicit saturation, and a healthy peer completes later work | Preserve failed-state, original-error, event-attempt, saturation, no-duplicate, and peer-progress regressions; do not extend this verification to panics, hangs, cleanup, or other callback event paths without separate evidence | `returned_work_error_fails_only_the_selected_application`; `returned_work_error_records_clock_captured_event_and_preserves_peer_progress`; `saturated_failure_event_retains_error_and_exact_event_for_retry`; `cargo test --workspace --all-features` (83 passed) | `9afc85686de192d66e36af950b1b63a29ca541ca` | Verified |
 
+## Messaging-owned work event evidence
+
+The 2026-09-10 [ADR-0020](../adr/0020-messaging-work-failure-events.md)
+increment adds `MessagingRuntime::work_with_failure_event(...)` and six focused
+public tests. `cargo test --test messaging_work_events` passes all six;
+`cargo test --workspace --all-features` passes 102 tests. The complete required
+Cargo baseline also passes. The implementation commit is recorded after the
+validated increment is committed locally; the table above retains its earlier
+committed baselines.
+
+Additional evidence for RFF-REQ-003, RFF-REQ-005, RFF-REQ-006, and RFF-REQ-008:
+
+- `returned_work_error_clears_selected_inbox_and_preserves_peer_dispatch`
+  proves two selected queued deliveries are discarded, the exact work error
+  and recorded event are retained, and the peer later dispatches its unchanged
+  FIFO contents and completes work.
+- `saturated_event_preserves_original_error_and_exact_event_for_explicit_retry`
+  proves a full event queue preserves the older event, original error/source
+  chain, exact rejected event and timestamp, inbox cleanup, and peer work.
+- `successful_work_preserves_inboxes_without_reading_clock_or_emitting`,
+  `non_running_work_preserves_peer_inbox_and_suppresses_event_effects`, and
+  `unknown_work_preserves_all_inboxes_without_clock_or_event_effects` prove
+  success and lifecycle rejection do not cause reporting effects.
+- `failed_work_observes_active_configuration_without_automatic_rollback`
+  proves active configuration visibility during failure, retained peer
+  visibility/history, rejection, consume-once rollback, and revision non-reuse.
+
+Source review establishes cleanup-before-clock ordering. The tests assert
+post-return state, counts, and effects; they do not inspect the exclusively
+borrowed runtime during clock invocation. No message-callback or scheduled
+event behavior, full-service sample, CI result, or arbitrary fault containment
+is established by this increment.
+
 ## Evidence policy
 
 "Verified" requires all of the following:
