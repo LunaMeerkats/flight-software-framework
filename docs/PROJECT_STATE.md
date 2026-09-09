@@ -18,6 +18,8 @@ and the v0.1 architecture review remain outstanding.
   1.9.0-stable, Clippy 0.1.98. These are evidence, not an MSRV or pin.
 - Final formatting, all-target/all-feature check, warnings-denied Clippy,
   102 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- Implementation and six-test evidence are committed locally at
+  `0d1ddb81a8dd41ef8a96ffc5d7afefea3b1c12bc`.
 - `cargo test --test messaging_work_events` passes six new tests for exact
   clearing/errors/events, lifecycle suppression, saturation, configuration
   history, and later peer work/dispatch. Existing direct-runtime event tests
@@ -50,8 +52,8 @@ owners share event construction; no mutable owner escape is exposed.
 ## Work in progress
 
 No unfinished implementation remains. The messaging-owned work event operation
-has reached its tested, documented, reviewed stopping point. The local commit
-hash is recorded in the subsequent evidence update.
+has reached its tested, documented, reviewed and locally committed stopping
+point. The evidence update changes documentation only.
 
 ## Highest risks and uncertainties
 

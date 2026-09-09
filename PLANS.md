@@ -86,7 +86,21 @@ new decision's opening viewport was also inspected successfully; complete-page
 screenshot coverage is not claimed. Review aids remain ignored under the run
 directory. No document-review adaptation or browser policy bypass was needed.
 
-The implementation reaches its tested and reviewed stopping point. The local
-commit hash is recorded in the subsequent evidence update. Scheduling through
-the messaging owner remains the likely next bounded increment. Nothing is
-pushed.
+The implementation reaches its tested and reviewed stopping point in local
+commit `0d1ddb81a8dd41ef8a96ffc5d7afefea3b1c12bc`. The evidence update changes
+only this plan, project state, and traceability; implementation, tests, and
+configuration remain identical to the verified commit. Scheduling through the
+messaging owner remains the likely next bounded increment. Nothing is pushed.
+
+Temporary audit commands, run from the repository root in PowerShell, are:
+
+```text
+& target/nightly-2026-09-10/render-documents.ps1 -Phase evidence
+python target/nightly-2026-09-10/audit-documents.py evidence
+python target/nightly-2026-09-10/review-rendered-content.py evidence 4cb621a
+```
+
+The aids also ran for the precommit `validated` and `final` phases. They check
+generated content, relative links, source widths, and exact references; the
+browser review separately inspects rendered layout. These are ignored review
+artifacts, not newly adopted or permanently required checkers.

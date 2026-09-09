@@ -78,9 +78,10 @@ The 2026-09-10 [ADR-0020](../adr/0020-messaging-work-failure-events.md)
 increment adds `MessagingRuntime::work_with_failure_event(...)` and six focused
 public tests. `cargo test --test messaging_work_events` passes all six;
 `cargo test --workspace --all-features` passes 102 tests. The complete required
-Cargo baseline also passes. The implementation commit is recorded after the
-validated increment is committed locally; the table above retains its earlier
-committed baselines.
+Cargo baseline also passes. Implementation and test evidence are committed at
+`0d1ddb81a8dd41ef8a96ffc5d7afefea3b1c12bc`; the table above retains its earlier
+committed baselines. This section extends that evidence only at the new
+messaging-owned ordinary-work boundary.
 
 Additional evidence for RFF-REQ-003, RFF-REQ-005, RFF-REQ-006, and RFF-REQ-008:
 
