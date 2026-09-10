@@ -130,6 +130,9 @@ fault tolerance.
 - [ADR-0020](adr/0020-messaging-work-failure-events.md) adds opt-in failure
   reporting after messaging-owned ordinary work finishes lifecycle commitment
   and selected-inbox clearing, retaining the exact error and discard count.
+- [ADR-0021](adr/0021-messaging-owned-scheduled-work.md) shares the finite
+  clock/consumption decision across direct and messaging-owned work, retaining
+  the scheduled item, observed instant, exact error, and inbox discard count.
 
 ## Current implementation boundary
 
@@ -230,14 +233,25 @@ an error includes the exact lifecycle or application work error. Identical
 manual scenarios reproduce work order, lifecycle outcomes, and clock-captured
 event timestamps, verifying RFF-REQ-004 at this finite boundary.
 
+`MessagingRuntime::run_next_scheduled_work` uses the same private schedule
+decision, then delegates to `MessagingRuntime::work`. A returned work error
+commits terminal failure and clears only the selected inbox. The existing
+`MessagingOperationError<ScheduledWorkError<...>>` preserves the discard count
+alongside the consumed item, observed instant, and exact work error. Success
+does not dispatch queued messages; lifecycle rejection clears no inbox. All
+attempted items are consumed once, so a due peer remains reachable on the next
+caller request. Configuration follows the same ordinary-work visibility and
+retention rules. No mutable owner access or scheduled event behavior is added.
+
 This combined routing, lifecycle-availability, and application-dispatch
 evidence verifies RFF-REQ-003. The positional configuration limitation remains:
 mission composition must associate each capacity and topic set with the intended
 registration position. The runtime-event integration plus existing bounded
-queue evidence verifies RFF-REQ-005 and RFF-REQ-008 only for direct cooperative
-returned work errors. There is still no automatic or batch message dispatch,
+queue evidence verifies RFF-REQ-005 and RFF-REQ-008 for opt-in direct and
+messaging-owned cooperative ordinary-work errors. There is still no automatic
+or batch message dispatch,
 periodic or dynamic work generation, multi-application fairness policy,
-messaging-aware scheduled work, application-authored event API, other callback
+application-authored event API, other callback
 event path, or host event drain adapter.
 
 `ConfigurationTable<E, MAX_BYTES>` separately owns an active immutable byte
@@ -325,9 +339,9 @@ automatic retry, additional library surface, or full-service sample integration.
   observation. Message dispatch and scheduled work do not emit failure events.
 - A work schedule cannot detect an identity from another same-shaped runtime or
   an instant from another clock origin. It retains consumed one-shot items until
-  drop, has no periodic or reconfiguration policy, and currently schedules only
-  through `Runtime::work`; messaging-aware scheduling would need to preserve
-  inbox clearing through `MessagingRuntime`.
+  drop, has no periodic or reconfiguration policy, and schedules ordinary work
+  only. Each owner retains its own work behavior; the messaging owner preserves
+  exact selected-inbox clearing.
 - Direct standalone routing-core construction can still be paired with a
   same-shaped foreign identity issuer or incomplete runtime topology; lifecycle
   guarantees apply only to `MessagingRuntime`.

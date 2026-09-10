@@ -11,8 +11,8 @@ dispatch together verify RFF-REQ-003. The clock, one-item due-work operation,
 stable equal-time ordering, and replayed work/lifecycle/event-timestamp trace
 verify RFF-REQ-004. The runtime-generated event, bounded queue, failed state,
 preserved work error, saturation outcome, and later peer work verify RFF-REQ-005
-and RFF-REQ-008 only at the direct cooperative returned-work boundary. The
-standalone table and runtime work-context evidence together verify RFF-REQ-006
+and RFF-REQ-008 at opt-in direct and messaging-owned ordinary-work boundaries.
+The standalone table and runtime work-context evidence verify RFF-REQ-006
 at the bounded in-memory ordinary-work boundary.
 Implementation and verification state remain separate so planned evidence is
 not represented as completed behavior.
@@ -105,6 +105,41 @@ post-return state, counts, and effects; they do not inspect the exclusively
 borrowed runtime during clock invocation. No message-callback or scheduled
 event behavior, full-service sample, CI result, or arbitrary fault containment
 is established by this increment.
+
+## Messaging-owned scheduled-work evidence
+
+[ADR-0021](../adr/0021-messaging-owned-scheduled-work.md) extends the finite
+RFF-REQ-004 boundary through the messaging owner. It preserves RFF-REQ-003
+selected-inbox cleanup and RFF-REQ-006 ordinary-work configuration visibility.
+The implementation and focused evidence are part of this ADR-0021 increment.
+The full required Cargo baseline passes 109 tests, and
+`cargo test --test messaging_scheduled_work` passes seven focused tests:
+
+- `complete_waiting_and_due_work_observe_clock_bounds_and_preserve_inboxes`
+  verifies zero reads when complete, one per pending decision, inclusive work,
+  final consumption, and retained inboxes on success.
+- `equal_time_and_overdue_items_follow_caller_order_one_per_call` verifies
+  stable configured order and one due or overdue callback per caller request.
+- `lifecycle_rejections_consume_once_and_leave_due_peer_available` covers
+  registered/stopped/failed callback suppression, zero discards, and later work.
+- `unknown_identity_is_consumed_without_touching_owned_inboxes` preserves the
+  exact unknown-identity error, both full inboxes, and later peer work.
+- `returned_failure_clears_exact_selected_inbox_and_preserves_peer_fifo`
+  observes terminal failure, exactly two discards, nested original error
+  sources, consumed item/observed time, and later peer work plus FIFO dispatch.
+- `scheduled_failure_retains_active_configuration_and_consume_once_rollback`
+  checks active revision/bytes on failed and peer work, rejected replacement,
+  retained history, and explicit consume-once rollback visibility.
+- `identical_manual_readings_and_caller_order_replay_the_same_trace` compares
+  successful outcomes, work/configuration observations, final states, and
+  clock-read counts from fresh owners with identical ordered manual readings.
+
+The existing seven direct scheduled-work tests remain regression evidence for
+the shared private timing/consumption decision. These new tests use a controlled
+counting clock and do not claim scheduled failure-event timestamps, panic/hang
+containment, recurrence, or the complete v0.1 sample. Source review separately
+checks that cursor consumption precedes owner invocation; public tests observe
+post-return state rather than access a mutably borrowed schedule in a callback.
 
 ## Evidence policy
 

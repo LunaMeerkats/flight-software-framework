@@ -140,6 +140,14 @@ RFF-REQ-008 for an opt-in direct `Runtime::work` error. Scheduled errors still
 follow this ADR's exact final-consumption behavior and do not emit an event;
 messaging-aware or scheduled event integration remains a separate decision.
 
+## Subsequent messaging-owned integration
+
+[ADR-0021](0021-messaging-owned-scheduled-work.md) adds the messaging-owned
+operation through `MessagingRuntime::work`. Both owners now share the private
+clock/consumption decision. The messaging wrapper retains exact inbox discards
+alongside the original scheduled error, preserving this decision's one-item
+and final-consumption contract. Scheduled events remain separate.
+
 ## Consequences and risks
 
 - The agenda is bounded by its immutable configured item count, but retaining

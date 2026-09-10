@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-09-10**
+Last reviewed: **2026-09-11**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -119,7 +119,9 @@ public APIs. Accepted project decisions now settle:
 - the RFF-REQ-004 elapsed-instant, injected-read, and manual-advance boundary in
   [ADR-0014](adr/0014-injected-manual-framework-clock.md), plus the finite
   one-shot scheduled-work, equal-time ordering, and replay boundary in
-  [ADR-0015](adr/0015-caller-driven-scheduled-work.md);
+  [ADR-0015](adr/0015-caller-driven-scheduled-work.md), extended through the
+  messaging owner with exact inbox cleanup in
+  [ADR-0021](adr/0021-messaging-owned-scheduled-work.md);
 - the RFF-REQ-005 and RFF-REQ-008 direct cooperative returned-work failure-event
   boundary in [ADR-0016](adr/0016-returned-work-failure-events.md), extended to
   messaging-owned ordinary work with exact inbox cleanup in

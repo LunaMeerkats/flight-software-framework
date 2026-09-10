@@ -216,14 +216,6 @@ impl WorkSchedule {
     pub fn is_complete(&self) -> bool {
         self.remaining() == 0
     }
-
-    fn next(&self) -> Option<ScheduledWork> {
-        self.scheduled_work.get(self.next_index).copied()
-    }
-
-    fn consume_next(&mut self) {
-        self.next_index += 1;
-    }
 }
 
 impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
@@ -251,7 +243,38 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
         schedule: &mut WorkSchedule,
         clock: &C,
     ) -> Result<ScheduledWorkOutcome, ScheduledWorkError<A::WorkError>> {
-        let Some(scheduled_work) = schedule.next() else {
+        schedule.run_next(clock, |scheduled_work, observed_at| {
+            self.work(scheduled_work.application_id())
+                .map_err(|work_error| {
+                    ScheduledWorkError::new(scheduled_work, observed_at, work_error)
+                })
+        })
+    }
+}
+
+impl<E> ScheduledWorkError<E> {
+    pub(crate) fn new(
+        scheduled_work: ScheduledWork,
+        observed_at: FrameworkInstant,
+        work_error: RuntimeWorkError<E>,
+    ) -> Self {
+        Self {
+            scheduled_work,
+            observed_at,
+            work_error,
+        }
+    }
+}
+
+impl WorkSchedule {
+    // Both owners share timing and consumption, but retain their own lifecycle
+    // and cleanup boundary. Consume before invoking any owner-supplied work.
+    pub(crate) fn run_next<C: Clock + ?Sized, E>(
+        &mut self,
+        clock: &C,
+        work: impl FnOnce(ScheduledWork, FrameworkInstant) -> Result<ApplicationState, E>,
+    ) -> Result<ScheduledWorkOutcome, E> {
+        let Some(scheduled_work) = self.scheduled_work.get(self.next_index).copied() else {
             return Ok(ScheduledWorkOutcome::Complete);
         };
 
@@ -263,18 +286,12 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
             });
         }
 
-        schedule.consume_next();
-        self.work(scheduled_work.application_id())
-            .map(|state| ScheduledWorkOutcome::Completed {
-                scheduled_work,
-                observed_at,
-                state,
-            })
-            .map_err(|work_error| ScheduledWorkError {
-                scheduled_work,
-                observed_at,
-                work_error,
-            })
+        self.next_index += 1;
+        work(scheduled_work, observed_at).map(|state| ScheduledWorkOutcome::Completed {
+            scheduled_work,
+            observed_at,
+            state,
+        })
     }
 }
 

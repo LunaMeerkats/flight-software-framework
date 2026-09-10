@@ -24,6 +24,7 @@ use crate::runtime::{
     RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
 use crate::runtime_events::RuntimeWorkEventError;
+use crate::scheduling::{ScheduledWorkError, ScheduledWorkOutcome, WorkSchedule};
 
 /// The reason a runtime could not take ownership of a message topology.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -464,6 +465,45 @@ impl<
                 ),
                 discarded_deliveries: error.discarded_deliveries,
             })
+    }
+
+    /// Attempts at most one due work item through the messaging owner.
+    ///
+    /// A complete schedule reads no clock. Otherwise one reading decides
+    /// whether to wait without mutation or consume the next due or overdue
+    /// item before delegating to [`Self::work`]. Equal-time items retain their
+    /// configured order. The caller retains the schedule and clock.
+    ///
+    /// Consumption is final on success, lifecycle rejection, or returned work
+    /// error. Retry requires a separately configured item. Successful work
+    /// leaves inboxes unchanged; an application error commits terminal
+    /// [`ApplicationState::Failed`] and clears only the selected inbox. This
+    /// operation performs ordinary work. It does not dispatch messages or emit
+    /// events.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the consumed item, observed instant, exact work error, and
+    /// discarded-delivery count inside [`MessagingOperationError`]. Lifecycle
+    /// rejection consumes its due item without invoking work or clearing any
+    /// inbox. Subsequent calls can attempt later due peers.
+    pub fn run_next_scheduled_work<C: Clock + ?Sized>(
+        &mut self,
+        schedule: &mut WorkSchedule,
+        clock: &C,
+    ) -> Result<ScheduledWorkOutcome, MessagingOperationError<ScheduledWorkError<A::WorkError>>>
+    {
+        schedule.run_next(clock, |scheduled_work, observed_at| {
+            self.work(scheduled_work.application_id())
+                .map_err(|error| MessagingOperationError {
+                    operation_error: ScheduledWorkError::new(
+                        scheduled_work,
+                        observed_at,
+                        error.operation_error,
+                    ),
+                    discarded_deliveries: error.discarded_deliveries,
+                })
+        })
     }
 
     /// Stops a running application and clears its inbox before returning.

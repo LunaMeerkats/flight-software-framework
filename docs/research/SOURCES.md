@@ -20,6 +20,13 @@ attempt, and ADR-0018's ordinary-work configuration visibility.
 through the existing messaging owner. No new external research, source reuse,
 or upstream behavior claim is introduced.
 
+The **2026-09-11** messaging-owned scheduling checkpoint likewise composes
+existing local contracts: ADR-0015's one-shot timing/consumption, ADR-0011's
+inbox cleanup, and ADR-0018's ordinary-work configuration visibility.
+[ADR-0021](../adr/0021-messaging-owned-scheduled-work.md) records the private
+shared decision and owner-specific delegation. No external source, source
+reuse, or new upstream claim was needed for this increment.
+
 ## SRC-RUST-MODULE-PATH — Explicit shared module source
 
 - Title: Modules — The Rust Reference, module source filenames and path attribute

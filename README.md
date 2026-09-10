@@ -84,6 +84,13 @@ public tests cover order validation, exact clock-read counts, inclusive and
 overdue work, lifecycle/error handling, and replay-equivalent work, lifecycle,
 and structured-event timestamp traces under manual time.
 
+`MessagingRuntime::run_next_scheduled_work` uses that same private timing and
+consumption decision, then delegates through messaging-owned ordinary work.
+The existing nested errors retain the item, observed instant, original work
+error, and exact discarded-delivery count. Failure clears only the selected
+inbox; later due peers can still work and dispatch their retained messages.
+This operation leaves successful inboxes intact and emits no failure event.
+
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
 assigns fresh revisions even to equal content, and retains only the former
@@ -110,7 +117,7 @@ and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
 no automatic or batch dispatch. It is not yet the full v0.1 sample mission.
-Periodic or messaging-aware scheduling, application-authored events, other
+Periodic scheduling, application-authored events, other
 callback event paths, and application configuration access outside ordinary
 work remain unimplemented.
 The private `host-echo` example implements ADR-0019's two-byte validated echo
@@ -118,8 +125,9 @@ command and matching telemetry. Its two applications use capacity-one inboxes
 and a borrowed capacity-one host mailbox drained outside dispatch. The same
 mission source is exercised by integration tests; no library API is added.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
-returned-work event and peer-progress evidence verifies RFF-REQ-005 and
-RFF-REQ-008 only at that cooperative boundary. Traceability distinguishes this
+returned-work event and peer-progress evidence, extended through the messaging
+owner, verifies RFF-REQ-005 and RFF-REQ-008 at those cooperative ordinary-work
+boundaries. Traceability distinguishes this
 evidence from event delivery guarantees or containment of panics, hangs,
 cleanup failures, and other arbitrary faults.
 
@@ -207,6 +215,7 @@ sample, CI, and architecture review remain separate release gates.
 - [Configuration-aware work-context decision](docs/adr/0018-configuration-aware-work-context.md)
 - [Host command/telemetry boundary decision](docs/adr/0019-host-command-telemetry-boundary.md)
 - [Messaging-owned work failure-event decision](docs/adr/0020-messaging-work-failure-events.md)
+- [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

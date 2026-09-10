@@ -146,8 +146,14 @@ ADR-0020 adds the prerequisite opt-in failure-event operation through the
 messaging owner. It completes ordinary-work lifecycle commitment and exact
 selected-inbox clearing before reading the borrowed clock and attempting one
 event, retaining the existing nested error types. The full sample still
-needs explicit service ownership and driver order; messaging-aware scheduling
-remains a separate bounded integration.
+needs explicit service ownership and driver order.
+
+ADR-0021 adds messaging-owned one-shot scheduling through ordinary work. Both
+owners share the private clock/consumption decision; messaging errors retain
+the consumed item, observed instant, original error, and exact selected-inbox
+discard count. Later due peers retain their queues and can progress. This
+completes the recorded scheduling prerequisite without adding scheduled events
+or implementing the combined sample.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission

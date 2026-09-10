@@ -34,10 +34,13 @@ translate NASA C source.
   finite caller-driven one-shot work schedule, plus direct and messaging-owned
   ordinary-work failure-event integration that borrows the clock and event
   queue, reporting after owner-specific lifecycle commitment and inbox cleanup.
+  Direct and messaging-owned schedules share one private clock/consumption
+  decision and delegate ordinary work through their respective owners.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
   application-dispatch, event-queue, manual-clock, and scheduled-work
   integration tests, including direct and messaging-owned ordinary-work event
-  reporting, exact inbox clearing, and event saturation,
+  reporting, exact inbox clearing, event saturation, and messaging-owned
+  one-shot schedule consumption with preserved peer queues,
   plus standalone and runtime-integrated configuration validation, revision,
   visibility, retention, and consume-once rollback tests.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.

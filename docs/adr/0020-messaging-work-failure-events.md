@@ -95,8 +95,9 @@ complete-diff review results are recorded in the project state and plan.
 
 Reporting remains opt-in and limited to cooperative ordinary-work errors.
 Message callbacks, lifecycle operations, and scheduled work gain no event
-behavior. The full sample remains incomplete until messaging-aware scheduling
-and the explicit mission driver are addressed.
+behavior. [ADR-0021](0021-messaging-owned-scheduled-work.md) subsequently adds
+messaging-owned scheduling without events. The full sample still requires an
+explicit mission driver.
 
 Event storage can reject the newest event; its caller-owned copy is outside
 the queue's retained-record bound. Callbacks and clocks may panic or fail to

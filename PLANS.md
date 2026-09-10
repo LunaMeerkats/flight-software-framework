@@ -1,106 +1,119 @@
-# Messaging-owned work failure events
+# Messaging-owned one-shot scheduled work
 
-Date: **2026-09-10**
+Date: **2026-09-11**
 Status: **Complete**
 
 ## Objective and context
 
-Expose the existing cooperative returned-work failure event through the
-messaging owner while preserving exact selected-inbox clearing. The full
-service sample cannot currently reach `Runtime::work_with_failure_event` or
-scheduled work after the runtime moves into `MessagingRuntime`. Its private
-owner is deliberate: mutable escape would bypass lifecycle/inbox coordination.
-This run implements only the event prerequisite; scheduling and the combined
-sample remain separate bounded work.
+Expose finite scheduled ordinary work through `MessagingRuntime`, preserving
+one-shot consumption, exact errors, and selected-inbox cleanup. This is the
+remaining recorded service-ownership prerequisite for the combined sample.
+ADR-0015 requires this path to use `MessagingRuntime::work`; ADR-0011 owns
+cleanup, and ADR-0018 keeps configuration on the same ordinary-work callback.
+The existing source policy is encoded and needs no adoption change.
 
 The starting tree is clean on `codex/nightly` at
-`4cb621aa50708fbc823dd50f110db7404a461889`. All six required baseline commands
-pass with 96 tests on unchanged rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and
-Clippy 0.1.98. The source-quality policy is already encoded.
+`ca40d7beba8b17d5f722e633bbb45db06e6f62bc`. All six baseline commands pass
+with 102 tests on unchanged rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and
+Clippy 0.1.98.
 
 ## Acceptance criteria
 
-- Add one opt-in `MessagingRuntime::work_with_failure_event` that delegates to
-  the existing messaging work operation before reporting an application error.
-- Preserve the order: callback return, terminal `Failed`, selected-inbox
-  clearing, one clock read, one bounded event attempt. Preserve peer queues.
-- Reuse `RuntimeWorkEventError` inside `MessagingOperationError`, retaining the
-  complete work error, optional event attempt, and exact discarded count.
-- Share the internal event construction with the direct runtime method, with
-  no new public constructor, error type, mutable runtime escape, or dependency.
-- Success and lifecycle rejection read no clock and emit nothing. Saturation
-  retains old events and returns the rejected event without retry or recovery.
-- Verify later peer work and dispatch, configuration visibility/history,
-  unknown/registered/stopped/failed suppression, and original error sources.
-- Pass baseline checks, focused integration tests, source/diff review, link and
+- Add one `MessagingRuntime::run_next_scheduled_work` with the existing
+  schedule, clock, outcome, and nested error types. Expose no mutable owner.
+- Share the private schedule decision between owners: no clock read when
+  complete, one read otherwise, no mutation while waiting, and at most one
+  due or overdue item consumed before invoking ordinary work.
+- Delegate to messaging-owned work so a returned error commits terminal
+  `Failed`, clears only the selected inbox, and preserves the original error
+  and exact discarded count. Lifecycle rejection consumes its item without
+  invoking work or clearing any inbox. Later due peers remain operable.
+- Preserve equal-time order, configuration visibility/history, explicit retry
+  through separately configured items, and direct-runtime behavior.
+- Verify complete/waiting boundaries, inclusive/overdue execution, exact clock
+  reads, lifecycle/unknown rejection, error sources, peer FIFO, and replay.
+- Add no scheduled event reporting, recurrence, new public error type,
+  executor trait, dependency, unsafe code, lint waiver, or full-sample scope.
+- Pass required baseline, focused tests, full-diff/source review, link and
   traceability audits, and changed rendered-document review.
 
 ## Components and verification
 
-`src/messaging_runtime.rs` owns the new operation because it owns inbox
-cleanup. `src/runtime_events.rs` keeps the single crate-private event-reporting
-implementation. `tests/messaging_work_events.rs` provides public-API service
-interaction evidence. ADR-0020 records alternatives and exact operation order;
-README, architecture, roadmap, traceability, project state, source register,
-and contributor guidance record the resulting scope.
+`src/scheduling.rs` owns the shared private clock/consumption decision and
+existing scheduled error. `src/messaging_runtime.rs` owns delegation and inbox
+error wrapping. `tests/messaging_scheduled_work.rs` exercises public service
+interactions. ADR-0021 records the decision and alternatives. Update current
+scope, requirement traceability, source provenance, and project state.
 
 Run all six AGENTS.md baseline commands with rustdoc warnings denied and
-`cargo test --test messaging_work_events`. Host adapters and ADR-0018/0019
-experiments are unchanged, so their extra commands are not required. Review
-aids remain ignored under `target/nightly-2026-09-10`; no checker gate is added.
+`cargo test --test messaging_scheduled_work`. Existing direct scheduling tests
+remain regression evidence. Host adapters and ADR-0018/0019 experiments remain
+unchanged; their extra commands are not applicable. Ignored review aids belong
+under `target/nightly-2026-09-11`; no checker gate is introduced.
 
 ## Risks and safe stopping point
 
-Only cooperative returned work errors are covered. Panics, hangs, clock
-failures, message-callback events, scheduled events, and physical delivery are
-outside this increment. Event storage can saturate. Existing owner-origin and
-application partial-effect limitations remain. The full sample still needs
-messaging-aware scheduling and an explicit mission driver.
+Application/clock origins remain caller-scoped. Callback panic/hang containment,
+rollback, recovery, timing guarantees, scheduled failure events, and automatic
+retry remain outside scope. The full sample still needs explicit mission
+driver order, followed by CI and architecture review.
 
-Stop at one tested, documented, reviewed local commit on `codex/nightly`.
-Preserve unexpected changes; if the implementation cannot pass, remove only
-this run's incomplete edits safely and retain useful evidence. Do not push.
+Stop after one coherent tested, documented, reviewed local increment on
+`codex/nightly`. If it cannot pass, remove only current-run incomplete edits
+safely and preserve useful evidence and unexpected changes. Do not push.
 
-## Outcome
+## Outcome and verification
 
-Implemented the one opt-in messaging-owned work event operation. It delegates
-through existing work before the shared event policy, preserving exact inbox
-cleanup, concrete errors, configuration history, and peer progress. Six focused
-integration tests pass. The full baseline passes 102 tests, warnings-denied
-Clippy/rustdoc, formatting, all-target check, and Git whitespace inspection.
-The host adapters and ADR-0018/0019 probes are unchanged and were not separately
-rerun; the full test suite includes all 13 existing adapter tests.
+Implemented the one messaging-owned scheduled ordinary-work operation with
+shared private timing/consumption. Seven focused tests cover clock boundaries,
+order, lifecycle rejection, exact errors/cleanup, peer FIFO, configuration
+history, and repeated manually controlled clock readings. The required full
+baseline passes with 109 tests, including all seven existing direct-schedule
+tests and all 13 unchanged host-adapter tests. No new public error type,
+dependency, unsafe code, suppression, or mutable owner access was added.
 
-Independent complete-diff review found no actionable defect. All 28 handwritten
-Rust files meet physical/comment-only width limits; the three existing reasoned
-expectations remain unchanged and fulfilled. The document audit passes for
-33 Markdown files, 107 relative links, eight requirement rows, 26 sources, and
-66 exact test references. A temporary audit initially misclassified a method
-name as a test reference; explicit invocation notation corrected the document
-ambiguity without changing the checker or adopting a new gate.
-
-All ten changed documents match generated content, heading/list/code/table
-structure, and source hashes. Browser layout inspection at 1,280 pixels found
-no page/table overflow, heading gaps, or console warnings. A screenshot of the
-new decision's opening viewport was also inspected successfully; complete-page
-screenshot coverage is not claimed. Review aids remain ignored under the run
-directory. No document-review adaptation or browser policy bypass was needed.
-
-The implementation reaches its tested and reviewed stopping point in local
-commit `0d1ddb81a8dd41ef8a96ffc5d7afefea3b1c12bc`. The evidence update changes
-only this plan, project state, and traceability; implementation, tests, and
-configuration remain identical to the verified commit. Scheduling through the
-messaging owner remains the likely next bounded increment. Nothing is pushed.
-
-Temporary audit commands, run from the repository root in PowerShell, are:
+Passed commands, run serially from the repository root:
 
 ```text
-& target/nightly-2026-09-10/render-documents.ps1 -Phase evidence
-python target/nightly-2026-09-10/audit-documents.py evidence
-python target/nightly-2026-09-10/review-rendered-content.py evidence 4cb621a
+cargo fmt --all -- --check
+cargo check --workspace --all-targets --all-features
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo test --test messaging_scheduled_work
+cargo test --workspace --all-features
+cargo doc --workspace --all-features --no-deps
+git diff --check
 ```
 
-The aids also ran for the precommit `validated` and `final` phases. They check
-generated content, relative links, source widths, and exact references; the
-browser review separately inspects rendered layout. These are ignored review
-artifacts, not newly adopted or permanently required checkers.
+Rustdoc runs with `$env:RUSTDOCFLAGS = '-D warnings'`. The full baseline is
+rechecked after the final Rust comment reflow. Host adapter execution and the
+ADR-0018/0019 standalone probes are unchanged and not separately rerun.
+
+Independent complete-diff review found no actionable code defect. It identified
+stale direct-only event evidence wording, now corrected to reflect ADR-0020.
+The first source audit found one new 81-column comment; reflow fixed it without
+a policy exception. All 29 Rust files now meet physical/comment-only width
+limits, and the three existing reasoned expectations remain fulfilled.
+The document audit passes for 34 Markdown files, 117 relative links, eight
+requirement rows, 26 sources, and 73 exact test references. All 12 changed
+documents match rendered content, headings, lists, code, tables, and hashes.
+
+The first browser initialization timed out and reset; opening the prepared local
+review server then succeeded. Browser DOM layout inspection of all 12 changed
+documents at 1,280 pixels found no page/table overflow, heading gaps, or console
+warnings. Screenshot capture timed out. Generated-content and browser DOM
+layout review are the narrow document-review adaptation for this run;
+screenshot-based visual QA was not completed. No alternate screenshot mechanism
+or browser policy bypass was used.
+
+Ignored review aids and command logs remain under `target/nightly-2026-09-11`.
+The render/audit commands below ran with `validated` and are rerun with `final`
+after recording the evidence; they are review aids, not adopted checker gates.
+
+```text
+& ./target/nightly-2026-09-11/render-documents.ps1 final
+python target/nightly-2026-09-11/audit-documents.py final
+python target/nightly-2026-09-11/review-rendered-content.py final ca40d7b
+```
+
+The increment reaches its tested, documented stopping point. The likely next
+bounded task is explicit composition of the combined sample. Nothing is pushed.
