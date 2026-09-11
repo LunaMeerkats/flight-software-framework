@@ -45,7 +45,12 @@ translate NASA C source.
   visibility, retention, and consume-once rollback tests.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
-  children own validation and application/output behavior. The integration
+  children own validation and application/output behavior. `work.rs` owns
+  bounded configuration observations and cooperative fault injection.
+  `sample.rs` owns the fixed combined scenario and report; `main.rs` prints
+  diagnostics outside callbacks. `tests/host_sample.rs` loads the exact mission
+  and driver source to verify lifecycle, time, configuration, and fault traces.
+  The adapter integration
   target `tests/host_adapters.rs` loads that same mission through one explicit
   `#[path]`; explicit child paths keep both target forms identical, avoiding
   copied adapters or new library exports.
@@ -82,10 +87,12 @@ handwritten Rust physical and comment-only line widths, and review the complete
 diff. Document any justified adaptation before treating it as the baseline.
 Never report a check as passing unless it completed successfully.
 
-When changing the host adapters, also run `cargo test --test host_adapters`
-and `cargo run --example host-echo`. The former exercises the exact shared
-mission source; the latter checks the host entry point and observable output.
-The example is not the full v0.1 service sample or a physical delivery guarantee.
+When changing the host adapters or combined sample, also run
+`cargo test --test host_adapters`, `cargo test --test host_sample`, and
+`cargo run --example host-echo`. These exercise the exact shared mission/driver
+source and the host entry point. The combined sample demonstrates controlled
+host behavior; it does not complete CI or human v0.1 review or guarantee
+physical delivery.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

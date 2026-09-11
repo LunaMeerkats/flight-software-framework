@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-09-11**
+Last reviewed: **2026-09-12**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -143,7 +143,9 @@ dispatch from host drain/encoding. Its returned full error uses existing
 terminal failure semantics. The private `host-echo` example now implements
 these adapters with shared-source integration evidence for RFF-REQ-007 at the
 selected local slice/returned-array boundary. The full v0.1 sample gate remains
-unchanged: it must still compose all required services in one demonstration.
+unchanged. [ADR-0022](adr/0022-combined-host-sample.md) now demonstrates the
+required services in one executable with a shared, tested scenario driver.
+CI and the documented human entry-point/architecture reviews remain pending.
 The original ownership probe alone does not establish adapter correctness.
 
 Do not use an implementation's accidental behavior to settle these parameters

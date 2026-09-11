@@ -115,7 +115,7 @@ added.
 
 ## Stage 3 — Configuration and mission boundaries
 
-Status: **In progress**
+Status: **Complete (2026-09-12)**
 
 - Add validated, versioned configuration activation and rollback.
 - Add one command-ingest and telemetry-output host adapter pair.
@@ -139,21 +139,27 @@ source with integration tests covering malformed records, explicit dispatch,
 publication diagnostics, bounded host output, terminal saturation failure,
 lifecycle retention, and replay. The host-owned borrowed mailbox is drained
 outside callbacks. RFF-REQ-007 has adapter-boundary evidence; the original
-ownership probe remains separate. Next compose and document the complete
-service sample, including the narrow returned-work failure/event scenario.
+ownership probe remains separate. ADR-0022 now composes and documents the
+complete service sample, including the narrow returned-work failure/event
+scenario, using that same private mission source.
 
 ADR-0020 adds the prerequisite opt-in failure-event operation through the
 messaging owner. It completes ordinary-work lifecycle commitment and exact
 selected-inbox clearing before reading the borrowed clock and attempting one
-event, retaining the existing nested error types. The full sample still
-needs explicit service ownership and driver order.
+event, retaining the existing nested error types.
 
 ADR-0021 adds messaging-owned one-shot scheduling through ordinary work. Both
 owners share the private clock/consumption decision; messaging errors retain
 the consumed item, observed instant, original error, and exact selected-inbox
 discard count. Later due peers retain their queues and can progress. This
-completes the recorded scheduling prerequisite without adding scheduled events
-or implementing the combined sample.
+completes the recorded scheduling prerequisite without adding scheduled events.
+
+ADR-0022 completes the combined host scenario: two-application lifecycle,
+command/telemetry exchange, finite scheduling under manual time, fresh work
+configuration observations through activation/rejection/rollback, and a
+cooperative work failure with exact inbox cleanup, event, and peer progress.
+Five shared-driver integration tests and the executed binary establish the
+sample behavior. CI and human release reviews remain in Stage 4.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission

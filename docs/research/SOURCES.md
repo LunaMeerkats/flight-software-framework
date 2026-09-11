@@ -27,6 +27,13 @@ inbox cleanup, and ADR-0018's ordinary-work configuration visibility.
 shared decision and owner-specific delegation. No external source, source
 reuse, or new upstream claim was needed for this increment.
 
+The **2026-09-12** combined host sample uses the existing configuration,
+adapter, messaging-event, and messaging-schedule contracts.
+[ADR-0022](../adr/0022-combined-host-sample.md) records the explicit host driver,
+bounded observation fixture, alternatives, and limits. This is independently
+written local composition and test evidence; no external research, source
+reuse, new dependency, or upstream behavior claim was needed.
+
 ## SRC-RUST-MODULE-PATH — Explicit shared module source
 
 - Title: Modules — The Rust Reference, module source filenames and path attribute

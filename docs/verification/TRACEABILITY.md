@@ -141,6 +141,50 @@ containment, recurrence, or the complete v0.1 sample. Source review separately
 checks that cursor consumption precedes owner invocation; public tests observe
 post-return state rather than access a mutably borrowed schedule in a callback.
 
+## Combined host sample evidence
+
+The 2026-09-12 [ADR-0022](../adr/0022-combined-host-sample.md) increment
+extends `host-echo` with one fixed driver shared by the executable and
+`tests/host_sample.rs`. It re-demonstrates RFF-REQ-002 through RFF-REQ-008 in
+one scenario; the earlier requirement rows retain their historical baselines.
+The [sample guide](HOST_SAMPLE.md) records exact fields, resource bounds,
+driver order, and limits. Implementation commit is recorded after validation.
+
+`cargo test --test host_sample` passes five tests:
+
+- `combined_sample_runs_both_lifecycles_and_preserves_exact_adapter_records`
+  observes both independent applications' registration/start/stop/restart
+  states, overlapping invalid-command precedence, and all three exact outputs.
+- `combined_sample_waits_then_runs_equal_time_work_with_observed_configuration`
+  asserts waiting at zero, echo then telemetry at 10 ms, completed schedule,
+  and callback-observed revision 1/value 10.
+- `combined_sample_observes_rejection_rollback_revision_non_reuse_and_restart_retention`
+  asserts revisions 2/1/3, typed rejection, unchanged rejected state, one-use
+  rollback, and fresh post-restart observations by both applications.
+- `combined_sample_records_exact_failure_and_preserves_peer_work_and_queued_telemetry`
+  checks the original concrete injected error/source chain, one selected
+  discard, retained peer queue, fresh failed/peer configuration observations,
+  later successful peer work and telemetry 7, exact error event at 20 ms,
+  emission outcome, empty post-drain event queue, and final lifecycle states.
+- `combined_sample_replays_the_complete_fixed_observable_report` compares two
+  fresh executions, including errors, ordered work outcomes, lifecycle,
+  configuration, telemetry, and event timestamps.
+
+The adapter target passes 14 tests, including
+`observed_work_records_configuration_and_injects_only_one_echo_failure` for
+fresh consume-on-read observations, telemetry not consuming the fault request,
+and a consumed echo switch on a fresh owner. That fresh owner is a test fixture,
+not recovery of the failed runtime. The unchanged codec and original 13 tests
+retain their malformed-input, saturation, lifecycle, and replay coverage.
+
+The final required Cargo baseline passes 115 tests with warnings-denied
+Clippy and rustdoc. `cargo run --example host-echo` completes, and the
+documented three command/telemetry lines and structured report were inspected.
+Source review confirms no new library API, dependency, unsafe code, or waiver.
+ADR-0018/0019 experiments are unchanged and not separately rerun. CI,
+RFF-REQ-001's human entry-point review, dependency review, and human v0.1
+architecture review are not established by this sample increment.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

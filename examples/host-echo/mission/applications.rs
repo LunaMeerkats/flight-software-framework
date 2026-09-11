@@ -16,20 +16,24 @@ use rust_flight_framework::{
 
 use super::MissionTopic;
 use super::codec::{ValidatedPercent, ValidationError, decode_internal};
+use super::work::{MissionRole, MissionWorkError, WorkMonitor, perform_work};
 
 #[derive(Default)]
 pub(crate) struct OutputMailbox {
     record: Cell<Option<ValidatedPercent>>,
 }
 
-pub(crate) struct EchoApplication;
+pub(crate) struct EchoApplication<'a> {
+    work_monitor: Option<&'a WorkMonitor>,
+}
 
 pub(crate) struct TelemetryApplication<'a> {
     mailbox: &'a OutputMailbox,
+    work_monitor: Option<&'a WorkMonitor>,
 }
 
 pub(crate) enum MissionApplication<'a> {
-    Echo(EchoApplication),
+    Echo(EchoApplication<'a>),
     Telemetry(TelemetryApplication<'a>),
 }
 
@@ -60,7 +64,11 @@ impl OutputMailbox {
     }
 }
 
-impl EchoApplication {
+impl<'a> EchoApplication<'a> {
+    pub(crate) const fn new(work_monitor: Option<&'a WorkMonitor>) -> Self {
+        Self { work_monitor }
+    }
+
     fn handle_message(
         &mut self,
         message: &Message<MissionTopic, 1>,
@@ -82,8 +90,14 @@ impl EchoApplication {
 }
 
 impl<'a> TelemetryApplication<'a> {
-    pub(crate) const fn new(mailbox: &'a OutputMailbox) -> Self {
-        Self { mailbox }
+    pub(crate) const fn new(
+        mailbox: &'a OutputMailbox,
+        work_monitor: Option<&'a WorkMonitor>,
+    ) -> Self {
+        Self {
+            mailbox,
+            work_monitor,
+        }
     }
 
     fn handle_message(
@@ -98,7 +112,7 @@ impl<'a> TelemetryApplication<'a> {
 
 impl Application for MissionApplication<'_> {
     type StartError = Infallible;
-    type WorkError = Infallible;
+    type WorkError = MissionWorkError;
     type StopError = Infallible;
     type RestartError = Infallible;
 
@@ -106,8 +120,15 @@ impl Application for MissionApplication<'_> {
         Ok(())
     }
 
-    fn work(&mut self, _context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
-        Ok(())
+    fn work(&mut self, context: ApplicationWorkContext<'_>) -> Result<(), Self::WorkError> {
+        match self {
+            Self::Echo(application) => {
+                perform_work(context, MissionRole::Echo, application.work_monitor)
+            }
+            Self::Telemetry(application) => {
+                perform_work(context, MissionRole::Telemetry, application.work_monitor)
+            }
+        }
     }
 
     fn stop(&mut self) -> Result<(), Self::StopError> {

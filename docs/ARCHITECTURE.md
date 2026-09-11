@@ -153,7 +153,8 @@ operation-specific result and commits terminal `Failed`. Public-API tests
 suppress callbacks for rejected operations and show that a returned work error
 does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The
-runtime has no automatic dispatch, general service context, or sample mission.
+runtime has no automatic dispatch or general service context. The private host
+sample composes its existing caller-selected operations as described below.
 Its ordinary lifecycle/work operations emit no events; the opt-in returned-work
 operations below provide failure reporting.
 
@@ -293,7 +294,18 @@ Full output retains the older record, returns a concrete rejected-value error,
 and causes terminal selected-app failure with zero remaining queued discards
 in the selected one-slot topology. Stop/restart and failure retain host output;
 drain cannot recover a failed application. The example has no callback I/O,
-automatic retry, additional library surface, or full-service sample integration.
+automatic retry or additional library surface.
+
+[ADR-0022](adr/0022-combined-host-sample.md) now composes the complete host
+scenario in that same example. Its runtime owns one validated configuration
+byte; actual ordinary-work callbacks copy revision/value observations into
+two host-owned slots that are consumed between phases. The explicit driver
+uses manual time, two equal-time work items, both applications' lifecycle,
+configuration activation/rejection/rollback, and a separate cooperative echo
+work failure with a structured event. The failed inbox is cleared while the
+peer later works and dispatches its retained telemetry. The binary and tests
+execute the same source and retain a fixed report. CI and human review remain
+release gates; this composition introduces no library API or new service owner.
 
 ## Alternatives kept open
 

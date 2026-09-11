@@ -1,91 +1,88 @@
 # Project state
 
-Last updated: **2026-09-11**
+Last updated: **2026-09-12**
 
 ## Current milestone
 
-Stages 1 and 2 and the first source-quality checkpoint are complete. Stage 3
-has verified configuration and host adapters. ADR-0020 added messaging-owned
-failure events; ADR-0021 now adds finite scheduled ordinary work through that
-owner. The combined sample, CI, and v0.1 architecture review remain outstanding.
+Stages 1 through 3 and the first source-quality checkpoint are complete.
+ADR-0022 now combines lifecycle, messaging, manual time, finite scheduling,
+configuration, host adapters, and cooperative work-failure events in one
+executable sample. CI and human v0.1 release reviews remain outstanding.
 
 ## Verified baseline
 
 - Started clean on `codex/nightly` at
-  `ca40d7beba8b17d5f722e633bbb45db06e6f62bc`; all six initial checks passed
-  with 102 tests. Toolchain unchanged: rustc/cargo 1.98.0, rustfmt
-  1.9.0-stable, Clippy 0.1.98. These are evidence, not an MSRV or pin.
-- `cargo test --test messaging_scheduled_work` passes seven new tests for
-  timing/consumption, exact errors and cleanup, lifecycle/unknown suppression,
-  peer FIFO and later work, configuration history, and manual-reading replay.
-- Final formatting, all-target/all-feature check, warnings-denied Clippy,
-  109 tests, warnings-denied rustdoc, and Git whitespace checks pass.
-- Independent complete-diff review found no actionable code defect. All 29 Rust
-  files meet physical/comment widths after one 81-column comment was reflowed.
-  Three reasoned expectations remain fulfilled; no dependency, unsafe code,
-  public error type, mutable owner access, or lint waiver was added.
-- Document audits pass: 34 Markdown files, 117 links, eight requirement rows,
-  26 sources, 73 exact test references, and 12 changed content comparisons.
-  Browser DOM layout review passes at 1,280 pixels with no overflow, heading
-  gaps, or console warnings. Screenshot capture timed out; the plan records
-  the narrow review adaptation, and screenshot-based visual QA is not claimed.
-- Host adapters and ADR-0018/0019 experiments are unchanged and not separately
-  rerun. The full suite still includes all 13 host-adapter tests.
+  `c8696f041d05a19aabb22c37871d1381425c06f9`. Initial required baseline
+  passed 109 tests on unchanged rustc/cargo 1.98.0, rustfmt 1.9.0-stable,
+  and Clippy 0.1.98. These are evidence, not an MSRV or pin.
+- Final format, all-target/all-feature check, warnings-denied Clippy,
+  115 tests, warnings-denied rustdoc, and Git whitespace checks pass.
+- Focused `host_sample` passes five shared-driver tests; `host_adapters`
+  passes 14 tests. The executed `host-echo` prints the scope notice, all three
+  documented command/telemetry records, and the fixed structured report.
+- A bounded two-slot monitor copies configuration from actual callbacks.
+  Review replaced non-consuming reads with consume-once reads to prevent
+  stale values from establishing later callback/restart evidence.
+- No library API, dependency, unsafe code, global policy change, or lint waiver
+  was added. Independent diff review also corrected one stale sample claim.
+- All 32 Rust files meet physical/comment widths; three existing expectations
+  remain fulfilled. Audits pass for 36 Markdown files, 128 relative links,
+  eight requirement rows, 26 sources, 79 test references, and 11 changed HTML
+  content comparisons. Rendered browser DOM/layout inspection at 1,280 pixels
+  found no overflow. Screenshot capture timed out; the plan records the narrow
+  review adaptation. Screenshot visual QA is not claimed.
+- ADR-0018/0019 experiments are unchanged and not separately rerun.
 
 ## Current architecture
 
-One unpublished, dependency-free safe-Rust library provides a finite LC1
-runtime with synchronous lifecycle/work callbacks, bounded lifecycle-owned
-inbox dispatch, injected manual time and finite one-shot scheduling, bounded
-events, and constructor-owned optional configuration with immutable
-ordinary-work visibility and consume-once rollback. The private `host-echo`
-example provides the validated caller-framed command/telemetry adapter pair.
+One unpublished, dependency-free safe-Rust library provides finite LC1
+lifecycle, synchronous work, bounded lifecycle-owned inbox dispatch, manual
+injected time and one-shot scheduling, bounded events, and constructor-owned
+configuration with immutable ordinary-work visibility and consume-once rollback.
 
-Both scheduled-work owners share one private timing/consumption decision.
-The messaging operation delegates through its existing ordinary-work path,
-retaining exact selected-inbox cleanup and configuration behavior. The nested
-existing errors retain the consumed item, observed instant, work error, and
-discard count. No mutable owner access is exposed. Failure-event reporting
-remains a separate opt-in ordinary-work operation.
+The private `host-echo` driver composes those APIs without a new service owner.
+The runtime owns two applications, their inboxes, and a one-byte table. Host
+values own one mailbox, two consumed observation slots, a manual clock, two
+agenda items, and one event slot. The fixed report copies observed outcomes.
+The separate ordinary-work fault path clears only echo's queued command and
+records one event at 20 ms; the telemetry peer then works and dispatches its
+retained record. The command grammar is unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The messaging-owned scheduling increment
-has reached its tested, documented, reviewed stopping point.
+No unfinished implementation remains. The combined sample has reached its
+tested, documented, reviewed stopping point.
 
 ## Highest risks and uncertainties
 
-- The full sample needs explicit ownership and driver order. Scheduled work
-  does not emit failure events; the sample can use the existing separate
-  ordinary-work event operation for its defined fault scenario.
-- Callbacks and clocks may panic or hang. No rollback, recovery, real-time
-  guarantee, implicit retry, recurrence, or event-delivery guarantee is added.
-- Host output saturation terminally fails telemetry while retaining old output;
-  drain cannot recover it. Physical delivery and stream framing remain absent.
-- IDs, revisions, and instants do not encode owner origin; callbacks/validators
-  need not terminate. Large inline bounds can exhaust stack resources.
-- No CI currently executes the local baseline.
+- CI does not yet execute the verified local baseline or combined sample.
+- Human scope, dependency, and architecture review remain release gates;
+  the sample does not establish flight readiness or v0.1 release readiness.
+- Callback/clock panics and hangs remain outside containment. No recovery,
+  real-time guarantee, recurrence, implicit retry, or event delivery is added.
+- Host output saturation remains terminal with retained older output; drain
+  does not recover it. Physical delivery and stream framing remain absent.
+- IDs, revisions, and instants remain caller-scoped. Validators/callbacks need
+  not terminate; large inline bounds can exhaust stack resources.
 
 ## Important unresolved decisions
 
-The combined sample's explicit service composition and driver order remain to
-be selected. Message/lifecycle configuration access, application-authored
-events, scheduled event reporting, host event drain, physical I/O, MSRV,
-hardware, RTOS, and no_std remain open. Local grammar and pre-v0.1 APIs remain
-unfrozen.
+CI platform and reproducible baseline execution are next. Message/lifecycle
+configuration access, application-authored or scheduled events, external I/O,
+MSRV, hardware, RTOS, and no_std remain open. Local grammar and pre-v0.1 APIs
+remain unfrozen; the sample's observation byte is not a physical setting.
 
 ## Most likely next tasks
 
-1. Compose the documented combined sample with explicit ownership/driver order,
-   including scheduled work and a separate cooperative work-failure event.
-2. Establish CI for the required local baseline.
-3. Record the v0.1 architecture review before broadening scope.
+1. Establish CI for the required baseline and combined sample commands.
+2. Review dependency features/licences and user-facing scope claims.
+3. Record human v0.1 architecture review before broadening scope.
 
 ## Latest run
 
-2026-09-11: Added messaging-owned one-shot scheduling and seven public
-integration tests. Initial and final Cargo baselines and focused tests pass.
-Source-form, document-content/browser-layout, and independent diff reviews
-are complete, with the screenshot limitation recorded above. The scheduling
-ownership prerequisite is resolved; the combined sample remains separate.
+2026-09-12: Built the combined host sample using existing service APIs. Five
+sample tests and one additional adapter fixture test pass; the full suite has
+115 passing tests. Initial/final Cargo baselines and executable inspection pass.
+Source, document-content/layout, and independent complete-diff reviews are
+complete, with the screenshot limitation recorded above.
 No push is authorized or performed.

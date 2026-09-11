@@ -116,14 +116,19 @@ RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
 and caller-selected dispatch evidence now verifies RFF-REQ-003, including
 capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
-no automatic or batch dispatch. It is not yet the full v0.1 sample mission.
+no automatic or batch dispatch. The private combined sample now composes these
+services with a fixed caller-driven scenario.
 Periodic scheduling, application-authored events, other
 callback event paths, and application configuration access outside ordinary
 work remain unimplemented.
-The private `host-echo` example implements ADR-0019's two-byte validated echo
+The private `host-echo` example preserves ADR-0019's two-byte validated echo
 command and matching telemetry. Its two applications use capacity-one inboxes
 and a borrowed capacity-one host mailbox drained outside dispatch. The same
 mission source is exercised by integration tests; no library API is added.
+ADR-0022 combines the adapters with both applications' lifecycle, finite
+scheduling at manual time 10 ms, observed configuration activation/rejection/
+rollback, and a separate cooperative work-failure event at 20 ms. The binary
+and sample tests execute the same fixed driver and retain a structured report.
 The finite scheduling and manual-time evidence verifies RFF-REQ-004. The direct
 returned-work event and peer-progress evidence, extended through the messaging
 owner, verifies RFF-REQ-005 and RFF-REQ-008 at those cooperative ordinary-work
@@ -155,7 +160,7 @@ Run rustdoc with warnings denied; in PowerShell, set
 `$env:RUSTDOCFLAGS = "-D warnings"` before the documentation command. Contributor
 guidance records the remaining structural and document checks.
 
-## Host command and telemetry example
+## Combined host sample
 
 Run `cargo run --example host-echo` from the repository root. The
 [example entry point](examples/host-echo/main.rs) prints the experimental scope
@@ -183,10 +188,18 @@ physical delivery, stream framing, authentication, or execution rollback is
 promised. Diagnostic stdout writes occur after drain and outside callbacks;
 a write error ends the host example without undoing execution.
 
-`cargo test --test host_adapters` exercises these adapters through the public
-runtime. This bounded command/telemetry demonstration does not integrate time,
-configuration, scheduling, or failure events into the full v0.1 sample. The
-sample, CI, and architecture review remain separate release gates.
+The executable then prints the fixed scenario report: both applications'
+lifecycle states, manual-time schedule outcomes, fresh callback configuration
+observations, and an injected echo work failure that clears one queued command
+while preserving the peer's work and queued telemetry. Configuration is one
+validated observation byte; it does not alter the command grammar.
+
+`cargo test --test host_adapters` exercises the adapters and fault fixture.
+`cargo test --test host_sample` verifies the same combined driver as the binary,
+including complete fresh-run report equality. See the
+[sample guide](docs/verification/HOST_SAMPLE.md) for exact expected fields and
+resource limits. CI, scope/dependency review, and human v0.1 architecture review
+remain separate release gates.
 
 ## Start here
 

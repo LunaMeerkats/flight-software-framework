@@ -8,7 +8,7 @@ use std::error::Error;
 use rust_flight_framework::{
     ApplicationId, ApplicationState, DeliveryStatus, LifecycleError, Message, MessageCreateError,
     MessageDispatchError, MessageDispatchOutcome, MessagingOperationError, MessagingRuntime,
-    PublishClassification, PublishReport, Runtime, RuntimeInboxConfig,
+    PublishClassification, PublishReport, Runtime, RuntimeInboxConfig, RuntimeWorkError,
 };
 
 #[path = "../examples/host-echo/mission.rs"]
@@ -18,6 +18,9 @@ use mission::applications::{
     EchoApplication, MissionApplication, MissionMessageError, OutputMailbox, TelemetryApplication,
 };
 use mission::codec::ValidationError;
+use mission::work::{
+    MissionRole, MissionWorkError, WorkMonitor, WorkObservation, initial_configuration,
+};
 use mission::{ComposedMission, IngestError, MissionTopic, compose, ingest};
 
 type DispatchFailure = MessagingOperationError<MessageDispatchError<MissionMessageError>>;
@@ -34,7 +37,7 @@ struct ReplayTrace {
 #[test]
 fn composition_is_registered_and_enforces_the_selected_record_bounds() {
     let mailbox = OutputMailbox::default();
-    let mission = compose(&mailbox).unwrap();
+    let mission = compose(&mailbox, None).unwrap();
     assert_eq!(mission.runtime.capacity(), 2);
     for application_id in [mission.echo_id, mission.telemetry_id] {
         assert_eq!(
@@ -51,6 +54,48 @@ fn composition_is_registered_and_enforces_the_selected_record_bounds() {
             length: 2,
             maximum: 1
         })
+    );
+}
+
+#[test]
+fn observed_work_records_configuration_and_injects_only_one_echo_failure() {
+    let mailbox = OutputMailbox::default();
+    let monitor = WorkMonitor::default();
+    let mut mission = compose(&mailbox, Some(&monitor)).unwrap();
+    start_both(&mut mission);
+    for role in [MissionRole::Echo, MissionRole::Telemetry] {
+        assert_eq!(monitor.take_observation(role), None);
+    }
+    monitor.arm_echo_failure();
+    assert_eq!(
+        mission.runtime.work(mission.telemetry_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(monitor.take_observation(MissionRole::Echo), None);
+    let failure = mission.runtime.work(mission.echo_id).unwrap_err();
+    assert_eq!(
+        failure.operation_error(),
+        &RuntimeWorkError::Application {
+            application_id: mission.echo_id,
+            source: MissionWorkError::InjectedEchoFailure,
+        }
+    );
+    for role in [MissionRole::Echo, MissionRole::Telemetry] {
+        assert_eq!(
+            monitor.take_observation(role),
+            Some(WorkObservation {
+                revision: 1,
+                value: 10,
+            })
+        );
+        assert_eq!(monitor.take_observation(role), None);
+    }
+    drop(mission);
+    let mut fresh_mission = compose(&mailbox, Some(&monitor)).unwrap();
+    start_both(&mut fresh_mission);
+    assert_eq!(
+        fresh_mission.runtime.work(fresh_mission.echo_id),
+        Ok(ApplicationState::Running)
     );
 }
 
@@ -196,7 +241,7 @@ fn ingress_saturation_returns_full_report_and_preserves_older_command() {
 #[test]
 fn unavailable_ingress_and_absent_subscriber_keep_distinct_reports() {
     let mailbox = OutputMailbox::default();
-    let mut mission = compose(&mailbox).unwrap();
+    let mut mission = compose(&mailbox, None).unwrap();
     let registered = ingest(&mut mission.runtime, &[0x01, 42]).unwrap();
     assert_report(
         &registered,
@@ -507,7 +552,7 @@ fn identical_ordered_inputs_dispatches_and_drains_replay_identically() {
 }
 
 fn running(mailbox: &OutputMailbox) -> ComposedMission<'_> {
-    let mut mission = compose(mailbox).expect("fixed mission topology is valid");
+    let mut mission = compose(mailbox, None).expect("fixed mission topology is valid");
     start_both(&mut mission);
     mission
 }
@@ -526,13 +571,13 @@ fn alternative_subscriptions<'a>(
     echo_topics: &[MissionTopic],
     telemetry_topics: &[MissionTopic],
 ) -> ComposedMission<'a> {
-    let mut runtime = Runtime::new(2).unwrap();
+    let mut runtime = Runtime::with_configuration(2, initial_configuration().unwrap()).unwrap();
     let echo_id = runtime
-        .register(MissionApplication::Echo(EchoApplication))
+        .register(MissionApplication::Echo(EchoApplication::new(None)))
         .unwrap();
     let telemetry_id = runtime
         .register(MissionApplication::Telemetry(TelemetryApplication::new(
-            mailbox,
+            mailbox, None,
         )))
         .unwrap();
     let inboxes = [
