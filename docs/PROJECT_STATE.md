@@ -32,6 +32,9 @@ executable sample. CI and human v0.1 release reviews remain outstanding.
   found no overflow. Screenshot capture timed out; the plan records the narrow
   review adaptation. Screenshot visual QA is not claimed.
 - ADR-0018/0019 experiments are unchanged and not separately rerun.
+- Implementation and exact test evidence are committed at
+  `4ef42bdd66997aeeefbbfe0ea95c647cdc6e6fa2`. The follow-up evidence commit
+  changes documentation only; the verified Rust source is unchanged.
 
 ## Current architecture
 

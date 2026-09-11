@@ -148,7 +148,9 @@ extends `host-echo` with one fixed driver shared by the executable and
 `tests/host_sample.rs`. It re-demonstrates RFF-REQ-002 through RFF-REQ-008 in
 one scenario; the earlier requirement rows retain their historical baselines.
 The [sample guide](HOST_SAMPLE.md) records exact fields, resource bounds,
-driver order, and limits. Implementation commit is recorded after validation.
+driver order, and limits. Implementation and exact test evidence are committed
+at `4ef42bdd66997aeeefbbfe0ea95c647cdc6e6fa2`; the following documentation-only
+commit records that reference without changing the verified Rust source.
 
 `cargo test --test host_sample` passes five tests:
 

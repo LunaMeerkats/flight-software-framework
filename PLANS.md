@@ -129,3 +129,12 @@ python target/nightly-2026-09-12/review-rendered-content.py final c8696f0
 This is a reviewed local increment. CI for these exact checks is the likely
 next bounded objective; human release reviews remain separate. Nothing is
 pushed.
+
+Implementation and exact tests are committed locally at
+`4ef42bdd66997aeeefbbfe0ea95c647cdc6e6fa2`. The follow-up documentation commit
+records this evidence hash without changing Rust source. Its three changed
+pages are re-rendered and inspected; link/source/content audits and Git
+whitespace checks are rerun. Cargo is not repeated for these reference-only
+edits. One temporary audit invocation initially redirected stdout to the
+script's own output filename and was refused; preserving the empty file and
+using a distinct stdout path resolved it without a checker/policy change.
