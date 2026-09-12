@@ -145,7 +145,8 @@ these adapters with shared-source integration evidence for RFF-REQ-007 at the
 selected local slice/returned-array boundary. The full v0.1 sample gate remains
 unchanged. [ADR-0022](adr/0022-combined-host-sample.md) now demonstrates the
 required services in one executable with a shared, tested scenario driver.
-CI and the documented human entry-point/architecture reviews remain pending.
+The [recorded hosted CI run](verification/CI_BASELINE.md) now passes. The
+documented human entry-point/architecture reviews remain pending.
 The original ownership probe alone does not establish adapter correctness.
 
 Do not use an implementation's accidental behavior to settle these parameters

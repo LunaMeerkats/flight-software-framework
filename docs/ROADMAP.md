@@ -169,7 +169,8 @@ re-demonstration of the narrow RFF-REQ-008 behavior.
 
 ADR-0023 configures one Windows GitHub Actions job for the existing baseline
 and sample. Local command replay and workflow validation are a configuration
-checkpoint; [hosted acceptance](verification/CI_BASELINE.md) remains open.
+checkpoint; the first [hosted run](verification/CI_BASELINE.md) subsequently
+passes the baseline and sample at `abb1293790136128d5f27d8c48c1e3d98a355540`.
 The user's 2026-09-12 approval now authorizes verified source pushes without
 per-push human review under AGENTS.md. Hosted results must be recorded
 separately; source publication does not complete v0.1 release review.

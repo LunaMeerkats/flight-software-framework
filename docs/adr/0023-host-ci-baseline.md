@@ -1,6 +1,6 @@
 # ADR-0023: One host CI baseline
 
-- Status: Accepted and configured; hosted execution unverified
+- Status: Accepted, configured, and verified at the recorded hosted revision
 - Date: 2026-09-12
 - Scope: Stage 4 execution of existing checks and the combined sample
 
@@ -13,6 +13,11 @@ accumulated work. Source/diff review remains autonomous; no human code review
 is implied. This supersedes this ADR's historical push-permission hold below.
 Hosted results still require exact-revision evidence. Source publication does
 not complete the separate v0.1 release or scope-expansion gates.
+
+The first hosted push run subsequently passed all 20 steps at
+`abb1293790136128d5f27d8c48c1e3d98a355540`, including 115 workspace tests.
+The [CI baseline](../verification/CI_BASELINE.md) records its URL, runner image,
+toolchain, and scope. The original local-only observations below are historical.
 
 ## Context
 

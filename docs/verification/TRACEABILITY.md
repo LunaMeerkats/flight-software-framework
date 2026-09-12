@@ -197,7 +197,14 @@ Rust source and requirement meanings are unchanged from
 `634941453be2503371d962f5d80ec865448a730a`. Existing evidence hashes above
 remain valid for their recorded boundaries. This checkpoint does not change
 any requirement's verification status or complete the CI release gate.
-No hosted run URL or result exists for the unpublished workflow.
+This initially local checkpoint was followed by the user's source-publication
+approval. The first
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34697541024)
+passes at `abb1293790136128d5f27d8c48c1e3d98a355540`: one job, all 20 steps,
+115 workspace tests, both focused targets, rustdoc, and the sample. The
+[CI baseline](CI_BASELINE.md) records the actual image/toolchain and review
+boundary. This establishes the hosted CI release gate at that revision;
+human entry-point, dependency/scope, and architecture acceptance remain open.
 
 ## Evidence policy
 

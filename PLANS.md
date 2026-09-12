@@ -1,6 +1,6 @@
 # Host CI baseline
 
-Follow-up status: **Source publication authorized; hosted validation in progress**
+Follow-up status: **Source published; first hosted CI run passed**
 
 On 2026-09-12, after the completed local checkpoint below, the user approved
 publication without human review. AGENTS.md and the existing nightly automation
@@ -12,6 +12,32 @@ code review or waiving automated checks or separate release gates.
 Acceptance for this follow-up: refresh remote ancestry, review the policy diff
 and outgoing history, pass local baseline and document/source review, commit
 and push without rewriting history, then record the exact hosted CI result.
+
+The follow-up passed the full local baseline (115 tests), outgoing-history
+whitespace checks, source/document audits, rendered inspection, and independent
+policy-diff review. The automation prompt was updated and read back exactly;
+schedule, model, reasoning, target, and active state were preserved.
+Policy commit `abb1293790136128d5f27d8c48c1e3d98a355540` and the 31 prior
+commits were published in one ordinary fast-forward push; remote HEAD matched.
+
+[Hosted run 34697541024](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34697541024)
+then passed one job and all 20 steps at that exact commit, with 115 workspace,
+14 adapter, and five sample tests. The CI baseline records the actual Windows
+image and Rust 1.98.1 toolchain. No source or workflow repair was needed.
+This evidence-only follow-up records that result; any later commit and CI run
+require separate verification. No human code review is claimed, and no per-push approval
+is required within the recorded source-publication scope.
+
+Follow-up review aids are under `target/publication-2026-09-12`. The
+`render-documents.ps1`, `audit-documents.py`, and `review-rendered-content.py`
+commands there pass with `prepush` and then `final`; the content comparison
+uses base `d1eb16b`. Required Cargo commands pass as originally listed in
+AGENTS.md, with rustdoc warnings denied.
+`git log origin/codex/nightly..HEAD --check --format= -- .` passed for the
+outgoing historical commits before push.
+Both `git diff --check` and staged whitespace checks pass before commits.
+
+## Initial local configuration checkpoint
 
 Date: **2026-09-12**
 Status: **Complete: local configuration checkpoint; hosted CI unverified**

@@ -83,5 +83,6 @@ of two complete fresh reports. This is controlled-input repeatability, not a
 timing, resource exhaustion, panic/hang, or fault-tolerance guarantee.
 
 The combined demonstration supports the executable host-sample release gate.
-CI execution, RFF-REQ-001 entry-point review, dependency review, and the human
-v0.1 architecture review remain separate gates.
+The [recorded CI run](CI_BASELINE.md) also executes it successfully.
+RFF-REQ-001 entry-point review, dependency review, and the human v0.1
+architecture review remain separate gates.

@@ -127,6 +127,10 @@ rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98. These versions
 record evidence, not a minimum supported Rust version or a toolchain pin.
 Re-audit the configuration and whole tree when the active toolchain changes.
 
+The 2026-09-12 hosted run passes the all-target baseline on rustc/cargo 1.98.1,
+rustfmt 1.9.0-stable, and Clippy 0.1.98. The companion whole-tree source review
+finds no width or policy changes; exact evidence is in the CI baseline.
+
 ## Engineering conventions
 
 - Use stable Rust and safe Rust. Ordinary crates should forbid unsafe code.
@@ -221,7 +225,7 @@ expressions.
 
 A strict physical-line checker, dependency-policy tool, or toolchain pin
 requires its own justified baseline and review. ADR-0023 separately records
-the adopted CI configuration and its outstanding hosted validation. New and
+the adopted CI configuration and its exact-revision hosted evidence. New and
 touched code must not worsen known findings while a gate is deferred. Record any
 environment-only failure precisely rather than weakening a threshold or hiding
 warnings.

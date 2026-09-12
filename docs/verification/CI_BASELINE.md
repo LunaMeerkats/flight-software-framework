@@ -1,7 +1,7 @@
 # Host CI verification baseline
 
 Date: **2026-09-12**
-Status: **Configured locally; hosted execution unverified**
+Status: **Hosted baseline passed at the exact revision below**
 
 ## Execution contract
 
@@ -64,7 +64,38 @@ per-intermediate-commit whitespace coverage. The separate working-tree check
 does not inspect unchanged committed content. No branch protection or required
 check policy is configured by adding this file.
 
-## Hosted acceptance still required
+## First hosted acceptance — 2026-09-12
+
+The source and CI workflow were published by ordinary fast-forward push under
+the user's standing permission. The first
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34697541024)
+completed successfully with one Windows job and all 20 steps successful.
+
+- Event: `push`; workflow and logged checkout revision:
+  `abb1293790136128d5f27d8c48c1e3d98a355540`.
+- Workflow label: `windows-2025`. Actual setup log image:
+  `windows-2025-vs2026`, image version `20260907.229.1`, runner `2.337.0`.
+- rustc 1.98.1 (`48a229cea`, 2026-09-01), Cargo 1.98.1
+  (`797e8a9bc`), rustfmt 1.9.0-stable, Clippy 0.1.98.
+- Checkout, stable installation, version logging, format, check, Clippy,
+  workspace tests (115), adapter tests (14), sample tests (five), rustdoc,
+  executable sample, both whitespace checks, and runner cleanup all passed.
+- The sample log has the exact documented 0, 42, and 100 command/telemetry
+  records. The shared-driver tests establish the structured scenario outcomes.
+
+The hosted toolchain is newer than the unchanged local 1.98.0 installation.
+The all-target hosted fmt/Clippy/check baseline revalidates the selected
+configuration. Companion whole-tree review covers all 32 Rust files, no physical
+or comment-only width findings, and three unchanged fulfilled expectations.
+No new source-form debt, suppression, dependency, or toolchain pin is introduced.
+Conditional ADR-0018/0019 probes are unchanged and not separately rerun.
+
+This is exact-revision CI evidence, not human code review or a v0.1 release.
+The later documentation commit records the result without changing Rust,
+Cargo files, lint configuration, or the workflow. Its CI result must still be
+assessed separately rather than inherited from this run.
+
+## Evidence for subsequent hosted runs
 
 The initial configuration checkpoint was local only. The user's subsequent
 2026-09-12 approval authorizes verified source pushes without per-push human

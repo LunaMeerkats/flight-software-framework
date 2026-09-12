@@ -5,86 +5,78 @@ Last updated: **2026-09-12**
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
-ADR-0022 combines the existing services in one tested executable sample.
-ADR-0023 now configures its Windows CI job. Hosted CI execution and human
-v0.1 release reviews remain outstanding.
+The combined host sample and its first hosted CI run now pass. Source
+publication is authorized without per-push human review. Separate human v0.1
+entry-point, dependency/scope, and architecture acceptance remain outstanding.
 
 ## Verified baseline
 
-- Started clean on `codex/nightly` at
-  `634941453be2503371d962f5d80ec865448a730a`. Initial required baseline
-  passed 115 tests on rustc/cargo 1.98.0, rustfmt 1.9.0-stable, and
-  Clippy 0.1.98. These are evidence, not an MSRV or pin.
-- The workflow's locked command bodies pass locally: format, all-target/
-  all-feature check, warnings-denied Clippy, 115 tests, warnings-denied
-  rustdoc, both focused host targets (14/five tests), and the sample binary.
-  Git working-tree and committed-tip whitespace commands pass.
-- No Rust, Cargo manifest/lockfile, runtime API, dependency, unsafe code,
-  lint threshold, or expectation changed. The initial whole-tree audit found
-  zero width findings in 32 Rust files and three fulfilled expectations.
-- Actionlint 1.7.12, all 16 PowerShell command parses, native failure probes,
-  and root/ordinary/merge/depth-two whitespace fixtures pass. The corrected
-  exit-code probe preserves failure rather than exact numeric status.
-- Audits pass for 38 Markdown files, 142 relative links, 32 sources, and
-  79 exact test references. Nine changed rendered documents match source;
-  browser layout review has no overflow or console warnings. CI/ADR opening
-  screenshots and independent complete-diff review are complete.
-- ADR-0018/0019 experiments are unchanged and not separately rerun.
-  Local rustup installation is not run; hosted bootstrap remains unverified.
+- Local required baseline passes all 115 tests on rustc/cargo 1.98.0,
+  rustfmt 1.9.0-stable, and Clippy 0.1.98; rustdoc warnings are denied.
+- Policy commit `abb1293790136128d5f27d8c48c1e3d98a355540` and 31 accumulated
+  commits were published by ordinary fast-forward push; remote HEAD matched.
+- [Hosted run 34697541024](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34697541024)
+  passed one job and all 20 steps at that exact revision: 115 workspace tests,
+  14 adapter tests, five sample tests, format/check/Clippy, rustdoc, the sample,
+  and both whitespace checks, including hosted checkout/bootstrap and cleanup.
+- Actual image: `windows-2025-vs2026` version `20260907.229.1`, selected via
+  `windows-2025`. Hosted rustc/cargo 1.98.1, rustfmt 1.9.0-stable, Clippy
+  0.1.98. The selected all-target configuration passes on this newer toolchain;
+  companion whole-tree review covers 32 Rust files, zero widths, and three
+  unchanged fulfilled expectations. These versions are evidence, not a pin.
+- No Rust, Cargo file, runtime API, dependency, unsafe code, lint threshold,
+  expectation, or workflow changed during the publication follow-up.
+  Source/document and complete-diff review pass; exact run evidence is in
+  [the CI baseline](verification/CI_BASELINE.md).
+- ADR-0018/0019 experiments are unchanged and not separately rerun. Local
+  rustup installation was not run; the hosted installation step passed.
 
 ## Current architecture
 
-One unpublished, dependency-free safe-Rust library provides finite LC1
-lifecycle, synchronous work, bounded lifecycle-owned inbox dispatch, manual
-injected time and one-shot scheduling, bounded events, and constructor-owned
-configuration with immutable ordinary-work visibility and consume-once rollback.
-The private shared-source host sample and all runtime behavior are unchanged.
+One unpublished Cargo package provides finite LC1 lifecycle, synchronous work,
+bounded lifecycle-owned inbox dispatch, injected manual time and one-shot
+scheduling, bounded events, and constructor-owned configuration with immutable
+ordinary-work visibility and consume-once rollback. The private shared-source
+host sample and all runtime behavior are unchanged.
 
-One GitHub Actions job requests stable Rust on Windows 2025, uses an upstream
-SHA-pinned checkout with read-only contents and persisted credentials disabled,
-and runs each native check in its own PowerShell step. It logs the checkout
-and tool versions. Source publication is now authorized without per-push human
-review; the nightly automation has been updated to use that permission.
+The single Windows CI job requests stable Rust and records actual versions
+and checkout identity. It uses a SHA-pinned checkout, read-only contents, and
+no persisted checkout credentials. Each native check has its own PowerShell step.
 
 ## Work in progress
 
-No unfinished implementation remains. The user's 2026-09-12 follow-up permits
-verified ordinary source pushes to the existing `origin/codex/nightly` without
-per-push human review, including accumulated commits. Publication and hosted
-acceptance are being completed under that standing permission;
-no hosted result is inferred from the workflow file or local command replay.
+No unfinished implementation remains. The source is published and the first
+hosted baseline passed. This evidence-only follow-up records that result;
+later commits and runs require separate verification.
+The nightly automation now uses the standing source-publication permission
+with its schedule/model/reasoning/target unchanged.
 
 ## Highest risks and uncertainties
 
-- Stable Rust and the named runner image float. Changed toolchain versions
-  require the existing source-quality re-audit; no reproducibility pin exists.
-- CI installation, checkout, event/permission behavior, and repository settings
-  remain unverified on GitHub until an exact-revision run completes.
-- Manual source/document and conditional ADR-probe checks are outside the job.
-  Human scope, dependency, and architecture reviews remain release gates.
+- Stable Rust and the runner image float. Later revisions and changed toolchains
+  need their own verification; earlier CI success is not transferable evidence.
+- Source/document and conditional ADR-probe checks remain outside the CI job.
+  Human v0.1 release/scope-expansion gates remain separate from source pushes.
 - Callback/clock panics and hangs remain outside containment. Host saturation
-  remains terminal; there is no recovery, real-time, or physical delivery claim.
+  is terminal; there is no recovery, real-time, or physical delivery claim.
 - IDs, revisions, and instants remain caller-scoped. Validators/callbacks need
   not terminate; large inline bounds can exhaust stack resources.
 
 ## Important unresolved decisions
 
-Hosted acceptance remains open; source publication is authorized. CI does not
-configure branch protection. MSRV, message/lifecycle configuration access,
-application-authored or scheduled events, external I/O, hardware, RTOS, and
-no_std remain open. Pre-v0.1 APIs and the local grammar remain unfrozen.
+CI does not configure branch protection. MSRV, message/lifecycle configuration
+access, application-authored or scheduled events, external I/O, hardware,
+RTOS, and no_std remain open. Pre-v0.1 APIs and the local grammar remain unfrozen.
 
 ## Most likely next tasks
 
-1. Review dependency features/licences and user-facing scope claims locally.
-2. Publish verified source and record exact hosted CI evidence.
-3. Record human v0.1 architecture review before broadening scope.
+1. Review dependency features/licences and user-facing scope claims.
+2. Record human v0.1 architecture review before broadening scope.
+3. Publish subsequent verified source increments and inspect their exact CI runs.
 
 ## Latest run
 
-2026-09-12: Prepared the existing baseline/sample CI configuration as a bounded
-Stage 4 checkpoint. Locked local command replay passes with 115 tests; hosted
-execution remains unverified. The current plan records final review evidence.
-Follow-up: the user authorized source publication without per-push human review.
-AGENTS.md and the existing nightly automation now record that scope. Automated
-verification, truthful provenance, and separate release gates remain required.
+2026-09-12 follow-up: recorded the user's source-publication authorization,
+updated the nightly automation in place, published the accumulated source,
+and verified the first hosted baseline. All work and reviews were performed
+by Codex; standing user authorization does not imply human code review.

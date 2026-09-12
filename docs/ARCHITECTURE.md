@@ -304,8 +304,10 @@ uses manual time, two equal-time work items, both applications' lifecycle,
 configuration activation/rejection/rollback, and a separate cooperative echo
 work failure with a structured event. The failed inbox is cleared while the
 peer later works and dispatches its retained telemetry. The binary and tests
-execute the same source and retain a fixed report. CI and human review remain
-release gates; this composition introduces no library API or new service owner.
+execute the same source and retain a fixed report. The
+[hosted CI baseline](verification/CI_BASELINE.md) now passes at its recorded
+revision; human release reviews remain outstanding. This composition
+introduces no library API or new service owner.
 
 ## Alternatives kept open
 
