@@ -4,6 +4,16 @@
 - Date: 2026-09-12
 - Scope: Stage 4 execution of existing checks and the combined sample
 
+## Source publication amendment — 2026-09-12
+
+After the initial local checkpoint, the user approved publication without
+human review. [AGENTS.md](../../AGENTS.md) now permits verified ordinary
+fast-forward pushes of `codex/nightly` to the existing origin, including the
+accumulated work. Source/diff review remains autonomous; no human code review
+is implied. This supersedes this ADR's historical push-permission hold below.
+Hosted results still require exact-revision evidence. Source publication does
+not complete the separate v0.1 release or scope-expansion gates.
+
 ## Context
 
 ADR-0022 completes the controlled host sample. Its 115-test local baseline

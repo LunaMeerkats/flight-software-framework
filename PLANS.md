@@ -1,5 +1,18 @@
 # Host CI baseline
 
+Follow-up status: **Source publication authorized; hosted validation in progress**
+
+On 2026-09-12, after the completed local checkpoint below, the user approved
+publication without human review. AGENTS.md and the existing nightly automation
+now authorize ordinary fast-forward source pushes to the existing
+`origin/codex/nightly`, including the 31 accumulated verified commits. This
+supersedes this plan's historical publication hold, without claiming human
+code review or waiving automated checks or separate release gates.
+
+Acceptance for this follow-up: refresh remote ancestry, review the policy diff
+and outgoing history, pass local baseline and document/source review, commit
+and push without rewriting history, then record the exact hosted CI result.
+
 Date: **2026-09-12**
 Status: **Complete: local configuration checkpoint; hosted CI unverified**
 

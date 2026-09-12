@@ -43,13 +43,15 @@ The private shared-source host sample and all runtime behavior are unchanged.
 One GitHub Actions job requests stable Rust on Windows 2025, uses an upstream
 SHA-pinned checkout with read-only contents and persisted credentials disabled,
 and runs each native check in its own PowerShell step. It logs the checkout
-and tool versions. No external action has been dispatched by this increment.
+and tool versions. Source publication is now authorized without per-push human
+review; the nightly automation has been updated to use that permission.
 
 ## Work in progress
 
-No unfinished implementation remains. The CI configuration checkpoint is
-locally validated and reviewed. Hosted
-acceptance requires an authorized push and an exact-revision successful run;
+No unfinished implementation remains. The user's 2026-09-12 follow-up permits
+verified ordinary source pushes to the existing `origin/codex/nightly` without
+per-push human review, including accumulated commits. Publication and hosted
+acceptance are being completed under that standing permission;
 no hosted result is inferred from the workflow file or local command replay.
 
 ## Highest risks and uncertainties
@@ -57,7 +59,7 @@ no hosted result is inferred from the workflow file or local command replay.
 - Stable Rust and the named runner image float. Changed toolchain versions
   require the existing source-quality re-audit; no reproducibility pin exists.
 - CI installation, checkout, event/permission behavior, and repository settings
-  remain unverified on GitHub. Pushes remain unauthorized.
+  remain unverified on GitHub until an exact-revision run completes.
 - Manual source/document and conditional ADR-probe checks are outside the job.
   Human scope, dependency, and architecture reviews remain release gates.
 - Callback/clock panics and hangs remain outside containment. Host saturation
@@ -67,7 +69,7 @@ no hosted result is inferred from the workflow file or local command replay.
 
 ## Important unresolved decisions
 
-Hosted acceptance is open under the existing publication gate. CI does not
+Hosted acceptance remains open; source publication is authorized. CI does not
 configure branch protection. MSRV, message/lifecycle configuration access,
 application-authored or scheduled events, external I/O, hardware, RTOS, and
 no_std remain open. Pre-v0.1 APIs and the local grammar remain unfrozen.
@@ -75,7 +77,7 @@ no_std remain open. Pre-v0.1 APIs and the local grammar remain unfrozen.
 ## Most likely next tasks
 
 1. Review dependency features/licences and user-facing scope claims locally.
-2. After explicit push authorization, run CI and record exact hosted evidence.
+2. Publish verified source and record exact hosted CI evidence.
 3. Record human v0.1 architecture review before broadening scope.
 
 ## Latest run
@@ -83,4 +85,6 @@ no_std remain open. Pre-v0.1 APIs and the local grammar remain unfrozen.
 2026-09-12: Prepared the existing baseline/sample CI configuration as a bounded
 Stage 4 checkpoint. Locked local command replay passes with 115 tests; hosted
 execution remains unverified. The current plan records final review evidence.
-No push is authorized or performed.
+Follow-up: the user authorized source publication without per-push human review.
+AGENTS.md and the existing nightly automation now record that scope. Automated
+verification, truthful provenance, and separate release gates remain required.

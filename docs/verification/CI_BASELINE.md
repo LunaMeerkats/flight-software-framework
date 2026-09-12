@@ -66,8 +66,9 @@ check policy is configured by adding this file.
 
 ## Hosted acceptance still required
 
-No workflow has been pushed or dispatched by this increment. To close the
-hosted CI gate after authorized publication, record:
+The initial configuration checkpoint was local only. The user's subsequent
+2026-09-12 approval authorizes verified source pushes without per-push human
+review, as recorded in AGENTS.md. To close the hosted CI gate, record:
 
 1. The run URL, event, workflow revision, and logged checkout SHA. For a PR,
    identify the tested merge SHA and its base/head; do not project that result

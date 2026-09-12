@@ -163,9 +163,10 @@ guidance records the remaining structural and document checks.
 [The host CI workflow](.github/workflows/ci.yml) encodes these checks with
 locked dependency resolution, both focused host tests, and the sample on
 Windows. [Its verification record](docs/verification/CI_BASELINE.md) separates
-local validation from hosted execution, which remains unverified until an
-authorized push and successful exact-revision run. Manual source/document
-review and human release reviews remain required.
+local validation from successful exact-revision hosted execution. Verified
+source pushes to the existing `codex/nightly` branch are authorized without
+per-push human review. Autonomous source/document review and automated checks
+remain required; separate human v0.1 release reviews remain outstanding.
 
 ## Combined host sample
 
