@@ -24,6 +24,8 @@ translate NASA C source.
 - `docs/research/SOURCES.md`: primary-source provenance and adoption decisions.
 - `docs/verification/`: requirement traceability and verification baselines.
 - `PLANS.md`: the active or most recently completed bounded work plan.
+- `.github/workflows/ci.yml`: one Windows host baseline job; its commands and
+  hosted-evidence boundary are recorded in `docs/verification/CI_BASELINE.md`.
 - `src/`: the single unpublished library package; currently logical lifecycle
   records, a synchronous start/work/stop/in-place-restart owned runtime, a
   constructor-owned optional bounded configuration table with immutable
@@ -86,6 +88,19 @@ relative Markdown links resolve, inspect changed rendered documents, audit
 handwritten Rust physical and comment-only line widths, and review the complete
 diff. Document any justified adaptation before treating it as the baseline.
 Never report a check as passing unless it completed successfully.
+
+[ADR-0023](docs/adr/0023-host-ci-baseline.md) configures one Windows CI job.
+Its Cargo resolving commands add `--locked`; this is also a supported local
+form and must fail instead of changing dependency resolution. CI separately
+runs both focused host tests and the sample. It adds
+`git show --format= --check --diff-merges=first-parent HEAD` for committed-tip
+whitespace (first-parent merge diff on PRs), with checkout depth two. This
+does not inspect every intermediate commit in a multiple-commit push.
+Keep source/document/diff review and conditional ADR probes outside this job
+explicit. When changing the workflow, run `actionlint -color .github/workflows/ci.yml`
+with reviewed actionlint 1.7.12 and inspect PowerShell failure propagation.
+The [CI baseline](docs/verification/CI_BASELINE.md) records provenance and
+hosted acceptance; a local replay does not establish a hosted CI pass.
 
 When changing the host adapters or combined sample, also run
 `cargo test --test host_adapters`, `cargo test --test host_sample`, and
@@ -204,9 +219,10 @@ ordering, module cohesion, and abstraction quality in review unless a narrow
 parse-aware rule proves reliable; do not enforce architecture with regular
 expressions.
 
-A strict physical-line checker, dependency-policy tool, CI workflow, or
-toolchain pin requires its own justified baseline and review. New and touched
-code must not worsen known findings while a gate is deferred. Record any
+A strict physical-line checker, dependency-policy tool, or toolchain pin
+requires its own justified baseline and review. ADR-0023 separately records
+the adopted CI configuration and its outstanding hosted validation. New and
+touched code must not worsen known findings while a gate is deferred. Record any
 environment-only failure precisely rather than weakening a threshold or hiding
 warnings.
 

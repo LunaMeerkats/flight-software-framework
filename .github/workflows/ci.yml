@@ -1,0 +1,61 @@
+name: Host Rust baseline
+
+on:
+  push:
+    branches: [codex/nightly]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host:
+    name: Stable Rust on Windows
+    runs-on: windows-2025
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      RUSTUP_TOOLCHAIN: stable
+      RUSTDOCFLAGS: -D warnings
+      CARGO_TERM_COLOR: always
+    steps:
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Install stable Rust with required components
+        run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy --no-self-update
+      - name: Record checkout
+        run: git rev-parse HEAD
+      - name: Record compiler
+        run: rustc --version --verbose
+      - name: Record Cargo
+        run: cargo --version
+      - name: Record rustfmt
+        run: cargo fmt --version
+      - name: Record Clippy
+        run: cargo clippy --version
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Check all targets and features
+        run: cargo check --locked --workspace --all-targets --all-features
+      - name: Lint all targets and features
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - name: Test workspace
+        run: cargo test --locked --workspace --all-features
+      - name: Test shared host adapters
+        run: cargo test --locked --test host_adapters
+      - name: Test combined host sample
+        run: cargo test --locked --test host_sample
+      - name: Build documentation with warnings denied
+        run: cargo doc --locked --workspace --all-features --no-deps
+      - name: Run combined host sample
+        run: cargo run --locked --example host-echo
+      - name: Check committed tip whitespace
+        run: git show --format= --check --diff-merges=first-parent HEAD
+      - name: Check working tree whitespace
+        run: git diff --check

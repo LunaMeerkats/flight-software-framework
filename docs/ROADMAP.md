@@ -167,6 +167,12 @@ re-demonstration of the narrow RFF-REQ-008 behavior.
 
 ## Stage 4 — v0.1 integration and review
 
+ADR-0023 configures one Windows GitHub Actions job for the existing baseline
+and sample. Local command replay and workflow validation are a configuration
+checkpoint; [hosted acceptance](verification/CI_BASELINE.md) remains open.
+Publication requires separate authorization under AGENTS.md. No successful
+hosted run or completed v0.1 review is claimed.
+
 - Run the complete sample mission and verification suite in CI.
 - Audit all resource bounds, failure paths, dependency licences, public APIs,
   provenance, and unsupported claims.

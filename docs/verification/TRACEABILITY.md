@@ -187,6 +187,18 @@ ADR-0018/0019 experiments are unchanged and not separately rerun. CI,
 RFF-REQ-001's human entry-point review, dependency review, and human v0.1
 architecture review are not established by this sample increment.
 
+## CI configuration checkpoint
+
+[ADR-0023](../adr/0023-host-ci-baseline.md) and the
+[CI verification record](CI_BASELINE.md) encode the Stage 4 Cargo/sample job.
+The initial required baseline and locked workflow command replay pass locally
+with 115 tests; focused adapter/sample reruns pass 14/five tests respectively.
+Rust source and requirement meanings are unchanged from
+`634941453be2503371d962f5d80ec865448a730a`. Existing evidence hashes above
+remain valid for their recorded boundaries. This checkpoint does not change
+any requirement's verification status or complete the CI release gate.
+No hosted run URL or result exists for the unpublished workflow.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

@@ -34,6 +34,85 @@ bounded observation fixture, alternatives, and limits. This is independently
 written local composition and test evidence; no external research, source
 reuse, new dependency, or upstream behavior claim was needed.
 
+## SRC-GITHUB-WORKFLOW — CI syntax, permissions, and shell results
+
+- Title: Workflow syntax for GitHub Actions
+- Organisation: GitHub
+- Source: <https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax>
+- Version: public documentation accessed 2026-09-12
+- Informed: workflow location, job timeout, permission scoping, and built-in
+  PowerShell exit handling. The wrapper propagates a nonzero result from the
+  last native command; numerical exit-code preservation is not assumed.
+- Local treatment: adopt one explicit native command per step, read-only
+  contents, a 20-minute timeout, and named check steps in ADR-0023. Reject
+  treating a workflow file or local replay as a hosted pass.
+
+## SRC-GITHUB-EVENTS — CI event and revision boundaries
+
+- Title: Events that trigger workflows
+- Organisation: GitHub
+- Source: <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows>
+- Version: public documentation accessed 2026-09-12
+- Informed: ordinary PR merge revisions, default activity types, manual dispatch
+  availability, and possible conflicts/approval holds.
+- Local treatment: adopt ordinary PR checks, a default-branch push filter,
+  and manual dispatch. Record the actual checkout SHA; reject privileged PR
+  execution or extending a result to an untested revision.
+
+## SRC-GITHUB-HOST-CHECKOUT — Hosted image and checkout provenance
+
+- Titles: GitHub-hosted runners reference; Checkout action
+- Organisation: GitHub / actions
+- Sources: <https://docs.github.com/en/actions/reference/runners/github-hosted-runners>
+  and <https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1>
+- Version: accessed 2026-09-12; checkout v7.0.1 tag verified with upstream
+  `git ls-remote`, commit `3d3c42e5aac5ba805825da76410c181273ba90b1`
+- Informed: Windows 2025 hosted label, moving image contents, checkout's event
+  revision, history depth, and credential persistence setting.
+- Local treatment: adopt the named Windows image and a full checkout commit
+  pin with depth two and persisted credentials disabled. Keep the hosted image
+  unpinned and actual execution unverified. This references an external action;
+  no action source is vendored into or reused in the Rust library.
+
+## SRC-RUST-CI-TOOLCHAIN — Stable selection and locked resolution
+
+- Titles: Toolchains — The rustup book; cargo check — The Cargo Book
+- Organisation: The Rust Project
+- Sources: <https://rust-lang.github.io/rustup/concepts/toolchains.html>
+  and <https://doc.rust-lang.org/cargo/commands/cargo-check.html>
+- Version: stable documentation and local `rustup toolchain install --help`
+  inspected 2026-09-12; local Rust/Cargo 1.98.0
+- Informed: named stable toolchain and Cargo's `--locked` resolution behavior.
+- Local treatment: retain floating stable, explicitly request required
+  components, and reject lockfile changes in CI. Log versions rather than
+  claiming an MSRV, compiler pin, or fully reproducible environment.
+
+## SRC-GIT-CI-WHITESPACE — Committed diff inspection
+
+- Titles: git-diff; git-show
+- Organisation: Git project
+- Sources: <https://git-scm.com/docs/git-diff>
+  and <https://git-scm.com/docs/git-show>
+- Version: public documentation accessed 2026-09-12 and local Git behavior
+- Informed: `--check` detects introduced whitespace and merge diff selection
+  determines what committed changes are inspected.
+- Local treatment: retain local working-tree checking and separately inspect
+  the committed tip against its first parent, including a PR merge. Record the
+  multiple-commit push limitation; test root, ordinary, and merge fixtures.
+
+## SRC-ACTIONLINT — Temporary workflow validation
+
+- Titles: actionlint installation; checks
+- Author: rhysd and actionlint contributors
+- Sources: <https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md>
+  and <https://github.com/rhysd/actionlint/blob/v1.7.12/docs/checks.md>
+- Version: v1.7.12, tag commit `914e7df21a07ef503a81201c76d2b11c789d3fca`,
+  accessed 2026-09-12; Windows archive checksum recorded in the CI baseline
+- Informed: workflow YAML, expressions, actions, and runner-label validation.
+- Local treatment: use a checksum-verified temporary standalone validator for
+  workflow maintenance, with separate PowerShell parsing/behavior review.
+  No validator binary is committed or added to CI, Cargo, or Rust source gates.
+
 ## SRC-RUST-MODULE-PATH — Explicit shared module source
 
 - Title: Modules — The Rust Reference, module source filenames and path attribute
