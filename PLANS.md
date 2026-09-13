@@ -1,7 +1,7 @@
 # Stage 4 messaging construction resource review
 
 Date: **2026-09-14**
-Status: **Locally verified; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -78,4 +78,14 @@ layout measurements. Independent complete-diff review found no defect.
 
 Logs and reused temporary aids are under `target/review-2026-09-14`.
 ADR-0018/0019, separate host, and actionlint local reruns are not triggered by
-this change. Publication results will be recorded after the exact run completes.
+this change.
+
+## Publication result
+
+Published `4db1a8074b014abc1c9b5cf3df5daef3cfca2b55` by ordinary fast-forward;
+the remote head matched. Hosted run 34780028767 passes at that exact revision:
+one job/all 20 steps, 117 workspace tests including both new regressions,
+14/five focused host tests, and the sample. The
+[constructor review](docs/verification/MESSAGING_CONSTRUCTION_REVIEW.md)
+records its URL and actual host/toolchain. This evidence-only follow-up changes
+no Rust source and does not project the recorded CI pass onto later commits.

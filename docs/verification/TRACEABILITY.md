@@ -220,6 +220,11 @@ The focused command `cargo test --locked --test message_bus --test runtime_messa
 passes eight/11 tests. These are public capacity-overflow and ownership-return
 regressions, not allocator-exhaustion injection or a complete Stage 4 audit.
 The review record separates source-inspected branches and remaining work.
+Tests and review are committed at
+`4db1a8074b014abc1c9b5cf3df5daef3cfca2b55`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34780028767)
+passes 117 workspace tests, both focused host targets, and the full configured
+baseline/sample. This documentation-only follow-up records that exact evidence.
 
 ## Evidence policy
 

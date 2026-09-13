@@ -19,14 +19,19 @@ public-API review and human v0.1 entry-point/architecture acceptance remain open
 - New focused messaging tests pass eight standalone and 11 owner tests.
   The [constructor review](verification/MESSAGING_CONSTRUCTION_REVIEW.md)
   separates capacity overflow from allocator exhaustion and source review.
-- Final required baseline passes 117 tests. Source widths, 170 relative links,
+- Final required baseline passes 117 tests. Source widths, relative links,
   81 exact test references, rendered content/DOM/layout, and independent diff
   review pass. Browser screenshot capture timed out; pixel inspection was
   unavailable. The plan records that rendered-review limitation.
 - The [dependency/scope record](verification/DEPENDENCY_SCOPE_REVIEW.md)
   retains the empty external Cargo graph and unchanged approved licences.
   The [CI baseline](verification/CI_BASELINE.md) records hosted provenance;
-  earlier hosted passes do not prove this run's changes.
+  earlier hosted passes do not prove later revisions.
+- Published checkpoint `4db1a8074b014abc1c9b5cf3df5daef3cfca2b55` has matching
+  remote identity and successful
+  [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34780028767):
+  one job/all 20 steps, 117 workspace tests, both focused host targets, and the
+  sample. The constructor record retains the actual image/toolchain evidence.
 
 ## Current architecture
 
@@ -39,8 +44,9 @@ unchanged by this test/review increment.
 
 ## Work in progress
 
-The constructor checkpoint is locally verified and independently reviewed.
-Publication and exact-revision hosted CI remain to be completed this run.
+No unfinished implementation remains. The constructor checkpoint is published
+with successful exact-revision CI. This evidence-only follow-up records the
+result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -73,4 +79,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 later-inbox overflow tests, including returned-runtime attachment with corrected
 capacities and preserved application behavior. The review records untouched
 allocation-error branches and whole-process-bound limits. Local checks and
-review pass; publication is pending. No human acceptance is inferred.
+review pass, and the published checkpoint's exact hosted CI passes. No human
+acceptance is inferred.

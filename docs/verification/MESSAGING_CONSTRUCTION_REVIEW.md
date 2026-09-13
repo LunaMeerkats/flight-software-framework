@@ -109,12 +109,32 @@ Rustdoc uses `RUSTDOCFLAGS=-D warnings`. The complete diff, 32-file source
 width/expectation audit, relative links, exact traceability references, and
 six changed rendered documents pass source/content and browser DOM/layout
 inspection. Screenshot capture timed out; pixel-level inspection is not
-claimed. The [plan](../../PLANS.md) records the local review adaptation and
-temporary aids; this record retains the boundary when that rolling plan changes.
-Publication and exact-revision hosted CI are pending.
+claimed. The
+[completed local plan](https://github.com/LunaMeerkats/flight-software-framework/blob/4db1a8074b014abc1c9b5cf3df5daef3cfca2b55/PLANS.md)
+records the adaptation and temporary aids at that immutable revision.
 
 Next select one remaining lifecycle/dispatch interaction boundary or another
 service's resource/failure contract. Revisit these findings if topology
 mutation, allocation ownership, message representation, configuration attachment,
 or concurrency changes. Human entry-point/architecture acceptance and the wider
 Stage 4 audit remain open. No operational or compatibility claim follows.
+
+## Published checkpoint evidence
+
+Commit `4db1a8074b014abc1c9b5cf3df5daef3cfca2b55` contains both tests and
+the reviewed checkpoint. Ordinary fast-forward publication succeeded, and
+the remote head matched. On 2026-09-13 UTC (2026-09-14 Sydney),
+[hosted run 34780028767](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34780028767)
+completed successfully with one job/all 20 steps. Job logs confirm that exact
+checkout, both new regression names, 117 workspace tests, 14 adapter tests,
+five sample tests, the sample executable, and every remaining baseline step.
+
+The runner is 2.337.0, image `windows-2025-vs2026` version `20260907.229.1`
+(requested label `windows-2025`). Actual rustc/Cargo are 1.98.1, rustfmt is
+1.9.0-stable, and Clippy is 0.1.98. These match the prior hosted environment;
+local Rust/Cargo remain 1.98.0. The whole-tree source-form audit and all-target
+hosted checks preserve the existing policy without a new waiver or toolchain
+pin. Logs are retained locally under `target/review-2026-09-14`.
+
+This evidence-only follow-up changes no Rust source. The recorded run does not
+establish CI success at a later commit, human acceptance, or wider scope.
