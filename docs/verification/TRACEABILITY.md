@@ -206,6 +206,21 @@ passes at `abb1293790136128d5f27d8c48c1e3d98a355540`: one job, all 20 steps,
 boundary. This establishes the hosted CI release gate at that revision;
 human entry-point, dependency/scope, and architecture acceptance remain open.
 
+## Messaging construction resource checkpoint
+
+The 2026-09-14
+[constructor review](MESSAGING_CONSTRUCTION_REVIEW.md) supplements RFF-REQ-003
+without changing its meaning or the historical evidence hashes above.
+`oversized_later_inbox_returns_exact_reservation_error` asserts the exact
+later-inbox capacity-overflow error; through the owner,
+`oversized_later_inbox_preserves_runtime_for_corrected_attachment` observes
+registered identities/count/capacity, corrected attachment with fresh inboxes,
+preserved application behavior, and healthy peer publication/work.
+The focused command `cargo test --locked --test message_bus --test runtime_messaging`
+passes eight/11 tests. These are public capacity-overflow and ownership-return
+regressions, not allocator-exhaustion injection or a complete Stage 4 audit.
+The review record separates source-inspected branches and remaining work.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

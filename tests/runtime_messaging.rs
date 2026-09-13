@@ -195,6 +195,71 @@ fn invalid_inbox_configuration_preserves_the_owned_runtime() {
 }
 
 #[test]
+fn oversized_later_inbox_preserves_runtime_for_corrected_attachment() {
+    let mut runtime = Runtime::new(2).expect("two runtime records can be reserved");
+    let application_ids = [None, Some(FailurePoint::Start)].map(|failure| {
+        runtime
+            .register(MissionApplication { failure })
+            .expect("application fits")
+    });
+    let configurations =
+        [1, usize::MAX].map(|capacity| RuntimeInboxConfig::new(capacity, &COMMAND_ONLY));
+
+    // A later reservation overflows after the first endpoint was constructed.
+    let error = MissionRuntime::new(runtime, &configurations)
+        .expect_err("the second inbox capacity is unrepresentable");
+    assert_eq!(
+        error.kind(),
+        MessagingRuntimeCreateErrorKind::MessageBus(
+            MessageBusCreateError::InboxStorageAllocationFailed {
+                application_id: application_ids[1],
+                requested: usize::MAX,
+            }
+        )
+    );
+    assert_eq!(error.runtime().len(), 2);
+    assert_eq!(error.runtime().capacity(), 2);
+    for application_id in application_ids {
+        assert_eq!(
+            error.runtime().state(application_id),
+            Ok(ApplicationState::Registered)
+        );
+    }
+
+    let corrected = [1, 2].map(|capacity| RuntimeInboxConfig::new(capacity, &COMMAND_ONLY));
+    let mut recovered = MissionRuntime::new(error.into_runtime(), &corrected)
+        .expect("the returned runtime accepts corrected inbox capacities");
+    for (application_id, capacity) in application_ids.into_iter().zip([1, 2]) {
+        assert_eq!(recovered.pending(application_id), Ok(0));
+        assert_eq!(recovered.inbox_capacity(application_id), Ok(capacity));
+    }
+    assert_eq!(
+        recovered.start(application_ids[0]),
+        Ok(ApplicationState::Running)
+    );
+    let start_error = recovered
+        .start(application_ids[1])
+        .expect_err("failure setting is retained");
+    assert_eq!(
+        start_error.operation_error(),
+        &RuntimeStartError::Application {
+            application_id: application_ids[1],
+            source: MissionFailure(FailurePoint::Start),
+        }
+    );
+    let report = recovered.publish(&command(7)).expect("report storage fits");
+    assert_eq!(
+        delivery_statuses(&report),
+        [DeliveryStatus::Delivered, DeliveryStatus::Unavailable]
+    );
+    assert_eq!(recovered.pending(application_ids[0]), Ok(1));
+    assert_eq!(
+        recovered.work(application_ids[0]),
+        Ok(ApplicationState::Running)
+    );
+}
+
+#[test]
 fn registered_subscribers_are_known_but_unavailable() {
     let (mut runtime, application_ids) = configured_runtime([None, None], [1, 2]);
 

@@ -1,91 +1,81 @@
-# Stage 4 dependency and scope review
+# Stage 4 messaging construction resource review
 
-Date: **2026-09-13**
-Status: **Complete: review published and exact-revision hosted CI passed**
+Date: **2026-09-14**
+Status: **Locally verified; publication and hosted CI pending**
 
 ## Objective and context
 
-Record one bounded autonomous review of dependency features, licence metadata,
-and user-facing scope claims. The combined sample and hosted CI already pass;
-this is the next recorded Stage 4 task. It prepares evidence for human v0.1
-architecture review without claiming that review or freezing the public API.
+Audit the existing message-topology construction boundary and prove that an
+unrepresentable inbox capacity returns its typed error without losing the
+owned runtime. This is one bounded part of Stage 4's resource/failure/public-API
+review; the remaining services and human v0.1 acceptance stay open.
 
 Started clean on `codex/nightly` at
-`c472c57c1aa241d821b891674ba25f42b25ae723`, equal to the refreshed origin.
+`553fb50832a2aa4948944d051575cc5fb704ea26`, equal to refreshed origin.
 The initial locked Cargo baseline passes 115 tests on local Rust/Cargo 1.98.0,
-rustfmt 1.9.0-stable, and Clippy 0.1.98. The existing 32-file source audit has
-zero width findings and three fulfilled expectations. No policy adoption or
-runtime feature is needed.
+rustfmt 1.9.0-stable, and Clippy 0.1.98. Existing formatting and lint policy
+remain encoded; no policy adoption or runtime feature is needed.
 
 ## Acceptance criteria
 
-- Reconcile manifest, lockfile, full metadata, all-target dependency/feature
-  tree, tracked build inputs, approved licence files, and CI tooling boundary.
-- Inventory top-level, sample, and generated documentation entry points;
-  correct concrete scope/status ambiguity while preserving requirement meaning.
-- Record reviewed source revision, primary sources, commands, findings, limits,
-  revisit triggers, and remaining human acceptance in one verification record.
-- Pass the required baseline, source/relative-link/traceability audits,
+- Reconcile constructor validation/reservation order, logical retained bounds,
+  typed errors, ownership return, and source-inspection-only failure paths.
+- Exercise `usize::MAX` inbox capacity with a small nonzero-sized message after
+  a valid first endpoint, asserting exact identity and requested capacity.
+- Through `MessagingRuntime`, recover both unchanged registered applications,
+  attach a corrected topology, and demonstrate preserved callback behavior and
+  subsequent peer delivery/work. Do not claim simulated allocator exhaustion.
+- Record exact tests, reviewed input, primary-source treatment, limits, and
+  remaining audit work without changing requirement meaning or public APIs.
+- Pass the applicable baseline, source/relative-link/traceability audit,
   rendered-document inspection, and independent complete-diff review.
-- Commit the coherent checkpoint and publish by ordinary fast-forward, then
-  inspect the exact remote revision and completed hosted CI results.
+- Commit and publish by ordinary fast-forward, verify the remote head, and
+  inspect completed hosted CI at the exact published revision.
 
-## Components and approach
+## Components and verification
 
-Add `docs/verification/DEPENDENCY_SCOPE_REVIEW.md`; update its source register,
-README, crate notice, the sample ADR's CI status, roadmap, project state,
-traceability, and the CI baseline's immutable evidence link. Leave dependencies,
-licences, runtime behavior, tests, workflow, lint policy, and requirement meanings
-unchanged.
+Change only the two messaging integration test files and supporting plan,
+review, source register, traceability, roadmap, and project-state records.
+Compare a deterministic capacity-overflow input with global allocator fault
+injection: use the public overflow boundary; defer allocator injection because
+it needs an isolated harness and independent justification.
 
-Use official Cargo metadata/tree documentation for graph semantics and the
-existing licence decision with current primary licence texts for content review.
-Compare direct evidence review with adding dependency tooling: retain direct
-review for the empty external graph; a new policy tool needs its own plan.
-
-## Verification approach
-
-Run the six AGENTS.md baseline commands, using the supported `--locked` Cargo
-forms and `RUSTDOCFLAGS=-D warnings`. Run the executable to inspect its actual
-notice and controlled report. Host source behavior and ADR-0018/0019 probes
-are unchanged; focused host reruns and standalone probes are conditional.
-Temporary review aids under `target/review-2026-09-13` render Markdown and
-check relative links, exact traceability references, source widths, and rendered
-content. Inspect rendered pages separately; these aids are not new policy gates.
+Run `cargo test --locked --test message_bus --test runtime_messaging` and all
+six AGENTS.md baseline commands with supported locked Cargo forms and
+`RUSTDOCFLAGS=-D warnings`. Host adapters, workflow, and ADR-0018/0019 probes
+are unchanged, so their additional local checks are not triggered.
+Reuse inspected temporary render/audit aids under `target/review-2026-09-14`;
+these remain local review aids, not new repository policy tools.
 
 ## Risks and safe stopping point
 
-An empty Cargo graph does not cover the standard library, operating system,
-compiler/linker, CI runner/action internals, or local review tools. Text and
-metadata inspection is not security, legal, redistribution, or operational
-clearance. Human entry-point and architecture acceptance remain pending.
-The safe stopping point is a verified review record and narrow documentation
-corrections. Revert only this run's own changes if they cannot be verified;
-preserve all prior source and generated review artifacts.
+Logical slots and inline payload bounds do not bound whole-process memory,
+caller-retained values, allocator overhead, stack use, or callback/topic effects.
+Capacity overflow does not establish allocator-exhaustion behavior. Report,
+endpoint, topic, and dispatch-state allocation failures still require distinct
+execution evidence. The safe stopping point is two public-contract regressions
+and an honest review record. Preserve prior artifacts and unexpected changes;
+revert only this run's own work if it cannot meet the baseline.
 
 ## Completed local evidence
 
-The final locked baseline passes 115 tests, warnings-denied Clippy/rustdoc,
-formatting, checking, and whitespace review. The executable notice/report,
-32-file source width and expectation audit, 79 exact test references, relative
-links, generated Markdown content, and browser layouts pass inspection.
-Independent complete-diff review identified a historical CI-evidence link
-that would follow the rolling plan; it now targets immutable commit c472c57.
-No behavior, dependency, licence, workflow, test, or lint policy changed.
+All six required baseline commands pass; the workspace has 117 passing tests.
+The focused command passes eight bus and 11 owner tests. No source-policy
+waiver, production behavior, dependency, or API change was needed. Initial
+Clippy review found 63 counted lines in the owner test; expressing the repeated
+topology as a capacity array mapped to configurations restores the 60-line
+baseline without dropping assertions. A trailing document blank line was
+corrected before the final whitespace pass.
 
-Review aids/logs: `target/review-2026-09-13`. Render with
-`./target/review-2026-09-13/render-documents.ps1 <phase>`, then run the local
-`audit-documents.py <phase>` and `review-rendered-content.py <phase>` with
-Python. The second aid compares the current diff with rendered text, code,
-headings, tables, and source hashes; browser inspection is separate.
-These temporary aids do not introduce a new checker or dependency gate.
+The whole-tree audit covers 32 Rust files with zero physical/comment width
+findings and three unchanged fulfilled expectations, 40 Markdown files with
+170 resolved relative links, and 81 exact traceability test references.
+All six changed rendered documents match source text/structure and were
+inspected through browser DOM and 1280px layout without page overflow.
+Screenshot capture timed out twice; pixel-level screenshot inspection is
+unavailable, not passed. This run's rendered inspection uses DOM content and
+layout measurements. Independent complete-diff review found no defect.
 
-## Publication result
-
-Commit `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` was published by ordinary
-fast-forward; the remote head matched. Hosted run 34727157216 passes at that
-exact SHA: one job/all 20 steps, 115 workspace tests, both focused host targets,
-the sample, and all remaining baseline commands. The
-[review record](docs/verification/DEPENDENCY_SCOPE_REVIEW.md) contains the run
-URL and actual image/toolchain. This evidence-only follow-up leaves the verified
-source unchanged and does not project CI success onto later commits.
+Logs and reused temporary aids are under `target/review-2026-09-14`.
+ADR-0018/0019, separate host, and actionlint local reruns are not triggered by
+this change. Publication results will be recorded after the exact run completes.

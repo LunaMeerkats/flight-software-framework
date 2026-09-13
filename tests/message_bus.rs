@@ -109,6 +109,26 @@ fn topology_validation_rejects_invalid_inboxes_without_a_partial_bus() {
 }
 
 #[test]
+fn oversized_later_inbox_returns_exact_reservation_error() {
+    let application_ids = configured_application_ids::<2>();
+    let configurations = [
+        ApplicationInboxConfig::new(application_ids[0], 1, &COMMAND_ONLY),
+        ApplicationInboxConfig::new(application_ids[1], usize::MAX, &COMMAND_ONLY),
+    ];
+
+    // A nonzero-sized message cannot fit usize::MAX slots. This exercises
+    // capacity overflow after an earlier inbox was built, not simulated OOM.
+    assert_eq!(
+        MessageBus::<MissionTopic, 4>::new(&configurations)
+            .expect_err("the later inbox requests an unrepresentable capacity"),
+        MessageBusCreateError::InboxStorageAllocationFailed {
+            application_id: application_ids[1],
+            requested: usize::MAX,
+        }
+    );
+}
+
+#[test]
 fn reject_newest_saturation_preserves_older_entries_and_healthy_fan_out() {
     let application_ids = configured_application_ids::<2>();
     let mut bus = two_command_subscriber_bus::<4>(application_ids, [1, 2]);

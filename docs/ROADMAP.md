@@ -185,8 +185,12 @@ records an empty external Cargo dependency/feature graph, unchanged approved
 licences, separate host/CI tool dependencies, and an autonomous entry-point
 scope inventory. Crate notice omissions and stale sample CI wording are
 corrected. This completes the bounded dependency/features review and prepares
-scope evidence. Resource/failure-path/public-API review and human entry-point
-and architecture acceptance remain open; Stage 4 is not complete.
+scope evidence. The 2026-09-14
+[messaging construction review](verification/MESSAGING_CONSTRUCTION_REVIEW.md)
+adds exact later-inbox reservation-overflow and returned-runtime reuse evidence.
+This closes one constructor boundary; lifecycle/dispatch interactions, other
+service resource/failure/public-API reviews, and human entry-point/architecture
+acceptance remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

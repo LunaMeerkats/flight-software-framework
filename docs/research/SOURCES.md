@@ -505,3 +505,16 @@ only; no new implementation, dependency, or upstream behavior is adopted.
   Australian Space Agency code-style standard applicable to this repository.
   Do not invent one or imply Australian certification; evaluate the cited ECSS
   sources on their own terms.
+
+## SRC-RUST-DEQUE-RESERVATION — Fallible inbox reservation
+
+- Title: VecDeque::try_reserve_exact — Rust standard library
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/std/collections/struct.VecDeque.html#method.try_reserve_exact>
+- Version: Rust 1.98.1 documentation, accessed 2026-09-14; local tests use 1.98.0
+- Informed: reservation can return capacity-overflow or allocator failure;
+  successful allocator capacity need not equal the requested logical limit.
+- Local treatment: retain explicit logical inbox limits and typed reservation
+  errors. Adopt deterministic oversized-capacity regression inputs through the
+  standalone bus and runtime owner. Do not treat these as injected allocator
+  exhaustion, whole-process memory bounds, or deallocation instrumentation.
