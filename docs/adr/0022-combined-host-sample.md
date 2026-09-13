@@ -77,9 +77,10 @@ not a growing event log. Diagnostic stdout is outside the scenario callbacks.
 ## Evidence
 
 The required baseline and focused sample/adapter results are recorded in
-[the plan](../../PLANS.md). Five tests execute the same complete driver and
-assert exact lifecycle states, adapter bytes, equal-time ordering, callback
-configuration, rejection/rollback, original error chain, event fields, inbox
+[the sample guide](../verification/HOST_SAMPLE.md) and
+[traceability](../verification/TRACEABILITY.md). Five tests execute the same
+complete driver and assert exact lifecycle states, adapter bytes, equal-time
+ordering, callback configuration, rejection/rollback, original error chain, event fields, inbox
 clearing, peer progress, and fresh-run report equality. A focused adapter test
 also proves telemetry does not consume the armed echo fault and that the
 switch is consume-once. Existing hostile-input and saturation tests remain.
@@ -87,7 +88,10 @@ switch is consume-once. Existing hostile-input and saturation tests remain.
 ## Consequences, risks, and revisit conditions
 
 This completes the combined host behavior demonstration, not the v0.1 release.
-CI, scope/dependency review, and human architecture review remain outstanding.
+CI was outstanding at this decision; the subsequent
+[hosted baseline](../verification/CI_BASELINE.md) passed. The
+[autonomous dependency and scope review](../verification/DEPENDENCY_SCOPE_REVIEW.md)
+prepares evidence; human entry-point and architecture acceptance remain pending.
 The scenario demonstrates repeatability only for its initial state, fixed
 inputs, manual time, and caller order. It does not contain panics or hangs,
 recover a failed application, establish real-time behavior, or guarantee

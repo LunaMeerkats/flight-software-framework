@@ -180,6 +180,14 @@ separately; source publication does not complete v0.1 release review.
   provenance, and unsupported claims.
 - Record a v0.1 architecture review before widening scope.
 
+The 2026-09-13 [dependency and scope checkpoint](verification/DEPENDENCY_SCOPE_REVIEW.md)
+records an empty external Cargo dependency/feature graph, unchanged approved
+licences, separate host/CI tool dependencies, and an autonomous entry-point
+scope inventory. Crate notice omissions and stale sample CI wording are
+corrected. This completes the bounded dependency/features review and prepares
+scope evidence. Resource/failure-path/public-API review and human entry-point
+and architecture acceptance remain open; Stage 4 is not complete.
+
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments
 before adding a large feature surface.

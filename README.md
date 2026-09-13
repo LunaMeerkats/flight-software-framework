@@ -146,7 +146,12 @@ review responsibilities rather than unsupported automated claims.
 
 ## Development
 
-The package is unpublished and uses stable Rust with no external dependencies.
+The package is unpublished and uses stable Rust with no external Cargo
+dependencies or package features. The standard library, host environment,
+toolchain, and CI tooling remain outside that Cargo graph. The
+[dependency and scope review](docs/verification/DEPENDENCY_SCOPE_REVIEW.md)
+records the exact inventory and autonomous review boundary; human v0.1
+entry-point and architecture acceptance remain pending.
 
 ```text
 cargo fmt --all -- --check

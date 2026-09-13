@@ -3,9 +3,10 @@
 Experimental host-side building blocks for the Rust Flight Framework.
 
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
-suitable for operational or safety-critical use. Its APIs and behavior are
-pre-v0.1 experiments and make no real-time, fault-tolerance, cFS, CCSDS, or RTOS
-compatibility claim.
+suitable for operational spacecraft, safety-critical, or human-rated use.
+No Technology Readiness Level is demonstrated. Its APIs and behavior are
+pre-v0.1 experiments and make no real-time or fault-tolerance claim, or claim
+of compatibility with cFS, cFE, OSAL, PSP, CCSDS, or an RTOS.
 "#]
 
 mod application_messaging;

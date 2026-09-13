@@ -34,6 +34,26 @@ bounded observation fixture, alternatives, and limits. This is independently
 written local composition and test evidence; no external research, source
 reuse, new dependency, or upstream behavior claim was needed.
 
+The **2026-09-13** [dependency and scope review](../verification/DEPENDENCY_SCOPE_REVIEW.md)
+uses current Cargo graph documentation and rechecks the existing licence
+sources below. It preserves the approved terms and records autonomous evidence
+only; no new implementation, dependency, or upstream behavior is adopted.
+
+## SRC-RUST-CARGO-GRAPH — Dependency and feature review semantics
+
+- Titles: cargo metadata; cargo tree — The Cargo Book
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/cargo/commands/cargo-metadata.html>
+  and <https://doc.rust-lang.org/cargo/commands/cargo-tree.html>
+- Version: public documentation accessed 2026-09-13; local Cargo 1.98.0
+- Informed: complete metadata includes resolved packages and enabled features;
+  omitting platform filtering retains all target platforms. Tree output exposes
+  dependency kinds/features but does not promise exact build equivalence.
+- Local treatment: adopt format-version 1 metadata without `--no-deps`,
+  all-target/all-edge trees, and direct manifest/lockfile review together.
+  Reject extending an empty Cargo graph to standard-library, host, CI,
+  security, or complete redistribution claims. No new checker is adopted.
+
 ## SRC-GITHUB-WORKFLOW — CI syntax, permissions, and shell results
 
 - Title: Workflow syntax for GitHub Actions
@@ -73,6 +93,11 @@ reuse, new dependency, or upstream behavior claim was needed.
   pin with depth two and persisted credentials disabled. Keep the hosted image
   unpinned and actual execution unverified. This references an external action;
   no action source is vendored into or reused in the Rust library.
+- Review follow-up 2026-09-13: the exact commit's
+  [top-level licence](https://github.com/actions/checkout/blob/3d3c42e5aac5ba805825da76410c181273ba90b1/LICENSE)
+  is MIT. This does not review its bundled third-party components. The hosted
+  execution hold above describes the initial configuration checkpoint;
+  subsequent exact-revision results are in the CI baseline.
 
 ## SRC-RUST-CI-TOOLCHAIN — Stable selection and locked resolution
 
@@ -293,6 +318,7 @@ reuse, new dependency, or upstream behavior claim was needed.
 - Organisation: The Rust Project
 - Source: <https://doc.rust-lang.org/cargo/reference/manifest.html#the-license-and-license-file-fields>
 - Version: stable documentation accessed 2026-08-26
+- Content/metadata review repeated 2026-09-13; approved expression unchanged.
 - Informed: Cargo uses SPDX expressions, and `OR` permits recipients to choose
   either listed licence.
 - Local treatment: use `MIT OR Apache-2.0` as the Cargo expression now that the
@@ -304,6 +330,8 @@ reuse, new dependency, or upstream behavior claim was needed.
 - Organisation: Open Source Initiative
 - Source: <https://opensource.org/license/mit>
 - Version: SPDX identifier `MIT`, accessed 2026-08-26
+- Rechecked 2026-09-13: tracked content agrees allowing wrapping, quote
+  typography, and the approved holder substitution; no licence change.
 - Informed: permissive use and redistribution terms, required notice retention,
   and warranty/liability disclaimer.
 - Local treatment: apply as one recipient-selectable branch of the repository's
@@ -315,6 +343,8 @@ reuse, new dependency, or upstream behavior claim was needed.
 - Organisation: Apache Software Foundation
 - Source: <https://www.apache.org/licenses/LICENSE-2.0.txt>
 - Version: Apache License 2.0, January 2004; accessed 2026-08-26
+- Rechecked 2026-09-13: terms agree after trimming; the current remote text
+  adds one leading newline. Content agreement is not byte identity.
 - Informed: copyright and patent grants, redistribution conditions, trademark
   limitation, and warranty/liability disclaimer.
 - Local treatment: apply the unmodified terms as one recipient-selectable branch

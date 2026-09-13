@@ -56,7 +56,9 @@ Its source/version provenance is recorded in
 maintenance check, not a new CI action, runtime dependency, Rust source-shape
 gate, or proof that GitHub will execute a job. PowerShell parsing and bounded
 failure/whitespace probes complement static workflow validation; exact results
-are recorded in [the completed plan](../../PLANS.md).
+are recorded in the
+[completed CI plan at c472c57](https://github.com/LunaMeerkats/flight-software-framework/blob/c472c57c1aa241d821b891674ba25f42b25ae723/PLANS.md).
+This immutable reference preserves the evidence as the active plan advances.
 
 The committed whitespace command checks a root or tip commit, or a merge
 against its first parent. A push containing multiple commits does not get
