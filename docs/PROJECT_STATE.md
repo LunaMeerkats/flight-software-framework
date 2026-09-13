@@ -29,6 +29,12 @@ entry-point and architecture acceptance remain outstanding.
 - The final whole-tree audit covers 32 Rust files, zero width findings,
   three fulfilled expectations, and 79 exact traceability test references.
   ADR-0018/0019 probes are unchanged and not separately rerun.
+- Review/corrections commit `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` was
+  published by ordinary fast-forward and the remote head matched.
+  [Hosted run 34727157216](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34727157216)
+  passes one job/all 20 steps at that SHA, including 115 workspace tests,
+  14/five focused host tests, and the sample. Hosted Rust/Cargo 1.98.1 and
+  Windows image `20260907.229.1` match the prior recorded environment.
 
 ## Current architecture
 
@@ -44,10 +50,10 @@ checkout credentials, and one native command per PowerShell step.
 
 ## Work in progress
 
-The dependency and scope checkpoint has passed local verification and
-autonomous source/document/diff review. Commit/publication and exact-revision
-hosted verification are next. No runtime implementation is in progress.
-Source pushes are authorized under AGENTS.md; human v0.1 review is separate.
+No unfinished implementation remains. The dependency and scope checkpoint is
+published with successful exact-revision CI. This documentation-only follow-up
+records that result; later revisions require their own verification.
+Human v0.1 entry-point and architecture review remain separate.
 
 ## Highest risks and uncertainties
 
@@ -79,5 +85,6 @@ RTOS, and no_std remain open. Pre-v0.1 APIs and the local grammar remain unfroze
 2026-09-13: selected the planned dependency and scope checkpoint. Independent
 Codex audits found no blocking dependency/licence issue or positive unsupported
 scope claim. Corrected the generated crate notice, stale sample CI wording,
-and a historical CI evidence link. All local checks pass; publication results
-will replace the remaining in-progress status.
+and a historical CI evidence link. All local checks and the published
+checkpoint's exact hosted CI pass. No human acceptance or scope expansion is
+claimed; the next bounded review concerns resource/failure/public-API contracts.

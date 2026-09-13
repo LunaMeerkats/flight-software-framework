@@ -9,7 +9,8 @@ Reviewed input: `c472c57c1aa241d821b891674ba25f42b25ae723` on `codex/nightly`.
 The working tree was clean and equal to refreshed origin. This checkpoint
 changes documentation only, including the crate-level rustdoc notice; runtime
 behavior, tests, manifests, lockfile, licence files, workflow, and lint policy
-remain unchanged. The commit containing this record identifies the corrections.
+remain unchanged. Review/corrections commit:
+`e17c5d3363092dbe55ba1fc6bb94a6e66956c667`.
 
 Codex performed the review, with independent dependency/licence and scope
 audits. No human code review, RFF-REQ-001 acceptance, v0.1 architecture approval,
@@ -144,3 +145,27 @@ Revisit when manifests, lockfile, features, vendored/build inputs, licence
 content, toolchain/CI choices, public documentation entry points, or externally
 observable behavior change. Audit new dependencies before adoption; do not
 project this empty-graph result onto a later graph.
+
+## Publication evidence
+
+Published `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` by ordinary fast-forward
+from `c472c57`; the remote branch head matched. Refreshed ancestry and both
+working/staged whitespace checks passed before publication.
+
+[Hosted run 34727157216](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34727157216)
+is a `push` event for `Host Rust baseline`, with workflow and checkout at the
+same exact revision. It completed successfully: one Windows job, all 20 steps,
+115 workspace tests, 14 focused adapter tests, five focused sample tests,
+format/check/Clippy, warnings-denied rustdoc, executable sample, and both Git
+whitespace checks, including checkout/bootstrap and cleanup.
+
+The logged image is `windows-2025-vs2026` version `20260907.229.1`, runner
+2.337.0. Hosted rustc/Cargo are 1.98.1, rustfmt 1.9.0-stable, Clippy 0.1.98;
+this matches the prior hosted toolchain/image. The 32-file source-policy audit
+and new notice inspection accompany the all-target checks. No toolchain pin or
+human acceptance is implied. Logs and job/step JSON were inspected and retained
+under the temporary review directory.
+
+This documentation-only follow-up records the completed checkpoint result;
+later revisions require their own CI inspection. Source/manifest/workflow
+content is unchanged from the verified corrections commit.

@@ -1,7 +1,7 @@
 # Stage 4 dependency and scope review
 
 Date: **2026-09-13**
-Status: **Local review checkpoint complete; publication verification pending**
+Status: **Complete: review published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -34,8 +34,9 @@ runtime feature is needed.
 
 Add `docs/verification/DEPENDENCY_SCOPE_REVIEW.md`; update its source register,
 README, crate notice, the sample ADR's CI status, roadmap, project state,
-traceability, and the CI baseline's immutable evidence link. Leave dependencies, licences, runtime behavior, tests, workflow,
-lint policy, and requirement meanings unchanged.
+traceability, and the CI baseline's immutable evidence link. Leave dependencies,
+licences, runtime behavior, tests, workflow, lint policy, and requirement meanings
+unchanged.
 
 Use official Cargo metadata/tree documentation for graph semantics and the
 existing licence decision with current primary licence texts for content review.
@@ -78,3 +79,13 @@ Review aids/logs: `target/review-2026-09-13`. Render with
 Python. The second aid compares the current diff with rendered text, code,
 headings, tables, and source hashes; browser inspection is separate.
 These temporary aids do not introduce a new checker or dependency gate.
+
+## Publication result
+
+Commit `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` was published by ordinary
+fast-forward; the remote head matched. Hosted run 34727157216 passes at that
+exact SHA: one job/all 20 steps, 115 workspace tests, both focused host targets,
+the sample, and all remaining baseline commands. The
+[review record](docs/verification/DEPENDENCY_SCOPE_REVIEW.md) contains the run
+URL and actual image/toolchain. This evidence-only follow-up leaves the verified
+source unchanged and does not project CI success onto later commits.
