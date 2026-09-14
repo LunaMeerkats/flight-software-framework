@@ -1,7 +1,7 @@
 # Returned-message failure review
 
 Date: **2026-09-15**
-Status: **Local checkpoint complete; publication pending**
+Status: **Complete: published checkpoint has successful exact-revision CI**
 
 ## Reviewed boundary and decision
 
@@ -102,7 +102,7 @@ exact traceability references, and rendered source-content comparison pass.
 All eight changed documents pass browser DOM/layout and screenshot inspection
 at 1280px without page overflow or console warnings/errors. Independent
 complete-diff review found no blocking defect; its source-order clarification
-is incorporated in ADR-0012. Hosted publication is pending. No changed
+is incorporated in ADR-0012. No changed
 adapter, sample, workflow, or ADR-0018/0019 probe triggers separate local
 commands. The complete workspace suite still includes both host test targets.
 
@@ -112,3 +112,26 @@ existing tests. The broader audit and human v0.1 entry-point/architecture
 acceptance remain open. Revisit this checkpoint if dispatch becomes concurrent,
 publication gains transactional semantics, lifecycle availability changes, or
 the callback receives broader authority.
+
+## Published checkpoint evidence
+
+Commit `63b149fcaeaae5c9842d75a5493e8809da6a9eba` contains the strengthened
+failure test, new availability regression, and reviewed checkpoint. Ordinary
+fast-forward publication succeeded and the remote head matched. On 2026-09-14
+UTC (2026-09-15 Sydney),
+[hosted run 34901286073](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34901286073)
+completed successfully for that exact push/checkout revision: one Windows job
+and all 20 steps. Logs confirm 118 workspace tests, both targeted regression
+names, 14 focused adapter tests, five focused sample tests, the sample, and
+every configured baseline command.
+
+The runner is 2.337.0, image `windows-2025-vs2026` version `20260907.229.1`
+(requested label `windows-2025`). Actual rustc/Cargo are 1.98.1, rustfmt is
+1.9.0-stable, and Clippy is 0.1.98. These match the previously reviewed hosted
+environment; local Rust/Cargo remain 1.98.0. The all-target hosted baseline and
+whole-tree source review preserve the existing policy without a new waiver.
+Logs are retained locally under `target/review-2026-09-15`.
+
+This documentation-only follow-up records completed evidence without changing
+Rust, Cargo, workflow, or lint inputs. It does not establish CI success for a
+later commit, human v0.1 acceptance, or broader scope.

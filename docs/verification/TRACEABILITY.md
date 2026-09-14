@@ -242,7 +242,12 @@ allocator failure, concurrency, and arbitrary containment. No requirement
 meaning or historical evidence hash above changes.
 `cargo test --locked --test message_dispatch` passes six tests; the complete
 required baseline passes 118 workspace tests. Complete source/document review
-passes; publication and exact hosted evidence remain pending.
+passes. The test/review checkpoint is committed at
+`63b149fcaeaae5c9842d75a5493e8809da6a9eba`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34901286073)
+passes all 20 steps, 118 workspace tests, both focused host targets, and the
+sample. This documentation-only follow-up records that exact evidence;
+subsequent revisions require their own CI result.
 
 ## Evidence policy
 

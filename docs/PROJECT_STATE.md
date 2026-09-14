@@ -6,9 +6,9 @@ Last updated: **2026-09-15**
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 The sample, hosted CI, dependency/scope review, and messaging-constructor
-checkpoint have recorded evidence. Stage 4 now examines returned-message
-failure: exact peer FIFO, concrete error preservation, selected cleanup, and
-fresh callback availability. Broader contract review and human v0.1
+checkpoint have recorded evidence. Stage 4 now has a verified returned-message
+failure checkpoint: exact peer FIFO, concrete error preservation, selected
+cleanup, and fresh callback availability. Broader contract review and human v0.1
 entry-point/architecture acceptance remain open.
 
 ## Verified baseline
@@ -19,7 +19,7 @@ entry-point/architecture acceptance remain open.
   and Clippy 0.1.98.
 - Final required baseline: 118 tests; focused message-dispatch target: six.
   Whole-tree audit: 32 Rust files, zero physical/comment width findings, three
-  unchanged lint expectations, 41 Markdown files, 177 resolved relative links,
+  unchanged lint expectations, 41 Markdown files, 178 resolved relative links,
   and 82 exact traceability test references.
 - The [dispatch failure review](verification/MESSAGE_FAILURE_REVIEW.md)
   records the selected boundary and proof limits. Eight changed rendered
@@ -31,6 +31,11 @@ entry-point/architecture acceptance remain open.
   the empty external Cargo graph and unchanged approved licences.
 - The [CI baseline](verification/CI_BASELINE.md) records hosted provenance;
   earlier hosted passes do not prove later revisions.
+- Published checkpoint `63b149fcaeaae5c9842d75a5493e8809da6a9eba` has matching
+  remote identity and successful
+  [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/34901286073):
+  one job/all 20 steps, 118 workspace tests, both focused host targets, and the
+  sample. The dispatch review records actual image/toolchain evidence.
 
 ## Current architecture
 
@@ -42,8 +47,9 @@ The current increment changes tests and supporting records only.
 
 ## Work in progress
 
-The returned-message failure checkpoint passes local checks and complete
-source/document review. Source publication and exact hosted CI remain pending.
+No unfinished implementation remains. The returned-message failure checkpoint
+is published with successful exact-revision CI. This documentation-only
+follow-up records the result; later revisions need their own verification.
 
 ## Highest risks and uncertainties
 
@@ -74,5 +80,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 2026-09-15: strengthened full peer FIFO and actual returned-error observations;
 added callback-availability evidence after message failure. Six focused and
 118 workspace tests pass. Source review found no production contract defect.
-ADR-0012's source-order prose is clarified. Local review passes; publication
-remains pending, and no human acceptance is inferred.
+ADR-0012's source-order prose is clarified. Local checks/review and the
+published checkpoint's exact hosted CI pass. No human acceptance is inferred.

@@ -1,7 +1,7 @@
 # Stage 4 returned-message failure review
 
 Date: **2026-09-15**
-Status: **Local checkpoint complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -69,7 +69,7 @@ source chain before consuming the wrapper to recover its operation error.
 One cohesive peer-drain helper preserves the complete chronological assertion
 without exceeding the 60-line function policy.
 
-The whole-tree audit finds 32 Rust files with zero physical/comment width
+The checkpoint's whole-tree audit finds 32 Rust files with zero physical/comment width
 findings and three unchanged expectations, 41 Markdown files with 177 resolved
 relative links, 34 source definitions, and 82 exact traceability references.
 All eight changed rendered documents match source text, code, tables, and
@@ -78,5 +78,20 @@ no page overflow or console warnings/errors. Independent complete-diff review
 found no blocking defect and identified a prose-order precision issue:
 ADR-0012 now says the closure drops
 the in-flight record before state commitment, matching existing source. This
-clarification also passed rendered/content review. Publication is pending.
+clarification also passed rendered/content review.
 Logs and temporary aids remain ignored under `target/review-2026-09-15`.
+
+## Publication result
+
+Published `63b149fcaeaae5c9842d75a5493e8809da6a9eba` by ordinary fast-forward;
+the remote head matched. Hosted run 34901286073 passes at that exact revision:
+one job/all 20 steps, 118 workspace tests including both targeted regression
+names, 14 adapter tests, five sample tests, and the sample executable.
+The [dispatch review](docs/verification/MESSAGE_FAILURE_REVIEW.md) records the
+run URL and actual runner/toolchain evidence. This documentation-only follow-up
+changes no Rust, Cargo, workflow, or lint inputs; local Cargo results remain
+evidence for that unchanged source. Its relative links, rendered content, and
+diff are reviewed separately. Later commits need their own hosted CI result.
+The evidence-only audit passes 178 relative links and four changed rendered
+documents; source counts and widths are unchanged. Browser DOM/layout and
+screenshots plus complete-diff review pass for this follow-up.
