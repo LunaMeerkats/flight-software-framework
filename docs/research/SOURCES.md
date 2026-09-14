@@ -39,6 +39,12 @@ uses current Cargo graph documentation and rechecks the existing licence
 sources below. It preserves the approved terms and records autonomous evidence
 only; no new implementation, dependency, or upstream behavior is adopted.
 
+The **2026-09-15** [returned-message failure review](../verification/MESSAGE_FAILURE_REVIEW.md)
+uses existing local contracts from ADR-0011 and ADR-0012, checked against the
+recorded source revision and public integration tests. It strengthens complete
+peer FIFO, actual returned-error, and refreshed-availability observations.
+No external research, source reuse, new dependency, or upstream claim is added.
+
 ## SRC-RUST-CARGO-GRAPH — Dependency and feature review semantics
 
 - Titles: cargo metadata; cargo tree — The Cargo Book

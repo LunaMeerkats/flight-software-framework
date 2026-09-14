@@ -226,6 +226,24 @@ Tests and review are committed at
 passes 117 workspace tests, both focused host targets, and the full configured
 baseline/sample. This documentation-only follow-up records that exact evidence.
 
+## Returned-message failure checkpoint
+
+The 2026-09-15 [dispatch failure review](MESSAGE_FAILURE_REVIEW.md) supplements
+RFF-REQ-003 with stronger observations for its existing callback-error contract.
+`callback_error_clears_selected_queue_but_retains_peer_publication` follows the
+actual returned source chain and drains the complete retained peer FIFO,
+including the reply accepted before publisher failure. It also checks exact
+selected cleanup and no repeated callback effects after rejection or empty
+dispatch. `dispatch_refreshes_peer_availability_after_message_failure` checks
+later callback publication against the newly failed lifecycle state.
+
+The review distinguishes these observations from source-inspected ordering,
+allocator failure, concurrency, and arbitrary containment. No requirement
+meaning or historical evidence hash above changes.
+`cargo test --locked --test message_dispatch` passes six tests; the complete
+required baseline passes 118 workspace tests. Complete source/document review
+passes; publication and exact hosted evidence remain pending.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

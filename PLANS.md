@@ -1,91 +1,82 @@
-# Stage 4 messaging construction resource review
+# Stage 4 returned-message failure review
 
-Date: **2026-09-14**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-09-15**
+Status: **Local checkpoint complete; publication pending**
 
 ## Objective and context
 
-Audit the existing message-topology construction boundary and prove that an
-unrepresentable inbox capacity returns its typed error without losing the
-owned runtime. This is one bounded part of Stage 4's resource/failure/public-API
-review; the remaining services and human v0.1 acceptance stay open.
+Verify one existing dispatch contract: a callback may publish successfully and
+then return an error. Only its own queued deliveries are cleared; accepted
+peer deliveries retain their exact FIFO contents, and later callback
+publication observes the failed endpoint as unavailable. This reduces an
+evidence gap in Stage 4 without changing runtime behavior or public APIs.
 
 Started clean on `codex/nightly` at
-`553fb50832a2aa4948944d051575cc5fb704ea26`, equal to refreshed origin.
-The initial locked Cargo baseline passes 115 tests on local Rust/Cargo 1.98.0,
-rustfmt 1.9.0-stable, and Clippy 0.1.98. Existing formatting and lint policy
-remain encoded; no policy adoption or runtime feature is needed.
+`ee63b4a7a7ec6c556bc76536298211fd3ff0d253`, equal to refreshed origin.
+The initial locked baseline passes 117 tests on Rust/Cargo 1.98.0, rustfmt
+1.9.0-stable, and Clippy 0.1.98. The initial audit finds 32 Rust files with
+zero width findings, 40 Markdown files with 170 resolved relative links, and
+81 exact traceability test references. Existing source-quality gates apply.
 
 ## Acceptance criteria
 
-- Reconcile constructor validation/reservation order, logical retained bounds,
-  typed errors, ownership return, and source-inspection-only failure paths.
-- Exercise `usize::MAX` inbox capacity with a small nonzero-sized message after
-  a valid first endpoint, asserting exact identity and requested capacity.
-- Through `MessagingRuntime`, recover both unchanged registered applications,
-  attach a corrected topology, and demonstrate preserved callback behavior and
-  subsequent peer delivery/work. Do not claim simulated allocator exhaustion.
-- Record exact tests, reviewed input, primary-source treatment, limits, and
-  remaining audit work without changing requirement meaning or public APIs.
-- Pass the applicable baseline, source/relative-link/traceability audit,
-  rendered-document inspection, and independent complete-diff review.
-- Commit and publish by ordinary fast-forward, verify the remote head, and
-  inspect completed hosted CI at the exact published revision.
+- Preserve exact selected failure, discard count excluding the in-flight item,
+  and terminal lifecycle rejection with no repeated callback effects.
+- Observe the actual returned error's source chain through both wrappers.
+- Dispatch all older peer messages followed by the accepted callback reply,
+  asserting identity, topic, payload, pending counts, and no extra callback.
+- Verify a later peer callback refreshes availability after message failure;
+  the failed inbox remains empty while healthy delivery continues.
+- Record the reviewed source order, ownership/resource limits, evidence gaps,
+  and unchanged ADR-0012 policy. Do not claim rollback or arbitrary containment.
+- Pass the required baseline, source/link/traceability audit, rendered-document
+  inspection, and independent complete-diff review before committing/pushing.
+- Publish by ordinary fast-forward, verify the remote head, and inspect hosted
+  CI at the exact published revision under the standing source permission.
 
 ## Components and verification
 
-Change only the two messaging integration test files and supporting plan,
-review, source register, traceability, roadmap, and project-state records.
-Compare a deterministic capacity-overflow input with global allocator fault
-injection: use the public overflow boundary; defer allocator injection because
-it needs an isolated harness and independent justification.
+Change `tests/message_dispatch.rs` and supporting review, plan, project-state,
+roadmap, and traceability records. Clarify ADR-0012's existing source order
+without changing its public post-return contract. Prefer extending the existing
+chronological regression for full retained FIFO evidence and one focused
+availability test over production fault hooks or a new test framework. No new
+ADR is necessary unless source review reveals a contract change.
 
-Run `cargo test --locked --test message_bus --test runtime_messaging` and all
-six AGENTS.md baseline commands with supported locked Cargo forms and
-`RUSTDOCFLAGS=-D warnings`. Host adapters, workflow, and ADR-0018/0019 probes
-are unchanged, so their additional local checks are not triggered.
-Reuse inspected temporary render/audit aids under `target/review-2026-09-14`;
-these remain local review aids, not new repository policy tools.
+Run `cargo test --locked --test message_dispatch` and all six AGENTS.md
+baseline commands with supported locked Cargo forms and
+`RUSTDOCFLAGS=-D warnings`. Host adapters, workflow, ADR-0018/0019, dependencies,
+and lint policy are unchanged, so their additional local probes are not
+triggered. Reuse reviewed temporary rendering and audit aids under
+`target/review-2026-09-15`; these are not adopted repository policy tools.
 
 ## Risks and safe stopping point
 
-Logical slots and inline payload bounds do not bound whole-process memory,
-caller-retained values, allocator overhead, stack use, or callback/topic effects.
-Capacity overflow does not establish allocator-exhaustion behavior. Report,
-endpoint, topic, and dispatch-state allocation failures still require distinct
-execution evidence. The safe stopping point is two public-contract regressions
-and an honest review record. Preserve prior artifacts and unexpected changes;
-revert only this run's own work if it cannot meet the baseline.
+The evidence covers cooperative returned message errors in serial dispatch.
+Panics, hangs, allocator exhaustion, callback-retained data, and external
+effects remain outside containment or queue-storage bounds. Peer publication
+is immediate and is not a transaction. Existing human v0.1 acceptance and
+scope gates remain open. Stop after the tested, reviewed contract checkpoint;
+preserve unexpected changes and revert only this run's own work if necessary.
 
-## Completed local evidence
+## Completed local checks
 
-All six required baseline commands pass; the workspace has 117 passing tests.
-The focused command passes eight bus and 11 owner tests. No source-policy
-waiver, production behavior, dependency, or API change was needed. Initial
-Clippy review found 63 counted lines in the owner test; expressing the repeated
-topology as a capacity array mapped to configurations restores the 60-line
-baseline without dropping assertions. A trailing document blank line was
-corrected before the final whitespace pass.
+The focused command passes six message-dispatch tests. The final required
+baseline passes 118 workspace tests, formatting, all-target check and Clippy,
+warnings-denied rustdoc, and `git diff --check`. No waiver or runtime change
+was needed. The existing error assertion now follows the actual returned
+source chain before consuming the wrapper to recover its operation error.
+One cohesive peer-drain helper preserves the complete chronological assertion
+without exceeding the 60-line function policy.
 
-The whole-tree audit covers 32 Rust files with zero physical/comment width
-findings and three unchanged fulfilled expectations, 40 Markdown files with
-170 resolved relative links, and 81 exact traceability test references.
-All six changed rendered documents match source text/structure and were
-inspected through browser DOM and 1280px layout without page overflow.
-Screenshot capture timed out twice; pixel-level screenshot inspection is
-unavailable, not passed. This run's rendered inspection uses DOM content and
-layout measurements. Independent complete-diff review found no defect.
-
-Logs and reused temporary aids are under `target/review-2026-09-14`.
-ADR-0018/0019, separate host, and actionlint local reruns are not triggered by
-this change.
-
-## Publication result
-
-Published `4db1a8074b014abc1c9b5cf3df5daef3cfca2b55` by ordinary fast-forward;
-the remote head matched. Hosted run 34780028767 passes at that exact revision:
-one job/all 20 steps, 117 workspace tests including both new regressions,
-14/five focused host tests, and the sample. The
-[constructor review](docs/verification/MESSAGING_CONSTRUCTION_REVIEW.md)
-records its URL and actual host/toolchain. This evidence-only follow-up changes
-no Rust source and does not project the recorded CI pass onto later commits.
+The whole-tree audit finds 32 Rust files with zero physical/comment width
+findings and three unchanged expectations, 41 Markdown files with 177 resolved
+relative links, 34 source definitions, and 82 exact traceability references.
+All eight changed rendered documents match source text, code, tables, and
+structure. Browser DOM/layout and screenshots were inspected at 1280px with
+no page overflow or console warnings/errors. Independent complete-diff review
+found no blocking defect and identified a prose-order precision issue:
+ADR-0012 now says the closure drops
+the in-flight record before state commitment, matching existing source. This
+clarification also passed rendered/content review. Publication is pending.
+Logs and temporary aids remain ignored under `target/review-2026-09-15`.

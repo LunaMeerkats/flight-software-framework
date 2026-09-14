@@ -37,8 +37,10 @@ returned callback error with an exact discarded-delivery count, and reconnects
 an empty inbox after successful restart. A separate `MessagingApplication`
 callback now receives one oldest in-flight delivery plus a publish-only context.
 It can self-publish through the same bounded bus without gaining lifecycle,
-dequeue, or nested-dispatch access. Seven routing-core, ten runtime-messaging,
-and five message-dispatch tests cover these boundaries.
+dequeue, or nested-dispatch access. Routing-core, runtime-messaging, and
+message-dispatch tests cover these boundaries; the
+[returned-message failure review](docs/verification/MESSAGE_FAILURE_REVIEW.md)
+records the complete retained peer FIFO and post-failure availability boundary.
 
 A standalone `EventQueue<EventId>` stores typed source, severity,
 mission-defined copied identifier, and explicit elapsed `EventTimestamp`

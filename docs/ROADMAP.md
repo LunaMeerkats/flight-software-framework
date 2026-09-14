@@ -188,9 +188,12 @@ corrected. This completes the bounded dependency/features review and prepares
 scope evidence. The 2026-09-14
 [messaging construction review](verification/MESSAGING_CONSTRUCTION_REVIEW.md)
 adds exact later-inbox reservation-overflow and returned-runtime reuse evidence.
-This closes one constructor boundary; lifecycle/dispatch interactions, other
-service resource/failure/public-API reviews, and human entry-point/architecture
-acceptance remain open. Stage 4 is not complete.
+This closes one constructor boundary. The 2026-09-15
+[returned-message failure review](verification/MESSAGE_FAILURE_REVIEW.md)
+examines immediate peer publication, selected cleanup, complete retained FIFO,
+and post-failure callback availability. Other lifecycle/service resource,
+failure, and public-API reviews plus human entry-point/architecture acceptance
+remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

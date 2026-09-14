@@ -424,7 +424,7 @@ fn dispatch_refreshes_peer_availability_after_lifecycle_change() {
 }
 
 fn assert_callback_failure_error(
-    error: &MessagingOperationError<MessageDispatchError<DispatchFailure>>,
+    error: MessagingOperationError<MessageDispatchError<DispatchFailure>>,
     application_id: ApplicationId,
 ) {
     let expected = MessageDispatchError::Application {
@@ -433,27 +433,62 @@ fn assert_callback_failure_error(
     };
     assert_eq!(error.operation_error(), &expected);
     assert_eq!(error.discarded_deliveries(), 2);
+    let operation_source = Error::source(&error)
+        .and_then(|source| source.downcast_ref::<MessageDispatchError<DispatchFailure>>())
+        .expect("returned wrapper preserves the concrete dispatch error");
+    assert_eq!(operation_source, &expected);
     assert_eq!(
-        Error::source(error).and_then(|source| source.downcast_ref()),
-        Some(&expected)
-    );
-    assert_eq!(
-        Error::source(&expected).and_then(|source| source.downcast_ref()),
+        Error::source(operation_source).and_then(|source| source.downcast_ref()),
         Some(&DispatchFailure::Requested)
     );
+    assert_eq!(error.into_operation_error(), expected);
+}
+
+fn assert_peer_dispatches_retained_messages(
+    runtime: &mut DispatchRuntime,
+    peer_id: ApplicationId,
+    peer_trace: &RefCell<DispatchTrace>,
+) {
+    let expected = [
+        (MissionTopic::Input, 1),
+        (MissionTopic::Input, 2),
+        (MissionTopic::Reply, 2),
+    ]
+    .map(|(topic, payload)| HandledMessage {
+        application_id: peer_id,
+        topic,
+        payload,
+    });
+    for (index, expected_message) in expected.iter().enumerate() {
+        assert_eq!(
+            runtime.dispatch_one(peer_id),
+            Ok(MessageDispatchOutcome::Dispatched)
+        );
+        assert_eq!(runtime.pending(peer_id), Ok(2 - index));
+        let trace = peer_trace.borrow();
+        assert_eq!(trace.handled.len(), index + 1);
+        assert_eq!(&trace.handled[index], expected_message);
+    }
+    assert_eq!(
+        runtime.dispatch_one(peer_id),
+        Ok(MessageDispatchOutcome::InboxEmpty)
+    );
+    assert_eq!(runtime.pending(peer_id), Ok(0));
+    assert_eq!(peer_trace.borrow().handled, expected);
+    assert!(peer_trace.borrow().publications.is_empty());
 }
 
 #[test]
 fn callback_error_clears_selected_queue_but_retains_peer_publication() {
     let (failing, failing_trace) = application(DispatchBehavior::PublishThenFail);
     let (peer, peer_trace) = application(DispatchBehavior::Passive);
-    let (mut runtime, application_ids) = configured_runtime(
+    let (mut runtime, [failing_id, peer_id]) = configured_runtime(
         [failing, peer],
         [2, 3],
         [&INPUT_AND_REPLY, &INPUT_AND_REPLY],
     );
-    runtime.start(application_ids[0]).expect("publisher starts");
-    runtime.start(application_ids[1]).expect("peer starts");
+    runtime.start(failing_id).expect("publisher starts");
+    runtime.start(peer_id).expect("peer starts");
     runtime
         .publish(&message(MissionTopic::Input, 1))
         .expect("first input report can be reserved");
@@ -462,42 +497,93 @@ fn callback_error_clears_selected_queue_but_retains_peer_publication() {
         .expect("second input report can be reserved");
 
     let error = runtime
-        .dispatch_one(application_ids[0])
+        .dispatch_one(failing_id)
         .expect_err("selected callback returns its concrete error");
-    assert_callback_failure_error(&error, application_ids[0]);
-    assert_eq!(
-        runtime.state(application_ids[0]),
-        Ok(ApplicationState::Failed)
-    );
-    assert_eq!(runtime.pending(application_ids[0]), Ok(0));
-    assert_eq!(
-        runtime.state(application_ids[1]),
-        Ok(ApplicationState::Running)
-    );
-    assert_eq!(runtime.pending(application_ids[1]), Ok(3));
+    assert_callback_failure_error(error, failing_id);
+    assert_eq!(runtime.state(failing_id), Ok(ApplicationState::Failed));
+    assert_eq!(runtime.pending(failing_id), Ok(0));
+    assert_eq!(runtime.state(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.pending(peer_id), Ok(3));
 
-    let publication = &failing_trace.borrow().publications[0];
-    assert_eq!(publication.classification, PublishClassification::Complete);
+    {
+        let trace = failing_trace.borrow();
+        assert_eq!(trace.handled.len(), 1);
+        assert_eq!(trace.publications.len(), 1);
+        let publication = &trace.publications[0];
+        assert_eq!(publication.classification, PublishClassification::Complete);
+        assert_eq!(
+            publication.outcomes,
+            [
+                (failing_id, DeliveryStatus::Delivered),
+                (peer_id, DeliveryStatus::Delivered),
+            ]
+        );
+    }
+
+    assert_peer_dispatches_retained_messages(&mut runtime, peer_id, &peer_trace);
+    let failed = runtime
+        .dispatch_one(failing_id)
+        .expect_err("terminal failed application remains ineligible");
     assert_eq!(
-        publication.outcomes,
+        failed.operation_error(),
+        &operation_error(failing_id, ApplicationState::Failed)
+    );
+    assert_eq!(failed.discarded_deliveries(), 0);
+    assert_eq!(runtime.pending(failing_id), Ok(0));
+    assert_eq!(runtime.pending(peer_id), Ok(0));
+    assert_eq!(failing_trace.borrow().handled.len(), 1);
+    assert_eq!(failing_trace.borrow().publications.len(), 1);
+}
+
+#[test]
+fn dispatch_refreshes_peer_availability_after_message_failure() {
+    let (failing, failing_trace) = application(DispatchBehavior::PublishThenFail);
+    let (peer, peer_trace) = application(DispatchBehavior::PublishOnce);
+    let (mut runtime, [failing_id, peer_id]) = configured_runtime(
+        [failing, peer],
+        [1, 2],
+        [&INPUT_AND_REPLY, &INPUT_AND_REPLY],
+    );
+    runtime
+        .start(failing_id)
+        .expect("failing application starts");
+    runtime.start(peer_id).expect("peer starts");
+    runtime
+        .publish(&message(MissionTopic::Input, 1))
+        .expect("input report can be reserved");
+
+    let error = runtime
+        .dispatch_one(failing_id)
+        .expect_err("callback publishes while running, then returns its error");
+    assert_eq!(error.discarded_deliveries(), 1);
+    assert_eq!(runtime.state(failing_id), Ok(ApplicationState::Failed));
+    assert_eq!(runtime.pending(failing_id), Ok(0));
+    assert_eq!(runtime.pending(peer_id), Ok(2));
+    assert_eq!(
+        failing_trace.borrow().publications[0].outcomes,
         [
-            (application_ids[0], DeliveryStatus::Delivered),
-            (application_ids[1], DeliveryStatus::Delivered),
+            (failing_id, DeliveryStatus::Delivered),
+            (peer_id, DeliveryStatus::Delivered),
         ]
     );
 
     assert_eq!(
-        runtime.dispatch_one(application_ids[1]),
+        runtime.dispatch_one(peer_id),
         Ok(MessageDispatchOutcome::Dispatched)
     );
-    assert_eq!(peer_trace.borrow().handled[0].payload, 1);
-    assert_eq!(runtime.pending(application_ids[1]), Ok(2));
-    let failed = runtime
-        .dispatch_one(application_ids[0])
-        .expect_err("terminal failed application remains ineligible");
     assert_eq!(
-        failed.operation_error(),
-        &operation_error(application_ids[0], ApplicationState::Failed)
+        peer_trace.borrow().publications,
+        [PublicationObservation {
+            classification: PublishClassification::Partial,
+            outcomes: vec![
+                (failing_id, DeliveryStatus::Unavailable),
+                (peer_id, DeliveryStatus::Delivered),
+            ],
+        }]
     );
-    assert_eq!(failed.discarded_deliveries(), 0);
+    assert_eq!(runtime.state(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.pending(peer_id), Ok(2));
+    assert_eq!(runtime.pending(failing_id), Ok(0));
+    assert_eq!(failing_trace.borrow().handled.len(), 1);
+    assert_eq!(failing_trace.borrow().publications.len(), 1);
 }

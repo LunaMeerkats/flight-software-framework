@@ -45,12 +45,17 @@ this order:
    returns `MessageDispatchOutcome::InboxEmpty` without invoking the callback.
 4. Hold the removed message as the sole framework-owned in-flight delivery and
    invoke `handle_message` once.
-5. On success, retain `Running`, drop the completed in-flight record, and keep
+5. On success, drop the completed in-flight record, retain `Running`, and keep
    all accepted callback publications queued.
-6. On a returned callback error, commit only the selected application to
-   terminal `Failed`, drop the attempted in-flight record, clear that
+6. On a returned callback error, drop the attempted in-flight record, commit
+   only the selected application to terminal `Failed`, clear that
    application's remaining queued deliveries, and return the original concrete
    error plus the exact queued discard count.
+
+The 2026-09-15 source review clarifies steps 5 and 6: the callback closure
+releases its local in-flight message before the runtime commits the returned
+state. This describes the existing serial implementation and does not change
+the public post-return contract or add panic/unwind containment.
 
 The in-flight message is attempted callback input, not a queued discard, so it
 is excluded from `discarded_deliveries`. Callback publications take effect
