@@ -249,6 +249,21 @@ passes all 20 steps, 118 workspace tests, both focused host targets, and the
 sample. This documentation-only follow-up records that exact evidence;
 subsequent revisions require their own CI result.
 
+## Schedule construction checkpoint
+
+The 2026-09-16 [constructor review](SCHEDULE_CONSTRUCTION_REVIEW.md)
+supplements RFF-REQ-004 without changing its meaning or historical evidence.
+`construction_reports_the_first_descending_pair_at_nanosecond_precision`
+asserts exact first-descent diagnostics after valid/equal-time prefixes.
+`copied_agenda_preserves_items_after_caller_storage_is_changed_and_dropped`
+observes the original agenda through dispatch after the caller replaces and
+releases its input vector, including exact items, order, and remaining counts.
+`cargo test --locked --test scheduled_work` passes nine tests. Allocation-error
+execution remains unverified; validation/reservation order and retained storage
+bounds are source-inspected. The full required baseline passes 120 tests;
+source and document review pass with the review record's screenshot limitation.
+Publication and exact-revision hosted CI evidence remain pending.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

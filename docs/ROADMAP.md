@@ -191,9 +191,11 @@ adds exact later-inbox reservation-overflow and returned-runtime reuse evidence.
 This closes one constructor boundary. The 2026-09-15
 [returned-message failure review](verification/MESSAGE_FAILURE_REVIEW.md)
 examines immediate peer publication, selected cleanup, complete retained FIFO,
-and post-failure callback availability. Other lifecycle/service resource,
-failure, and public-API reviews plus human entry-point/architecture acceptance
-remain open. Stage 4 is not complete.
+and post-failure callback availability. The 2026-09-16
+[schedule construction review](verification/SCHEDULE_CONSTRUCTION_REVIEW.md)
+adds first-descent diagnostics and copied-agenda ownership observations.
+Other lifecycle/service resource, failure, and public-API reviews plus human
+entry-point/architecture acceptance remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

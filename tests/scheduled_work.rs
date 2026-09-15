@@ -165,6 +165,67 @@ fn schedule_rejects_descending_instants_and_accepts_an_empty_agenda() {
 }
 
 #[test]
+fn construction_reports_the_first_descending_pair_at_nanosecond_precision() {
+    let (_, alpha, _, _) = running_runtime(false);
+    let cases = [([0, 1, 1, 0], 3), ([1, 1, 0, 0], 2), ([0, 3, 2, 1], 2)];
+
+    for (nanoseconds, index) in cases {
+        let items = nanoseconds.map(|value| {
+            ScheduledWork::new(
+                alpha,
+                FrameworkInstant::from_elapsed(Duration::from_nanos(value)),
+            )
+        });
+        assert_eq!(
+            WorkSchedule::new(&items).expect_err("the first descending pair is rejected"),
+            WorkScheduleCreateError::ScheduledInstantsOutOfOrder {
+                index,
+                previous: items[index - 1].scheduled_at(),
+                scheduled_at: items[index].scheduled_at(),
+            }
+        );
+    }
+}
+
+#[test]
+fn copied_agenda_preserves_items_after_caller_storage_is_changed_and_dropped() {
+    let (mut runtime, alpha, beta, trace) = running_runtime(false);
+    let items = [scheduled(beta, 5), scheduled(alpha, 5), scheduled(beta, 8)];
+    let mut schedule = {
+        let mut caller_items = items.to_vec();
+        let schedule = WorkSchedule::new(&caller_items).expect("ordered agenda is copied");
+        caller_items.fill(scheduled(alpha, 99));
+        schedule
+    };
+    let clock = ManualClock::from_elapsed(Duration::from_secs(8));
+    let expected_order = [
+        ApplicationName::Beta,
+        ApplicationName::Alpha,
+        ApplicationName::Beta,
+    ];
+    assert_eq!(schedule.remaining(), items.len());
+
+    for (index, item) in items.into_iter().enumerate() {
+        assert_eq!(
+            runtime.run_next_scheduled_work(&mut schedule, &clock),
+            Ok(ScheduledWorkOutcome::Completed {
+                scheduled_work: item,
+                observed_at: instant(8),
+                state: ApplicationState::Running,
+            })
+        );
+        assert_eq!(schedule.remaining(), items.len() - index - 1);
+        assert_eq!(*trace.borrow(), expected_order[..=index]);
+    }
+    assert!(schedule.is_complete());
+    assert_eq!(
+        runtime.run_next_scheduled_work(&mut schedule, &clock),
+        Ok(ScheduledWorkOutcome::Complete)
+    );
+    assert_eq!(*trace.borrow(), expected_order);
+}
+
+#[test]
 fn complete_reads_no_clock_and_each_pending_item_decision_reads_once() {
     let (mut runtime, alpha, _, trace) = running_runtime(false);
     let clock = CountingClock::new(FrameworkInstant::ZERO);
