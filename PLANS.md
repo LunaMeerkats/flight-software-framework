@@ -1,7 +1,7 @@
 # Stage 4 schedule construction review
 
 Date: **2026-09-16**
-Status: **Local checkpoint complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -65,3 +65,17 @@ content and pass browser DOM/layout inspection at 1280px with no page overflow
 or console warnings/errors. Two screenshot attempts timed out, so pixel-level
 inspection is unavailable; this limitation does not imply a visual screenshot
 pass. Git whitespace checks pass. No new checker is adopted.
+
+## Publication result
+
+Ordinary fast-forward publication of
+`1b7d8281f9a6f987ce8608ad51bcf375837acbbd` succeeded; the remote head
+matched. Hosted run 35017990579 passes that exact push/checkout: one Windows
+job, all 20 steps, 120 workspace tests including both new regressions,
+14 focused adapter tests, five sample tests, and the sample executable.
+The schedule review records the run URL and actual image/toolchain.
+
+This documentation-only follow-up records completed evidence without changing
+Rust, Cargo, workflow, or lint inputs. Its source-content, relative-link,
+browser DOM/layout, and diff review are performed separately. The recorded
+screenshot limitation remains. Later commits require their own hosted result.

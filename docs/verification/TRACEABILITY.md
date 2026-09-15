@@ -262,7 +262,12 @@ releases its input vector, including exact items, order, and remaining counts.
 execution remains unverified; validation/reservation order and retained storage
 bounds are source-inspected. The full required baseline passes 120 tests;
 source and document review pass with the review record's screenshot limitation.
-Publication and exact-revision hosted CI evidence remain pending.
+The tests/review are committed at
+`1b7d8281f9a6f987ce8608ad51bcf375837acbbd`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35017990579)
+passes all 20 steps, 120 workspace tests, both focused host targets, and the
+sample. This documentation-only follow-up records that exact result;
+later revisions need their own CI evidence.
 
 ## Evidence policy
 

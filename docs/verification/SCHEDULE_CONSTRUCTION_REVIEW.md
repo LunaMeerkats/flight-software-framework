@@ -1,7 +1,7 @@
 # Schedule construction review
 
 Date: **2026-09-16**
-Status: **Local verification complete; publication pending**
+Status: **Complete: published checkpoint has successful exact-revision CI**
 
 ## Reviewed boundary and decision
 
@@ -98,3 +98,25 @@ saturation/reuse, selected only after reconciling existing evidence. The
 broader Stage 4 audit and human v0.1 entry-point/architecture acceptance remain
 open. Revisit this record if construction accepts new input forms, schedule
 storage becomes mutable, or dispatch ownership changes.
+
+## Published checkpoint evidence
+
+Commit `1b7d8281f9a6f987ce8608ad51bcf375837acbbd` contains both regressions
+and the reviewed checkpoint. Ordinary fast-forward publication succeeded and
+the remote head matched. On 2026-09-15 UTC (2026-09-16 Sydney),
+[hosted run 35017990579](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35017990579)
+completed successfully for that exact push/checkout revision: one Windows job
+and all 20 steps. Logs confirm 120 workspace tests, both new regression names,
+14 focused adapter tests, five focused sample tests, the sample executable,
+and every configured baseline command.
+
+Actual runner: 2.337.0; image: `windows-2025-vs2026` version `20260907.229.1`
+(requested label `windows-2025`). Actual rustc/Cargo: 1.98.1; rustfmt:
+1.9.0-stable; Clippy: 0.1.98. These match the previously reviewed hosted
+environment. The all-target hosted baseline and whole-tree source review
+preserve the existing policy without a new waiver. Local Rust/Cargo remain
+1.98.0. Logs are retained under `target/review-2026-09-16`.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. It does not establish CI success for
+its own later revision, human v0.1 acceptance, or broader scope.

@@ -30,6 +30,10 @@ review and human v0.1 entry-point/architecture acceptance remain open.
   [dependency/scope record](verification/DEPENDENCY_SCOPE_REVIEW.md) retain
   their earlier bounded evidence. The [CI baseline](verification/CI_BASELINE.md)
   records hosted provenance; earlier passes do not prove later revisions.
+- Published checkpoint `1b7d8281f9a6f987ce8608ad51bcf375837acbbd` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35017990579):
+  one job/all 20 steps, 120 workspace tests, both focused host targets, and the
+  sample. The schedule review records the actual hosted environment.
 
 ## Current architecture
 
@@ -41,8 +45,9 @@ This increment changes two schedule tests and supporting records only.
 
 ## Work in progress
 
-Local implementation, baseline, and source/document review are complete.
-Publication and exact-revision hosted CI inspection are pending.
+No unfinished implementation remains. The schedule-construction checkpoint
+is published with successful exact-revision CI. This documentation-only
+follow-up records that result; later revisions need their own verification.
 
 ## Highest risks and uncertainties
 
@@ -73,4 +78,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 2026-09-16: exact first-descent diagnostics and independent copied-agenda
 ownership pass nine focused and 120 workspace tests. No production defect or
 API change was needed. Source/document review passes with the recorded
-screenshot limitation; publication remains pending.
+screenshot limitation. The published checkpoint's exact hosted CI passes;
+human v0.1 acceptance remains open.
