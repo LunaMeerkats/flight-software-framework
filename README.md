@@ -46,9 +46,12 @@ A standalone `EventQueue<EventId>` stores typed source, severity,
 mission-defined copied identifier, and explicit elapsed `EventTimestamp`
 values. It pre-reserves a positive record limit, preserves emission-order FIFO,
 rejects the newest event at saturation with a caller-visible outcome, and frees
-one slot on dequeue. Four public tests cover its fields and exact storage
-boundary. `EventTimestamp` can now capture an injected `Clock` reading. The
-manually advanced implementation starts at zero by default or at one explicit
+one slot on dequeue. Six public tests cover its fields, exact reservation-error
+diagnostics, storage boundary, and repeated saturation/reuse; the
+[event-queue review](docs/verification/EVENT_QUEUE_REVIEW.md) records their
+resource and failure limits. `EventTimestamp` can now capture an injected
+`Clock` reading. The manually advanced implementation starts at zero by default
+or at one explicit
 controlled instant, changes only on explicit nonnegative advances, and rejects
 representational overflow without mutation. Five public tests prove zero and
 repeated reads, cumulative and replayed traces, typed overflow, object-safe

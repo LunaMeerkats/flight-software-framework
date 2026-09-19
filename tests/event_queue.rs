@@ -86,6 +86,19 @@ fn queue_requires_positive_capacity() {
 }
 
 #[test]
+fn oversized_event_capacity_returns_exact_reservation_error() {
+    // Event records are nonzero-sized: this count cannot fit in an allocation.
+    // This exercises capacity overflow without exhausting available memory.
+    assert_eq!(
+        EventQueue::<MissionEventId>::new(usize::MAX)
+            .expect_err("an impossible record count must fail reservation"),
+        EventQueueCreateError::CapacityAllocationFailed {
+            requested: usize::MAX,
+        }
+    );
+}
+
+#[test]
 fn queue_accepts_its_exact_limit_and_dequeues_fifo() {
     let mut queue = EventQueue::new(2).expect("test event storage can be reserved");
     let first = framework_event(MissionEventId::Started, EventSeverity::Informational, 20);
@@ -121,4 +134,62 @@ fn reject_newest_preserves_older_events_and_allows_explicit_retry() {
     assert_eq!(queue.dequeue(), Some(second));
     assert_eq!(queue.dequeue(), Some(rejected));
     assert!(queue.is_empty());
+}
+
+#[test]
+fn repeated_saturation_and_reuse_preserve_exact_fifo_and_logical_capacity() {
+    for capacity in [1, 3] {
+        let mut queue = EventQueue::new(capacity).expect("test storage can be reserved");
+        for cycle in 0..8 {
+            let time = 100 - cycle * 10;
+            let accepted = [
+                framework_event(MissionEventId::Started, EventSeverity::Informational, time),
+                framework_event(MissionEventId::Degraded, EventSeverity::Warning, time - 1),
+                framework_event(MissionEventId::Failed, EventSeverity::Error, time - 2),
+            ];
+            let retried = framework_event(MissionEventId::Failed, EventSeverity::Error, time - 3);
+            let omitted =
+                framework_event(MissionEventId::Degraded, EventSeverity::Warning, time - 4);
+
+            for (index, event) in accepted[..capacity].iter().enumerate() {
+                assert_eq!(queue.emit(event), EventEmitOutcome::Recorded);
+                assert_eq!(queue.pending(), index + 1);
+                assert!(!queue.is_empty());
+            }
+            for rejected in [&retried, &omitted] {
+                assert_eq!(
+                    queue.emit(rejected),
+                    EventEmitOutcome::QueueFull { capacity }
+                );
+                assert_eq!(queue.pending(), capacity);
+                assert_eq!(queue.capacity(), capacity);
+            }
+
+            assert_eq!(queue.dequeue(), Some(accepted[0]));
+            assert_eq!(queue.pending(), capacity - 1);
+            assert_eq!(queue.is_empty(), capacity == 1);
+            assert_eq!(queue.emit(&retried), EventEmitOutcome::Recorded);
+            assert_eq!(queue.pending(), capacity);
+            assert_eq!(
+                queue.emit(&omitted),
+                EventEmitOutcome::QueueFull { capacity }
+            );
+            assert_eq!(queue.pending(), capacity);
+
+            // Complete record equality proves acceptance order, even though
+            // timestamps decrease. A record never accepted must not appear.
+            let expected = accepted[1..capacity]
+                .iter()
+                .chain(std::iter::once(&retried));
+            for (index, event) in expected.enumerate() {
+                assert_eq!(queue.dequeue(), Some(*event));
+                assert_eq!(queue.pending(), capacity - index - 1);
+            }
+            assert_eq!(queue.dequeue(), None);
+            assert_eq!(queue.dequeue(), None);
+            assert_eq!(queue.pending(), 0);
+            assert!(queue.is_empty());
+            assert_eq!(queue.capacity(), capacity);
+        }
+    }
 }

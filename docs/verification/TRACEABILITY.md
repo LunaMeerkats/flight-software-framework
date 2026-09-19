@@ -269,6 +269,23 @@ passes all 20 steps, 120 workspace tests, both focused host targets, and the
 sample. This documentation-only follow-up records that exact result;
 later revisions need their own CI evidence.
 
+## Event-queue boundary checkpoint
+
+The 2026-09-20 [event-queue review](EVENT_QUEUE_REVIEW.md) supplements
+RFF-REQ-005 without changing its meaning or historical evidence hashes.
+`oversized_event_capacity_returns_exact_reservation_error` checks the typed
+error and requested count for `usize::MAX` nonzero-sized records.
+`repeated_saturation_and_reuse_preserve_exact_fifo_and_logical_capacity`
+observes eight fill/reject/dequeue/retry/drain cycles at each of capacities one
+and three, exact complete records, counts, and logical limits. Only the
+successfully retried rejection appears in the retained FIFO.
+
+The focused command `cargo test --locked --test event_queue` passes six tests.
+This is capacity-overflow evidence, not allocator-exhaustion injection or
+internal deque-layout instrumentation. The full locked baseline passes 122
+tests; source/document review passes with the recorded screenshot limitation.
+Publication results are recorded in the linked checkpoint record when complete.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

@@ -194,6 +194,9 @@ examines immediate peer publication, selected cleanup, complete retained FIFO,
 and post-failure callback availability. The 2026-09-16
 [schedule construction review](verification/SCHEDULE_CONSTRUCTION_REVIEW.md)
 adds first-descent diagnostics and copied-agenda ownership observations.
+The 2026-09-20 [event-queue review](verification/EVENT_QUEUE_REVIEW.md) adds
+exact capacity-overflow rejection and repeated saturation/reuse observations
+at logical capacities one and three without changing the queue policy.
 Other lifecycle/service resource, failure, and public-API reviews plus human
 entry-point/architecture acceptance remain open. Stage 4 is not complete.
 

@@ -1,81 +1,65 @@
-# Stage 4 schedule construction review
+# Stage 4 event-queue boundary review
 
-Date: **2026-09-16**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-09-20**
+Status: **Local checks and review passed; publication pending**
 
 ## Objective and context
 
-Verify the existing finite schedule's construction contract: reject the first
-descending adjacent pair with exact diagnostics, and retain an independent
-copy of the caller's ordered agenda. The starting revision is
-`75f7cbdc659d73d2430b9987bfe64b1afa62ff35`, clean and equal to refreshed
-`origin/codex/nightly`. Its hosted CI passed; the initial local locked baseline
-passes 118 tests on Rust/Cargo 1.98.0.
+Verify the existing event queue's fallible construction and repeated bounded
+reuse. The starting revision is `4bfbda5907b92b3b71cded0422c25dfca8d987a7`,
+clean and equal to refreshed `origin/codex/nightly`. Its hosted run 35018337047
+passed; the initial locked local baseline passes 120 tests on Rust/Cargo 1.98.0.
 
-This closes two public-observation gaps in ADR-0015 without changing the API
-or execution policy. An independent event-queue audit also identified useful
-capacity-overflow coverage, deferred to keep this checkpoint coherent.
+This is the recorded next Stage 4 gap. Independent source/test inspection
+found no production defect: the four existing standalone tests cover zero
+capacity, metadata, capacity-two FIFO, and one saturation/retry cycle. Exact
+reservation-overflow diagnostics and repeated reuse remain untested.
 
 ## Acceptance criteria and files
 
-- In `tests/scheduled_work.rs`, assert exact first-error index and instants
-  after valid prefixes, including equal instants and nanosecond differences.
-- Observe the original agenda's application identities, instants, order,
-  remaining count, and callback trace after the caller replaces its input.
-- Keep production behavior, dependencies, lint policy, and existing requirements
-  unchanged. No unsafe allocation experiment or production test hook.
-- Record the source-inspected resource/failure contract and its proof limits in
-  `docs/verification/SCHEDULE_CONSTRUCTION_REVIEW.md`; update project state,
-  roadmap, and traceability with completed evidence.
+- Add two public-API tests in `tests/event_queue.rs`: exact `usize::MAX`
+  reservation rejection and repeated capacity-one/capacity-three saturation,
+  explicit retry, complete FIFO drain, and refill.
+- Observe pending counts and unchanged logical capacity, retain distinct
+  rejected records, and prove that only an explicitly retried record appears.
+- Preserve production code, API, requirements, dependencies, and lint policy.
+- Record source-inspected resource properties separately from executed evidence
+  in `docs/verification/EVENT_QUEUE_REVIEW.md`; update README, source register,
+  project state, roadmap, and traceability.
 
 ## Verification
 
-Run `cargo test --locked --test scheduled_work` and the complete required
-locked Cargo baseline with warnings-denied Clippy and rustdoc. Audit physical
-and comment widths, exact traceability names, relative links, rendered changed
-documents, and the complete diff. Independent Codex review supplements the
-author's review. Unchanged host adapters, workflow, and ADR-0018/0019 experiments
-do not trigger their separate local commands.
+Run `cargo test --locked --test event_queue`, then the required locked Cargo
+baseline with warnings-denied Clippy and rustdoc. Audit Rust physical/comment
+widths, relative links, traceability names, rendered changed documents, and the
+complete diff. Obtain independent Codex review. Unchanged host adapters,
+workflow, and ADR-0018/0019 probes do not trigger separate local commands.
 
-After local acceptance, commit on `codex/nightly`, refresh origin, push by
-ordinary fast-forward, and inspect hosted CI at the exact published revision.
-Record that result without claiming CI for a later revision.
+After local acceptance, commit on `codex/nightly`, refresh origin, publish by
+ordinary fast-forward, and inspect exact-revision hosted CI. Record completed
+publication evidence separately without projecting a pass onto a later commit.
 
 ## Risks and safe stopping point
 
-Capacity-allocation failure remains source-inspected, not fault-injected:
-a valid borrowed slice cannot safely impersonate an oversized allocation.
-Caller-scoped runtime/clock identity, cooperative callbacks, fixed retained
-storage, and human v0.1 acceptance remain unchanged. If verification fails,
-repair or remove only this run's changes. Stop after this one verified
-construction checkpoint and its publication evidence.
+The impossible nonzero-sized record count tests capacity overflow, not actual
+allocator exhaustion. Public observations do not measure allocation bytes,
+internal deque wrapping, timing, concurrency, or arbitrary fault containment.
+Human v0.1 acceptance remains open. If verification fails, repair or remove
+only this run's changes. Stop after this one verified checkpoint and its
+publication evidence.
 
-## Completed local evidence
+## Completed local checks
 
-The focused target passes nine tests and the full locked baseline passes
-120 tests, formatting, all-target check/Clippy, and warnings-denied rustdoc.
-No production change, dependency, or lint exception was needed. Both author
-and independent Codex complete-diff/source reviews found no blocking defect.
-
-The temporary review aids under `target/review-2026-09-16` find 42 Markdown
-files, 181 resolving relative links, 84 exact traceability test references,
-and 32 Rust files with zero physical/comment width findings and three unchanged
-fulfilled lint expectations. All five changed rendered documents match source
-content and pass browser DOM/layout inspection at 1280px with no page overflow
-or console warnings/errors. Two screenshot attempts timed out, so pixel-level
-inspection is unavailable; this limitation does not imply a visual screenshot
-pass. Git whitespace checks pass. No new checker is adopted.
-
-## Publication result
-
-Ordinary fast-forward publication of
-`1b7d8281f9a6f987ce8608ad51bcf375837acbbd` succeeded; the remote head
-matched. Hosted run 35017990579 passes that exact push/checkout: one Windows
-job, all 20 steps, 120 workspace tests including both new regressions,
-14 focused adapter tests, five sample tests, and the sample executable.
-The schedule review records the run URL and actual image/toolchain.
-
-This documentation-only follow-up records completed evidence without changing
-Rust, Cargo, workflow, or lint inputs. Its source-content, relative-link,
-browser DOM/layout, and diff review are performed separately. The recorded
-screenshot limitation remains. Later commits require their own hosted result.
+Both new regressions pass: six focused and 122 workspace tests. Formatting,
+all-target check, warnings-denied Clippy/rustdoc, and whitespace checks pass.
+No production change, dependency, or lint exception was needed. Author and
+independent Codex complete-diff/source reviews found no blocking defect.
+The final audit passes 43 Markdown files, 187 relative links, 86 exact test
+references, and 32 Rust files with zero width findings and three unchanged
+fulfilled expectations. Seven rendered changed documents match source content
+and pass browser DOM/layout review at 1280px with no page overflow or console
+warnings/errors. Browser inventory recovered after an initial timeout.
+Screenshot capture timed out; pixel inspection is unavailable. The completed
+rendered-content/DOM review is the documented adaptation, not a screenshot
+pass. Temporary aids/logs are under `target/review-2026-09-20`; no checker is
+adopted. Exact-revision hosted results remain pending.

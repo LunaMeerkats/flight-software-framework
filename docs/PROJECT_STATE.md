@@ -1,39 +1,36 @@
 # Project state
 
-Last updated: **2026-09-16**
+Last updated: **2026-09-20**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
-Stage 4 has recorded sample, hosted CI, dependency/scope, messaging-constructor,
-and returned-message failure evidence. The current checkpoint strengthens
-schedule construction diagnostics and copied-agenda ownership. Broader contract
-review and human v0.1 entry-point/architecture acceptance remain open.
+Stage 4 has sample, hosted CI, dependency/scope, messaging-constructor,
+returned-message failure, and schedule-construction evidence. The current
+checkpoint verifies event-queue construction and repeated saturation/reuse.
+Broader contract review and human v0.1 architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `75f7cbdc659d73d2430b9987bfe64b1afa62ff35`, equal to
-  refreshed `origin/codex/nightly`; its hosted run 34901623549 succeeded.
-  Initial locked local Cargo baseline: 118 tests.
-- Final locked local baseline: 120 tests; focused schedule target: nine.
-  Formatting, all-target check, warnings-denied Clippy/rustdoc pass on local
-  Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
-- The [schedule review](verification/SCHEDULE_CONSTRUCTION_REVIEW.md) separates
-  exact public observations from source-inspected resource/failure properties.
-  Independent complete-diff review found no blocking defect. The audit passes
-  42 Markdown files, 181 relative links, 84 exact test references, and 32 Rust
-  files with zero width findings and three unchanged lint expectations.
-  Five changed rendered documents pass content/DOM/layout review; screenshot
-  capture timed out twice, leaving pixel inspection unavailable.
-- The [dispatch review](verification/MESSAGE_FAILURE_REVIEW.md),
-  [constructor review](verification/MESSAGING_CONSTRUCTION_REVIEW.md), and
-  [dependency/scope record](verification/DEPENDENCY_SCOPE_REVIEW.md) retain
-  their earlier bounded evidence. The [CI baseline](verification/CI_BASELINE.md)
-  records hosted provenance; earlier passes do not prove later revisions.
-- Published checkpoint `1b7d8281f9a6f987ce8608ad51bcf375837acbbd` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35017990579):
-  one job/all 20 steps, 120 workspace tests, both focused host targets, and the
-  sample. The schedule review records the actual hosted environment.
+- Started clean at `4bfbda5907b92b3b71cded0422c25dfca8d987a7`, equal to
+  refreshed `origin/codex/nightly`; its hosted run 35018337047 succeeded.
+  Initial locked local Cargo baseline: 120 tests.
+- Final locked baseline: 122 tests; focused event-queue target: six. Formatting,
+  all-target check, warnings-denied Clippy/rustdoc, and whitespace checks pass
+  without new exceptions. Independent complete-diff review found no blocker.
+- Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
+  Final audit: 32 Rust files with zero width findings and three unchanged
+  expectations; 43 Markdown files, 187 resolving links, 86 exact test references.
+  Seven changed rendered documents pass content/DOM/layout review. Screenshot
+  capture timed out, leaving pixel inspection unavailable.
+- The [event review](verification/EVENT_QUEUE_REVIEW.md) distinguishes
+  executed capacity-overflow/FIFO evidence from source-inspected allocation
+  properties. Earlier [schedule](verification/SCHEDULE_CONSTRUCTION_REVIEW.md),
+  [dispatch](verification/MESSAGE_FAILURE_REVIEW.md),
+  [messaging construction](verification/MESSAGING_CONSTRUCTION_REVIEW.md), and
+  [dependency/scope](verification/DEPENDENCY_SCOPE_REVIEW.md) records retain
+  their evidence. The [CI baseline](verification/CI_BASELINE.md) records the
+  hosted acceptance policy; earlier passes do not prove later revisions.
 
 ## Current architecture
 
@@ -41,25 +38,23 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment changes two schedule tests and supporting records only.
+This increment changes two event-queue tests and supporting records only.
 
 ## Work in progress
 
-No unfinished implementation remains. The schedule-construction checkpoint
-is published with successful exact-revision CI. This documentation-only
-follow-up records that result; later revisions need their own verification.
+Complete authorized publication and exact-revision hosted verification of the
+locally reviewed event-queue checkpoint. No unfinished implementation remains.
 
 ## Highest risks and uncertainties
 
-- Schedule allocation-error execution remains unverified. The configured item
-  count bounds logical retained storage, not allocator bytes or callback data.
-- Runtime and clock origins remain caller-scoped; construction cannot detect
-  mismatched origins. Consumed schedule items retain storage until drop.
+- Impossible-capacity rejection is verified; actual allocator exhaustion and
+  allocation counts are not. Logical bounds do not bound whole-process bytes.
+- Runtime and clock origins remain caller-scoped. A full event queue can reject
+  a later high-severity event; delivery is not guaranteed.
 - Callback/clock panics and hangs remain outside containment. Host saturation
   is terminal; no recovery, real-time, or physical delivery claim is made.
 - Stable Rust and runner images float. Source/document and conditional ADR
-  probe checks remain outside CI. The empty Cargo graph does not audit the
-  host/toolchain/CI supply chain.
+  checks remain outside CI; an empty Cargo graph does not audit the toolchain.
 
 ## Important unresolved decisions
 
@@ -69,14 +64,13 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 ## Most likely next tasks
 
-1. Select the event queue's construction/saturation/reuse contract after
-   reconciling existing tests, or another bounded Stage 4 gap with stronger need.
+1. Review lifecycle registration/construction ownership and resource boundaries
+   after reconciling existing tests, or select a stronger bounded Stage 4 gap.
 2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
-2026-09-16: exact first-descent diagnostics and independent copied-agenda
-ownership pass nine focused and 120 workspace tests. No production defect or
-API change was needed. Source/document review passes with the recorded
-screenshot limitation. The published checkpoint's exact hosted CI passes;
-human v0.1 acceptance remains open.
+2026-09-20: six focused and 122 workspace tests pass, verifying exact event
+reservation-overflow rejection and repeated FIFO preservation/reuse. Review
+passes with the recorded screenshot limitation. Publication is pending;
+no production defect or API change was needed.
