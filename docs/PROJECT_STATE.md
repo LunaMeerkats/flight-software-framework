@@ -31,6 +31,10 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   [dependency/scope](verification/DEPENDENCY_SCOPE_REVIEW.md) records retain
   their evidence. The [CI baseline](verification/CI_BASELINE.md) records the
   hosted acceptance policy; earlier passes do not prove later revisions.
+- Published checkpoint `adb77e76ca47b629e2cdc18fd64bd29be58cf472` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35466593661):
+  one job/all 20 steps, 122 workspace tests, both focused host targets, and the
+  sample executable. The event review records the actual hosted environment.
 
 ## Current architecture
 
@@ -42,8 +46,9 @@ This increment changes two event-queue tests and supporting records only.
 
 ## Work in progress
 
-Complete authorized publication and exact-revision hosted verification of the
-locally reviewed event-queue checkpoint. No unfinished implementation remains.
+No unfinished implementation remains. The event-queue checkpoint is published
+with successful exact-revision CI. This documentation-only follow-up records
+that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -72,5 +77,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 2026-09-20: six focused and 122 workspace tests pass, verifying exact event
 reservation-overflow rejection and repeated FIFO preservation/reuse. Review
-passes with the recorded screenshot limitation. Publication is pending;
-no production defect or API change was needed.
+passes with the recorded screenshot limitation. The published checkpoint's
+exact hosted CI passes; no production defect or API change was needed.

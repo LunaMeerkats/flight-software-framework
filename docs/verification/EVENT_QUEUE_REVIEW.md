@@ -98,9 +98,26 @@ unavailable. Rendered-content/DOM inspection is the recorded adaptation and
 does not imply a screenshot pass. Temporary aids/logs remain under
 `target/review-2026-09-20`; no checker or gate was adopted.
 
-## Publication and continuation
+## Published checkpoint and continuation
 
-Publication and hosted verification are pending. A local pass cannot establish
-hosted success. The likely next bounded task is lifecycle registration and
-construction ownership/resource review, selected after reconciling existing
-tests; this does not authorize broader service or platform scope.
+Commit `adb77e76ca47b629e2cdc18fd64bd29be58cf472` contains both regressions
+and the reviewed checkpoint. Ordinary fast-forward publication succeeded and
+the remote head matched. On 2026-09-19 UTC (2026-09-20 Sydney),
+[hosted run 35466593661](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35466593661)
+passed that exact push/checkout revision: one Windows job and all 20 steps.
+Logs confirm 122 workspace tests including both new regression names,
+14 focused adapter tests, five focused sample tests, the sample executable,
+and every configured baseline command.
+
+Actual runner: 2.337.0; image: `windows-2025-vs2026` version `20260907.229.1`
+(requested label `windows-2025`). Actual Rust/Cargo: 1.98.1; rustfmt:
+1.9.0-stable; Clippy: 0.1.98. This matches the previously reviewed hosted
+environment. The all-target hosted baseline and companion whole-tree source
+review preserve existing policy without a new waiver. Local Rust/Cargo remain
+1.98.0. JSON and full logs are under `target/review-2026-09-20`.
+
+This documentation-only follow-up records the completed result with unchanged
+Rust, Cargo, workflow, and lint inputs; it does not establish a hosted pass
+for its own later revision or human v0.1 acceptance. The likely next bounded
+task is lifecycle registration/construction ownership and resource review,
+selected after reconciling existing tests. Broader scope remains unapproved.

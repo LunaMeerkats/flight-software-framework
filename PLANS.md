@@ -1,7 +1,7 @@
 # Stage 4 event-queue boundary review
 
 Date: **2026-09-20**
-Status: **Local checks and review passed; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -62,4 +62,16 @@ warnings/errors. Browser inventory recovered after an initial timeout.
 Screenshot capture timed out; pixel inspection is unavailable. The completed
 rendered-content/DOM review is the documented adaptation, not a screenshot
 pass. Temporary aids/logs are under `target/review-2026-09-20`; no checker is
-adopted. Exact-revision hosted results remain pending.
+adopted.
+
+## Publication result
+
+Checkpoint `adb77e76ca47b629e2cdc18fd64bd29be58cf472` was published by
+ordinary fast-forward; the remote head matched. Hosted run 35466593661 passed
+that exact push/checkout: one Windows job, all 20 steps, 122 workspace tests
+including both new regressions, 14 focused adapter tests, five sample tests,
+and the sample executable. The event review records its URL and environment.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

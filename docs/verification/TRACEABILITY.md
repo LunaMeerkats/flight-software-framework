@@ -284,7 +284,12 @@ The focused command `cargo test --locked --test event_queue` passes six tests.
 This is capacity-overflow evidence, not allocator-exhaustion injection or
 internal deque-layout instrumentation. The full locked baseline passes 122
 tests; source/document review passes with the recorded screenshot limitation.
-Publication results are recorded in the linked checkpoint record when complete.
+The tests/review are committed at
+`adb77e76ca47b629e2cdc18fd64bd29be58cf472`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35466593661)
+passes all 20 steps, 122 workspace tests, both focused host targets, and the
+sample executable. This documentation-only follow-up records that exact
+result; later revisions need their own CI evidence.
 
 ## Evidence policy
 
