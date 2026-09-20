@@ -1,7 +1,7 @@
 # Stage 4 lifecycle construction review
 
 Date: **2026-09-21**
-Status: **Local checkpoint complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -62,3 +62,16 @@ Markdown files, 194 resolving relative links, and 88 exact traceability test
 references. Complete source/diff review found no blocking defect. GitHub GFM
 rendering of all seven changed documents preserved every heading and fenced
 code block and produced nonempty linked HTML.
+
+## Publication result
+
+Checkpoint `15e4166bbead2d824e732460fa1a67266386f648` was published by
+ordinary fast-forward; the remote head matched. Hosted run 35534767664 passed
+that exact push and checkout: one Windows job, all configured steps, 124
+workspace tests including both new regressions, 14 focused adapter tests, five
+focused sample tests, and the sample executable. The lifecycle construction
+review records its URL and environment.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

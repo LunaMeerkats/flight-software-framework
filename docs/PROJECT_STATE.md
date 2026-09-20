@@ -36,6 +36,11 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   [messaging construction](verification/MESSAGING_CONSTRUCTION_REVIEW.md), and
   [dependency/scope](verification/DEPENDENCY_SCOPE_REVIEW.md) records retain
   their evidence.
+- Published checkpoint `15e4166bbead2d824e732460fa1a67266386f648` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35534767664):
+  one job, all configured steps, 124 workspace tests, both focused host targets,
+  and the sample executable. The lifecycle review records the actual hosted
+  environment.
 
 ## Current architecture
 
@@ -48,9 +53,9 @@ only; production code and API remain unchanged.
 
 ## Work in progress
 
-The lifecycle-construction checkpoint passes local verification and review.
-Commit, ordinary fast-forward publication, and exact-revision hosted CI
-inspection remain before this run is complete.
+No unfinished implementation remains. The lifecycle-construction checkpoint is
+published with successful exact-revision CI. This documentation-only follow-up
+records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -80,4 +85,4 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 2026-09-21: five lifecycle-registry, eleven application-runtime, and 124
 workspace tests pass. The two new regressions verify exact impossible-capacity
 errors for both public lifecycle constructors. No production defect or API
-change was needed; publication evidence remains pending.
+change was needed; the published checkpoint's exact hosted CI passes.

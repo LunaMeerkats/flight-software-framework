@@ -309,7 +309,12 @@ whole-process memory bounds. Existing registration saturation, returned-value
 ownership, configured-runtime table-lineage, transition, and identity tests
 remain the evidence for those separate behaviors. The complete locked baseline
 passes 124 tests with source, link, diff, and rendered-document review;
-publication and hosted CI results remain to be recorded after completion.
+the checkpoint is committed at
+`15e4166bbead2d824e732460fa1a67266386f648`. Its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35534767664)
+passes all configured steps, 124 workspace tests, both new regressions, both
+focused host targets, and the sample executable. This documentation-only
+follow-up records that exact evidence; later revisions need their own CI result.
 
 ## Evidence policy
 

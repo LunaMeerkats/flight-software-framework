@@ -96,5 +96,29 @@ unchanged fulfilled expectations, plus 44 Markdown files, 194 resolving
 relative links, and 88 exact traceability test references. Complete source and
 diff review found no blocking defect. GitHub GFM rendering of all seven changed
 documents produced nonempty HTML with matching heading and fenced-code-block
-counts. Publication and hosted CI evidence remain to be recorded after they
-complete.
+counts. The following section records the subsequently completed publication
+and hosted CI evidence.
+
+## Published checkpoint and continuation
+
+Commit `15e4166bbead2d824e732460fa1a67266386f648` contains both regressions
+and the reviewed checkpoint. Ordinary fast-forward publication succeeded and
+the remote head matched. On 2026-09-20 UTC (2026-09-21 Sydney),
+[hosted run 35534767664](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35534767664)
+passed that exact push and checkout: one Windows job and all configured steps.
+Logs confirm 124 workspace tests including both new regression names, 14
+focused adapter tests, five focused sample tests, the sample executable, and
+every configured baseline command.
+
+Actual runner: 2.337.0; image: `windows-2025-vs2026` version
+`20260907.229.1` (requested label `windows-2025`). Actual Rust/Cargo: 1.98.1;
+rustfmt: 1.9.0-stable; Clippy: 0.1.98. This matches the previously reviewed
+hosted environment. The all-target hosted baseline and companion whole-tree
+source review preserve existing policy without a new waiver. Local Rust/Cargo
+remain 1.98.0.
+
+This documentation-only follow-up records the completed result with unchanged
+Rust, Cargo, workflow, and lint inputs. It does not establish a hosted pass for
+its own later revision or human v0.1 acceptance. The next bounded task should be
+selected from a reconciled service resource, failure, or public-API contract
+gap. Broader scope remains unapproved.

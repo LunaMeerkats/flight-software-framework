@@ -29,6 +29,9 @@ The [lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REV
 adds exact capacity-overflow diagnostics for both the standalone registry and
 unconfigured owned runtime constructors. Those impossible-capacity tests do not
 claim actual allocator exhaustion or whole-process memory bounds.
+The checkpoint at `15e4166bbead2d824e732460fa1a67266386f648` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35534767664)
+for 124 workspace tests, both focused host targets, and the sample executable.
 
 The standalone `MessageBus` uses mission-selected topics and inline
 const-bounded payloads. It copies immutable positive-capacity inbox topology,
