@@ -4,6 +4,17 @@ use rust_flight_framework::{
 };
 
 #[test]
+fn oversized_registry_capacity_returns_exact_reservation_error() {
+    assert_eq!(
+        LifecycleRegistry::new(usize::MAX)
+            .expect_err("an impossible record capacity must be rejected"),
+        RegistryCreateError::CapacityAllocationFailed {
+            requested: usize::MAX,
+        }
+    );
+}
+
+#[test]
 fn configured_capacity_bounds_registration_without_mutating_existing_records() {
     assert_eq!(
         LifecycleRegistry::new(0).expect_err("zero capacity is invalid"),

@@ -1,40 +1,41 @@
 # Project state
 
-Last updated: **2026-09-20**
+Last updated: **2026-09-21**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, messaging-constructor,
-returned-message failure, and schedule-construction evidence. The current
-checkpoint verifies event-queue construction and repeated saturation/reuse.
+returned-message failure, schedule-construction, event-queue, and lifecycle-
+construction evidence. The current checkpoint verifies exact reservation
+failure through the standalone registry and unconfigured owned runtime.
 Broader contract review and human v0.1 architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `4bfbda5907b92b3b71cded0422c25dfca8d987a7`, equal to
-  refreshed `origin/codex/nightly`; its hosted run 35018337047 succeeded.
-  Initial locked local Cargo baseline: 120 tests.
-- Final locked baseline: 122 tests; focused event-queue target: six. Formatting,
-  all-target check, warnings-denied Clippy/rustdoc, and whitespace checks pass
-  without new exceptions. Independent complete-diff review found no blocker.
+- Started clean at `7cabe599d88fa5a7f3ce74b2e35fac33488aa711`, equal to
+  refreshed `origin/codex/nightly`; its hosted run 35466793755 succeeded.
+  Initial locked local Cargo baseline: 122 tests.
+- Final locked local baseline: 124 tests; focused lifecycle-registry and
+  application-runtime targets: five and eleven. Formatting, all-target check,
+  warnings-denied Clippy/rustdoc, and whitespace checks pass without new
+  exceptions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-  Final audit: 32 Rust files with zero width findings and three unchanged
-  expectations; 43 Markdown files, 187 resolving links, 86 exact test references.
-  Seven changed rendered documents pass content/DOM/layout review. Screenshot
-  capture timed out, leaving pixel inspection unavailable.
-- The [event review](verification/EVENT_QUEUE_REVIEW.md) distinguishes
-  executed capacity-overflow/FIFO evidence from source-inspected allocation
-  properties. Earlier [schedule](verification/SCHEDULE_CONSTRUCTION_REVIEW.md),
+  Final source audit: 32 Rust files with zero width findings and three unchanged
+  expectations; 44 Markdown files, 194 resolving links, and 88 exact
+  traceability test references.
+- Complete source/diff review found no blocking defect. GitHub GFM rendering of
+  all seven changed documents preserved heading and fenced-code-block counts
+  and produced nonempty linked HTML.
+- The [lifecycle construction review](verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
+  distinguishes executed deterministic capacity overflow from actual allocator
+  exhaustion and source-inspected ownership/registration properties. Earlier
+  [event](verification/EVENT_QUEUE_REVIEW.md),
+  [schedule](verification/SCHEDULE_CONSTRUCTION_REVIEW.md),
   [dispatch](verification/MESSAGE_FAILURE_REVIEW.md),
   [messaging construction](verification/MESSAGING_CONSTRUCTION_REVIEW.md), and
   [dependency/scope](verification/DEPENDENCY_SCOPE_REVIEW.md) records retain
-  their evidence. The [CI baseline](verification/CI_BASELINE.md) records the
-  hosted acceptance policy; earlier passes do not prove later revisions.
-- Published checkpoint `adb77e76ca47b629e2cdc18fd64bd29be58cf472` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35466593661):
-  one job/all 20 steps, 122 workspace tests, both focused host targets, and the
-  sample executable. The event review records the actual hosted environment.
+  their evidence.
 
 ## Current architecture
 
@@ -42,20 +43,21 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment changes two event-queue tests and supporting records only.
+This increment changes two lifecycle-construction tests and supporting records
+only; production code and API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The event-queue checkpoint is published
-with successful exact-revision CI. This documentation-only follow-up records
-that result; later revisions require their own verification.
+The lifecycle-construction checkpoint passes local verification and review.
+Commit, ordinary fast-forward publication, and exact-revision hosted CI
+inspection remain before this run is complete.
 
 ## Highest risks and uncertainties
 
 - Impossible-capacity rejection is verified; actual allocator exhaustion and
-  allocation counts are not. Logical bounds do not bound whole-process bytes.
-- Runtime and clock origins remain caller-scoped. A full event queue can reject
-  a later high-severity event; delivery is not guaranteed.
+  allocation counts are not. Logical limits do not bound whole-process bytes.
+- Application identities remain caller-scoped; equal-position keys from
+  different owners can alias and no origin is encoded.
 - Callback/clock panics and hangs remain outside containment. Host saturation
   is terminal; no recovery, real-time, or physical delivery claim is made.
 - Stable Rust and runner images float. Source/document and conditional ADR
@@ -69,13 +71,13 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 ## Most likely next tasks
 
-1. Review lifecycle registration/construction ownership and resource boundaries
-   after reconciling existing tests, or select a stronger bounded Stage 4 gap.
+1. Select another bounded Stage 4 service resource, failure, or public-API
+   contract gap after reconciling existing evidence.
 2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
-2026-09-20: six focused and 122 workspace tests pass, verifying exact event
-reservation-overflow rejection and repeated FIFO preservation/reuse. Review
-passes with the recorded screenshot limitation. The published checkpoint's
-exact hosted CI passes; no production defect or API change was needed.
+2026-09-21: five lifecycle-registry, eleven application-runtime, and 124
+workspace tests pass. The two new regressions verify exact impossible-capacity
+errors for both public lifecycle constructors. No production defect or API
+change was needed; publication evidence remains pending.

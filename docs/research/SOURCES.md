@@ -512,6 +512,20 @@ No external research, source reuse, new dependency, or upstream claim is added.
   Do not invent one or imply Australian certification; evaluate the cited ECSS
   sources on their own terms.
 
+## SRC-RUST-VEC-RESERVATION — Fallible lifecycle record reservation
+
+- Title: `Vec::try_reserve_exact` — Rust standard library
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/1.98.0/std/vec/struct.Vec.html#method.try_reserve_exact>
+- Version: Rust 1.98.0 documentation, accessed 2026-09-21
+- Informed: reservation can return capacity-overflow or allocator failure;
+  successful allocator capacity may exceed the requested count.
+- Local treatment: retain explicit logical lifecycle/runtime record limits and
+  typed errors that preserve the requested count. Add deterministic
+  impossible-capacity regressions for both public constructors. Do not treat
+  these as heap-exhaustion injection, allocation accounting, or an identity
+  policy change.
+
 ## SRC-RUST-DEQUE-RESERVATION — Fallible inbox and event reservation
 
 - Title: VecDeque::try_reserve_exact — Rust standard library

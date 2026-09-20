@@ -25,6 +25,10 @@ Successful lifecycle operations enter `Running`, `Stopped`, and `Running`;
 successful work retains `Running`. Restart and work retain application-owned
 state, while a returned concrete operation error enters terminal `Failed`
 without mutating peer records.
+The [lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
+adds exact capacity-overflow diagnostics for both the standalone registry and
+unconfigured owned runtime constructors. Those impossible-capacity tests do not
+claim actual allocator exhaustion or whole-process memory bounds.
 
 The standalone `MessageBus` uses mission-selected topics and inline
 const-bounded payloads. It copies immutable positive-capacity inbox topology,
@@ -247,6 +251,7 @@ remain separate release gates.
 - [Host command/telemetry boundary decision](docs/adr/0019-host-command-telemetry-boundary.md)
 - [Messaging-owned work failure-event decision](docs/adr/0020-messaging-work-failure-events.md)
 - [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
+- [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)

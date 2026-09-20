@@ -291,6 +291,26 @@ passes all 20 steps, 122 workspace tests, both focused host targets, and the
 sample executable. This documentation-only follow-up records that exact
 result; later revisions need their own CI evidence.
 
+## Lifecycle construction checkpoint
+
+The 2026-09-21
+[lifecycle construction review](LIFECYCLE_CONSTRUCTION_REVIEW.md) supplements
+RFF-REQ-002 without changing its meaning or historical evidence hash above.
+`oversized_registry_capacity_returns_exact_reservation_error` and
+`oversized_runtime_capacity_returns_exact_reservation_error` assert the exact
+typed error and requested `usize::MAX` count through the standalone registry
+and unconfigured owned runtime public constructors.
+
+The focused command
+`cargo test --locked --test lifecycle_registry --test application_runtime`
+passes five and eleven tests respectively. These deterministic inputs exercise
+capacity overflow for nonzero-sized records, not allocator exhaustion or
+whole-process memory bounds. Existing registration saturation, returned-value
+ownership, configured-runtime table-lineage, transition, and identity tests
+remain the evidence for those separate behaviors. The complete locked baseline
+passes 124 tests with source, link, diff, and rendered-document review;
+publication and hosted CI results remain to be recorded after completion.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

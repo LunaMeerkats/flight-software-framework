@@ -197,8 +197,14 @@ adds first-descent diagnostics and copied-agenda ownership observations.
 The 2026-09-20 [event-queue review](verification/EVENT_QUEUE_REVIEW.md) adds
 exact capacity-overflow rejection and repeated saturation/reuse observations
 at logical capacities one and three without changing the queue policy.
-Other lifecycle/service resource, failure, and public-API reviews plus human
-entry-point/architecture acceptance remain open. Stage 4 is not complete.
+The 2026-09-21
+[lifecycle construction review](verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
+adds exact reservation-overflow diagnostics through both the standalone
+registry and unconfigured owned runtime constructors. Existing zero-capacity,
+logical saturation, returned-application ownership, and configured-runtime
+table-lineage evidence remains unchanged. Other lifecycle/service resource,
+failure, and public-API reviews plus human entry-point/architecture acceptance
+remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

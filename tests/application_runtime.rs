@@ -929,6 +929,17 @@ fn returned_stop_error_fails_only_the_selected_application() {
 }
 
 #[test]
+fn oversized_runtime_capacity_returns_exact_reservation_error() {
+    assert_eq!(
+        Runtime::<MissionApplication>::new(usize::MAX)
+            .expect_err("an impossible record capacity must be rejected"),
+        RuntimeCreateError::CapacityAllocationFailed {
+            requested: usize::MAX,
+        }
+    );
+}
+
+#[test]
 fn runtime_capacity_rejection_preserves_application_ownership() {
     assert_eq!(
         Runtime::<MissionApplication>::new(0).expect_err("zero runtime capacity is invalid"),
