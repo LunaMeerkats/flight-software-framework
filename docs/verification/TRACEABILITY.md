@@ -331,7 +331,12 @@ The focused command passes six registry and twelve application-runtime tests.
 These regressions demonstrate the existing lack of issuer provenance; they do
 not authorize cross-owner key mixing or establish a globally unique, persistent,
 or origin-checked identity. Human architecture acceptance and any redesign
-before API stabilization remain separate.
+before API stabilization remain separate. The checkpoint is committed at
+`9ea7f48f827031fcbeb63f712c97dfbe14cc629c`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35658016416)
+passes every configured step, 126 workspace tests including both regressions,
+both focused host targets, and the sample executable. This documentation-only
+follow-up records that exact result; later revisions need their own CI evidence.
 
 ## Evidence policy
 

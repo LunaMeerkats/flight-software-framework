@@ -32,6 +32,11 @@ review and human v0.1 architecture acceptance remain open.
   [identity scope review](verification/APPLICATION_ID_SCOPE_REVIEW.md)
   distinguishes executed alias behavior from caller authorization and from an
   origin-bearing identity design.
+- Published checkpoint `9ea7f48f827031fcbeb63f712c97dfbe14cc629c` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35658016416):
+  one job, all configured steps, 126 workspace tests, both focused host targets,
+  and the sample executable. The identity review records the actual hosted
+  environment.
 
 ## Current architecture
 
@@ -44,9 +49,9 @@ only; production code and API remain unchanged.
 
 ## Work in progress
 
-The application-identity scope checkpoint is locally complete and reviewed.
-Commit, ordinary fast-forward publication, and exact-revision hosted CI evidence
-remain to be completed and recorded.
+No unfinished implementation remains. The application-identity scope checkpoint
+is published with successful exact-revision CI. This documentation-only
+follow-up records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -72,13 +77,14 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 ## Most likely next tasks
 
-1. Complete and record exact-revision publication evidence for this checkpoint.
-2. Then select another bounded Stage 4 service or public-API gap, or record
-   human entry-point/architecture acceptance before broadening scope.
+1. Select another bounded Stage 4 service or public-API gap after reconciling
+   existing evidence.
+2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
 2026-09-22: six lifecycle-registry, twelve application-runtime, and 126
 workspace tests pass. The two new regressions execute same-position identity
 aliasing through the logical and owned callback boundaries. No production
-defect, API change, dependency, or lint-policy change was needed.
+defect, API change, dependency, or lint-policy change was needed; the published
+checkpoint's exact hosted CI passes.

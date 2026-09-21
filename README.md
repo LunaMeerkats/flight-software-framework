@@ -36,6 +36,9 @@ The [application identity scope review](docs/verification/APPLICATION_ID_SCOPE_R
 now executes the distinct caller-discipline boundary: equal-position keys from
 separate owners compare equal and select the corresponding local record. They
 do not carry issuer provenance, and callers must not mix them across owners.
+Checkpoint `9ea7f48f827031fcbeb63f712c97dfbe14cc629c` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35658016416)
+for 126 workspace tests and the configured host/sample evidence.
 
 The standalone `MessageBus` uses mission-selected topics and inline
 const-bounded payloads. It copies immutable positive-capacity inbox topology,

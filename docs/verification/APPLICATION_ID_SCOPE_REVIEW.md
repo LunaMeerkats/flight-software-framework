@@ -76,5 +76,28 @@ comparisons pass; pixel-level visual acceptance is not claimed.
 Host adapters, the combined sample, CI workflow, and ADR-0018/0019 experiments
 are unchanged, so their separate local commands are not triggered. The full
 workspace suite still exercises both host test targets. This checkpoint does
-not establish hosted CI or human acceptance until those results are recorded
-separately.
+not establish human acceptance.
+
+## Published checkpoint and continuation
+
+Commit `9ea7f48f827031fcbeb63f712c97dfbe14cc629c` contains both
+regressions and the reviewed checkpoint. Ordinary fast-forward publication
+succeeded and the remote head matched. On 2026-09-21 UTC (2026-09-22 Sydney),
+[hosted run 35658016416](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35658016416)
+passed that exact push and checkout: one Windows job and all configured steps.
+Logs confirm 126 workspace tests including both new regression names, 14
+focused adapter tests, five focused sample tests, the sample executable, and
+every configured baseline command.
+
+Actual runner: 2.337.0; image: `windows-2025-vs2026` version
+`20260907.229.1` (requested label `windows-2025`). Actual Rust/Cargo: 1.98.1;
+rustfmt: 1.9.0-stable; Clippy: 0.1.98. This matches the previously reviewed
+hosted environment. The all-target hosted baseline and companion whole-tree
+source review preserve existing policy without a new waiver. Local Rust/Cargo
+remain 1.98.0.
+
+This documentation-only follow-up records the completed result with unchanged
+Rust, Cargo, workflow, and lint inputs. It does not establish a hosted pass for
+its own later revision or human v0.1 acceptance. The next bounded task should be
+selected from a reconciled service or public-API contract gap; broader scope
+remains unapproved.

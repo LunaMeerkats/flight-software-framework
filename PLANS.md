@@ -1,7 +1,7 @@
 # Stage 4 application-identity scope review
 
 Date: **2026-09-22**
-Status: **Complete locally; publication evidence pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -63,8 +63,14 @@ expectations, plus 45 Markdown files, 194 resolving relative links, and 90 exact
 traceability test references. Rendered document structure and exact content
 comparisons pass; complete source/diff review found no blocking defect.
 
-## Publication status
+## Publication result
 
-No checkpoint commit or push has yet been made. After committing, refresh the
-remote again, publish only by ordinary fast-forward, and inspect the exact-head
-hosted run. Record that result without projecting it onto a later revision.
+Checkpoint `9ea7f48f827031fcbeb63f712c97dfbe14cc629c` was published by
+ordinary fast-forward; the remote head matched. Hosted run 35658016416 passed
+that exact push and checkout: one Windows job, all configured steps, 126
+workspace tests including both new regressions, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.
