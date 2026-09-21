@@ -202,9 +202,13 @@ The 2026-09-21
 adds exact reservation-overflow diagnostics through both the standalone
 registry and unconfigured owned runtime constructors. Existing zero-capacity,
 logical saturation, returned-application ownership, and configured-runtime
-table-lineage evidence remains unchanged. Other lifecycle/service resource,
-failure, and public-API reviews plus human entry-point/architecture acceptance
-remain open. Stage 4 is not complete.
+table-lineage evidence remains unchanged. The 2026-09-22
+[application identity scope review](verification/APPLICATION_ID_SCOPE_REVIEW.md)
+executes ADR-0003's caller-scoped key consequence through both owners:
+equal-position foreign keys select local records because issuer provenance is
+not encoded. Other lifecycle/service resource, failure, and public-API reviews
+plus human entry-point/architecture acceptance remain open. Stage 4 is not
+complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

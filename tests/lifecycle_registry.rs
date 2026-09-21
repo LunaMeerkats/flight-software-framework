@@ -38,6 +38,19 @@ fn configured_capacity_bounds_registration_without_mutating_existing_records() {
 }
 
 #[test]
+fn equal_position_id_from_another_registry_addresses_the_local_record() {
+    let mut local = LifecycleRegistry::new(1).expect("one local record can be reserved");
+    let local_id = local.register().expect("local record fits");
+    let mut foreign = LifecycleRegistry::new(1).expect("one foreign record can be reserved");
+    let foreign_id = foreign.register().expect("foreign record fits");
+
+    assert_eq!(foreign_id, local_id);
+    assert_eq!(local.start(foreign_id), Ok(ApplicationState::Running));
+    assert_eq!(local.state(local_id), Ok(ApplicationState::Running));
+    assert_eq!(foreign.state(foreign_id), Ok(ApplicationState::Registered));
+}
+
+#[test]
 fn approved_lc1_sequence_preserves_identity_and_registry_bound() {
     let mut registry = LifecycleRegistry::new(1).expect("test capacity is valid");
     let application_id = registry.register().expect("test record fits");

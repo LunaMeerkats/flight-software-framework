@@ -32,6 +32,10 @@ claim actual allocator exhaustion or whole-process memory bounds.
 The checkpoint at `15e4166bbead2d824e732460fa1a67266386f648` has successful
 [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35534767664)
 for 124 workspace tests, both focused host targets, and the sample executable.
+The [application identity scope review](docs/verification/APPLICATION_ID_SCOPE_REVIEW.md)
+now executes the distinct caller-discipline boundary: equal-position keys from
+separate owners compare equal and select the corresponding local record. They
+do not carry issuer provenance, and callers must not mix them across owners.
 
 The standalone `MessageBus` uses mission-selected topics and inline
 const-bounded payloads. It copies immutable positive-capacity inbox topology,

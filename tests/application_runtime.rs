@@ -997,6 +997,35 @@ fn runtime_capacity_rejection_preserves_application_ownership() {
 }
 
 #[test]
+fn equal_position_id_from_another_runtime_invokes_the_local_application() {
+    let local_start_calls = Rc::new(Cell::new(0));
+    let foreign_start_calls = Rc::new(Cell::new(0));
+    let mut local = Runtime::new(1).expect("one local record can be reserved");
+    let local_id = local
+        .register(MissionApplication::Healthy(HealthyApplication {
+            start_calls: Rc::clone(&local_start_calls),
+            stop_calls: Rc::new(Cell::new(0)),
+            work_calls: Rc::new(Cell::new(0)),
+        }))
+        .expect("local application fits");
+    let mut foreign = Runtime::new(1).expect("one foreign record can be reserved");
+    let foreign_id = foreign
+        .register(MissionApplication::Healthy(HealthyApplication {
+            start_calls: Rc::clone(&foreign_start_calls),
+            stop_calls: Rc::new(Cell::new(0)),
+            work_calls: Rc::new(Cell::new(0)),
+        }))
+        .expect("foreign application fits");
+
+    assert_eq!(foreign_id, local_id);
+    assert_eq!(local.start(foreign_id), Ok(ApplicationState::Running));
+    assert_eq!(local_start_calls.get(), 1);
+    assert_eq!(foreign_start_calls.get(), 0);
+    assert_eq!(local.state(local_id), Ok(ApplicationState::Running));
+    assert_eq!(foreign.state(foreign_id), Ok(ApplicationState::Registered));
+}
+
+#[test]
 fn unknown_identity_is_rejected_before_application_code_runs() {
     let target_start_calls = Rc::new(Cell::new(0));
     let target_work_calls = Rc::new(Cell::new(0));

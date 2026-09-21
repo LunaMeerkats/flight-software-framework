@@ -316,6 +316,23 @@ passes all configured steps, 124 workspace tests, both new regressions, both
 focused host targets, and the sample executable. This documentation-only
 follow-up records that exact evidence; later revisions need their own CI result.
 
+## Application identity scope checkpoint
+
+The 2026-09-22
+[identity scope review](APPLICATION_ID_SCOPE_REVIEW.md) supplements RFF-REQ-002
+and ADR-0003 without changing their caller-scoped identity decision.
+`equal_position_id_from_another_registry_addresses_the_local_record` proves
+that a same-position key from another registry compares equal and transitions
+the receiving registry's local record. Through the owned callback boundary,
+`equal_position_id_from_another_runtime_invokes_the_local_application` proves
+that only the receiving runtime's application is invoked and mutated.
+
+The focused command passes six registry and twelve application-runtime tests.
+These regressions demonstrate the existing lack of issuer provenance; they do
+not authorize cross-owner key mixing or establish a globally unique, persistent,
+or origin-checked identity. Human architecture acceptance and any redesign
+before API stabilization remain separate.
+
 ## Evidence policy
 
 "Verified" requires all of the following:
