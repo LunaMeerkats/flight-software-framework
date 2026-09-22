@@ -352,8 +352,12 @@ The focused command passes nine message-bus tests. This regression demonstrates
 the existing lack of issuer provenance; it does not authorize cross-owner key
 mixing or establish a globally unique, persistent, or origin-checked identity.
 `MessagingRuntime` internal topology assignment and human architecture
-acceptance remain separate. Publication and exact-revision hosted evidence are
-recorded after they complete.
+acceptance remain separate. The checkpoint is committed at
+`f6786d0ada7812bc10b2d7aec03a0f4b8f48b4b3`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35778516818)
+passes every configured step, 127 workspace tests including the regression,
+both focused host targets, and the sample executable. This documentation-only
+follow-up records that exact result; later revisions need their own CI evidence.
 
 ## Evidence policy
 

@@ -1,7 +1,7 @@
 # Stage 4 detached-message identity scope review
 
 Date: **2026-09-23**
-Status: **Complete locally; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -64,3 +64,15 @@ fulfilled expectations, plus 46 Markdown files, 200 resolving relative links,
 and 91 exact traceability test references. Rendered document structure and
 exact content comparisons pass; pixel-level visual acceptance is not claimed.
 Complete source/diff review found no blocking defect.
+
+## Publication result
+
+Checkpoint `f6786d0ada7812bc10b2d7aec03a0f4b8f48b4b3` was published by
+ordinary fast-forward; the remote head matched. Hosted run 35778516818 passed
+that exact push and checkout: one Windows job, all configured steps, 127
+workspace tests including the new regression, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

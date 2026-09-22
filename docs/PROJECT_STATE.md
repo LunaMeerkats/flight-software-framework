@@ -32,9 +32,11 @@ acceptance remain open.
   [detached-message identity review](verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
   distinguishes executed alias behavior from caller authorization and records
   the integrated owner's topology-assignment mitigation.
-- Publication and exact-revision hosted CI for this checkpoint remain to be
-  completed. The starting revision's exact hosted evidence remains valid only
-  for that earlier revision.
+- Published checkpoint `f6786d0ada7812bc10b2d7aec03a0f4b8f48b4b3` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35778516818):
+  one job, all configured steps, 127 workspace tests, both focused host targets,
+  and the sample executable. The detached-message review records the actual
+  hosted environment.
 
 ## Current architecture
 
@@ -48,8 +50,8 @@ records only; production code and API remain unchanged.
 ## Work in progress
 
 No unfinished implementation remains. The detached-message identity checkpoint
-is locally verified and awaiting ordinary fast-forward publication plus exact-
-revision hosted CI.
+is published with successful exact-revision CI. This documentation-only
+follow-up records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -85,4 +87,4 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 2026-09-23: nine message-bus and 127 workspace tests pass. The new regression
 executes same-position foreign-identity acceptance and inbox access through the
 detached topology. No production defect, API change, dependency, or lint-policy
-change was needed. Publication and hosted evidence remain pending.
+change was needed; the published checkpoint's exact hosted CI passes.

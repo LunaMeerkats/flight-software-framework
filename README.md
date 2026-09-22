@@ -47,7 +47,10 @@ fan-out to unaffected subscribers, and returns stable ordered outcomes. The
 [detached-message identity review](docs/verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
 executes its caller-scoped boundary: a same-position foreign key passes
 registration-order validation and addresses the configured inbox because the
-key carries no issuer provenance. This is not permission to mix identities. The
+key carries no issuer provenance. This is not permission to mix identities.
+Checkpoint `f6786d0ada7812bc10b2d7aec03a0f4b8f48b4b3` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35778516818)
+for 127 workspace tests and the configured host/sample evidence. The
 owning `MessagingRuntime` now consumes a fully composed still-registered
 runtime, constructs exactly one fresh inbox per application, derives delivery
 availability from lifecycle state, clears queues after successful stop or a
