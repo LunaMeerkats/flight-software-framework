@@ -338,6 +338,23 @@ passes every configured step, 126 workspace tests including both regressions,
 both focused host targets, and the sample executable. This documentation-only
 follow-up records that exact result; later revisions need their own CI evidence.
 
+## Detached message identity scope checkpoint
+
+The 2026-09-23
+[detached-message identity review](MESSAGE_IDENTITY_SCOPE_REVIEW.md) supplements
+RFF-REQ-003 and ADR-0010 without changing their caller-scoped identity contract.
+`equal_position_foreign_identity_passes_topology_and_addresses_the_inbox`
+proves that a first-position key from another registry passes detached topology
+validation, identifies the same report destination, and accesses the configured
+inbox through the equal local key. Both issuing registries remain unchanged.
+
+The focused command passes nine message-bus tests. This regression demonstrates
+the existing lack of issuer provenance; it does not authorize cross-owner key
+mixing or establish a globally unique, persistent, or origin-checked identity.
+`MessagingRuntime` internal topology assignment and human architecture
+acceptance remain separate. Publication and exact-revision hosted evidence are
+recorded after they complete.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

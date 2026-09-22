@@ -1,8 +1,9 @@
 //! Public-API evidence for bounded available-endpoint message fan-out.
 
 use rust_flight_framework::{
-    ApplicationId, ApplicationInboxConfig, DeliveryStatus, InboxAccessError, LifecycleRegistry,
-    Message, MessageBus, MessageBusCreateError, MessageCreateError, PublishClassification,
+    ApplicationId, ApplicationInboxConfig, ApplicationState, DeliveryStatus, InboxAccessError,
+    LifecycleRegistry, Message, MessageBus, MessageBusCreateError, MessageCreateError,
+    PublishClassification,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -106,6 +107,32 @@ fn topology_validation_rejects_invalid_inboxes_without_a_partial_bus() {
             duplicate_index: 2,
         }
     );
+}
+
+#[test]
+fn equal_position_foreign_identity_passes_topology_and_addresses_the_inbox() {
+    let mut local = LifecycleRegistry::new(1).expect("one local record can be reserved");
+    let local_id = local.register().expect("local record fits");
+    let mut foreign = LifecycleRegistry::new(1).expect("one foreign record can be reserved");
+    let foreign_id = foreign.register().expect("foreign record fits");
+    assert_eq!(foreign_id, local_id);
+
+    let configurations = [ApplicationInboxConfig::new(foreign_id, 1, &COMMAND_ONLY)];
+    let mut bus = MessageBus::<MissionTopic, 1>::new(&configurations)
+        .expect("topology validation checks position rather than issuer");
+    let message = Message::try_new(MissionTopic::Command, &[7]).expect("payload fits");
+    let report = bus
+        .publish(&message)
+        .expect("report storage can be reserved");
+
+    assert_eq!(report.classification(), PublishClassification::Complete);
+    assert_eq!(report.outcomes()[0].application_id(), local_id);
+    assert_eq!(bus.pending(local_id), Ok(1));
+    assert_eq!(bus.pending(foreign_id), Ok(1));
+    assert_eq!(bus.dequeue(local_id), Ok(Some(message)));
+    assert_eq!(bus.dequeue(foreign_id), Ok(None));
+    assert_eq!(local.state(local_id), Ok(ApplicationState::Registered));
+    assert_eq!(foreign.state(foreign_id), Ok(ApplicationState::Registered));
 }
 
 #[test]

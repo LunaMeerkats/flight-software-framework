@@ -206,9 +206,13 @@ table-lineage evidence remains unchanged. The 2026-09-22
 [application identity scope review](verification/APPLICATION_ID_SCOPE_REVIEW.md)
 executes ADR-0003's caller-scoped key consequence through both owners:
 equal-position foreign keys select local records because issuer provenance is
-not encoded. Other lifecycle/service resource, failure, and public-API reviews
-plus human entry-point/architecture acceptance remain open. Stage 4 is not
-complete.
+not encoded. The 2026-09-23
+[detached-message identity review](verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
+executes the corresponding ADR-0010 service boundary: positional topology
+validation accepts a same-position key from another issuer, and equal keys
+address the same configured inbox. Other lifecycle/service resource, failure,
+and public-API reviews plus human entry-point/architecture acceptance remain
+open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

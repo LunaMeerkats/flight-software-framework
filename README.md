@@ -44,6 +44,10 @@ The standalone `MessageBus` uses mission-selected topics and inline
 const-bounded payloads. It copies immutable positive-capacity inbox topology,
 preserves FIFO order across topics, applies reject-newest saturation, continues
 fan-out to unaffected subscribers, and returns stable ordered outcomes. The
+[detached-message identity review](docs/verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
+executes its caller-scoped boundary: a same-position foreign key passes
+registration-order validation and addresses the configured inbox because the
+key carries no issuer provenance. This is not permission to mix identities. The
 owning `MessagingRuntime` now consumes a fully composed still-registered
 runtime, constructs exactly one fresh inbox per application, derives delivery
 availability from lifecycle state, clears queues after successful stop or a
