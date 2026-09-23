@@ -1,42 +1,36 @@
 # Project state
 
-Last updated: **2026-09-23**
+Last updated: **2026-09-24**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, returned-
-message failure, schedule, and application-identity evidence. The current
-checkpoint executes the detached message-topology consequence: a same-position
-key from a different issuer passes positional validation and addresses the
-configured inbox. Broader contract review and human v0.1 architecture
+message failure, schedule, and identity-boundary evidence. The current
+checkpoint executes the scheduled-work consequence: a due same-position key
+from another owner selects the receiving owner's local application through
+both scheduling APIs. Broader contract review and human v0.1 architecture
 acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `3041407580c09236adbc46ad05819c66984b2c9e`, equal to
-  refreshed `origin/codex/nightly`; its hosted run 35658357984 succeeded.
-  Initial locked local Cargo baseline: 126 tests.
-- Final locked local baseline: 127 tests; focused message-bus target: nine.
-  Formatting, all-target check, warnings-denied Clippy/rustdoc, and whitespace
-  checks pass without new exceptions.
+- Started clean at `4ef3b74296700259ad80ad5a6792de054fddbea2`, equal to
+  refreshed `origin/codex/nightly`; its hosted run 35778881015 succeeded.
+  Initial locked local Cargo baseline: 127 tests.
+- Final locked local baseline: 129 tests; focused direct/messaging scheduled-
+  work targets: ten and eight. Formatting, all-target check, warnings-denied
+  Clippy/rustdoc, and whitespace checks pass without new exceptions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-  Final source audit: 32 Rust files with zero width findings, no block comments,
-  and three unchanged expectations; 46 Markdown files, 200 resolving relative
-  links, and 91 exact traceability test references.
-- Rendered HTML for all Markdown files passes heading, table, link, and source-
-  content checks. The changed-document comparison preserves exact text,
-  headings, lists, inline/fenced code, and tables. This structural inspection is
-  not pixel-level visual acceptance.
-- Complete source and diff review found no blocking defect. The
-  [detached-message identity review](verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
-  distinguishes executed alias behavior from caller authorization and records
-  the integrated owner's topology-assignment mitigation.
-- Published checkpoint `f6786d0ada7812bc10b2d7aec03a0f4b8f48b4b3` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35778516818):
-  one job, all configured steps, 127 workspace tests, both focused host targets,
-  and the sample executable. The detached-message review records the actual
-  hosted environment.
+  Final audit: 32 Rust files with zero width findings, no block comments, and
+  three unchanged fulfilled expectations; 47 Markdown files, 208 resolving
+  relative links, 35 source definitions, and 93 exact test references.
+- Generated HTML for all Markdown files passes heading, table, link, and source-
+  content checks. The six changed documents preserve exact text and structure;
+  rendered-layout inspection found no visible overflow or malformed section.
+- Complete source and diff review found no production mismatch. The
+  [scheduled-work identity review](verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
+  distinguishes executed alias behavior from caller authorization and from
+  clock-origin validation.
 
 ## Current architecture
 
@@ -44,24 +38,26 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment adds one public detached-message regression and supporting
-records only; production code and API remain unchanged.
+This increment adds two public scheduling regressions and supporting records
+only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The detached-message identity checkpoint
-is published with successful exact-revision CI. This documentation-only
-follow-up records that result; later revisions require their own verification.
+The scheduled-work identity checkpoint is locally complete and awaiting
+publication plus exact-revision hosted CI. Later revisions require their own
+verification.
 
 ## Highest risks and uncertainties
 
 - `ApplicationId` encodes only a record position. Equal-position keys from
-  separate live owners compare equal and can invoke or transition the receiving
-  owner's local application or address a detached inbox. Correct issuer pairing
-  remains caller discipline.
-- Adding issuer provenance needs a bounded origin source and explicit equality,
-  exhaustion, persistence, and public-API decisions; no redesign is approved by
-  this evidence checkpoint.
+  separate live owners compare equal and can select the receiving owner's
+  local record, callback, detached inbox, or scheduled work target. Correct
+  issuer pairing remains caller discipline.
+- `FrameworkInstant` likewise carries no clock-origin identity. The schedule
+  cannot validate that an injected clock belongs to its configured domain.
+- Adding issuer or clock provenance needs bounded origin sources and explicit
+  equality, exhaustion, persistence, and public-API decisions; no redesign is
+  approved by these evidence checkpoints.
 - Impossible-capacity rejection is verified; actual allocator exhaustion and
   allocation counts are not. Logical limits do not bound whole-process bytes.
 - Callback/clock panics and hangs remain outside containment. Host saturation
@@ -71,20 +67,23 @@ follow-up records that result; later revisions require their own verification.
 
 ## Important unresolved decisions
 
-Human v0.1 acceptance remains pending, including whether caller-scoped identity
-is sufficient before API stabilization. APIs and local grammar are unfrozen.
-MSRV, message/lifecycle configuration access, broader events, external I/O,
-hardware, RTOS, and no_std remain open; no scope expansion is approved here.
+Human v0.1 acceptance remains pending, including whether caller-scoped
+application and clock identity are sufficient before API stabilization. APIs
+and local grammar are unfrozen. MSRV, message/lifecycle configuration access,
+broader events, external I/O, hardware, RTOS, and no_std remain open; no scope
+expansion is approved here.
 
 ## Most likely next tasks
 
-1. Select another bounded Stage 4 service or public-API gap after reconciling
-   existing evidence.
+1. Select another bounded Stage 4 service, resource, failure, or public-API gap
+   after reconciling existing evidence.
 2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
-2026-09-23: nine message-bus and 127 workspace tests pass. The new regression
-executes same-position foreign-identity acceptance and inbox access through the
-detached topology. No production defect, API change, dependency, or lint-policy
-change was needed; the published checkpoint's exact hosted CI passes.
+2026-09-24: ten direct-schedule, eight messaging-schedule, and 129 workspace
+tests pass. The two new regressions execute same-position foreign-identity
+selection through both scheduling owners while preserving the foreign owner
+and successful messaging inboxes. No production defect, API change,
+dependency, external research, or lint-policy change was needed. Publication
+and hosted verification are pending.

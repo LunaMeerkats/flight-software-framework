@@ -359,6 +359,26 @@ passes every configured step, 127 workspace tests including the regression,
 both focused host targets, and the sample executable. This documentation-only
 follow-up records that exact result; later revisions need their own CI evidence.
 
+## Scheduled-work identity scope checkpoint
+
+The 2026-09-24
+[scheduled-work identity review](SCHEDULE_IDENTITY_SCOPE_REVIEW.md) supplements
+RFF-REQ-004 and ADR-0015/0021 without changing their caller-scoped identity or
+clock-origin contracts.
+`equal_position_foreign_identity_schedules_the_receiving_runtime_application`
+proves that a due foreign same-position key invokes only the receiving direct
+runtime's local callback. Through the lifecycle/inbox owner,
+`equal_position_foreign_identity_schedules_the_receiving_messaging_application`
+proves the same local callback selection while preserving both receiving
+inboxes and leaving the foreign owner's trace, inboxes, and state unchanged.
+
+The focused command passes ten direct and eight messaging-owned scheduled-work
+tests. These regressions demonstrate the existing lack of issuer provenance;
+they do not authorize cross-owner key mixing or establish global identity,
+clock-origin validation, failure cleanup under an aliased selector, or human
+architecture acceptance. Exact commit and hosted evidence are recorded after
+publication; a local pass alone is not hosted verification.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

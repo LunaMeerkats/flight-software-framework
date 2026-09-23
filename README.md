@@ -105,7 +105,7 @@ injected clock once while an item remains, waits without mutation before its
 instant, and consumes at most one due or overdue item per caller request. Equal-
 time items retain configuration order. Success returns the lifecycle state;
 lifecycle rejection or a returned work error preserves the exact runtime error
-and consumes only the attempted item so a due peer can still progress. Seven
+and consumes only the attempted item so a due peer can still progress. Ten
 public tests cover order validation, exact clock-read counts, inclusive and
 overdue work, lifecycle/error handling, and replay-equivalent work, lifecycle,
 and structured-event timestamp traces under manual time.
@@ -116,6 +116,12 @@ The existing nested errors retain the item, observed instant, original work
 error, and exact discarded-delivery count. Failure clears only the selected
 inbox; later due peers can still work and dispatch their retained messages.
 This operation leaves successful inboxes intact and emits no failure event.
+The [scheduled-work identity review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
+executes the remaining caller-discipline boundary through both owners: a due
+same-position key from another runtime invokes the receiving owner's local
+application. The foreign owner remains unchanged, and successful messaging-
+owned work preserves the receiving inboxes. This does not authorize mixing
+identities or clock domains.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
@@ -268,6 +274,7 @@ remain separate release gates.
 - [Host command/telemetry boundary decision](docs/adr/0019-host-command-telemetry-boundary.md)
 - [Messaging-owned work failure-event decision](docs/adr/0020-messaging-work-failure-events.md)
 - [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
+- [Scheduled-work identity scope review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)

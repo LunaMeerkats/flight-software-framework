@@ -210,9 +210,13 @@ not encoded. The 2026-09-23
 [detached-message identity review](verification/MESSAGE_IDENTITY_SCOPE_REVIEW.md)
 executes the corresponding ADR-0010 service boundary: positional topology
 validation accepts a same-position key from another issuer, and equal keys
-address the same configured inbox. Other lifecycle/service resource, failure,
-and public-API reviews plus human entry-point/architecture acceptance remain
-open. Stage 4 is not complete.
+address the same configured inbox. The 2026-09-24
+[scheduled-work identity review](verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
+executes the ADR-0015/0021 consequence through both scheduling owners: a due
+foreign same-position key selects the receiving owner's local application,
+while the foreign owner remains unchanged. Other lifecycle/service resource,
+failure, and public-API reviews plus human entry-point/architecture acceptance
+remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

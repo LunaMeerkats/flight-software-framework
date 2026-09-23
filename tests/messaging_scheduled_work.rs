@@ -347,6 +347,40 @@ fn complete_waiting_and_due_work_observe_clock_bounds_and_preserve_inboxes() {
 }
 
 #[test]
+fn equal_position_foreign_identity_schedules_the_receiving_messaging_application() {
+    let mut fixture = MissionFixture::running(None);
+    let foreign = MissionFixture::running(None);
+    assert_eq!(foreign.alpha, fixture.alpha);
+    fixture.fill_inboxes();
+    let item = scheduled(foreign.alpha, 0);
+    let mut schedule = WorkSchedule::new(&[item]).unwrap();
+    let clock = CountingClock::at(0);
+
+    assert_eq!(
+        fixture
+            .runtime
+            .run_next_scheduled_work(&mut schedule, &clock),
+        Ok(ScheduledWorkOutcome::Completed {
+            scheduled_work: item,
+            observed_at: instant(0),
+            state: ApplicationState::Running,
+        })
+    );
+    assert_eq!(fixture.work_order(), [ApplicationName::Alpha]);
+    assert!(foreign.work_order().is_empty());
+    assert_eq!(fixture.runtime.pending(fixture.alpha), Ok(2));
+    assert_eq!(fixture.runtime.pending(fixture.beta), Ok(2));
+    assert_eq!(foreign.runtime.pending(foreign.alpha), Ok(0));
+    assert_eq!(foreign.runtime.pending(foreign.beta), Ok(0));
+    assert_eq!(
+        foreign.runtime.state(foreign.alpha),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(clock.reads.get(), 1);
+    assert!(schedule.is_complete());
+}
+
+#[test]
 fn equal_time_and_overdue_items_follow_caller_order_one_per_call() {
     let mut fixture = MissionFixture::running(None);
     let items = [

@@ -226,6 +226,32 @@ fn copied_agenda_preserves_items_after_caller_storage_is_changed_and_dropped() {
 }
 
 #[test]
+fn equal_position_foreign_identity_schedules_the_receiving_runtime_application() {
+    let (mut runtime, alpha, _, trace) = running_runtime(false);
+    let (foreign_runtime, foreign_alpha, _, foreign_trace) = running_runtime(false);
+    assert_eq!(foreign_alpha, alpha);
+    let item = scheduled(foreign_alpha, 0);
+    let mut schedule = WorkSchedule::new(&[item]).expect("one due item is ordered");
+
+    assert_eq!(
+        runtime.run_next_scheduled_work(&mut schedule, &ManualClock::new()),
+        Ok(ScheduledWorkOutcome::Completed {
+            scheduled_work: item,
+            observed_at: FrameworkInstant::ZERO,
+            state: ApplicationState::Running,
+        })
+    );
+    assert_eq!(*trace.borrow(), [ApplicationName::Alpha]);
+    assert!(foreign_trace.borrow().is_empty());
+    assert_eq!(runtime.state(alpha), Ok(ApplicationState::Running));
+    assert_eq!(
+        foreign_runtime.state(foreign_alpha),
+        Ok(ApplicationState::Running)
+    );
+    assert!(schedule.is_complete());
+}
+
+#[test]
 fn complete_reads_no_clock_and_each_pending_item_decision_reads_once() {
     let (mut runtime, alpha, _, trace) = running_runtime(false);
     let clock = CountingClock::new(FrameworkInstant::ZERO);
