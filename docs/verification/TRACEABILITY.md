@@ -376,8 +376,13 @@ The focused command passes ten direct and eight messaging-owned scheduled-work
 tests. These regressions demonstrate the existing lack of issuer provenance;
 they do not authorize cross-owner key mixing or establish global identity,
 clock-origin validation, failure cleanup under an aliased selector, or human
-architecture acceptance. Exact commit and hosted evidence are recorded after
-publication; a local pass alone is not hosted verification.
+architecture acceptance. The checkpoint is committed at
+`9f3aac6947943c3f9affbe38383e5e4ad09f382d`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35914683806)
+passes every configured step, both new regressions, 129 workspace tests in
+aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 

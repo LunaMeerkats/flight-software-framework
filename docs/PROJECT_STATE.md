@@ -31,6 +31,10 @@ acceptance remain open.
   [scheduled-work identity review](verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
   distinguishes executed alias behavior from caller authorization and from
   clock-origin validation.
+- Published checkpoint `9f3aac6947943c3f9affbe38383e5e4ad09f382d` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35914683806):
+  one job, all configured steps, both regressions, 129 workspace tests in
+  aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -43,9 +47,9 @@ only; production code and public API remain unchanged.
 
 ## Work in progress
 
-The scheduled-work identity checkpoint is locally complete and awaiting
-publication plus exact-revision hosted CI. Later revisions require their own
-verification.
+No unfinished implementation remains. The scheduled-work identity checkpoint
+is published with successful exact-revision CI. This documentation-only
+follow-up records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -86,4 +90,4 @@ tests pass. The two new regressions execute same-position foreign-identity
 selection through both scheduling owners while preserving the foreign owner
 and successful messaging inboxes. No production defect, API change,
 dependency, external research, or lint-policy change was needed. Publication
-and hosted verification are pending.
+and exact-revision hosted verification succeeded.

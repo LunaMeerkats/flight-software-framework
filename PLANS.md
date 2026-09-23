@@ -1,7 +1,7 @@
 # Stage 4 scheduled-work identity scope review
 
 Date: **2026-09-24**
-Status: **Locally complete; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -71,3 +71,15 @@ no block comments, three unchanged fulfilled expectations, 47 Markdown files,
 test references. Generated HTML for all documents passes structural checks;
 the six changed documents pass exact content comparison and rendered-layout
 inspection without visible overflow or malformed sections.
+
+## Publication result
+
+Checkpoint `9f3aac6947943c3f9affbe38383e5e4ad09f382d` was published by
+ordinary fast-forward; the remote head matched. Hosted run 35914683806 passed
+that exact push and checkout: one Windows job, all configured steps, both new
+regressions, 129 workspace tests in aggregate, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

@@ -121,7 +121,10 @@ executes the remaining caller-discipline boundary through both owners: a due
 same-position key from another runtime invokes the receiving owner's local
 application. The foreign owner remains unchanged, and successful messaging-
 owned work preserves the receiving inboxes. This does not authorize mixing
-identities or clock domains.
+identities or clock domains. Checkpoint
+`9f3aac6947943c3f9affbe38383e5e4ad09f382d` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35914683806)
+for both regressions and the configured host/sample evidence.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
