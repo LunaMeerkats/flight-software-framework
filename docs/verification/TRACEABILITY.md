@@ -401,7 +401,13 @@ work tests; the complete locked baseline passes 131 workspace tests. These
 regressions demonstrate the existing lack of clock provenance. They do not
 authorize cross-clock comparison or establish a meaningful shared origin,
 wall-clock mapping, real-time behavior, or human architecture acceptance.
-Publication and exact-revision hosted CI evidence remain pending.
+The checkpoint is committed at
+`11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36053097771)
+passes every configured step, both new regressions, 131 workspace tests in
+aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 

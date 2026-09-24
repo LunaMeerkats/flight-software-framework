@@ -1,7 +1,7 @@
 # Stage 4 clock-origin scope review
 
 Date: **2026-09-25**
-Status: **Complete locally; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -71,3 +71,15 @@ resolving relative links, 35 source definitions, and 95 exact traceability test
 references. Generated HTML for all documents passes structural checks. The six
 changed documents preserve exact content and have no horizontal overflow; the
 new review's rendered layout was inspected without a visible defect.
+
+## Publication result
+
+Checkpoint `11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36053097771 passed
+that exact push and checkout: one Windows job, all configured steps, both new
+regressions, 131 workspace tests in aggregate, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

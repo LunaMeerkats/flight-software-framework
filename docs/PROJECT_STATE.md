@@ -17,7 +17,7 @@ architecture acceptance remain open.
 - Started clean at `f5b6ab82f888b45ea122ab1fb84aed2e202187c2`, equal to
   refreshed `origin/codex/nightly`; its hosted run 35915158895 succeeded.
   Initial locked local Cargo baseline: 129 tests.
-- Current locked local baseline: 131 tests; focused direct/messaging scheduled-
+- Final locked local baseline: 131 tests; focused direct/messaging scheduled-
   work targets: eleven and nine. Formatting, all-target check, warnings-denied
   Clippy/rustdoc, and whitespace checks pass without new exceptions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
@@ -31,9 +31,10 @@ architecture acceptance remain open.
   [clock-origin review](verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
   distinguishes executed elapsed-value comparison from permission or evidence
   for cross-clock ordering.
-- Publication and exact-revision hosted CI evidence for this checkpoint remain
-  pending. The prior exact-revision hosted baseline remains the last published
-  evidence.
+- Published checkpoint `11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36053097771):
+  one job, all configured steps, both regressions, 131 workspace tests in
+  aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -46,9 +47,9 @@ only; production code and public API remain unchanged.
 
 ## Work in progress
 
-Local implementation, focused tests, required Cargo baseline, complete diff,
-source-form, and rendered-document reviews pass. Publication and exact-
-revision hosted verification must complete before this checkpoint is final.
+No unfinished implementation remains. The clock-origin checkpoint is
+published with successful exact-revision CI. This documentation-only follow-up
+records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -89,4 +90,5 @@ expansion is approved here.
 tests pass. The two new regressions execute equal elapsed values from unrelated
 manual clocks through both scheduling owners while preserving successful
 messaging inboxes. No production defect, API change, dependency, external
-research, or lint-policy change was needed. Publication remains pending.
+research, or lint-policy change was needed. Publication and exact-revision
+hosted verification succeeded.

@@ -130,7 +130,10 @@ executes the companion time boundary through both scheduling owners. A
 deadline obtained from one manual clock waits for and is released by an
 unrelated clock solely according to elapsed value; `FrameworkInstant` cannot
 validate clock provenance. This is evidence of the existing caller-discipline
-limit, not permission to compare unrelated clock domains.
+limit, not permission to compare unrelated clock domains. Checkpoint
+`11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36053097771)
+for both regressions and the configured host/sample evidence.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
