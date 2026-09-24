@@ -252,6 +252,44 @@ fn equal_position_foreign_identity_schedules_the_receiving_runtime_application()
 }
 
 #[test]
+fn unrelated_clock_elapsed_value_drives_direct_schedule() {
+    let (mut runtime, alpha, _, trace) = running_runtime(false);
+    let mut schedule_clock = ManualClock::new();
+    let scheduled_at = schedule_clock
+        .advance(Duration::from_secs(5))
+        .expect("schedule clock advance fits");
+    let item = ScheduledWork::new(alpha, scheduled_at);
+    let mut schedule = WorkSchedule::new(&[item]).expect("one item is ordered");
+    let mut execution_clock = ManualClock::new();
+
+    assert_eq!(
+        runtime.run_next_scheduled_work(&mut schedule, &execution_clock),
+        Ok(ScheduledWorkOutcome::Waiting {
+            next: item,
+            observed_at: FrameworkInstant::ZERO,
+        })
+    );
+    assert_eq!(schedule.remaining(), 1);
+    assert!(trace.borrow().is_empty());
+
+    execution_clock
+        .advance(Duration::from_secs(5))
+        .expect("execution clock advance fits");
+    assert_eq!(
+        runtime.run_next_scheduled_work(&mut schedule, &execution_clock),
+        Ok(ScheduledWorkOutcome::Completed {
+            scheduled_work: item,
+            observed_at: scheduled_at,
+            state: ApplicationState::Running,
+        })
+    );
+    assert_eq!(schedule_clock.now(), scheduled_at);
+    assert_eq!(execution_clock.now(), scheduled_at);
+    assert_eq!(*trace.borrow(), [ApplicationName::Alpha]);
+    assert!(schedule.is_complete());
+}
+
+#[test]
 fn complete_reads_no_clock_and_each_pending_item_decision_reads_once() {
     let (mut runtime, alpha, _, trace) = running_runtime(false);
     let clock = CountingClock::new(FrameworkInstant::ZERO);

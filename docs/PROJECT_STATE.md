@@ -1,40 +1,39 @@
 # Project state
 
-Last updated: **2026-09-24**
+Last updated: **2026-09-25**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, returned-
 message failure, schedule, and identity-boundary evidence. The current
-checkpoint executes the scheduled-work consequence: a due same-position key
-from another owner selects the receiving owner's local application through
-both scheduling APIs. Broader contract review and human v0.1 architecture
-acceptance remain open.
+checkpoint executes the remaining clock-origin consequence: an instant from
+one manual clock can be released by an unrelated clock with the same elapsed
+value through both scheduling APIs. Broader contract review and human v0.1
+architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `4ef3b74296700259ad80ad5a6792de054fddbea2`, equal to
-  refreshed `origin/codex/nightly`; its hosted run 35778881015 succeeded.
-  Initial locked local Cargo baseline: 127 tests.
-- Final locked local baseline: 129 tests; focused direct/messaging scheduled-
-  work targets: ten and eight. Formatting, all-target check, warnings-denied
+- Started clean at `f5b6ab82f888b45ea122ab1fb84aed2e202187c2`, equal to
+  refreshed `origin/codex/nightly`; its hosted run 35915158895 succeeded.
+  Initial locked local Cargo baseline: 129 tests.
+- Current locked local baseline: 131 tests; focused direct/messaging scheduled-
+  work targets: eleven and nine. Formatting, all-target check, warnings-denied
   Clippy/rustdoc, and whitespace checks pass without new exceptions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-  Final audit: 32 Rust files with zero width findings, no block comments, and
-  three unchanged fulfilled expectations; 47 Markdown files, 208 resolving
-  relative links, 35 source definitions, and 93 exact test references.
+- Final audit: 32 Rust files with zero width findings, no block comments, and
+  three unchanged fulfilled expectations; 48 Markdown files, 216 resolving
+  relative links, 35 source definitions, and 95 exact test references.
 - Generated HTML for all Markdown files passes heading, table, link, and source-
-  content checks. The six changed documents preserve exact text and structure;
-  rendered-layout inspection found no visible overflow or malformed section.
+  content checks. The six changed documents preserve exact content and have no
+  horizontal overflow; the new review's layout has no visible defect.
 - Complete source and diff review found no production mismatch. The
-  [scheduled-work identity review](verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
-  distinguishes executed alias behavior from caller authorization and from
-  clock-origin validation.
-- Published checkpoint `9f3aac6947943c3f9affbe38383e5e4ad09f382d` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35914683806):
-  one job, all configured steps, both regressions, 129 workspace tests in
-  aggregate, both focused host targets, and the sample executable.
+  [clock-origin review](verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
+  distinguishes executed elapsed-value comparison from permission or evidence
+  for cross-clock ordering.
+- Publication and exact-revision hosted CI evidence for this checkpoint remain
+  pending. The prior exact-revision hosted baseline remains the last published
+  evidence.
 
 ## Current architecture
 
@@ -47,9 +46,9 @@ only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The scheduled-work identity checkpoint
-is published with successful exact-revision CI. This documentation-only
-follow-up records that result; later revisions require their own verification.
+Local implementation, focused tests, required Cargo baseline, complete diff,
+source-form, and rendered-document reviews pass. Publication and exact-
+revision hosted verification must complete before this checkpoint is final.
 
 ## Highest risks and uncertainties
 
@@ -57,8 +56,9 @@ follow-up records that result; later revisions require their own verification.
   separate live owners compare equal and can select the receiving owner's
   local record, callback, detached inbox, or scheduled work target. Correct
   issuer pairing remains caller discipline.
-- `FrameworkInstant` likewise carries no clock-origin identity. The schedule
-  cannot validate that an injected clock belongs to its configured domain.
+- `FrameworkInstant` carries no clock-origin identity. Equal elapsed values
+  from unrelated clocks compare equal and can release work; meaningful clock-
+  domain pairing remains caller discipline.
 - Adding issuer or clock provenance needs bounded origin sources and explicit
   equality, exhaustion, persistence, and public-API decisions; no redesign is
   approved by these evidence checkpoints.
@@ -85,9 +85,8 @@ expansion is approved here.
 
 ## Latest run
 
-2026-09-24: ten direct-schedule, eight messaging-schedule, and 129 workspace
-tests pass. The two new regressions execute same-position foreign-identity
-selection through both scheduling owners while preserving the foreign owner
-and successful messaging inboxes. No production defect, API change,
-dependency, external research, or lint-policy change was needed. Publication
-and exact-revision hosted verification succeeded.
+2026-09-25: eleven direct-schedule, nine messaging-schedule, and 131 workspace
+tests pass. The two new regressions execute equal elapsed values from unrelated
+manual clocks through both scheduling owners while preserving successful
+messaging inboxes. No production defect, API change, dependency, external
+research, or lint-policy change was needed. Publication remains pending.

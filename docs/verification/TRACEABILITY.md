@@ -384,6 +384,25 @@ aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Clock-origin scope checkpoint
+
+The 2026-09-25
+[clock-origin review](CLOCK_IDENTITY_SCOPE_REVIEW.md) supplements RFF-REQ-004
+and ADR-0014/0015/0021 without changing their caller-scoped clock contract.
+`unrelated_clock_elapsed_value_drives_direct_schedule` proves that a deadline
+obtained from one manual clock waits for and is released by an unrelated clock
+through the direct runtime solely according to elapsed value. Through the
+lifecycle/inbox owner,
+`unrelated_clock_elapsed_value_drives_messaging_schedule` proves the same
+behavior while preserving both full inboxes.
+
+The focused command passes eleven direct and nine messaging-owned scheduled-
+work tests; the complete locked baseline passes 131 workspace tests. These
+regressions demonstrate the existing lack of clock provenance. They do not
+authorize cross-clock comparison or establish a meaningful shared origin,
+wall-clock mapping, real-time behavior, or human architecture acceptance.
+Publication and exact-revision hosted CI evidence remain pending.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

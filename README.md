@@ -125,6 +125,12 @@ identities or clock domains. Checkpoint
 `9f3aac6947943c3f9affbe38383e5e4ad09f382d` has successful
 [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/35914683806)
 for both regressions and the configured host/sample evidence.
+The [clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
+executes the companion time boundary through both scheduling owners. A
+deadline obtained from one manual clock waits for and is released by an
+unrelated clock solely according to elapsed value; `FrameworkInstant` cannot
+validate clock provenance. This is evidence of the existing caller-discipline
+limit, not permission to compare unrelated clock domains.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
@@ -278,6 +284,7 @@ remain separate release gates.
 - [Messaging-owned work failure-event decision](docs/adr/0020-messaging-work-failure-events.md)
 - [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
 - [Scheduled-work identity scope review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
+- [Clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)

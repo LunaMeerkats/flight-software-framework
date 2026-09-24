@@ -1,34 +1,32 @@
-# Stage 4 scheduled-work identity scope review
+# Stage 4 clock-origin scope review
 
-Date: **2026-09-24**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-09-25**
+Status: **Complete locally; publication pending**
 
 ## Objective and context
 
-Verify the public consequence of copying a caller-scoped `ApplicationId` into
-`ScheduledWork`: a due same-position key from another owner selects the
-receiving owner's local application. Exercise both the direct `Runtime` and
-the lifecycle/inbox-owning `MessagingRuntime` scheduling paths.
+Verify the public consequence of `FrameworkInstant` carrying elapsed time but
+no clock provenance: a schedule configured from one `ManualClock` origin can be
+released by an unrelated clock with the same elapsed value. Exercise both the
+direct `Runtime` and lifecycle/inbox-owning `MessagingRuntime` scheduling APIs.
 
-The starting revision is `4ef3b74296700259ad80ad5a6792de054fddbea2`, clean
-and equal to refreshed `origin/codex/nightly`; its prior exact hosted run
-35778881015 succeeded. The initial locked local baseline passes 127 tests on
-Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+The starting revision is `f5b6ab82f888b45ea122ab1fb84aed2e202187c2`, clean
+and equal to refreshed `origin/codex/nightly`; its exact hosted run 35915158895
+succeeded. The initial locked local baseline passes 129 tests on Rust/Cargo
+1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
-This is one bounded Stage 4 public-API checkpoint. ADR-0003, ADR-0015, and
-ADR-0021 already state that application identities remain caller-scoped and
-that callers must pair a schedule with the intended owner. Existing schedule
-tests cover out-of-range identities but do not execute the equal-position
-foreign-issuer case through either scheduling owner.
+This is one bounded Stage 4 public-API checkpoint. ADR-0014, ADR-0015, and
+ADR-0021 already require callers to pair schedule instants with the intended
+clock domain. Existing tests cover controlled elapsed-time decisions but do not
+execute the cross-origin case through either scheduling owner.
 
 ## Acceptance criteria and files
 
-- Add one public `tests/scheduled_work.rs` regression proving that a due item
-  containing a foreign same-position identity invokes only the receiving
-  direct runtime's corresponding local application.
+- Add one public `tests/scheduled_work.rs` regression proving that a deadline
+  read from one manual clock waits for and is released by an unrelated direct-
+  runtime clock solely according to elapsed value.
 - Add one public `tests/messaging_scheduled_work.rs` regression proving the
-  same selector behavior through the messaging owner while preserving the
-  local inbox and both issuing owners' independent state.
+  same behavior through the messaging owner while preserving both inboxes.
 - Preserve production code, public API, requirements, dependencies, licences,
   scheduling policy, and lint policy.
 - Record the observed boundary in a focused verification note; update README,
@@ -51,35 +49,25 @@ publication evidence separately without projecting a pass onto a later commit.
 ## Risks and safe stopping point
 
 The regressions deliberately execute an existing caller-discipline boundary;
-they do not authorize cross-owner key mixing. An origin-bearing redesign
-remains a separate architecture decision with bounded issuer, equality,
-exhaustion, persistence, event-source, and public-API consequences. The tests
-will not imply clock-origin validation, global identity, or human API
-acceptance. If verification fails, remove only this run's changes. Stop after
-this evidence checkpoint and its publication record.
+they do not authorize cross-clock comparison. An origin-bearing redesign
+remains a separate architecture decision with bounded origin, equality,
+construction, persistence, event-timestamp, and public-API consequences. The
+tests will not imply wall-clock meaning, cross-origin ordering validity, real-
+time behavior, or human API acceptance. If verification fails, remove only
+this run's changes. Stop after this evidence checkpoint and publication record.
 
 ## Completed local checks
 
-Both focused targets pass: ten direct-schedule tests and eight messaging-owned
-schedule tests. The final locked workspace baseline passes 129 tests.
+Both focused targets pass: eleven direct-schedule tests and nine messaging-
+owned schedule tests. The final locked workspace baseline passes 131 tests.
 Formatting, all-target checking, warnings-denied Clippy/rustdoc, and whitespace
 checks pass without a new lint exception. Production code, public API,
 dependencies, licences, workflow, source register, and scheduling policy are
-unchanged. The whole-tree audit passes 32 Rust files with zero width findings,
-no block comments, three unchanged fulfilled expectations, 47 Markdown files,
-208 resolving relative links, 35 source definitions, and 93 exact traceability
-test references. Generated HTML for all documents passes structural checks;
-the six changed documents pass exact content comparison and rendered-layout
-inspection without visible overflow or malformed sections.
+unchanged.
 
-## Publication result
-
-Checkpoint `9f3aac6947943c3f9affbe38383e5e4ad09f382d` was published by
-ordinary fast-forward; the remote head matched. Hosted run 35914683806 passed
-that exact push and checkout: one Windows job, all configured steps, both new
-regressions, 129 workspace tests in aggregate, 14 focused adapter tests, five
-focused sample tests, and the sample executable.
-
-This documentation-only follow-up records completed evidence with unchanged
-Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
-are reviewed separately. A later revision requires its own hosted result.
+The whole-tree audit passes 32 Rust files with zero width findings, no block
+comments, and three unchanged fulfilled expectations; 48 Markdown files, 216
+resolving relative links, 35 source definitions, and 95 exact traceability test
+references. Generated HTML for all documents passes structural checks. The six
+changed documents preserve exact content and have no horizontal overflow; the
+new review's rendered layout was inspected without a visible defect.
