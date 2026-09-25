@@ -1,7 +1,7 @@
 # Stage 4 configured messaging-attachment recovery review
 
 Date: **2026-09-26**
-Status: **Complete locally; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -68,3 +68,15 @@ overflow attachment error. It does not inject allocator exhaustion, inspect
 temporary endpoint destruction, or generalize to panic, concurrency, secure
 erasure, or every constructor error. If verification fails, remove only this
 run's changes. Stop after this evidence checkpoint and publication record.
+
+## Publication result
+
+Checkpoint `b21b59bff68fe6c16b0d153661865a67a28f8df2` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36184310315 passed
+that exact push and checkout: one Windows job, all configured steps, the new
+regression, 132 workspace tests in aggregate, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

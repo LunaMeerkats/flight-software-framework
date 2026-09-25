@@ -156,7 +156,9 @@ also proves that a failed inbox reservation returns the runtime with active
 configuration, consume-once rollback, and revision high-water intact. Eleven
 focused runtime tests plus the standalone table tests verify RFF-REQ-006. No
 schema, wire format, host loader, or message/lifecycle callback access is
-selected.
+selected. Checkpoint `b21b59bff68fe6c16b0d153661865a67a28f8df2` has
+successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36184310315)
+for the new regression and configured host/sample evidence.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded

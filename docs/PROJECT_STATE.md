@@ -30,6 +30,10 @@ human v0.1 architecture acceptance remain open.
 - The [configured attachment review](verification/CONFIGURATION_ATTACHMENT_REVIEW.md)
   distinguishes the executed ownership path from allocator exhaustion, general
   recovery, or every constructor failure.
+- Published checkpoint `b21b59bff68fe6c16b0d153661865a67a28f8df2` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36184310315):
+  one job, all configured steps, the regression, 132 workspace tests in
+  aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -42,8 +46,9 @@ and supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. Complete local review passes; commit,
-publication, and exact-revision hosted verification remain in progress.
+No unfinished implementation remains. The configured attachment checkpoint is
+published with successful exact-revision CI. This documentation-only follow-up
+records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -84,5 +89,6 @@ expansion is approved here.
 the final locked workspace baseline passes 132. The new regression recovers a
 configured runtime after failed inbox reservation, then observes active
 revision 2, rollback revision 1, and next revision 3. Local source/document
-review passes; hosted verification remains pending. No production defect, API
-change, dependency, external research, or lint-policy change was needed.
+review passes; publication and exact-revision hosted verification succeeded. No
+production defect, API change, dependency, external research, or lint-policy
+change was needed.

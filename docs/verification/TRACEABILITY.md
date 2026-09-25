@@ -424,8 +424,12 @@ replacement receives revision 3.
 The focused configuration-runtime target passes eleven tests. This regression
 proves ownership and lineage preservation at one capacity-overflow attachment
 path; it does not inject allocator exhaustion, execute every constructor error,
-or establish human architecture acceptance. Publication evidence is recorded
-in the focused review after exact-revision hosted CI completes.
+or establish human architecture acceptance. The checkpoint is committed at
+`b21b59bff68fe6c16b0d153661865a67a28f8df2`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36184310315)
+passes every configured step, the regression, 132 workspace tests in aggregate,
+both focused host targets, and the sample executable. This documentation-only
+follow-up records that exact result; later revisions need their own CI evidence.
 
 ## Evidence policy
 
