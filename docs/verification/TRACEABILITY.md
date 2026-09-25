@@ -409,6 +409,24 @@ aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Configured messaging-attachment recovery checkpoint
+
+The 2026-09-26
+[configured attachment review](CONFIGURATION_ATTACHMENT_REVIEW.md) supplements
+RFF-REQ-003 and RFF-REQ-006 without changing their messaging or configuration
+contracts. `failed_messaging_attachment_preserves_configuration_lineage`
+forces an unrepresentable inbox reservation after a configured runtime owns one
+registered application. It observes the exact typed attachment error, consumes
+the returned runtime, attaches corrected topology, and proves through ordinary
+work that revision 2 remains active, rollback restores revision 1, and the next
+replacement receives revision 3.
+
+The focused configuration-runtime target passes eleven tests. This regression
+proves ownership and lineage preservation at one capacity-overflow attachment
+path; it does not inject allocator exhaustion, execute every constructor error,
+or establish human architecture acceptance. Publication evidence is recorded
+in the focused review after exact-revision hosted CI completes.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

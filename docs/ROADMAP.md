@@ -218,9 +218,13 @@ while the foreign owner remains unchanged. The 2026-09-25
 [clock-origin scope review](verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
 executes the companion ADR-0014/0015/0021 limitation: both scheduling owners
 accept an instant from one manual clock and release it using an unrelated
-clock's equal elapsed value because no provenance is encoded. Other lifecycle/
-service resource, failure, and public-API reviews plus human entry-point/
-architecture acceptance remain open. Stage 4 is not complete.
+clock's equal elapsed value because no provenance is encoded. The 2026-09-26
+[configured attachment review](verification/CONFIGURATION_ATTACHMENT_REVIEW.md)
+executes the previously open composition boundary: a failed inbox reservation
+returns a configured runtime with active revision, rollback history, revision
+high-water, and application ownership intact. Other lifecycle/service resource,
+failure, and public-API reviews plus human entry-point/architecture acceptance
+remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

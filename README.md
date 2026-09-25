@@ -150,9 +150,13 @@ operations retain the table's validation and revision rules, while construction
 failure returns the unchanged table. The same configured runtime composes with
 scheduled work, failure-event reporting, and `MessagingRuntime` work without a
 parallel callback. Returned work errors do not roll configuration back, and
-stop/restart retains the full lineage. Ten focused runtime tests plus the
-standalone table tests verify RFF-REQ-006. No schema, wire format, host loader,
-or message/lifecycle callback access is selected.
+stop/restart retains the full lineage. The
+[configured attachment review](docs/verification/CONFIGURATION_ATTACHMENT_REVIEW.md)
+also proves that a failed inbox reservation returns the runtime with active
+configuration, consume-once rollback, and revision high-water intact. Eleven
+focused runtime tests plus the standalone table tests verify RFF-REQ-006. No
+schema, wire format, host loader, or message/lifecycle callback access is
+selected.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded

@@ -1,40 +1,35 @@
 # Project state
 
-Last updated: **2026-09-25**
+Last updated: **2026-09-26**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, returned-
 message failure, schedule, and identity-boundary evidence. The current
-checkpoint executes the remaining clock-origin consequence: an instant from
-one manual clock can be released by an unrelated clock with the same elapsed
-value through both scheduling APIs. Broader contract review and human v0.1
-architecture acceptance remain open.
+checkpoint executes configuration ownership across a failed messaging
+attachment: the returned runtime retains its active revision, rollback history,
+revision high-water, and registered application. Broader contract review and
+human v0.1 architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `f5b6ab82f888b45ea122ab1fb84aed2e202187c2`, equal to
-  refreshed `origin/codex/nightly`; its hosted run 35915158895 succeeded.
-  Initial locked local Cargo baseline: 129 tests.
-- Final locked local baseline: 131 tests; focused direct/messaging scheduled-
-  work targets: eleven and nine. Formatting, all-target check, warnings-denied
-  Clippy/rustdoc, and whitespace checks pass without new exceptions.
+- Started clean at `6a60f381736d2b7c7d069088d494000017ceaa75`, equal to
+  refreshed `origin/codex/nightly`; its hosted run 36053484748 succeeded.
+  Initial locked local Cargo baseline: 131 tests.
+- Final locked local baseline: 132 tests; the focused configuration-runtime
+  target passes eleven. Formatting, all-target check, warnings-denied Clippy/
+  rustdoc, and whitespace checks pass without new exceptions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Final audit: 32 Rust files with zero width findings, no block comments, and
-  three unchanged fulfilled expectations; 48 Markdown files, 216 resolving
-  relative links, 35 source definitions, and 95 exact test references.
-- Generated HTML for all Markdown files passes heading, table, link, and source-
-  content checks. The six changed documents preserve exact content and have no
-  horizontal overflow; the new review's layout has no visible defect.
-- Complete source and diff review found no production mismatch. The
-  [clock-origin review](verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
-  distinguishes executed elapsed-value comparison from permission or evidence
-  for cross-clock ordering.
-- Published checkpoint `11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36053097771):
-  one job, all configured steps, both regressions, 131 workspace tests in
-  aggregate, both focused host targets, and the sample executable.
+  three unchanged fulfilled expectations; 49 Markdown files, 222 resolving
+  relative links, 35 source definitions, and 96 exact test references.
+- Generated HTML for all documents passes structural and source-content checks.
+  The six changed documents preserve exact content; inspected 1280-pixel
+  browser views have no visible layout defect.
+- The [configured attachment review](verification/CONFIGURATION_ATTACHMENT_REVIEW.md)
+  distinguishes the executed ownership path from allocator exhaustion, general
+  recovery, or every constructor failure.
 
 ## Current architecture
 
@@ -42,14 +37,13 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment adds two public scheduling regressions and supporting records
-only; production code and public API remain unchanged.
+This increment adds one public configuration/messaging composition regression
+and supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The clock-origin checkpoint is
-published with successful exact-revision CI. This documentation-only follow-up
-records that result; later revisions require their own verification.
+No unfinished implementation remains. Complete local review passes; commit,
+publication, and exact-revision hosted verification remain in progress.
 
 ## Highest risks and uncertainties
 
@@ -86,9 +80,9 @@ expansion is approved here.
 
 ## Latest run
 
-2026-09-25: eleven direct-schedule, nine messaging-schedule, and 131 workspace
-tests pass. The two new regressions execute equal elapsed values from unrelated
-manual clocks through both scheduling owners while preserving successful
-messaging inboxes. No production defect, API change, dependency, external
-research, or lint-policy change was needed. Publication and exact-revision
-hosted verification succeeded.
+2026-09-26: the focused configuration-runtime target passes eleven tests and
+the final locked workspace baseline passes 132. The new regression recovers a
+configured runtime after failed inbox reservation, then observes active
+revision 2, rollback revision 1, and next revision 3. Local source/document
+review passes; hosted verification remains pending. No production defect, API
+change, dependency, external research, or lint-policy change was needed.

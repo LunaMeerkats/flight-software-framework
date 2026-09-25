@@ -11,9 +11,9 @@ use rust_flight_framework::{
     Application, ApplicationId, ApplicationState, ApplicationWorkContext, Clock,
     ConfigurationError, ConfigurationTable, DeliveryStatus, EventEmitOutcome, EventQueue,
     EventSeverity, EventSource, EventTimestamp, FrameworkInstant, LifecycleError, Message,
-    MessagingRuntime, PublishClassification, Runtime, RuntimeConfigurationError,
-    RuntimeCreateError, RuntimeInboxConfig, RuntimeWorkError, ScheduledWork, ScheduledWorkOutcome,
-    WorkSchedule,
+    MessageBusCreateError, MessagingRuntime, MessagingRuntimeCreateErrorKind,
+    PublishClassification, Runtime, RuntimeConfigurationError, RuntimeCreateError,
+    RuntimeInboxConfig, RuntimeWorkError, ScheduledWork, ScheduledWorkOutcome, WorkSchedule,
 };
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -431,6 +431,51 @@ const COMMAND_ONLY: [MissionTopic; 1] = [MissionTopic::Command];
 
 type ConfiguredMessagingRuntime =
     MessagingRuntime<ObservingApplication, MissionTopic, 1, MissionValidationError, 2>;
+
+#[test]
+fn failed_messaging_attachment_preserves_configuration_lineage() {
+    let mut table = mission_table(&[0, 1]);
+    assert_eq!(table.replace(&[1, 2]), Ok(2));
+    let (application, observations, _) = application(None);
+    let mut runtime = ConfiguredRuntime::with_configuration(1, table)
+        .expect("configured runtime storage can be reserved");
+    let application_id = runtime.register(application).expect("application fits");
+    let invalid = [RuntimeInboxConfig::new(usize::MAX, &COMMAND_ONLY)];
+
+    let error = ConfiguredMessagingRuntime::new(runtime, &invalid)
+        .expect_err("the inbox capacity is unrepresentable");
+    assert_eq!(
+        error.kind(),
+        MessagingRuntimeCreateErrorKind::MessageBus(
+            MessageBusCreateError::InboxStorageAllocationFailed {
+                application_id,
+                requested: usize::MAX,
+            }
+        )
+    );
+    assert_eq!(
+        error.runtime().state(application_id),
+        Ok(ApplicationState::Registered)
+    );
+
+    let corrected = [RuntimeInboxConfig::new(1, &COMMAND_ONLY)];
+    let mut recovered = ConfiguredMessagingRuntime::new(error.into_runtime(), &corrected)
+        .expect("the returned runtime accepts a corrected inbox");
+    recovered.start(application_id).expect("application starts");
+    recovered
+        .work(application_id)
+        .expect("revision two is visible");
+    assert_eq!(recovered.rollback_configuration(), Ok(1));
+    recovered.work(application_id).expect("rollback is visible");
+    assert_eq!(recovered.replace_configuration(&[2, 3]), Ok(3));
+    recovered
+        .work(application_id)
+        .expect("revision three is visible");
+
+    assert_observation(&observations, 0, 2, &[1, 2]);
+    assert_observation(&observations, 1, 1, &[0, 1]);
+    assert_observation(&observations, 2, 3, &[2, 3]);
+}
 
 struct StartedMessagingRuntime {
     runtime: ConfiguredMessagingRuntime,
