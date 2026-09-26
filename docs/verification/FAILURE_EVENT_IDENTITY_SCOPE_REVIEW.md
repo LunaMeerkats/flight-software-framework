@@ -87,9 +87,25 @@ are unchanged, so their separate local commands are not triggered. The full
 workspace suite still exercises both host test targets. This checkpoint does
 not establish human acceptance.
 
-## Continuation boundary
+## Published checkpoint and continuation
 
-This checkpoint does not establish issuer validation or human acceptance. A
-later checkpoint must carry its own exact revision and hosted evidence. Next
-select another bounded Stage 4 service, resource, failure, or public-API gap
-after reconciling existing evidence; broader scope remains unapproved.
+Commit `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241` contains both
+regressions and the reviewed checkpoint. Ordinary fast-forward publication
+succeeded and the remote head matched. On 2026-09-26 UTC (2026-09-27 Sydney),
+[hosted run 36276474765](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36276474765)
+passed that exact push and checkout: one Windows job and every configured step.
+Logs confirm both regression names, 134 workspace tests in aggregate, 14 focused
+adapter tests, five focused sample tests, the sample executable, and the
+warnings-denied/whitespace baseline.
+
+Actual runner: 2.337.0; image: `windows-2025-vs2026` version
+`20260922.246.2` (requested label `windows-2025`). Actual Rust/Cargo: 1.98.1;
+rustfmt: 1.9.0-stable; Clippy: 0.1.98. The all-target hosted baseline and
+companion whole-tree source review preserve existing policy without a new
+waiver. Local Rust/Cargo remain 1.98.0.
+
+This documentation-only follow-up records the completed result with unchanged
+Rust, Cargo, workflow, and lint inputs. It does not establish a hosted pass for
+its own later revision or human v0.1 acceptance. The next bounded task should
+be selected from a reconciled service, resource, failure, or public-API gap;
+broader scope remains unapproved.

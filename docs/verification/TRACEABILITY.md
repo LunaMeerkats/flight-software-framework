@@ -450,8 +450,13 @@ The focused command passes five direct and seven messaging-owned event tests;
 the complete locked baseline passes 134 workspace tests. These regressions
 demonstrate the existing lack of issuer provenance; they do not authorize
 cross-owner key mixing or establish global identity, panic/hang containment,
-guaranteed event delivery, or human architecture acceptance. Publication and
-exact-revision hosted verification remain pending.
+guaranteed event delivery, or human architecture acceptance. The checkpoint is
+committed at `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36276474765)
+passes every configured step, both new regressions, 134 workspace tests in
+aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 

@@ -1,7 +1,7 @@
 # Stage 4 failure-event identity scope review
 
 Date: **2026-09-27**
-Status: **Local checkpoint complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -73,3 +73,15 @@ and is indistinguishable in the event source. They cannot establish issuer
 validation, safe cross-owner mixing, global identity, panic or hang containment,
 or human API acceptance. If verification fails, remove only this run's changes.
 Stop after this evidence checkpoint and publication record.
+
+## Publication result
+
+Checkpoint `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36276474765 passed
+that exact push and checkout: one Windows job, all configured steps, both new
+regressions, 134 workspace tests in aggregate, 14 focused adapter tests, five
+focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

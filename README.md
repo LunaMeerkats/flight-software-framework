@@ -102,7 +102,10 @@ executes both owners' caller-scoped attribution boundary: a same-position key
 from another live owner fails the receiving local application and is copied
 into its event while the foreign owner remains unchanged. Five direct and seven
 messaging-owned tests cover the event paths. This does not authorize cross-
-owner key mixing or add events to message dispatch or scheduled work.
+owner key mixing or add events to message dispatch or scheduled work. The
+checkpoint has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36276474765)
+for both regressions and the configured host/sample evidence.
 
 A `WorkSchedule` copies a finite agenda of one-shot application work items in
 nondecreasing elapsed-time order. `Runtime::run_next_scheduled_work` reads an

@@ -29,6 +29,10 @@ architecture acceptance remain open.
 - The [failure-event identity review](verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
   distinguishes executed positional attribution from issuer validation or
   authorization to mix identities.
+- Published checkpoint `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36276474765):
+  one job, all configured steps, both regressions, 134 workspace tests in
+  aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -41,9 +45,9 @@ records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-Local implementation, verification, source/diff review, and document audits are
-complete. The checkpoint has not yet been committed or published; hosted CI for
-this revision is therefore pending.
+No unfinished implementation remains. The failure-event identity checkpoint is
+published with successful exact-revision CI. This documentation-only follow-up
+records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -86,5 +90,6 @@ regressions prove that a foreign same-position key fails only the receiving
 owner's local application and is copied into its event; the foreign owner stays
 running and uninvoked, and messaging cleanup remains receiver-local. Local
 source/document review passes except that browser visual layout inspection is
-not run due local-file URL policy. No production defect, API change, dependency,
-external research, or lint-policy change was needed.
+not run due local-file URL policy. Publication and exact-revision hosted
+verification succeeded. No production defect, API change, dependency, external
+research, or lint-policy change was needed.
