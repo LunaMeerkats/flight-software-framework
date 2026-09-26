@@ -408,6 +408,65 @@ fn returned_work_error_clears_selected_inbox_and_preserves_peer_dispatch() {
 }
 
 #[test]
+fn equal_position_foreign_identity_records_receiving_messaging_failure_event() {
+    let mut foreign = MissionFixture::started();
+    foreign.fill_inboxes();
+    let mut receiving = MissionFixture::started();
+    receiving.fill_inboxes();
+    assert_eq!(foreign.faulting_id, receiving.faulting_id);
+    let clock = CountingClock {
+        reads: Cell::new(0),
+    };
+    let mut events = EventQueue::new(1).unwrap();
+
+    let error = receiving
+        .runtime
+        .work_with_failure_event(
+            foreign.faulting_id,
+            MissionEventId::WorkReturnedError,
+            &clock,
+            &mut events,
+        )
+        .expect_err("equal-position key selects the receiving faulting application");
+
+    assert_eq!(error.discarded_deliveries(), 2);
+    assert_eq!(
+        error.operation_error().work_error(),
+        &expected_work_error(receiving.faulting_id)
+    );
+    let expected_event = expected_failure_event(foreign.faulting_id);
+    let attempt = error.operation_error().failure_event_attempt().unwrap();
+    assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
+    assert_eq!(attempt.event(), &expected_event);
+    assert_eq!(events.dequeue(), Some(expected_event));
+    assert_eq!(receiving.runtime.pending(receiving.faulting_id), Ok(0));
+    assert_eq!(receiving.runtime.pending(receiving.peer_id), Ok(2));
+    assert_eq!(receiving.faulting.work_calls.get(), 1);
+    assert_eq!(receiving.peer.work_calls.get(), 0);
+    assert_eq!(
+        receiving.runtime.state(receiving.faulting_id),
+        Ok(ApplicationState::Failed)
+    );
+    assert_eq!(
+        receiving.runtime.state(receiving.peer_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(foreign.runtime.pending(foreign.faulting_id), Ok(2));
+    assert_eq!(foreign.runtime.pending(foreign.peer_id), Ok(2));
+    assert_eq!(foreign.faulting.work_calls.get(), 0);
+    assert_eq!(foreign.peer.work_calls.get(), 0);
+    assert_eq!(
+        foreign.runtime.state(foreign.faulting_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(
+        foreign.runtime.state(foreign.peer_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(clock.reads.get(), 1);
+}
+
+#[test]
 fn saturated_event_preserves_original_error_and_exact_event_for_explicit_retry() {
     let mut fixture = MissionFixture::started();
     fixture.fill_inboxes();

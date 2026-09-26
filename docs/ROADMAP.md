@@ -222,9 +222,13 @@ clock's equal elapsed value because no provenance is encoded. The 2026-09-26
 [configured attachment review](verification/CONFIGURATION_ATTACHMENT_REVIEW.md)
 executes the previously open composition boundary: a failed inbox reservation
 returns a configured runtime with active revision, rollback history, revision
-high-water, and application ownership intact. Other lifecycle/service resource,
-failure, and public-API reviews plus human entry-point/architecture acceptance
-remain open. Stage 4 is not complete.
+high-water, and application ownership intact. The 2026-09-27
+[failure-event identity review](verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
+executes the ADR-0016/0020 attribution limitation through both event-producing
+owners: a foreign same-position key fails the receiving local application and
+is copied into its event while the foreign owner remains unchanged. Other
+lifecycle/service resource, failure, and public-API reviews plus human entry-
+point/architecture acceptance remain open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

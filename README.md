@@ -85,7 +85,7 @@ terminal `Failed`, the operation reads the injected clock once and attempts one
 application-sourced error event. Its returned error retains the complete
 `RuntimeWorkError`, exact event, and `Recorded` or `QueueFull` outcome. A full
 queue preserves its older event and returns the rejected event for explicit
-retry while leaving a healthy peer operable for later work. Four public tests
+retry while leaving a healthy peer operable for later work. Five public tests
 cover exact fields, the error-source chain, single emission, lifecycle
 suppression, saturation, retry, and peer progress. `Runtime` still does not
 permanently own the clock or event queue.
@@ -97,7 +97,12 @@ single clock read and event attempt. The existing `MessagingOperationError`
 retains the discard count around the existing `RuntimeWorkEventError`; success
 and lifecycle rejection emit nothing. Direct and messaging-owned operations
 share event construction while preserving separate ownership responsibilities.
-This does not add events to message dispatch or scheduled work.
+The [failure-event identity review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
+executes both owners' caller-scoped attribution boundary: a same-position key
+from another live owner fails the receiving local application and is copied
+into its event while the foreign owner remains unchanged. Five direct and seven
+messaging-owned tests cover the event paths. This does not authorize cross-
+owner key mixing or add events to message dispatch or scheduled work.
 
 A `WorkSchedule` copies a finite agenda of one-shot application work items in
 nondecreasing elapsed-time order. `Runtime::run_next_scheduled_work` reads an
@@ -294,6 +299,7 @@ remain separate release gates.
 - [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
 - [Scheduled-work identity scope review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
 - [Clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
+- [Failure-event identity scope review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)

@@ -431,6 +431,28 @@ passes every configured step, the regression, 132 workspace tests in aggregate,
 both focused host targets, and the sample executable. This documentation-only
 follow-up records that exact result; later revisions need their own CI evidence.
 
+## Failure-event identity scope checkpoint
+
+The 2026-09-27
+[failure-event identity review](FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
+supplements RFF-REQ-005, RFF-REQ-008, and ADR-0016/0020 without changing their
+event, failure, or caller-scoped identity contracts.
+`equal_position_foreign_identity_records_receiving_runtime_failure_event`
+proves that a foreign same-position key fails only the receiving direct
+runtime's local application, is copied into the recorded event source, and
+leaves the foreign owner running and uninvoked. Through the lifecycle/inbox
+owner,
+`equal_position_foreign_identity_records_receiving_messaging_failure_event`
+proves the same attribution while clearing only the receiving selected inbox
+and preserving its peer inbox plus both foreign inboxes.
+
+The focused command passes five direct and seven messaging-owned event tests;
+the complete locked baseline passes 134 workspace tests. These regressions
+demonstrate the existing lack of issuer provenance; they do not authorize
+cross-owner key mixing or establish global identity, panic/hang containment,
+guaranteed event delivery, or human architecture acceptance. Publication and
+exact-revision hosted verification remain pending.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

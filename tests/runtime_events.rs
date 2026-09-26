@@ -251,6 +251,54 @@ fn returned_work_error_records_clock_captured_event_and_preserves_peer_progress(
 }
 
 #[test]
+fn equal_position_foreign_identity_records_receiving_runtime_failure_event() {
+    let (mut foreign_runtime, foreign_id, foreign_work_calls) = registered_healthy_runtime();
+    foreign_runtime
+        .start(foreign_id)
+        .expect("foreign application starts");
+    let mut receiving = started_runtime(19);
+    assert_eq!(foreign_id, receiving.faulting_id);
+    let clock = CountingClock::at(Duration::from_secs(11));
+    let mut events = EventQueue::new(1).expect("one event record can be reserved");
+
+    let error = receiving
+        .runtime
+        .work_with_failure_event(
+            foreign_id,
+            MissionEventId::WorkReturnedError,
+            &clock,
+            &mut events,
+        )
+        .expect_err("equal-position key selects the receiving faulting application");
+
+    assert_eq!(
+        error.work_error(),
+        &expected_work_error(receiving.faulting_id, 19)
+    );
+    let expected_event = expected_failure_event(foreign_id, Duration::from_secs(11));
+    let attempt = error.failure_event_attempt().unwrap();
+    assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
+    assert_eq!(attempt.event(), &expected_event);
+    assert_eq!(events.dequeue(), Some(expected_event));
+    assert_eq!(clock.reads(), 1);
+    assert_eq!(receiving.faulting_work_calls.get(), 1);
+    assert_eq!(receiving.peer_work_calls.get(), 0);
+    assert_eq!(
+        receiving.runtime.state(receiving.faulting_id),
+        Ok(ApplicationState::Failed)
+    );
+    assert_eq!(
+        receiving.runtime.state(receiving.peer_id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(foreign_work_calls.get(), 0);
+    assert_eq!(
+        foreign_runtime.state(foreign_id),
+        Ok(ApplicationState::Running)
+    );
+}
+
+#[test]
 fn saturated_failure_event_retains_error_and_exact_event_for_retry() {
     let mut fixture = started_runtime(23);
     let clock = CountingClock::at(Duration::from_secs(12));
