@@ -477,6 +477,14 @@ observations establish diagnostic traversal, final item consumption, and later
 peer progress for cooperative errors; they do not add scheduled events, retry,
 panic or hang containment, API stabilization, or human acceptance.
 
+The checkpoint is committed at
+`6eefde2b49c6f4c93a82c97719f4673c93f1babf`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36346952408)
+passes every configured step, both strengthened direct regressions, 134
+workspace tests in aggregate, both focused host targets, and the sample
+executable. This documentation-only follow-up records that exact result; later
+revisions need their own CI evidence.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

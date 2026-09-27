@@ -147,7 +147,11 @@ also executes the direct error-source contract for lifecycle rejection and a
 cooperative returned application error. Both chains preserve the scheduled
 item and observed time around the exact runtime and concrete source errors;
 final item consumption and later peer progress remain unchanged. This does not
-add scheduled failure events, retry, or broader fault containment.
+add scheduled failure events, retry, or broader fault containment. Checkpoint
+`6eefde2b49c6f4c93a82c97719f4673c93f1babf` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36346952408)
+for both direct source-chain observations and the configured host/sample
+evidence.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,

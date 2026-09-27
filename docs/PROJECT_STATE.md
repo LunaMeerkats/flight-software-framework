@@ -23,12 +23,16 @@ review and human v0.1 architecture acceptance remain open.
   block comments, and three unchanged fulfilled expectations; 51 Markdown
   files, 237 resolving relative links, 35 source definitions, and 101 exact
   traceability test references.
-- PowerShell Markdown rendering for the five changed controlling documents
+- PowerShell Markdown rendering for the six changed controlling documents
   passes structural inspection. Pixel-level visual acceptance is not claimed.
 - The
   [scheduled-failure diagnostics review](verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
   distinguishes standard diagnostic traversal from retry, event reporting,
   arbitrary fault containment, or API stabilization.
+- Published checkpoint `6eefde2b49c6f4c93a82c97719f4673c93f1babf` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36346952408):
+  one job, all configured steps, both strengthened regressions, 134 workspace
+  tests in aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -41,9 +45,10 @@ supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-The scheduled-failure diagnostics checkpoint is locally complete. Publication
-and exact-revision hosted CI remain pending; a local pass does not establish
-either result.
+No unfinished implementation remains. The scheduled-failure diagnostics
+checkpoint is published with successful exact-revision CI. This documentation-
+only follow-up records that result; later revisions require their own
+verification.
 
 ## Highest risks and uncertainties
 
@@ -86,4 +91,4 @@ error. Existing item consumption, terminal-state behavior, and later peer
 progress remain unchanged. Focused targets and the full 134-test locked local
 baseline pass, as do source/document audits. No production defect, API change,
 dependency, external research, or lint-policy change was needed. Publication
-and hosted verification remain pending.
+and exact-revision hosted verification succeeded.

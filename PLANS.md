@@ -1,7 +1,7 @@
 # Stage 4 scheduled-failure diagnostics review
 
 Date: **2026-09-28**
-Status: **Complete locally; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -77,7 +77,7 @@ licences, workflow, source register, and service policies are unchanged.
 The whole-tree audit passes 32 Rust files with zero physical or comment-width
 findings, no block comments, and three unchanged fulfilled expectations; 51
 Markdown files, 237 resolving relative links, 35 source definitions, and 101
-exact traceability test references. PowerShell Markdown rendering for the five
+exact traceability test references. PowerShell Markdown rendering for the six
 changed controlling documents passes structural inspection. Pixel-level visual
 acceptance is not claimed.
 
@@ -89,3 +89,15 @@ errors at this API boundary; it does not promise a stable public API freeze.
 
 Stop after the direct source-chain regressions and review record are verified.
 Do not add scheduled events or change error types in this increment.
+
+## Publication result
+
+Checkpoint `6eefde2b49c6f4c93a82c97719f4673c93f1babf` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36346952408 passed
+that exact push and checkout: one Windows job, every configured step, both
+strengthened direct regressions, 134 workspace tests in aggregate, 14 focused
+adapter tests, five focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.
