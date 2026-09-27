@@ -226,9 +226,14 @@ high-water, and application ownership intact. The 2026-09-27
 [failure-event identity review](verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 executes the ADR-0016/0020 attribution limitation through both event-producing
 owners: a foreign same-position key fails the receiving local application and
-is copied into its event while the foreign owner remains unchanged. Other
-lifecycle/service resource, failure, and public-API reviews plus human entry-
-point/architecture acceptance remain open. Stage 4 is not complete.
+is copied into its event while the foreign owner remains unchanged. The
+2026-09-28
+[scheduled-failure diagnostics review](verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
+executes the ADR-0015 direct standard-error chains for lifecycle rejection and
+a cooperative returned application error while preserving final item
+consumption and later peer progress. Other lifecycle/service resource, failure,
+and public-API reviews plus human entry-point/architecture acceptance remain
+open. Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments

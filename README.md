@@ -142,6 +142,12 @@ limit, not permission to compare unrelated clock domains. Checkpoint
 `11d9fcde908de38174f70cb4b92fb6d1c1e1f0a0` has successful
 [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36053097771)
 for both regressions and the configured host/sample evidence.
+The [scheduled-failure diagnostics review](docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
+also executes the direct error-source contract for lifecycle rejection and a
+cooperative returned application error. Both chains preserve the scheduled
+item and observed time around the exact runtime and concrete source errors;
+final item consumption and later peer progress remain unchanged. This does not
+add scheduled failure events, retry, or broader fault containment.
 
 `ConfigurationTable<E, MAX_BYTES>` validates and copies in-memory byte content
 through one retained mission function. It exposes immutable active snapshots,
@@ -302,6 +308,7 @@ remain separate release gates.
 - [Messaging-owned scheduling decision](docs/adr/0021-messaging-owned-scheduled-work.md)
 - [Scheduled-work identity scope review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
 - [Clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
+- [Scheduled-failure diagnostics review](docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
 - [Failure-event identity scope review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)

@@ -458,6 +458,25 @@ aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Scheduled-failure diagnostics checkpoint
+
+The 2026-09-28
+[scheduled-failure diagnostics review](SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
+supplements RFF-REQ-004 and ADR-0015/0021 without changing their finite
+one-shot behavior. The direct
+`lifecycle_rejection_consumes_one_item_without_blocking_a_due_peer` regression
+now proves the standard source chain from `ScheduledWorkError` through
+`RuntimeWorkError` to the exact `LifecycleError`. The direct
+`returned_work_error_consumes_one_item_without_blocking_a_due_peer` regression
+proves the corresponding chain to the concrete application error.
+
+The unchanged messaging-owned returned-failure regression continues through
+one additional owner wrapper and preserves its exact selected-inbox cleanup.
+The focused direct and messaging targets pass 11 and nine tests. These
+observations establish diagnostic traversal, final item consumption, and later
+peer progress for cooperative errors; they do not add scheduled events, retry,
+panic or hang containment, API stabilization, or human acceptance.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

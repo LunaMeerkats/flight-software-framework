@@ -1,38 +1,34 @@
 # Project state
 
-Last updated: **2026-09-27**
+Last updated: **2026-09-28**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
-Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, returned-
-message failure, schedule, and identity-boundary evidence. The current
-checkpoint executes caller-scoped application identity through both opt-in
-ordinary-work failure-event owners. Broader contract review and human v0.1
-architecture acceptance remain open.
+Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, failure,
+schedule, and identity-boundary evidence. The current checkpoint executes the
+direct finite schedule's standard diagnostic source chains. Broader contract
+review and human v0.1 architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `3d38bf6bcb5c56ad061561a43ca2d05be639175c`, equal
-  to refreshed `origin/codex/nightly`; its hosted run 36184729804 succeeded.
-  Initial locked local Cargo baseline: 132 tests.
-- Final locked local baseline: 134 tests; the focused direct and messaging-owned
-  event targets pass five and seven. Formatting, all-target check, warnings-
-  denied Clippy/rustdoc, and whitespace checks pass without new exceptions.
+- Started clean at `bb3ec40cac4d72e9ca8b9d38c3a191fa55cdb070`, equal
+  to `origin/codex/nightly`; its hosted run 36276641746 succeeded. Initial and
+  final locked local Cargo baselines: 134 tests.
+- Focused direct and messaging-owned schedule targets pass 11 and nine tests.
+  Formatting, all-target check, warnings-denied Clippy/rustdoc, and whitespace
+  checks pass without a new exception.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-- Final audit: 32 Rust files with zero width findings, no block comments, and
-  three unchanged fulfilled expectations; 50 Markdown files, 230 resolving
-  relative links, 35 source definitions, and 98 exact test references.
-- Generated HTML for all documents passes structural checks. The six changed
-  documents preserve exact content. Visual browser layout inspection was not
-  run because browser URL policy blocked the local rendered files.
-- The [failure-event identity review](verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
-  distinguishes executed positional attribution from issuer validation or
-  authorization to mix identities.
-- Published checkpoint `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36276474765):
-  one job, all configured steps, both regressions, 134 workspace tests in
-  aggregate, both focused host targets, and the sample executable.
+- Final audit: 32 Rust files with zero physical or comment-width findings, no
+  block comments, and three unchanged fulfilled expectations; 51 Markdown
+  files, 237 resolving relative links, 35 source definitions, and 101 exact
+  traceability test references.
+- PowerShell Markdown rendering for the five changed controlling documents
+  passes structural inspection. Pixel-level visual acceptance is not claimed.
+- The
+  [scheduled-failure diagnostics review](verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
+  distinguishes standard diagnostic traversal from retry, event reporting,
+  arbitrary fault containment, or API stabilization.
 
 ## Current architecture
 
@@ -40,14 +36,14 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment adds two public failure-event identity regressions and supporting
-records only; production code and public API remain unchanged.
+This increment strengthens two direct public scheduled-work regressions and
+supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The failure-event identity checkpoint is
-published with successful exact-revision CI. This documentation-only follow-up
-records that result; later revisions require their own verification.
+The scheduled-failure diagnostics checkpoint is locally complete. Publication
+and exact-revision hosted CI remain pending; a local pass does not establish
+either result.
 
 ## Highest risks and uncertainties
 
@@ -58,9 +54,8 @@ records that result; later revisions require their own verification.
 - `FrameworkInstant` carries no clock-origin identity. Equal elapsed values
   from unrelated clocks compare equal and can release work; meaningful clock-
   domain pairing remains caller discipline.
-- Adding issuer or clock provenance needs bounded origin sources and explicit
-  equality, exhaustion, persistence, and public-API decisions; no redesign is
-  approved by these evidence checkpoints.
+- Scheduled errors are finally consumed. Their source chain preserves exact
+  diagnostics, but does not add automatic retry, event reporting, or rollback.
 - Impossible-capacity rejection is verified; actual allocator exhaustion and
   allocation counts are not. Logical limits do not bound whole-process bytes.
 - Callback/clock panics and hangs remain outside containment. Host saturation
@@ -84,12 +79,11 @@ expansion is approved here.
 
 ## Latest run
 
-2026-09-27: the focused direct and messaging-owned event targets pass five and
-seven tests, and the final locked workspace baseline passes 134. Two new
-regressions prove that a foreign same-position key fails only the receiving
-owner's local application and is copied into its event; the foreign owner stays
-running and uninvoked, and messaging cleanup remains receiver-local. Local
-source/document review passes except that browser visual layout inspection is
-not run due local-file URL policy. Publication and exact-revision hosted
-verification succeeded. No production defect, API change, dependency, external
-research, or lint-policy change was needed.
+2026-09-28: direct scheduled lifecycle rejection now proves
+`ScheduledWorkError -> RuntimeWorkError -> LifecycleError`; direct cooperative
+application failure proves the corresponding chain to the concrete application
+error. Existing item consumption, terminal-state behavior, and later peer
+progress remain unchanged. Focused targets and the full 134-test locked local
+baseline pass, as do source/document audits. No production defect, API change,
+dependency, external research, or lint-policy change was needed. Publication
+and hosted verification remain pending.

@@ -416,6 +416,17 @@ fn lifecycle_rejection_consumes_one_item_without_blocking_a_due_peer() {
         .expect_err("stopped alpha cannot work");
     assert_eq!(error.scheduled_work(), alpha_item);
     assert_eq!(error.observed_at(), FrameworkInstant::ZERO);
+    let work_error = Error::source(&error)
+        .and_then(|source| source.downcast_ref::<RuntimeWorkError<TestApplicationError>>())
+        .expect("scheduled error source retains the runtime work error");
+    assert_eq!(work_error, error.work_error());
+    assert_eq!(
+        Error::source(work_error).and_then(|source| source.downcast_ref()),
+        Some(&LifecycleError::NotRunning {
+            application_id: alpha,
+            state: ApplicationState::Stopped,
+        })
+    );
     assert_eq!(
         error.into_work_error(),
         RuntimeWorkError::Lifecycle(LifecycleError::NotRunning {
@@ -451,6 +462,14 @@ fn returned_work_error_consumes_one_item_without_blocking_a_due_peer() {
             application_id: alpha,
             source: TestApplicationError::WorkRejected(ApplicationName::Alpha),
         }
+    );
+    let work_error = Error::source(&error)
+        .and_then(|source| source.downcast_ref::<RuntimeWorkError<TestApplicationError>>())
+        .expect("scheduled error source retains the runtime work error");
+    assert_eq!(work_error, error.work_error());
+    assert_eq!(
+        Error::source(work_error).and_then(|source| source.downcast_ref()),
+        Some(&TestApplicationError::WorkRejected(ApplicationName::Alpha))
     );
     assert_eq!(runtime.state(alpha), Ok(ApplicationState::Failed));
     assert_eq!(*trace.borrow(), [ApplicationName::Alpha]);

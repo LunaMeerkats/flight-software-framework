@@ -1,87 +1,91 @@
-# Stage 4 failure-event identity scope review
+# Stage 4 scheduled-failure diagnostics review
 
-Date: **2026-09-27**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-09-28**
+Status: **Complete locally; publication and hosted CI pending**
 
 ## Objective and context
 
-Execute the documented caller-scoped `ApplicationId` limitation through both
-opt-in ordinary-work failure-event owners. Prove which receiving application is
-invoked, which owner changes state and inbox contents, and which positional key
-is copied into the resulting event.
+Close one bounded public-diagnostics evidence gap in the existing finite
+scheduled-work API. Verify that both direct scheduled lifecycle rejection and
+cooperative application failure expose the complete standard-library error
+source chain while preserving the already-tested final item consumption and
+later peer progress.
 
-The starting revision is `3d38bf6bcb5c56ad061561a43ca2d05be639175c`,
-clean and equal to refreshed `origin/codex/nightly`. Hosted run 36184729804
-passed that exact revision. The initial locked local baseline passes 132 tests
-on Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+The starting revision is `bb3ec40cac4d72e9ca8b9d38c3a191fa55cdb070`,
+clean and equal to `origin/codex/nightly`. Its exact hosted run 36276641746
+passed. The initial locked local baseline passes 134 tests on Rust/Cargo 1.98.0,
+rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
-This is one bounded Stage 4 public-API and failure-attribution checkpoint. The
-prior identity reviews execute positional aliasing through standalone/runtime
-lookup, detached messaging, and both scheduling owners. ADR-0016 and ADR-0020
-document the same caller-scoped origin limitation for failure events, but no
-public regression currently observes it through either event-producing owner.
+This is a Stage 4 public-API and failure-diagnostics checkpoint. It does not add
+scheduled event emission, retry, recurrence, panic or hang containment, an
+executor, a dependency, or a new public API.
 
-## Acceptance criteria and files
+## Acceptance criteria
 
-- Add one public `tests/runtime_events.rs` regression using a same-position key
-  from a separate live runtime to invoke the receiving runtime's local faulting
-  application and record one application-sourced event.
-- Add the corresponding `tests/messaging_work_events.rs` regression, proving
-  that only the receiving selected inbox is cleared while both foreign inboxes
-  and the receiving peer inbox remain unchanged.
-- Observe that the foreign owner remains running and uninvoked, and distinguish
-  positional aliasing from authorization to mix keys or issuer validation.
-- Preserve production code, public API, requirements, dependencies, licences,
-  event/messaging policy, and lint policy.
-- Record the boundary in a focused verification note; update README, project
-  state, roadmap, and traceability. No new external source is expected.
+- Direct scheduled lifecycle rejection exposes
+  `ScheduledWorkError -> RuntimeWorkError -> LifecycleError` through
+  `std::error::Error::source`.
+- Direct scheduled application failure exposes
+  `ScheduledWorkError -> RuntimeWorkError -> application error` through the
+  same standard interface.
+- Both paths retain the consumed item, observed instant, exact typed error,
+  terminal-state behavior where applicable, and later due-peer progress.
+- Existing messaging-owned source-chain evidence remains passing.
+- Required locked Cargo checks, source-form review, document checks, and
+  complete diff review pass without a new lint exception.
+- Durable state distinguishes this diagnostic evidence from scheduled event
+  reporting or broader fault containment.
 
-## Verification
+## Proposed files
 
-Format before running
-`cargo test --locked --test runtime_events --test messaging_work_events`, then
-run the required locked Cargo baseline with warnings-denied Clippy and rustdoc.
-Audit Rust physical/comment widths, relative Markdown links, exact traceability
-test names, changed rendered documents, and the complete diff. Unchanged host
-adapters, workflow, and ADR-0018/0019 experiments do not trigger their separate
-commands.
+- `tests/scheduled_work.rs`
+- `docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md`
+- `README.md`
+- `docs/ROADMAP.md`
+- `docs/PROJECT_STATE.md`
+- `docs/verification/TRACEABILITY.md`
+- `PLANS.md`
 
-After local acceptance, commit on `codex/nightly`, refresh origin, publish by
-ordinary fast-forward, and inspect exact-revision hosted CI. Record completed
-publication evidence separately without projecting a pass onto a later commit.
+## Verification approach
+
+Run the direct and messaging-owned scheduled-work targets first, then the full
+locked repository baseline:
+
+```text
+cargo test --locked --test scheduled_work
+cargo test --locked --test messaging_scheduled_work
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+RUSTDOCFLAGS=-D warnings cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+```
+
+Also audit handwritten Rust physical widths and comment widths, relative
+Markdown links, exact test references, changed rendered documents, and the
+complete diff.
 
 ## Completed local checks
 
-The focused direct and messaging-owned event targets pass five and seven tests,
-and the final locked workspace baseline passes 134 tests. Formatting, all-target
-checking, warnings-denied Clippy/rustdoc, and whitespace checks pass without a
-new lint exception. Production code, public API, dependencies, licences,
-workflow, source register, and service policies are unchanged.
+The focused direct and messaging-owned schedule targets pass 11 and nine tests,
+and the initial and final locked workspace baselines pass 134 tests. Formatting,
+all-target checking, warnings-denied Clippy/rustdoc, and whitespace checks pass
+without a new lint exception. Production code, public API, dependencies,
+licences, workflow, source register, and service policies are unchanged.
 
-The whole-tree audit passes 32 Rust files with zero width findings, no block
-comments, and three unchanged fulfilled expectations; 50 Markdown files, 230
-resolving relative links, 35 source definitions, and 98 exact traceability test
-references. Generated HTML for all documents passes structural and exact-
-content checks. Browser visual layout inspection was not run because browser
-URL policy blocked local rendered files.
+The whole-tree audit passes 32 Rust files with zero physical or comment-width
+findings, no block comments, and three unchanged fulfilled expectations; 51
+Markdown files, 237 resolving relative links, 35 source definitions, and 101
+exact traceability test references. PowerShell Markdown rendering for the five
+changed controlling documents passes structural inspection. Pixel-level visual
+acceptance is not claimed.
 
-## Risks and safe stopping point
+## Risks and stopping point
 
-The tests can establish only the current positional-key behavior: a foreign
-same-position value compares equal, selects the receiving owner's local record,
-and is indistinguishable in the event source. They cannot establish issuer
-validation, safe cross-owner mixing, global identity, panic or hang containment,
-or human API acceptance. If verification fails, remove only this run's changes.
-Stop after this evidence checkpoint and publication record.
+The source chain is a diagnostic traversal contract, not ownership recovery or
+automatic error handling. Downcasting in tests proves the concrete nested
+errors at this API boundary; it does not promise a stable public API freeze.
 
-## Publication result
-
-Checkpoint `ce232c6a9d1a49dcf6764e0cd6ac2a1d64331241` was published by
-ordinary fast-forward; the remote head matched. Hosted run 36276474765 passed
-that exact push and checkout: one Windows job, all configured steps, both new
-regressions, 134 workspace tests in aggregate, 14 focused adapter tests, five
-focused sample tests, and the sample executable.
-
-This documentation-only follow-up records completed evidence with unchanged
-Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
-are reviewed separately. A later revision requires its own hosted result.
+Stop after the direct source-chain regressions and review record are verified.
+Do not add scheduled events or change error types in this increment.
