@@ -500,7 +500,13 @@ corrected attachment, fresh inboxes, retained application behavior, healthy
 peer publication, and peer work. The focused runtime-messaging target passes
 11 tests. This deterministic capacity-overflow evidence does not establish
 allocator-exhaustion handling, every constructor error, automatic recovery,
-API stabilization, or human acceptance.
+API stabilization, or human acceptance. The checkpoint is committed at
+`70beaedd8c315baeea3e399bb6a7cbf0a8ded9a9`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36477080053)
+passes every configured step, the strengthened regression, 134 workspace tests
+in aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 

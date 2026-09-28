@@ -67,7 +67,10 @@ The
 also executes the nested standard source chain for a later-inbox capacity
 overflow while retaining the existing returned-runtime recovery path. This is
 diagnostic evidence for one deterministic constructor failure, not allocator-
-exhaustion injection or automatic recovery.
+exhaustion injection or automatic recovery. Checkpoint
+`70beaedd8c315baeea3e399bb6a7cbf0a8ded9a9` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36477080053)
+for the strengthened regression and configured host/sample evidence.
 
 A standalone `EventQueue<EventId>` stores typed source, severity,
 mission-defined copied identifier, and explicit elapsed `EventTimestamp`

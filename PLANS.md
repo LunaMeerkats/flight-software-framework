@@ -1,7 +1,7 @@
 # Stage 4 messaging-construction diagnostics review
 
 Date: **2026-09-29**
-Status: **Complete locally; publication and hosted verification pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -88,3 +88,15 @@ Markdown files and 244 resolving relative links; 35 source definitions and 104
 exact traceability test-name references under the current audit method. Six
 changed controlling documents pass PowerShell Markdown structural rendering.
 Pixel-level visual acceptance is not claimed.
+
+## Publication result
+
+Checkpoint `70beaedd8c315baeea3e399bb6a7cbf0a8ded9a9` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36477080053 passed
+that exact push and checkout: one Windows job, every configured step, the
+strengthened regression, 134 workspace tests in aggregate, 14 focused adapter
+tests, five focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

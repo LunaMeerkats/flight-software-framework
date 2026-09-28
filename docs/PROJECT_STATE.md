@@ -30,6 +30,10 @@ acceptance remain open.
   [messaging-construction diagnostics review](verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
   distinguishes standard diagnostic traversal from allocator exhaustion,
   every constructor failure, automatic recovery, or API stabilization.
+- Published checkpoint `70beaedd8c315baeea3e399bb6a7cbf0a8ded9a9` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36477080053):
+  one job, every configured step, the strengthened regression, 134 workspace
+  tests in aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -43,8 +47,9 @@ supporting records only; production code and public API remain unchanged.
 ## Work in progress
 
 No unfinished implementation remains. The messaging-construction diagnostics
-checkpoint passes its complete local baseline and is ready for the authorized
-ordinary fast-forward publication and exact-revision hosted verification.
+checkpoint is published with successful exact-revision CI. This documentation-
+only follow-up records that result; later revisions require their own
+verification.
 
 ## Highest risks and uncertainties
 
@@ -88,4 +93,5 @@ to typed access. Returned-runtime ownership, corrected attachment, preserved
 application behavior, peer publication, and peer work remain passing. The
 focused target and full 134-test locked local baseline pass, as do source and
 document audits. No production defect, API change, dependency, external
-research, or lint-policy change was needed. Publication remains pending.
+research, or lint-policy change was needed. Publication and exact-revision
+hosted verification succeeded.
