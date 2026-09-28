@@ -62,6 +62,12 @@ dequeue, or nested-dispatch access. Routing-core, runtime-messaging, and
 message-dispatch tests cover these boundaries; the
 [returned-message failure review](docs/verification/MESSAGE_FAILURE_REVIEW.md)
 records the complete retained peer FIFO and post-failure availability boundary.
+The
+[messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+also executes the nested standard source chain for a later-inbox capacity
+overflow while retaining the existing returned-runtime recovery path. This is
+diagnostic evidence for one deterministic constructor failure, not allocator-
+exhaustion injection or automatic recovery.
 
 A standalone `EventQueue<EventId>` stores typed source, severity,
 mission-defined copied identifier, and explicit elapsed `EventTimestamp`
@@ -313,6 +319,7 @@ remain separate release gates.
 - [Scheduled-work identity scope review](docs/verification/SCHEDULE_IDENTITY_SCOPE_REVIEW.md)
 - [Clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
 - [Scheduled-failure diagnostics review](docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
+- [Messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 - [Failure-event identity scope review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)

@@ -1,45 +1,43 @@
-# Stage 4 scheduled-failure diagnostics review
+# Stage 4 messaging-construction diagnostics review
 
-Date: **2026-09-28**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-09-29**
+Status: **Complete locally; publication and hosted verification pending**
 
 ## Objective and context
 
-Close one bounded public-diagnostics evidence gap in the existing finite
-scheduled-work API. Verify that both direct scheduled lifecycle rejection and
-cooperative application failure expose the complete standard-library error
-source chain while preserving the already-tested final item consumption and
-later peer progress.
+Close one bounded public-diagnostics evidence gap in the existing
+`MessagingRuntime` attachment API. Verify that a later-inbox capacity-overflow
+failure exposes its complete standard-library error source chain while
+preserving the already-tested unchanged runtime ownership and corrected
+attachment path.
 
-The starting revision is `bb3ec40cac4d72e9ca8b9d38c3a191fa55cdb070`,
-clean and equal to `origin/codex/nightly`. Its exact hosted run 36276641746
+The starting revision is `f4ffabbef7787b3bbbdede28f1e4bcf50a044dcb`,
+clean and equal to `origin/codex/nightly`. Its exact hosted run 36347110418
 passed. The initial locked local baseline passes 134 tests on Rust/Cargo 1.98.0,
 rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
-This is a Stage 4 public-API and failure-diagnostics checkpoint. It does not add
-scheduled event emission, retry, recurrence, panic or hang containment, an
-executor, a dependency, or a new public API.
+This is a Stage 4 constructor and public-diagnostics checkpoint. It does not
+change construction order, allocation behavior, returned ownership, public
+types, message routing, dependencies, or configuration semantics.
 
 ## Acceptance criteria
 
-- Direct scheduled lifecycle rejection exposes
-  `ScheduledWorkError -> RuntimeWorkError -> LifecycleError` through
-  `std::error::Error::source`.
-- Direct scheduled application failure exposes
-  `ScheduledWorkError -> RuntimeWorkError -> application error` through the
-  same standard interface.
-- Both paths retain the consumed item, observed instant, exact typed error,
-  terminal-state behavior where applicable, and later due-peer progress.
-- Existing messaging-owned source-chain evidence remains passing.
+- The failed attachment exposes
+  `MessagingRuntimeCreateError -> MessagingRuntimeCreateErrorKind ->
+  MessageBusCreateError` through `std::error::Error::source`.
+- The source-chain values match the existing typed `kind()` result exactly.
+- The returned runtime still retains both registered applications and supports
+  corrected attachment, preserved application behavior, peer publication, and
+  peer work.
 - Required locked Cargo checks, source-form review, document checks, and
   complete diff review pass without a new lint exception.
-- Durable state distinguishes this diagnostic evidence from scheduled event
-  reporting or broader fault containment.
+- Durable state distinguishes this diagnostic evidence from allocator
+  exhaustion, every constructor failure, or a public API freeze.
 
 ## Proposed files
 
-- `tests/scheduled_work.rs`
-- `docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md`
+- `tests/runtime_messaging.rs`
+- `docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md`
 - `README.md`
 - `docs/ROADMAP.md`
 - `docs/PROJECT_STATE.md`
@@ -48,12 +46,10 @@ executor, a dependency, or a new public API.
 
 ## Verification approach
 
-Run the direct and messaging-owned scheduled-work targets first, then the full
-locked repository baseline:
+Run the focused owner target first, then the full locked repository baseline:
 
 ```text
-cargo test --locked --test scheduled_work
-cargo test --locked --test messaging_scheduled_work
+cargo test --locked --test runtime_messaging
 cargo fmt --all -- --check
 cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -66,38 +62,29 @@ Also audit handwritten Rust physical widths and comment widths, relative
 Markdown links, exact test references, changed rendered documents, and the
 complete diff.
 
-## Completed local checks
-
-The focused direct and messaging-owned schedule targets pass 11 and nine tests,
-and the initial and final locked workspace baselines pass 134 tests. Formatting,
-all-target checking, warnings-denied Clippy/rustdoc, and whitespace checks pass
-without a new lint exception. Production code, public API, dependencies,
-licences, workflow, source register, and service policies are unchanged.
-
-The whole-tree audit passes 32 Rust files with zero physical or comment-width
-findings, no block comments, and three unchanged fulfilled expectations; 51
-Markdown files, 237 resolving relative links, 35 source definitions, and 101
-exact traceability test references. PowerShell Markdown rendering for the six
-changed controlling documents passes structural inspection. Pixel-level visual
-acceptance is not claimed.
-
 ## Risks and stopping point
 
-The source chain is a diagnostic traversal contract, not ownership recovery or
-automatic error handling. Downcasting in tests proves the concrete nested
-errors at this API boundary; it does not promise a stable public API freeze.
+The source chain is diagnostic traversal, not automatic recovery. The
+deterministic `usize::MAX` input exercises an unrepresentable nonzero-sized
+inbox reservation; it does not inject allocator exhaustion or execute every
+construction failure variant.
 
-Stop after the direct source-chain regressions and review record are verified.
-Do not add scheduled events or change error types in this increment.
+Stop after the existing owner regression proves the nested source chain and
+recovery behavior. Do not change error types or add allocation hooks in this
+increment.
 
-## Publication result
+## Completed local checks
 
-Checkpoint `6eefde2b49c6f4c93a82c97719f4673c93f1babf` was published by
-ordinary fast-forward; the remote head matched. Hosted run 36346952408 passed
-that exact push and checkout: one Windows job, every configured step, both
-strengthened direct regressions, 134 workspace tests in aggregate, 14 focused
-adapter tests, five focused sample tests, and the sample executable.
+The focused runtime-messaging target passes 11 tests, and the initial and final
+locked workspace baselines pass 134 tests. Formatting, all-target checking,
+warnings-denied Clippy/rustdoc, and whitespace checks pass without a new lint
+exception. The first full Clippy attempt correctly rejected a 69-line expanded
+test; extracting the independently meaningful source-chain assertion into a
+narrow helper restored the 60-line policy without a waiver.
 
-This documentation-only follow-up records completed evidence with unchanged
-Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
-are reviewed separately. A later revision requires its own hosted result.
+The whole-tree audit passes 32 Rust files with zero physical or comment-width
+findings, no block comments, and three unchanged fulfilled expectations; 52
+Markdown files and 244 resolving relative links; 35 source definitions and 104
+exact traceability test-name references under the current audit method. Six
+changed controlling documents pass PowerShell Markdown structural rendering.
+Pixel-level visual acceptance is not claimed.

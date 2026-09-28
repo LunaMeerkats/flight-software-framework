@@ -107,6 +107,25 @@ fn delivery_statuses(report: &PublishReport) -> Vec<DeliveryStatus> {
         .collect()
 }
 
+fn assert_inbox_capacity_source_chain(
+    error: &(dyn Error + 'static),
+    expected_kind: MessagingRuntimeCreateErrorKind,
+    application_id: ApplicationId,
+) {
+    let construction_kind = error
+        .source()
+        .and_then(|source| source.downcast_ref::<MessagingRuntimeCreateErrorKind>())
+        .expect("attachment source retains the construction failure kind");
+    assert_eq!(*construction_kind, expected_kind);
+    assert_eq!(
+        Error::source(construction_kind).and_then(|source| source.downcast_ref()),
+        Some(&MessageBusCreateError::InboxStorageAllocationFailed {
+            application_id,
+            requested: usize::MAX,
+        })
+    );
+}
+
 #[test]
 fn inbox_count_mismatch_preserves_the_owned_runtime() {
     let mut runtime = Runtime::new(1).expect("one runtime record can be reserved");
@@ -217,6 +236,7 @@ fn oversized_later_inbox_preserves_runtime_for_corrected_attachment() {
             }
         )
     );
+    assert_inbox_capacity_source_chain(&error, error.kind(), application_ids[1]);
     assert_eq!(error.runtime().len(), 2);
     assert_eq!(error.runtime().capacity(), 2);
     for application_id in application_ids {

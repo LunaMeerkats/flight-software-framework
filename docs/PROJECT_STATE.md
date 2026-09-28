@@ -1,38 +1,35 @@
 # Project state
 
-Last updated: **2026-09-28**
+Last updated: **2026-09-29**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, failure,
-schedule, and identity-boundary evidence. The current checkpoint executes the
-direct finite schedule's standard diagnostic source chains. Broader contract
-review and human v0.1 architecture acceptance remain open.
+schedule, identity-boundary, and public-diagnostics evidence. The current
+checkpoint executes the messaging attachment constructor's nested standard
+error-source chain. Broader contract review and human v0.1 architecture
+acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `bb3ec40cac4d72e9ca8b9d38c3a191fa55cdb070`, equal
-  to `origin/codex/nightly`; its hosted run 36276641746 succeeded. Initial and
+- Started clean at `f4ffabbef7787b3bbbdede28f1e4bcf50a044dcb`, equal
+  to `origin/codex/nightly`; its hosted run 36347110418 succeeded. Initial and
   final locked local Cargo baselines: 134 tests.
-- Focused direct and messaging-owned schedule targets pass 11 and nine tests.
-  Formatting, all-target check, warnings-denied Clippy/rustdoc, and whitespace
-  checks pass without a new exception.
+- The focused runtime-messaging target passes 11 tests. Formatting, all-target
+  check, warnings-denied Clippy/rustdoc, and whitespace checks pass without a
+  new exception.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Final audit: 32 Rust files with zero physical or comment-width findings, no
-  block comments, and three unchanged fulfilled expectations; 51 Markdown
-  files, 237 resolving relative links, 35 source definitions, and 101 exact
-  traceability test references.
+  block comments, and three unchanged fulfilled expectations; 52 Markdown
+  files and 244 resolving relative links; 35 source definitions and 104 exact
+  traceability test-name references under the current audit method.
 - PowerShell Markdown rendering for the six changed controlling documents
   passes structural inspection. Pixel-level visual acceptance is not claimed.
 - The
-  [scheduled-failure diagnostics review](verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
-  distinguishes standard diagnostic traversal from retry, event reporting,
-  arbitrary fault containment, or API stabilization.
-- Published checkpoint `6eefde2b49c6f4c93a82c97719f4673c93f1babf` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36346952408):
-  one job, all configured steps, both strengthened regressions, 134 workspace
-  tests in aggregate, both focused host targets, and the sample executable.
+  [messaging-construction diagnostics review](verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+  distinguishes standard diagnostic traversal from allocator exhaustion,
+  every constructor failure, automatic recovery, or API stabilization.
 
 ## Current architecture
 
@@ -40,15 +37,14 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment strengthens two direct public scheduled-work regressions and
+This increment strengthens one public messaging-construction regression and
 supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The scheduled-failure diagnostics
-checkpoint is published with successful exact-revision CI. This documentation-
-only follow-up records that result; later revisions require their own
-verification.
+No unfinished implementation remains. The messaging-construction diagnostics
+checkpoint passes its complete local baseline and is ready for the authorized
+ordinary fast-forward publication and exact-revision hosted verification.
 
 ## Highest risks and uncertainties
 
@@ -59,10 +55,11 @@ verification.
 - `FrameworkInstant` carries no clock-origin identity. Equal elapsed values
   from unrelated clocks compare equal and can release work; meaningful clock-
   domain pairing remains caller discipline.
+- Constructor source traversal preserves the exact typed cause but provides no
+  automatic recovery. Actual allocator exhaustion and allocation counts remain
+  unverified; logical limits do not bound whole-process bytes.
 - Scheduled errors are finally consumed. Their source chain preserves exact
   diagnostics, but does not add automatic retry, event reporting, or rollback.
-- Impossible-capacity rejection is verified; actual allocator exhaustion and
-  allocation counts are not. Logical limits do not bound whole-process bytes.
 - Callback/clock panics and hangs remain outside containment. Host saturation
   is terminal; no recovery, real-time, or physical delivery claim is made.
 - Stable Rust and runner images float. Source/document and conditional ADR
@@ -84,11 +81,11 @@ expansion is approved here.
 
 ## Latest run
 
-2026-09-28: direct scheduled lifecycle rejection now proves
-`ScheduledWorkError -> RuntimeWorkError -> LifecycleError`; direct cooperative
-application failure proves the corresponding chain to the concrete application
-error. Existing item consumption, terminal-state behavior, and later peer
-progress remain unchanged. Focused targets and the full 134-test locked local
-baseline pass, as do source/document audits. No production defect, API change,
-dependency, external research, or lint-policy change was needed. Publication
-and exact-revision hosted verification succeeded.
+2026-09-29: the existing later-inbox capacity-overflow regression now proves
+`MessagingRuntimeCreateError -> MessagingRuntimeCreateErrorKind ->
+MessageBusCreateError` through `std::error::Error::source`, with exact agreement
+to typed access. Returned-runtime ownership, corrected attachment, preserved
+application behavior, peer publication, and peer work remain passing. The
+focused target and full 134-test locked local baseline pass, as do source and
+document audits. No production defect, API change, dependency, external
+research, or lint-policy change was needed. Publication remains pending.

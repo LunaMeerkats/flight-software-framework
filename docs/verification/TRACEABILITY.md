@@ -485,6 +485,23 @@ workspace tests in aggregate, both focused host targets, and the sample
 executable. This documentation-only follow-up records that exact result; later
 revisions need their own CI evidence.
 
+## Messaging-construction diagnostics checkpoint
+
+The 2026-09-29
+[messaging-construction diagnostics review](MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+supplements RFF-REQ-003 and ADR-0010/0011 without changing attachment behavior.
+`oversized_later_inbox_preserves_runtime_for_corrected_attachment` now proves
+`MessagingRuntimeCreateError -> MessagingRuntimeCreateErrorKind ->
+MessageBusCreateError` through `std::error::Error::source`, with exact agreement
+between the traversed cause and typed construction kind.
+
+The unchanged remainder of the regression proves returned-runtime ownership,
+corrected attachment, fresh inboxes, retained application behavior, healthy
+peer publication, and peer work. The focused runtime-messaging target passes
+11 tests. This deterministic capacity-overflow evidence does not establish
+allocator-exhaustion handling, every constructor error, automatic recovery,
+API stabilization, or human acceptance.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

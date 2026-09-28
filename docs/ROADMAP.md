@@ -231,9 +231,13 @@ is copied into its event while the foreign owner remains unchanged. The
 [scheduled-failure diagnostics review](verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
 executes the ADR-0015 direct standard-error chains for lifecycle rejection and
 a cooperative returned application error while preserving final item
-consumption and later peer progress. Other lifecycle/service resource, failure,
-and public-API reviews plus human entry-point/architecture acceptance remain
-open. Stage 4 is not complete.
+consumption and later peer progress. The 2026-09-29
+[messaging-construction diagnostics review](verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+executes the existing attachment wrapper's standard source chain through the
+exact message-bus capacity-overflow cause while retaining the corrected
+attachment recovery path. Other lifecycle/service resource, failure, and
+public-API reviews plus human entry-point/architecture acceptance remain open.
+Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments
