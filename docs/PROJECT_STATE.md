@@ -31,6 +31,10 @@ open.
   [configured-runtime construction diagnostics review](verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
   distinguishes standard diagnostic traversal and explicit ownership recovery
   from allocator exhaustion, automatic recovery, or API stabilization.
+- Published checkpoint `887f9965bc8db0939dc161ffc3a58ad7387d2910` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36624191212):
+  one job, every configured step, the strengthened regression, 134 workspace
+  tests in aggregate, both focused host targets, and the sample executable.
 
 ## Current architecture
 
@@ -43,9 +47,10 @@ supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-The configured-runtime source-chain regression and review record are complete.
-The full local baseline and source/document audits pass. The checkpoint commit,
-publication, and exact-revision hosted CI remain pending.
+No unfinished implementation remains. The configured-runtime construction
+diagnostics checkpoint is published with successful exact-revision CI. This
+documentation-only follow-up records that result; later revisions require their
+own verification.
 
 ## Highest risks and uncertainties
 
@@ -76,11 +81,9 @@ expansion is approved here.
 
 ## Most likely next tasks
 
-1. Complete and publish the configured-runtime construction diagnostics
-   checkpoint with exact-revision hosted evidence.
-2. Select another bounded Stage 4 service, resource, failure, or public-API gap
+1. Select another bounded Stage 4 service, resource, failure, or public-API gap
    after reconciling existing evidence.
-3. Record human entry-point/architecture acceptance before broadening scope.
+2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
@@ -91,4 +94,4 @@ record-capacity overflow, with exact agreement to typed access. Returned table
 ownership, active revision 2, rollback revision 1, and next replacement revision
 3 remain passing. No production defect, API change, dependency, external
 research, or lint-policy change was needed. Local verification is complete;
-checkpoint commit, publication, and exact-revision hosted evidence are pending.
+publication and exact-revision hosted verification succeeded.

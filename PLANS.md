@@ -1,7 +1,7 @@
 # Stage 4 configured-runtime construction diagnostics review
 
 Date: **2026-09-30**
-Status: **Complete locally; publication and exact-revision hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -86,8 +86,14 @@ exact traceability test-name references under the current audit method. Six
 changed controlling documents pass PowerShell Markdown structural rendering.
 Pixel-level visual acceptance is not claimed.
 
-## Publication status
+## Publication result
 
-The checkpoint commit, ordinary fast-forward publication, and exact-revision
-hosted result remain pending. No earlier CI run is projected onto this working
-tree.
+Checkpoint `887f9965bc8db0939dc161ffc3a58ad7387d2910` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36624191212 passed
+that exact push and checkout: one Windows job, every configured step, the
+strengthened regression, 134 workspace tests in aggregate, 14 focused adapter
+tests, five focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

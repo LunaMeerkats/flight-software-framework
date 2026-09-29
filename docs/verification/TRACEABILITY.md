@@ -524,8 +524,13 @@ retains active revision 2, rollback revision 1, and the next unused revision 3
 after ownership recovery. The focused configuration-runtime target passes 11
 tests. This evidence does not inject allocator exhaustion, execute unrelated
 constructor wrappers, add automatic recovery, stabilize the public API, or
-establish human acceptance. Final checkpoint and hosted evidence are recorded
-after publication; no prior run is projected onto this revision.
+establish human acceptance. The checkpoint is committed at
+`887f9965bc8db0939dc161ffc3a58ad7387d2910`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36624191212)
+passes every configured step, the strengthened regression, 134 workspace tests
+in aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 
