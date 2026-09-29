@@ -193,6 +193,10 @@ fn assert_failed_construction_preserves_table(capacity: usize, expected: Runtime
         .expect_err("configured runtime storage must be rejected");
 
     assert_eq!(error.kind(), expected);
+    assert_eq!(
+        Error::source(&error).and_then(|source| source.downcast_ref()),
+        Some(&expected)
+    );
     assert_eq!(error.configuration().active().revision(), 2);
     assert_eq!(error.configuration().active().bytes(), &[1, 2]);
     let mut recovered = error.into_configuration();

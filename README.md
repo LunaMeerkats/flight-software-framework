@@ -323,6 +323,7 @@ remain separate release gates.
 - [Clock-origin scope review](docs/verification/CLOCK_IDENTITY_SCOPE_REVIEW.md)
 - [Scheduled-failure diagnostics review](docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
 - [Messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+- [Configured-runtime construction diagnostics review](docs/verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 - [Failure-event identity scope review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)

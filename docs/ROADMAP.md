@@ -235,8 +235,13 @@ consumption and later peer progress. The 2026-09-29
 [messaging-construction diagnostics review](verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 executes the existing attachment wrapper's standard source chain through the
 exact message-bus capacity-overflow cause while retaining the corrected
-attachment recovery path. Other lifecycle/service resource, failure, and
-public-API reviews plus human entry-point/architecture acceptance remain open.
+attachment recovery path. The 2026-09-30
+[configured-runtime construction diagnostics review](verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+executes the ADR-0018 ownership wrapper's standard source chain for zero
+capacity and deterministic record-capacity overflow while retaining the full
+active, rollback, and revision-allocation lineage. Other lifecycle/service
+resource, failure, and public-API reviews plus human entry-point/architecture
+acceptance remain open.
 Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,

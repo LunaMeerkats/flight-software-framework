@@ -508,6 +508,25 @@ in aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Configured-runtime construction diagnostics checkpoint
+
+The 2026-09-30
+[configured-runtime construction diagnostics review](CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+supplements RFF-REQ-006 and ADR-0018 without changing configured-runtime
+construction. `configured_construction_failures_return_the_unchanged_table_lineage`
+now proves `RuntimeConfigurationCreateError -> RuntimeCreateError` through
+`std::error::Error::source` for zero capacity and deterministic `usize::MAX`
+record-capacity overflow. Each traversed cause exactly matches the typed
+`kind()` value.
+
+The unchanged remainder of the regression proves that each returned table
+retains active revision 2, rollback revision 1, and the next unused revision 3
+after ownership recovery. The focused configuration-runtime target passes 11
+tests. This evidence does not inject allocator exhaustion, execute unrelated
+constructor wrappers, add automatic recovery, stabilize the public API, or
+establish human acceptance. Final checkpoint and hosted evidence are recorded
+after publication; no prior run is projected onto this revision.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

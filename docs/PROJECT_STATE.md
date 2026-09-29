@@ -1,39 +1,36 @@
 # Project state
 
-Last updated: **2026-09-29**
+Last updated: **2026-09-30**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, failure,
 schedule, identity-boundary, and public-diagnostics evidence. The current
-checkpoint executes the messaging attachment constructor's nested standard
-error-source chain. Broader contract review and human v0.1 architecture
-acceptance remain open.
+checkpoint executes the configured-runtime constructor's standard error source
+for both deterministic storage failures while retaining its returned table
+lineage. Broader contract review and human v0.1 architecture acceptance remain
+open.
 
 ## Verified baseline
 
-- Started clean at `f4ffabbef7787b3bbbdede28f1e4bcf50a044dcb`, equal
-  to `origin/codex/nightly`; its hosted run 36347110418 succeeded. Initial and
-  final locked local Cargo baselines: 134 tests.
-- The focused runtime-messaging target passes 11 tests. Formatting, all-target
-  check, warnings-denied Clippy/rustdoc, and whitespace checks pass without a
-  new exception.
+- Started clean at `9cad622987f47f0ab14e9922a8ab2b4e29b20f6a`, equal
+  to `origin/codex/nightly`; its hosted run 36477422468 succeeded. The initial
+  locked local Cargo baseline passes 134 tests.
+- The focused configuration-runtime target passes 11 tests. Formatting,
+  all-target check, warnings-denied Clippy/rustdoc, and whitespace checks pass
+  without a new exception. The final locked Cargo baseline passes 134 tests.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Final audit: 32 Rust files with zero physical or comment-width findings, no
-  block comments, and three unchanged fulfilled expectations; 52 Markdown
-  files and 244 resolving relative links; 35 source definitions and 104 exact
+  block comments, and three unchanged fulfilled expectations; 53 Markdown
+  files and 249 resolving relative links; 35 source identifiers and 107 exact
   traceability test-name references under the current audit method.
 - PowerShell Markdown rendering for the six changed controlling documents
   passes structural inspection. Pixel-level visual acceptance is not claimed.
 - The
-  [messaging-construction diagnostics review](verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
-  distinguishes standard diagnostic traversal from allocator exhaustion,
-  every constructor failure, automatic recovery, or API stabilization.
-- Published checkpoint `70beaedd8c315baeea3e399bb6a7cbf0a8ded9a9` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36477080053):
-  one job, every configured step, the strengthened regression, 134 workspace
-  tests in aggregate, both focused host targets, and the sample executable.
+  [configured-runtime construction diagnostics review](verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+  distinguishes standard diagnostic traversal and explicit ownership recovery
+  from allocator exhaustion, automatic recovery, or API stabilization.
 
 ## Current architecture
 
@@ -41,15 +38,14 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment strengthens one public messaging-construction regression and
+This increment strengthens one public configured-construction regression and
 supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The messaging-construction diagnostics
-checkpoint is published with successful exact-revision CI. This documentation-
-only follow-up records that result; later revisions require their own
-verification.
+The configured-runtime source-chain regression and review record are complete.
+The full local baseline and source/document audits pass. The checkpoint commit,
+publication, and exact-revision hosted CI remain pending.
 
 ## Highest risks and uncertainties
 
@@ -60,7 +56,7 @@ verification.
 - `FrameworkInstant` carries no clock-origin identity. Equal elapsed values
   from unrelated clocks compare equal and can release work; meaningful clock-
   domain pairing remains caller discipline.
-- Constructor source traversal preserves the exact typed cause but provides no
+- Constructor source traversal preserves exact typed causes but provides no
   automatic recovery. Actual allocator exhaustion and allocation counts remain
   unverified; logical limits do not bound whole-process bytes.
 - Scheduled errors are finally consumed. Their source chain preserves exact
@@ -80,18 +76,19 @@ expansion is approved here.
 
 ## Most likely next tasks
 
-1. Select another bounded Stage 4 service, resource, failure, or public-API gap
+1. Complete and publish the configured-runtime construction diagnostics
+   checkpoint with exact-revision hosted evidence.
+2. Select another bounded Stage 4 service, resource, failure, or public-API gap
    after reconciling existing evidence.
-2. Record human entry-point/architecture acceptance before broadening scope.
+3. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
 
-2026-09-29: the existing later-inbox capacity-overflow regression now proves
-`MessagingRuntimeCreateError -> MessagingRuntimeCreateErrorKind ->
-MessageBusCreateError` through `std::error::Error::source`, with exact agreement
-to typed access. Returned-runtime ownership, corrected attachment, preserved
-application behavior, peer publication, and peer work remain passing. The
-focused target and full 134-test locked local baseline pass, as do source and
-document audits. No production defect, API change, dependency, external
-research, or lint-policy change was needed. Publication and exact-revision
-hosted verification succeeded.
+2026-09-30: the existing configured-construction regression now proves
+`RuntimeConfigurationCreateError -> RuntimeCreateError` through
+`std::error::Error::source` for zero capacity and deterministic `usize::MAX`
+record-capacity overflow, with exact agreement to typed access. Returned table
+ownership, active revision 2, rollback revision 1, and next replacement revision
+3 remain passing. No production defect, API change, dependency, external
+research, or lint-policy change was needed. Local verification is complete;
+checkpoint commit, publication, and exact-revision hosted evidence are pending.
