@@ -186,6 +186,13 @@ schema, wire format, host loader, or message/lifecycle callback access is
 selected. Checkpoint `b21b59bff68fe6c16b0d153661865a67a28f8df2` has
 successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36184310315)
 for the new regression and configured host/sample evidence.
+The
+[configuration-operation diagnostics review](docs/verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
+also executes the existing runtime wrapper's standard source shapes for
+unconfigured operations, semantic validation rejection, and exhausted
+consume-once rollback. The surrounding regression retains the active,
+rollback, and revision-allocation lineage. This is diagnostic evidence, not
+automatic recovery, logging policy, or API stabilization.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
@@ -324,6 +331,7 @@ remain separate release gates.
 - [Scheduled-failure diagnostics review](docs/verification/SCHEDULE_FAILURE_DIAGNOSTICS_REVIEW.md)
 - [Messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 - [Configured-runtime construction diagnostics review](docs/verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
+- [Configuration-operation diagnostics review](docs/verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
 - [Failure-event identity scope review](docs/verification/FAILURE_EVENT_IDENTITY_SCOPE_REVIEW.md)
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)

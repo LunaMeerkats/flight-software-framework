@@ -1,40 +1,36 @@
 # Project state
 
-Last updated: **2026-09-30**
+Last updated: **2026-10-01**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, constructor/resource, failure,
 schedule, identity-boundary, and public-diagnostics evidence. The current
-checkpoint executes the configured-runtime constructor's standard error source
-for both deterministic storage failures while retaining its returned table
-lineage. Broader contract review and human v0.1 architecture acceptance remain
-open.
+checkpoint executes the runtime-owned configuration operations' standard error
+source shapes for absence, semantic rejection, and exhausted rollback while
+retaining their revision lineage. Broader contract review and human v0.1
+architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `9cad622987f47f0ab14e9922a8ab2b4e29b20f6a`, equal
-  to `origin/codex/nightly`; its hosted run 36477422468 succeeded. The initial
+- Started clean at `dc7c2e67`, equal to `origin/codex/nightly`; its hosted run
+  36624544756 succeeded. The initial
   locked local Cargo baseline passes 134 tests.
 - The focused configuration-runtime target passes 11 tests. Formatting,
   all-target check, warnings-denied Clippy/rustdoc, and whitespace checks pass
   without a new exception. The final locked Cargo baseline passes 134 tests.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Final audit: 32 Rust files with zero physical or comment-width findings, no
-  block comments, and three unchanged fulfilled expectations; 53 Markdown
-  files and 249 resolving relative links; 35 source identifiers and 107 exact
-  traceability test-name references under the current audit method.
-- PowerShell Markdown rendering for the six changed controlling documents
-  passes structural inspection. Pixel-level visual acceptance is not claimed.
+  block comments, and three unchanged fulfilled expectations; 54 Markdown
+  files and 255 resolving relative links.
+- PowerShell Markdown rendering for the changed controlling documents passes
+  structural inspection. Pixel-level visual acceptance is not claimed.
 - The
-  [configured-runtime construction diagnostics review](verification/CONFIGURATION_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
-  distinguishes standard diagnostic traversal and explicit ownership recovery
-  from allocator exhaustion, automatic recovery, or API stabilization.
-- Published checkpoint `887f9965bc8db0939dc161ffc3a58ad7387d2910` has
-  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36624191212):
-  one job, every configured step, the strengthened regression, 134 workspace
-  tests in aggregate, both focused host targets, and the sample executable.
+  [configuration-operation diagnostics review](verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
+  distinguishes standard diagnostic traversal from automatic recovery,
+  logging policy, API stabilization, or broader configuration behavior.
+- Publication and exact-revision hosted CI for this checkpoint remain pending.
 
 ## Current architecture
 
@@ -42,15 +38,14 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This increment strengthens one public configured-construction regression and
+This increment strengthens two public configuration-operation regressions and
 supporting records only; production code and public API remain unchanged.
 
 ## Work in progress
 
-No unfinished implementation remains. The configured-runtime construction
-diagnostics checkpoint is published with successful exact-revision CI. This
-documentation-only follow-up records that result; later revisions require their
-own verification.
+No unfinished implementation remains. The configuration-operation diagnostics
+checkpoint passes local verification and awaits ordinary source publication
+and exact-revision hosted CI.
 
 ## Highest risks and uncertainties
 
@@ -87,11 +82,10 @@ expansion is approved here.
 
 ## Latest run
 
-2026-09-30: the existing configured-construction regression now proves
-`RuntimeConfigurationCreateError -> RuntimeCreateError` through
-`std::error::Error::source` for zero capacity and deterministic `usize::MAX`
-record-capacity overflow, with exact agreement to typed access. Returned table
-ownership, active revision 2, rollback revision 1, and next replacement revision
-3 remain passing. No production defect, API change, dependency, external
-research, or lint-policy change was needed. Local verification is complete;
-publication and exact-revision hosted verification succeeded.
+2026-10-01: existing public regressions now prove terminal unconfigured
+configuration errors, the semantic `RuntimeConfigurationError ->
+ConfigurationError -> MissionValidationError` chain, and the structural chain
+ending at `NoRollbackAvailable`. Active revision 2, rollback revision 1, and
+next replacement revision 3 remain passing. No production defect, API change,
+dependency, external research, or lint-policy change was needed. Local
+verification is complete; publication and hosted verification remain pending.

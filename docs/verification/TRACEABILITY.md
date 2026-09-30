@@ -532,6 +532,28 @@ in aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Configuration-operation diagnostics checkpoint
+
+The 2026-10-01
+[configuration-operation diagnostics review](CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
+supplements RFF-REQ-006 and ADR-0017/0018 without changing configuration
+behavior. `unconfigured_work_reports_absence_and_rejects_table_operations`
+now proves that replacement and rollback terminate at the exact
+`RuntimeConfigurationError::NotConfigured` value without a fabricated source.
+
+`work_observes_activation_rejection_rollback_and_revision_non_reuse` now proves
+the semantic chain `RuntimeConfigurationError -> ConfigurationError ->
+MissionValidationError` and the structural chain `RuntimeConfigurationError ->
+ConfigurationError` terminating at `NoRollbackAvailable`. Its unchanged state
+observations retain active revision 2 after rejection, restore revision 1 once,
+and assign revision 3 to the next accepted replacement.
+
+The focused configuration-runtime target passes 11 tests; the locked workspace
+baseline passes 134 tests. This evidence does not execute every standalone
+configuration error through the runtime owner, add recovery or logging policy,
+stabilize the API, or establish human acceptance. Publication and hosted
+evidence remain separate.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

@@ -146,14 +146,17 @@ fn unconfigured_work_reports_absence_and_rejects_table_operations() {
     assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
     assert_eq!(&*observations.borrow(), &[None]);
     assert_eq!(work_calls.get(), 1);
-    assert_eq!(
-        runtime.replace_configuration(&[]),
-        Err(RuntimeConfigurationError::NotConfigured)
-    );
-    assert_eq!(
-        runtime.rollback_configuration(),
-        Err(RuntimeConfigurationError::NotConfigured)
-    );
+    let replace_error = runtime
+        .replace_configuration(&[])
+        .expect_err("replacement requires a configured table");
+    assert_eq!(replace_error, RuntimeConfigurationError::NotConfigured);
+    assert!(Error::source(&replace_error).is_none());
+
+    let rollback_error = runtime
+        .rollback_configuration()
+        .expect_err("rollback requires a configured table");
+    assert_eq!(rollback_error, RuntimeConfigurationError::NotConfigured);
+    assert!(Error::source(&rollback_error).is_none());
 }
 
 #[test]
@@ -233,6 +236,28 @@ fn started_runtime(
     (runtime, application_id, observations, work_calls)
 }
 
+fn assert_validation_source_chain(
+    error: &RuntimeConfigurationError<MissionValidationError>,
+    expected: MissionValidationError,
+) {
+    let table_error = Error::source(error)
+        .and_then(|source| source.downcast_ref::<ConfigurationError<MissionValidationError>>())
+        .expect("runtime error exposes the table error");
+    assert_eq!(table_error, &ConfigurationError::Rejected(expected));
+    assert_eq!(
+        Error::source(table_error).and_then(|source| source.downcast_ref()),
+        Some(&expected)
+    );
+}
+
+fn assert_no_rollback_source_chain(error: &RuntimeConfigurationError<MissionValidationError>) {
+    let table_error = Error::source(error)
+        .and_then(|source| source.downcast_ref::<ConfigurationError<MissionValidationError>>())
+        .expect("runtime error exposes the table error");
+    assert_eq!(table_error, &ConfigurationError::NoRollbackAvailable);
+    assert!(Error::source(table_error).is_none());
+}
+
 #[test]
 fn work_observes_activation_rejection_rollback_and_revision_non_reuse() {
     let (mut runtime, application_id, observations, _) =
@@ -243,23 +268,29 @@ fn work_observes_activation_rejection_rollback_and_revision_non_reuse() {
     runtime
         .work(application_id)
         .expect("replacement is visible");
+    let validation_error = runtime
+        .replace_configuration(&[9, 2])
+        .expect_err("mission validation rejects mode nine");
     assert_eq!(
-        runtime.replace_configuration(&[9, 2]),
-        Err(RuntimeConfigurationError::Table(
-            ConfigurationError::Rejected(MissionValidationError::UnknownMode(9))
+        validation_error,
+        RuntimeConfigurationError::Table(ConfigurationError::Rejected(
+            MissionValidationError::UnknownMode(9)
         ))
     );
+    assert_validation_source_chain(&validation_error, MissionValidationError::UnknownMode(9));
     runtime
         .work(application_id)
         .expect("rejection retains active");
     assert_eq!(runtime.rollback_configuration(), Ok(1));
     runtime.work(application_id).expect("rollback is visible");
+    let rollback_error = runtime
+        .rollback_configuration()
+        .expect_err("the only rollback snapshot was consumed");
     assert_eq!(
-        runtime.rollback_configuration(),
-        Err(RuntimeConfigurationError::Table(
-            ConfigurationError::NoRollbackAvailable
-        ))
+        rollback_error,
+        RuntimeConfigurationError::Table(ConfigurationError::NoRollbackAvailable)
     );
+    assert_no_rollback_source_chain(&rollback_error);
     assert_eq!(runtime.replace_configuration(&[2, 3]), Ok(3));
     runtime
         .work(application_id)
