@@ -552,7 +552,13 @@ The focused configuration-runtime target passes 11 tests; the locked workspace
 baseline passes 134 tests. This evidence does not execute every standalone
 configuration error through the runtime owner, add recovery or logging policy,
 stabilize the API, or establish human acceptance. Publication and hosted
-evidence remain separate.
+evidence remain separate. The checkpoint is committed at
+`5372a52f888b38b0d725b74bbd330f40ef4a0a31`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36770444600)
+passes every configured step, both strengthened regressions, 134 workspace
+tests in aggregate, both focused host targets, and the sample executable. This
+documentation-only follow-up records that exact result; later revisions need
+their own CI evidence.
 
 ## Evidence policy
 

@@ -192,7 +192,10 @@ also executes the existing runtime wrapper's standard source shapes for
 unconfigured operations, semantic validation rejection, and exhausted
 consume-once rollback. The surrounding regression retains the active,
 rollback, and revision-allocation lineage. This is diagnostic evidence, not
-automatic recovery, logging policy, or API stabilization.
+automatic recovery, logging policy, or API stabilization. Checkpoint
+`5372a52f888b38b0d725b74bbd330f40ef4a0a31` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36770444600)
+for the strengthened regressions and configured host/sample evidence.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded

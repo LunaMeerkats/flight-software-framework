@@ -30,7 +30,10 @@ architecture acceptance remain open.
   [configuration-operation diagnostics review](verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
   distinguishes standard diagnostic traversal from automatic recovery,
   logging policy, API stabilization, or broader configuration behavior.
-- Publication and exact-revision hosted CI for this checkpoint remain pending.
+- Published checkpoint `5372a52f888b38b0d725b74bbd330f40ef4a0a31` has
+  successful [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36770444600):
+  one job, every configured step, 134 workspace tests, both focused host
+  targets, and the sample executable.
 
 ## Current architecture
 
@@ -44,8 +47,9 @@ supporting records only; production code and public API remain unchanged.
 ## Work in progress
 
 No unfinished implementation remains. The configuration-operation diagnostics
-checkpoint passes local verification and awaits ordinary source publication
-and exact-revision hosted CI.
+checkpoint is published with successful exact-revision CI. This
+documentation-only follow-up records that result; later revisions require their
+own verification.
 
 ## Highest risks and uncertainties
 
@@ -88,4 +92,4 @@ ConfigurationError -> MissionValidationError` chain, and the structural chain
 ending at `NoRollbackAvailable`. Active revision 2, rollback revision 1, and
 next replacement revision 3 remain passing. No production defect, API change,
 dependency, external research, or lint-policy change was needed. Local
-verification is complete; publication and hosted verification remain pending.
+verification, publication, and exact-revision hosted verification succeeded.

@@ -1,7 +1,7 @@
 # Stage 4 configuration-operation diagnostics review
 
 Date: **2026-10-01**
-Status: **Complete locally; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -84,7 +84,14 @@ findings, no block comments, and three unchanged fulfilled expectations. All
 passes PowerShell structural rendering. Pixel-level visual acceptance is not
 claimed.
 
-## Publication status
+## Publication result
 
-The coherent checkpoint is ready for an ordinary fast-forward push after its
-local commit. Exact-revision hosted CI remains separate evidence.
+Checkpoint `5372a52f888b38b0d725b74bbd330f40ef4a0a31` was published by
+ordinary fast-forward; the remote head matched. Hosted run 36770444600 passed
+that exact push and checkout: one Windows job, every configured step, both
+strengthened regressions, 134 workspace tests in aggregate, 14 focused adapter
+tests, five focused sample tests, and the sample executable.
+
+This documentation-only follow-up records completed evidence with unchanged
+Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
+are reviewed separately. A later revision requires its own hosted result.

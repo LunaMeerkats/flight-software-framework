@@ -69,3 +69,10 @@ cargo test --locked --workspace --all-features
 cargo doc --locked --workspace --all-features --no-deps
 git diff --check
 ```
+
+Checkpoint `5372a52f888b38b0d725b74bbd330f40ef4a0a31` was published by
+ordinary fast-forward. Hosted run
+[36770444600](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36770444600)
+passed that exact revision: one Windows job, every configured step, 134
+workspace tests in aggregate, 14 focused adapter tests, five focused sample
+tests, and the sample executable.
