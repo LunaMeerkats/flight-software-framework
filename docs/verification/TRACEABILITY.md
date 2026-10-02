@@ -574,8 +574,14 @@ passes with `cargo test --locked --test messaging_stop_failure` (one test).
 The final locked workspace baseline passes 135 tests. It observes the concrete
 stop-error chain, exact discard count two, peer FIFO with two old messages and
 one new message, and unchanged state/inbox/callback traces after every terminal
-rejection. Publication and hosted verification remain pending. Human
-architecture acceptance remains separate.
+rejection. The checkpoint is committed at
+`cd7318e0bfdcedb33610e887cfd794f90d6f16cf`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102)
+passes every configured step, the regression, 135 workspace tests in aggregate,
+both focused host targets, and the sample executable. The
+[CI baseline](CI_BASELINE.md) records the required hosted toolchain re-audit.
+This documentation-only follow-up records that exact result; later revisions
+need their own CI evidence. Human architecture acceptance remains separate.
 
 ## Evidence policy
 

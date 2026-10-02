@@ -131,6 +131,12 @@ The 2026-09-12 hosted run passes the all-target baseline on rustc/cargo 1.98.1,
 rustfmt 1.9.0-stable, and Clippy 0.1.98. The companion whole-tree source review
 finds no width or policy changes; exact evidence is in the CI baseline.
 
+The 2026-10-03 hosted checkpoint passes on rustc/cargo 1.99.0, rustfmt
+1.10.0-stable, and Clippy 0.1.99. The required configuration and whole-tree
+re-audit retains the same policy without source or waiver changes; exact
+revision, runner, and review evidence are in the CI baseline. Local checks
+remain on rustc/cargo 1.98.0 and do not claim a local 1.99.0 execution.
+
 ## Engineering conventions
 
 - Use stable Rust and safe Rust. Ordinary crates should forbid unsafe code.

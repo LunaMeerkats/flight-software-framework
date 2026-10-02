@@ -18,13 +18,19 @@ contract review and human v0.1 architecture acceptance remain open.
   135. The focused stop-failure target passes one test. Formatting, all-target
   checking, warnings-denied Clippy/rustdoc, and whitespace checks pass.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
+- Hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99. The
+  required [source-policy re-audit](verification/CI_BASELINE.md) retains the
+  existing format, width, function-size, and waiver policy.
 - Whole-tree review: 33 Rust files, zero physical/comment-width findings, no
   block comments, three unchanged fulfilled expectations; 55 Markdown files
-  and 261 resolving relative links. Six changed documents render structurally
+  and 266 resolving relative links. Eight changed documents render structurally
   in PowerShell; pixel-level visual acceptance is not claimed.
 - The [returned-stop failure review](verification/STOP_FAILURE_REVIEW.md)
-  records completed local observations and their evidence limits. Publication
-  and exact-revision hosted verification remain pending.
+  records completed observations and their evidence limits. Published
+  checkpoint `cd7318e0bfdcedb33610e887cfd794f90d6f16cf` has successful
+  [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102):
+  every configured step, 135 workspace tests, both focused host targets, and
+  the sample executable.
 
 ## Current architecture
 
@@ -37,8 +43,10 @@ production code, public API, and dependencies remain unchanged.
 
 ## Work in progress
 
-The selected regression passes local verification. Publication and hosted CI
-are the remaining steps; no current-run hosted result is claimed yet.
+No unfinished implementation remains. The stop-failure checkpoint is published
+with successful exact-revision CI. This documentation-only follow-up records
+that result and the required hosted toolchain re-audit; later revisions require
+their own verification.
 
 ## Highest risks and uncertainties
 
@@ -67,8 +75,8 @@ expansion is approved here.
 
 ## Most likely next tasks
 
-1. Reconcile another bounded Stage 4 service/resource/failure gap against
-   existing evidence before selecting more work.
+1. Review copied message-topology/topic ownership after caller buffers change,
+   reconciling existing evidence before selecting that bounded checkpoint.
 2. Record human entry-point/architecture acceptance before broadening scope.
 
 ## Latest run
@@ -77,4 +85,6 @@ expansion is approved here.
 terminal callback gates, retained peer FIFO dispatch, later publication,
 peer work, and the concrete stop-error source chain. Focused and full local
 verification pass; no production defect, API, dependency, or policy change was
-needed. Exact publication and hosted evidence remain pending.
+needed. Publication and exact-checkpoint hosted verification succeed. The
+hosted stable-toolchain change receives the required source-policy re-audit;
+the user's local toolchain remains unchanged.

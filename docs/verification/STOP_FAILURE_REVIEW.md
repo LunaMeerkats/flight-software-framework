@@ -78,7 +78,21 @@ and the complete diff are reviewed separately from hosted CI.
 
 The whole-tree source review passes 33 Rust files with zero physical/comment
 width findings, no block comments, and three unchanged fulfilled expectations.
-The document audit passes 55 Markdown files and 261 relative links. Six
+The final document audit passes 55 Markdown files and 266 relative links. Eight
 changed documents render successfully in PowerShell and receive structural
-review; pixel-level visual acceptance is not claimed. Publication and hosted
-verification remain pending.
+review; pixel-level visual acceptance is not claimed.
+
+## Publication and hosted result
+
+Checkpoint `cd7318e0bfdcedb33610e887cfd794f90d6f16cf` was published by
+ordinary fast-forward. Hosted run
+[37018451102](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102)
+passed its exact push and logged checkout, every configured step, the new
+regression, 135 workspace tests in aggregate, 14 focused adapter tests, five
+focused sample tests, and the sample executable. Runner 2.337.0 used image
+`windows-2025-vs2026` version `20260925.250.1`.
+
+Hosted Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 differ from
+the unchanged local toolchain. The required source-policy re-audit is in the
+[CI baseline](CI_BASELINE.md). This documentation-only follow-up records
+completed evidence and does not project that run onto later revisions.

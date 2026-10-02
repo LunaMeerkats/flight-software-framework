@@ -97,6 +97,43 @@ The later documentation commit records the result without changing Rust,
 Cargo files, lint configuration, or the workflow. Its CI result must still be
 assessed separately rather than inherited from this run.
 
+## Hosted toolchain re-audit — 2026-10-03
+
+The returned-stop checkpoint at
+`cd7318e0bfdcedb33610e887cfd794f90d6f16cf` passes
+[push run 37018451102](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102).
+The workflow is the unchanged tracked `.github/workflows/ci.yml` at that
+revision, and the `Record checkout` log contains that exact SHA. Its single
+Windows job and every configured step complete successfully: 135 workspace
+tests including the new regression, 14 focused adapter tests, five focused
+sample tests, warnings-denied documentation, the sample executable, and both
+whitespace steps. Focused reruns do not increase the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`. Stable now
+resolves to rustc 1.99.0 (`b940084d7`, 2026-09-28), cargo 1.99.0
+(`5f94df478`, 2026-08-27), rustfmt 1.10.0-stable, and Clippy 0.1.99. Local
+execution remains on Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy
+0.1.98; no local 1.99.0 execution or toolchain installation is claimed.
+
+AGENTS.md requires a configuration and whole-tree source re-audit when the
+active toolchain changes. The re-audit retains the existing policy:
+
+- `rustfmt.toml` still contains stable `max_width = 100`; the exact hosted
+  `cargo fmt --all -- --check` accepts every existing target's formatting.
+- `clippy.toml` still sets the local 60-line threshold. All targets inherit
+  the workspace `too_many_lines = "deny"` policy; hosted Clippy with warnings
+  denied passes, including all three unchanged item-level expectations.
+- The separate manual review covers all 33 handwritten Rust files and their
+  module organization, names, progressive reading order, and invariants.
+  Physical/comment-width review finds zero violations and no block comments.
+  No `allow` attribute, broad waiver, threshold change, or exclusion is added.
+- Safe-Rust policy remains `unsafe_code = "forbid"`. No production, manifest,
+  lockfile, lint configuration, or workflow change is needed for this re-audit.
+
+The [stop-failure review](STOP_FAILURE_REVIEW.md) records behavior and limits.
+This is exact-revision hosted and autonomous source-review evidence, not an
+MSRV, toolchain pin, human v0.1 acceptance, or operational suitability claim.
+
 ## Evidence for subsequent hosted runs
 
 The initial configuration checkpoint was local only. The user's subsequent

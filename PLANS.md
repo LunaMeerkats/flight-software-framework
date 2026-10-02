@@ -1,7 +1,7 @@
 # Stage 4 returned-stop failure and peer dispatch
 
 Date: **2026-10-03**
-Status: **Locally verified; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -69,7 +69,24 @@ and licence inputs remain unchanged.
 
 The whole-tree review finds no physical/comment-width violations or block
 comments across 33 Rust files; three existing expectations remain fulfilled.
-The relative-link audit passes 55 Markdown files and 261 links. Six changed
-documents render successfully with PowerShell and receive structural review;
+The final relative-link audit passes 55 Markdown files and 266 links. Eight
+changed documents render successfully with PowerShell and receive structural review;
 pixel-level visual acceptance is not claimed. The complete diff is reviewed
 before committing. Exact publication and hosted results remain separate.
+
+## Publication and required toolchain re-audit
+
+Checkpoint `cd7318e0bfdcedb33610e887cfd794f90d6f16cf` was published by
+ordinary fast-forward and its remote head matched. Hosted run
+[37018451102](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102)
+passed the exact logged checkout: one Windows job, every configured step, the
+new regression, 135 workspace tests, 14 focused adapter tests, five focused
+sample tests, and the sample executable.
+
+The hosted stable toolchain advanced to Rust/Cargo 1.99.0, rustfmt
+1.10.0-stable, and Clippy 0.1.99. The required configuration/whole-tree
+re-audit is recorded in the [CI baseline](docs/verification/CI_BASELINE.md).
+The unchanged format/lint configuration and source pass the new hosted gates;
+manual source review and widths remain separate. No local toolchain was
+installed or changed. This documentation-only follow-up records completed
+evidence; later revisions require their own hosted result.
