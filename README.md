@@ -62,6 +62,11 @@ dequeue, or nested-dispatch access. Routing-core, runtime-messaging, and
 message-dispatch tests cover these boundaries; the
 [returned-message failure review](docs/verification/MESSAGE_FAILURE_REVIEW.md)
 records the complete retained peer FIFO and post-failure availability boundary.
+The [returned-stop failure review](docs/verification/STOP_FAILURE_REVIEW.md)
+adds the corresponding stop-specific scenario: exact full-inbox clearing,
+terminal callback suppression, retained peer FIFO dispatch, and later peer
+work. Its verification record distinguishes cooperative queue cleanup from
+application-internal cleanup or recovery.
 The
 [messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 also executes the nested standard source chain for a later-inbox capacity

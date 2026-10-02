@@ -560,6 +560,23 @@ tests in aggregate, both focused host targets, and the sample executable. This
 documentation-only follow-up records that exact result; later revisions need
 their own CI evidence.
 
+## Returned-stop failure and peer dispatch checkpoint
+
+The 2026-10-03 [returned-stop failure review](STOP_FAILURE_REVIEW.md)
+supplements RFF-REQ-002, RFF-REQ-003, and the cooperative peer-operability
+aspect of RFF-REQ-008. It adds stop-specific observations of full selected
+inbox cleanup, terminal callback suppression, retained peer FIFO dispatch,
+and later peer work. It does not add the work-failure event behavior required
+by RFF-REQ-008; that requirement retains its existing event evidence.
+
+`returned_stop_failure_preserves_peer_fifo_and_terminal_callback_gates`
+passes with `cargo test --locked --test messaging_stop_failure` (one test).
+The final locked workspace baseline passes 135 tests. It observes the concrete
+stop-error chain, exact discard count two, peer FIFO with two old messages and
+one new message, and unchanged state/inbox/callback traces after every terminal
+rejection. Publication and hosted verification remain pending. Human
+architecture acceptance remains separate.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

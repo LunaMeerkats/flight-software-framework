@@ -243,7 +243,11 @@ active, rollback, and revision-allocation lineage. The 2026-10-01
 [configuration-operation diagnostics review](verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md)
 executes selected runtime-wrapper source shapes for unconfigured
 operations, semantic validation rejection, and exhausted consume-once rollback
-while retaining the same lineage behavior. Other lifecycle/service resource,
+while retaining the same lineage behavior. The 2026-10-03
+[returned-stop failure review](verification/STOP_FAILURE_REVIEW.md)
+adds a full selected-inbox stop failure followed by exact retained peer FIFO
+dispatch, later publication, and terminal callback suppression. It retains
+the existing cooperative stop policy. Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.
 Stage 4 is not complete.

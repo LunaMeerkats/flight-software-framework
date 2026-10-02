@@ -1,97 +1,75 @@
-# Stage 4 configuration-operation diagnostics review
+# Stage 4 returned-stop failure and peer dispatch
 
-Date: **2026-10-01**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-03**
+Status: **Locally verified; publication pending**
 
 ## Objective and context
 
-Close one bounded public-diagnostics evidence gap in the existing runtime-owned
-configuration operations. Execute the standard source chains for unconfigured
-operations, semantic validation rejection, and exhausted consume-once rollback
-while retaining the already-tested configuration lineage.
+Verify the complete retained peer FIFO and callback eligibility after a
+cooperative stop error through the messaging owner. The existing stop test
+checks one discarded message and peer counts, but does not consume the peer's
+retained messages. ADR-0007 and ADR-0011 already define the expected behavior;
+this checkpoint adds evidence without changing those contracts.
 
-The starting revision is `dc7c2e67`, clean and equal to
-`origin/codex/nightly`. Its exact hosted run 36624544756 passed. The initial
-locked local baseline passes 134 tests on Rust/Cargo 1.98.0, rustfmt
-1.9.0-stable, and Clippy 0.1.98.
-
-This is a Stage 4 public-diagnostics checkpoint. It does not change error
-types, configuration transitions, validation order, revision assignment,
-rollback behavior, dependencies, or runtime behavior.
+The starting revision is `2b138e11415695129e6162954600911f71ec2eaf`,
+clean and equal to refreshed `origin/codex/nightly`. Its hosted run 36770717562
+succeeded. The initial locked local baseline passes 134 tests on Rust/Cargo
+1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
 ## Acceptance criteria
 
-- Unconfigured replacement and rollback return exact `NotConfigured` values
-  with no standard error source.
-- Semantic rejection exposes `RuntimeConfigurationError -> ConfigurationError
-  -> MissionValidationError` through `std::error::Error::source`.
-- Exhausted rollback exposes the exact table error and terminates its source
-  chain without a fabricated cause.
-- Active revision 2, rollback revision 1, and next replacement revision 3
-  remain passing around the observed diagnostics.
-- Required locked Cargo checks, source-form review, document checks, and the
-  complete diff pass without a new lint exception.
+- A concrete stop error commits only the selected application to `Failed` and
+  clears its full two-message inbox with an exact discard count of two.
+- The running peer retains its two older messages, accepts a third publication,
+  and dispatches the exact three-message FIFO one message per call.
+- Failed application stop, restart, ordinary work, and dispatch requests return
+  lifecycle errors with zero discard and invoke no additional callbacks.
+- The peer completes subsequent ordinary work; an empty dispatch invokes no
+  callback.
+- Focused and full locked checks, source-form review, rendered-document review,
+  links, and complete-diff review pass without new lint exceptions.
 
-## Proposed files
+## Proposed files and verification
 
-- `tests/configuration_runtime.rs`
-- `docs/verification/CONFIGURATION_OPERATION_DIAGNOSTICS_REVIEW.md`
-- `README.md`
-- `docs/ROADMAP.md`
-- `docs/PROJECT_STATE.md`
-- `docs/verification/TRACEABILITY.md`
-- `PLANS.md`
-
-## Verification approach
-
-Run the focused configured-owner target first, then the full locked repository
-baseline:
+Add `tests/messaging_stop_failure.rs` with a stop-specific callback trace.
+Reconcile `docs/verification/STOP_FAILURE_REVIEW.md`, traceability, README,
+roadmap, project state, and this plan. No production or dependency change is
+planned.
 
 ```text
-cargo test --locked --test configuration_runtime
+cargo test --locked --test messaging_stop_failure
 cargo fmt --all -- --check
 cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
-RUSTDOCFLAGS=-D warnings cargo doc --locked --workspace --all-features --no-deps
+cargo doc --locked --workspace --all-features --no-deps
 git diff --check
 ```
 
-Also audit handwritten Rust physical widths and comment widths, relative
-Markdown links, exact test references, changed rendered documents, and the
-complete diff.
+Set `RUSTDOCFLAGS=-D warnings` for documentation. Audit handwritten Rust
+physical/comment widths, expectations, relative Markdown links, exact test
+references, changed rendered documents, and the complete diff. Publish only
+after local acceptance, then inspect hosted CI at the exact published revision.
 
-## Risks and stopping point
+## Risks and safe stopping point
 
-The selected paths do not execute every standalone configuration error through
-the runtime owner and do not define automatic recovery, logging, or validator
-panic containment.
-
-Stop after the existing public regressions prove the exact source shapes and
-unchanged lineage behavior. Do not change production error types or
-configuration behavior in this increment.
+This returned-error scenario does not prove application-internal cleanup,
+panic or hang containment, recovery, secure erasure, or human v0.1 acceptance.
+Stop after the new public regression and its records are verified. If it fails,
+investigate the existing stop boundary before changing production behavior;
+preserve unrelated files and revert only this run's changes if needed.
 
 ## Completed local checks
 
-The focused configuration-runtime target passes 11 tests, and the initial and
-final locked workspace baselines pass 134 tests. Formatting, all-target
-checking, warnings-denied Clippy/rustdoc, and whitespace checks pass without a
-new lint exception.
+`returned_stop_failure_preserves_peer_fifo_and_terminal_callback_gates`
+passes in the focused target. The final locked workspace baseline passes 135
+tests, with formatting, all-target check, warnings-denied Clippy/rustdoc, and
+whitespace passing. No lint exception was added. Production, Cargo, workflow,
+and licence inputs remain unchanged.
 
-The whole-tree audit passes 32 Rust files with zero physical or comment-width
-findings, no block comments, and three unchanged fulfilled expectations. All
-54 Markdown files and 255 relative links pass the link audit; changed Markdown
-passes PowerShell structural rendering. Pixel-level visual acceptance is not
-claimed.
-
-## Publication result
-
-Checkpoint `5372a52f888b38b0d725b74bbd330f40ef4a0a31` was published by
-ordinary fast-forward; the remote head matched. Hosted run 36770444600 passed
-that exact push and checkout: one Windows job, every configured step, both
-strengthened regressions, 134 workspace tests in aggregate, 14 focused adapter
-tests, five focused sample tests, and the sample executable.
-
-This documentation-only follow-up records completed evidence with unchanged
-Rust, Cargo, workflow, and lint inputs. Its rendered content, links, and diff
-are reviewed separately. A later revision requires its own hosted result.
+The whole-tree review finds no physical/comment-width violations or block
+comments across 33 Rust files; three existing expectations remain fulfilled.
+The relative-link audit passes 55 Markdown files and 261 links. Six changed
+documents render successfully with PowerShell and receive structural review;
+pixel-level visual acceptance is not claimed. The complete diff is reviewed
+before committing. Exact publication and hosted results remain separate.
