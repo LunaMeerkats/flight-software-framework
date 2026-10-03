@@ -247,7 +247,12 @@ while retaining the same lineage behavior. The 2026-10-03
 [returned-stop failure review](verification/STOP_FAILURE_REVIEW.md)
 adds a full selected-inbox stop failure followed by exact retained peer FIFO
 dispatch, later publication, and terminal callback suppression. It retains
-the existing cooperative stop policy. Other lifecycle/service resource,
+the existing cooperative stop policy. The 2026-10-04
+[copied message-topology review](verification/MESSAGE_TOPOLOGY_OWNERSHIP_REVIEW.md)
+executes original capacity, routing, and standalone FIFO after caller
+configuration/topic mutation and destruction, plus runtime availability,
+saturation, stop clearing, and restart reconnection under the copied topology.
+Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.
 Stage 4 is not complete.

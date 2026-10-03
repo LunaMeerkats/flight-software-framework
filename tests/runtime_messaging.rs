@@ -13,6 +13,7 @@ use rust_flight_framework::{
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum MissionTopic {
     Command,
+    Unrouted,
 }
 
 const COMMAND_ONLY: [MissionTopic; 1] = [MissionTopic::Command];
@@ -95,6 +96,26 @@ fn configured_runtime<const COUNT: usize>(
     (messaging_runtime, application_ids)
 }
 
+fn runtime_with_dropped_caller_topology() -> (MissionRuntime, [ApplicationId; 2]) {
+    let mut runtime = Runtime::new(2).expect("two runtime records can be reserved");
+    let application_ids = [None, None].map(|failure| {
+        runtime
+            .register(MissionApplication { failure })
+            .expect("test application fits")
+    });
+    let mut topics = vec![MissionTopic::Command];
+    let mut configurations = vec![
+        RuntimeInboxConfig::new(1, &topics),
+        RuntimeInboxConfig::new(2, &topics),
+    ];
+    let owner = MissionRuntime::new(runtime, &configurations).expect("test topology is valid");
+    configurations.reverse();
+    configurations.fill(RuntimeInboxConfig::new(9, &[]));
+    drop(configurations);
+    topics.fill(MissionTopic::Unrouted);
+    (owner, application_ids)
+}
+
 fn command(payload: u8) -> Message<MissionTopic, 4> {
     Message::try_new(MissionTopic::Command, &[payload]).expect("test payload fits")
 }
@@ -123,6 +144,68 @@ fn assert_inbox_capacity_source_chain(
             application_id,
             requested: usize::MAX,
         })
+    );
+}
+
+#[test]
+fn copied_runtime_topology_survives_caller_storage_changes_and_drop() {
+    let (mut owner, application_ids) = runtime_with_dropped_caller_topology();
+    for (application_id, capacity) in application_ids.into_iter().zip([1, 2]) {
+        assert_eq!(owner.inbox_capacity(application_id), Ok(capacity));
+    }
+    let before_start = owner.publish(&command(1)).expect("report fits");
+    assert_eq!(
+        delivery_statuses(&before_start),
+        [DeliveryStatus::Unavailable; 2]
+    );
+    assert_eq!(
+        before_start
+            .outcomes()
+            .iter()
+            .map(|outcome| outcome.application_id())
+            .collect::<Vec<_>>(),
+        application_ids
+    );
+    let replacement_topic = Message::try_new(MissionTopic::Unrouted, &[9]).expect("payload fits");
+    let unrouted = owner.publish(&replacement_topic).expect("report fits");
+    assert_eq!(
+        unrouted.classification(),
+        PublishClassification::NoSubscribers
+    );
+    assert!(unrouted.outcomes().is_empty());
+    for application_id in application_ids {
+        assert_eq!(owner.start(application_id), Ok(ApplicationState::Running));
+    }
+    let first = owner.publish(&command(1)).expect("report fits");
+    assert_eq!(delivery_statuses(&first), [DeliveryStatus::Delivered; 2]);
+    let second = owner.publish(&command(2)).expect("report fits");
+    assert_eq!(
+        delivery_statuses(&second),
+        [DeliveryStatus::InboxFull, DeliveryStatus::Delivered]
+    );
+    let saturated = owner.publish(&command(3)).expect("report fits");
+    assert_eq!(
+        delivery_statuses(&saturated),
+        [DeliveryStatus::InboxFull; 2]
+    );
+    assert_eq!(
+        owner
+            .stop(application_ids[0])
+            .expect("stop succeeds")
+            .discarded_deliveries(),
+        1
+    );
+    assert_eq!(owner.pending(application_ids[0]), Ok(0));
+    assert_eq!(owner.pending(application_ids[1]), Ok(2));
+    assert_eq!(
+        owner.restart(application_ids[0]),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(owner.inbox_capacity(application_ids[0]), Ok(1));
+    let reconnected = owner.publish(&command(4)).expect("report fits");
+    assert_eq!(
+        delivery_statuses(&reconnected),
+        [DeliveryStatus::Delivered, DeliveryStatus::InboxFull]
     );
 }
 

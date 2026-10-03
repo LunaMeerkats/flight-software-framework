@@ -1,43 +1,40 @@
-# Stage 4 returned-stop failure and peer dispatch
+# Stage 4 copied message-topology ownership
 
-Date: **2026-10-03**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-04**
+Status: **Local acceptance complete; publication and hosted CI pending**
 
 ## Objective and context
 
-Verify the complete retained peer FIFO and callback eligibility after a
-cooperative stop error through the messaging owner. The existing stop test
-checks one discarded message and peer counts, but does not consume the peer's
-retained messages. ADR-0007 and ADR-0011 already define the expected behavior;
-this checkpoint adds evidence without changing those contracts.
+Verify that both public messaging constructors retain their original topology
+following caller configuration and topic buffer mutation and destruction.
+ADR-0010 and ADR-0011 already define copied, immutable topology; existing tests
+drop configuration arrays but do not mutate their static or still-live topics.
+This is the recorded next Stage 4 ownership checkpoint.
 
-The starting revision is `2b138e11415695129e6162954600911f71ec2eaf`,
-clean and equal to refreshed `origin/codex/nightly`. Its hosted run 36770717562
-succeeded. The initial locked local baseline passes 134 tests on Rust/Cargo
-1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+Starting revision: `565c9d44a0cc18bf9717c64416e5f265b5dda9e2`, clean and
+equal to refreshed `origin/codex/nightly`; hosted run 37019302807 succeeded.
+Initial locked local baseline: 135 tests, Rust/Cargo 1.98.0, rustfmt
+1.9.0-stable, Clippy 0.1.98.
 
 ## Acceptance criteria
 
-- A concrete stop error commits only the selected application to `Failed` and
-  clears its full two-message inbox with an exact discard count of two.
-- The running peer retains its two older messages, accepts a third publication,
-  and dispatches the exact three-message FIFO one message per call.
-- Failed application stop, restart, ordinary work, and dispatch requests return
-  lifecycle errors with zero discard and invoke no additional callbacks.
-- The peer completes subsequent ordinary work; an empty dispatch invokes no
-  callback.
-- Focused and full locked checks, source-form review, rendered-document review,
-  links, and complete-diff review pass without new lint exceptions.
+- Standalone construction retains original identities, registration-order
+  outcomes, capacities, topics, and exact FIFO after caller storage changes.
+- Runtime construction retains original capacities and subscriptions through
+  lifecycle availability, saturation, stop clearing, and restart reconnection.
+- Replacement caller topics acquire no subscribers in either owner.
+- Focused and full locked checks, source form, links, rendered documents, test
+  references, and full diff review pass without new exceptions or dependencies.
 
-## Proposed files and verification
+## Files and verification
 
-Add `tests/messaging_stop_failure.rs` with a stop-specific callback trace.
-Reconcile `docs/verification/STOP_FAILURE_REVIEW.md`, traceability, README,
-roadmap, project state, and this plan. No production or dependency change is
-planned.
+Extend `tests/message_bus.rs` and `tests/runtime_messaging.rs`. Add
+`docs/verification/MESSAGE_TOPOLOGY_OWNERSHIP_REVIEW.md` and reconcile README,
+roadmap, project state, traceability, and this plan. Contracts and requirements
+remain unchanged; no production/API change or external research is planned.
 
 ```text
-cargo test --locked --test messaging_stop_failure
+cargo test --locked --test message_bus --test runtime_messaging
 cargo fmt --all -- --check
 cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -46,47 +43,32 @@ cargo doc --locked --workspace --all-features --no-deps
 git diff --check
 ```
 
-Set `RUSTDOCFLAGS=-D warnings` for documentation. Audit handwritten Rust
-physical/comment widths, expectations, relative Markdown links, exact test
-references, changed rendered documents, and the complete diff. Publish only
-after local acceptance, then inspect hosted CI at the exact published revision.
+Set `RUSTDOCFLAGS=-D warnings` for documentation. Review physical/comment
+widths and expectations separately from Cargo. Publish after local acceptance,
+then inspect hosted CI at the exact published revision.
 
 ## Risks and safe stopping point
 
-This returned-error scenario does not prove application-internal cleanup,
-panic or hang containment, recovery, secure erasure, or human v0.1 acceptance.
-Stop after the new public regression and its records are verified. If it fails,
-investigate the existing stop boundary before changing production behavior;
-preserve unrelated files and revert only this run's changes if needed.
+Topics are copied values with mission-defined equality. Plain-enum tests do not
+prove deep isolation for topics referring to shared mutable state, allocation
+accounting, issuer validation, dynamic subscription support, or human v0.1
+acceptance. Stop after this checkpoint. If a regression fails, investigate the
+copy boundary before changing production code; preserve unrelated work and
+revert only this run's changes if necessary.
 
-## Completed local checks
+## Completed local verification
 
-`returned_stop_failure_preserves_peer_fifo_and_terminal_callback_gates`
-passes in the focused target. The final locked workspace baseline passes 135
-tests, with formatting, all-target check, warnings-denied Clippy/rustdoc, and
-whitespace passing. No lint exception was added. Production, Cargo, workflow,
-and licence inputs remain unchanged.
+The focused targets pass 10 standalone and 12 runtime tests. The full locked
+workspace baseline passes 137 tests; formatting, all-target check,
+warnings-denied Clippy/rustdoc, and whitespace pass. Fixture extraction and a
+shorter local owner binding keep the runtime scenario below the function-size
+threshold without a new exception. No production, manifest, lockfile, lint,
+workflow, or licence input changed.
 
-The whole-tree review finds no physical/comment-width violations or block
-comments across 33 Rust files; three existing expectations remain fulfilled.
-The final relative-link audit passes 55 Markdown files and 266 links. Eight
-changed documents render successfully with PowerShell and receive structural review;
-pixel-level visual acceptance is not claimed. The complete diff is reviewed
-before committing. Exact publication and hosted results remain separate.
-
-## Publication and required toolchain re-audit
-
-Checkpoint `cd7318e0bfdcedb33610e887cfd794f90d6f16cf` was published by
-ordinary fast-forward and its remote head matched. Hosted run
-[37018451102](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37018451102)
-passed the exact logged checkout: one Windows job, every configured step, the
-new regression, 135 workspace tests, 14 focused adapter tests, five focused
-sample tests, and the sample executable.
-
-The hosted stable toolchain advanced to Rust/Cargo 1.99.0, rustfmt
-1.10.0-stable, and Clippy 0.1.99. The required configuration/whole-tree
-re-audit is recorded in the [CI baseline](docs/verification/CI_BASELINE.md).
-The unchanged format/lint configuration and source pass the new hosted gates;
-manual source review and widths remain separate. No local toolchain was
-installed or changed. This documentation-only follow-up records completed
-evidence; later revisions require their own hosted result.
+Final review passes 33 Rust files and 12,483 physical lines with no physical
+or comment-width findings, no block comments, and three unchanged fulfilled
+expectations. All 270 relative links in 56 Markdown files resolve; 101 exact
+traceability test references resolve to the 137 test functions. Six changed
+Markdown documents render with PowerShell and receive HTML structural/content
+review; pixel-level acceptance is not claimed. The complete diff and source
+form are accepted. Publication and hosted CI remain separate pending evidence.

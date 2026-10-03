@@ -583,6 +583,27 @@ both focused host targets, and the sample executable. The
 This documentation-only follow-up records that exact result; later revisions
 need their own CI evidence. Human architecture acceptance remains separate.
 
+## Copied message-topology ownership checkpoint
+
+The 2026-10-04 [copied topology review](MESSAGE_TOPOLOGY_OWNERSHIP_REVIEW.md)
+supplements RFF-REQ-003 and ADR-0010/0011 without changing their contracts.
+`copied_topology_survives_caller_configuration_and_topic_changes` proves
+original capacities, identities, route order, selective subscriptions, exact
+FIFO and exhaustion after configuration/topic mutation and destruction.
+`copied_runtime_topology_survives_caller_storage_changes_and_drop` proves
+original capacities/subscriptions through registered unavailability, running
+saturation, exact selected stop clearing, and restart reconnection after caller
+storage changes and drops. Replacement topics remain unrouted in both owners.
+
+The focused command `cargo test --locked --test message_bus --test runtime_messaging`
+passes 10 standalone and 12 runtime tests. The runtime scenario observes
+counts; it does not independently inspect queued payloads. The final locked
+workspace baseline passes 137 tests with formatting, all-target check,
+warnings-denied Clippy/rustdoc, and whitespace passing. Publication evidence is
+recorded after completion. Arbitrary shared topic
+referents, dynamic subscriptions, allocator accounting, identity provenance,
+API stabilization, and human acceptance remain outside this checkpoint.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

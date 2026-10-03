@@ -110,6 +110,66 @@ fn topology_validation_rejects_invalid_inboxes_without_a_partial_bus() {
 }
 
 #[test]
+fn copied_topology_survives_caller_configuration_and_topic_changes() {
+    let application_ids = configured_application_ids::<2>();
+    let mut bus = {
+        let mut first_topics = vec![MissionTopic::Command];
+        let mut peer_topics = vec![MissionTopic::Command, MissionTopic::Telemetry];
+        let mut configurations = vec![
+            ApplicationInboxConfig::new(application_ids[0], 1, &first_topics),
+            ApplicationInboxConfig::new(application_ids[1], 2, &peer_topics),
+        ];
+        let bus = MessageBus::<MissionTopic, 4>::new(&configurations)
+            .expect("the original topology is valid");
+        configurations.reverse();
+        configurations[0] =
+            ApplicationInboxConfig::new(application_ids[1], 4, &[MissionTopic::Unrouted]);
+        configurations[1] =
+            ApplicationInboxConfig::new(application_ids[0], 5, &[MissionTopic::Unrouted]);
+        configurations.clear();
+        drop(configurations);
+        first_topics[0] = MissionTopic::Unrouted;
+        peer_topics.fill(MissionTopic::Unrouted);
+        first_topics.clear();
+        peer_topics.clear();
+        bus
+    };
+    let command = Message::try_new(MissionTopic::Command, &[7]).expect("command payload fits");
+    let telemetry = Message::try_new(MissionTopic::Telemetry, &[8]).expect("telemetry fits");
+    let replacement = Message::try_new(MissionTopic::Unrouted, &[9]).expect("replacement fits");
+
+    for (application_id, capacity) in application_ids.into_iter().zip([1, 2]) {
+        assert_eq!(bus.inbox_capacity(application_id), Ok(capacity));
+    }
+    let report = bus.publish(&command).expect("command report storage fits");
+    assert_eq!(report.classification(), PublishClassification::Complete);
+    assert_eq!(report.outcomes().len(), 2);
+    for (outcome, application_id) in report.outcomes().iter().zip(application_ids) {
+        assert_eq!(outcome.application_id(), application_id);
+        assert_eq!(outcome.status(), DeliveryStatus::Delivered);
+    }
+    let report = bus
+        .publish(&telemetry)
+        .expect("telemetry report storage fits");
+    assert_eq!(report.classification(), PublishClassification::Complete);
+    assert_eq!(report.outcomes().len(), 1);
+    assert_eq!(report.outcomes()[0].application_id(), application_ids[1]);
+    let report = bus
+        .publish(&replacement)
+        .expect("replacement report storage fits");
+    assert_eq!(
+        report.classification(),
+        PublishClassification::NoSubscribers
+    );
+    assert!(report.outcomes().is_empty());
+    assert_eq!(bus.dequeue(application_ids[0]), Ok(Some(command)));
+    assert_eq!(bus.dequeue(application_ids[0]), Ok(None));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(Some(command)));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(Some(telemetry)));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(None));
+}
+
+#[test]
 fn equal_position_foreign_identity_passes_topology_and_addresses_the_inbox() {
     let mut local = LifecycleRegistry::new(1).expect("one local record can be reserved");
     let local_id = local.register().expect("local record fits");

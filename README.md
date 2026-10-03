@@ -67,6 +67,12 @@ adds the corresponding stop-specific scenario: exact full-inbox clearing,
 terminal callback suppression, retained peer FIFO dispatch, and later peer
 work. Its verification record distinguishes cooperative queue cleanup from
 application-internal cleanup or recovery.
+The [copied topology review](docs/verification/MESSAGE_TOPOLOGY_OWNERSHIP_REVIEW.md)
+adds caller-storage mutation and destruction regressions through both public
+constructors. Original capacities and routing remain intact; the standalone
+test consumes the exact retained FIFO and the runtime test preserves lifecycle
+availability, saturation, stop clearing, and restart reconnection. Plain-enum
+topic copying does not establish deep isolation of arbitrary shared referents.
 The
 [messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 also executes the nested standard source chain for a later-inbox capacity
