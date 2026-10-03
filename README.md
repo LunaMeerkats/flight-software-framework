@@ -73,6 +73,9 @@ constructors. Original capacities and routing remain intact; the standalone
 test consumes the exact retained FIFO and the runtime test preserves lifecycle
 availability, saturation, stop clearing, and restart reconnection. Plain-enum
 topic copying does not establish deep isolation of arbitrary shared referents.
+Checkpoint `ab9914618a739d4b7c8a46f0e14d7e12c55b6649` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
+for both regressions, 137 workspace tests, and configured host/sample evidence.
 The
 [messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 also executes the nested standard source chain for a later-inbox capacity

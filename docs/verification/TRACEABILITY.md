@@ -599,8 +599,13 @@ The focused command `cargo test --locked --test message_bus --test runtime_messa
 passes 10 standalone and 12 runtime tests. The runtime scenario observes
 counts; it does not independently inspect queued payloads. The final locked
 workspace baseline passes 137 tests with formatting, all-target check,
-warnings-denied Clippy/rustdoc, and whitespace passing. Publication evidence is
-recorded after completion. Arbitrary shared topic
+warnings-denied Clippy/rustdoc, and whitespace passing. The checkpoint is
+committed at `ab9914618a739d4b7c8a46f0e14d7e12c55b6649`; its
+[hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
+passes every configured step, both regressions, 137 workspace tests, both
+focused host targets, and the sample executable. This documentation follow-up
+records that exact result; later revisions need their own CI evidence.
+Arbitrary shared topic
 referents, dynamic subscriptions, allocator accounting, identity provenance,
 API stabilization, and human acceptance remain outside this checkpoint.
 

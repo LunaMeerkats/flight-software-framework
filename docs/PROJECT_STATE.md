@@ -18,14 +18,17 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   all-target check, warnings-denied Clippy/rustdoc, and whitespace pass.
   Focused topology targets pass 10 standalone and 12 runtime tests.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-- Previous hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
+- Hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
   Its required [source-policy re-audit](verification/CI_BASELINE.md) retains
   existing format, width, function-size, and waiver policy.
 - Final audit passes 33 Rust files, zero physical/comment-width findings,
   no block comments, three unchanged expectations, and 270 relative links
   across 56 Markdown files. Six changed documents render structurally;
   pixel-level acceptance is not claimed. Complete source/diff review passes.
-- Publication and exact-revision hosted results remain pending.
+- Checkpoint `ab9914618a739d4b7c8a46f0e14d7e12c55b6649` is published.
+  [Hosted run 37128965033](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
+  passes its exact logged checkout and every configured step: 137 workspace
+  tests, both focused host targets, and the executed sample.
 
 ## Current architecture
 
@@ -39,9 +42,9 @@ public API, dependencies, lint policy, and workflow remain unchanged.
 ## Work in progress
 
 The [copied topology review](verification/MESSAGE_TOPOLOGY_OWNERSHIP_REVIEW.md)
-records local observations. No unfinished implementation remains. Full local
-verification and autonomous source/diff review pass; publication and hosted CI
-remain pending.
+records completed observations. No unfinished implementation remains. The
+checkpoint is published with successful exact-revision CI. This documentation
+follow-up records that result; later revisions require their own verification.
 
 ## Highest risks and uncertainties
 
@@ -78,5 +81,6 @@ mutation and destruction. Standalone evidence consumes exact FIFO; runtime
 owner evidence covers availability, saturation, selected clearing, and restart.
 No production defect was found. Focused tests and Clippy pass after correcting
 one test accessor and shortening the runtime test without a lint exception.
-The full locked baseline passes 137 tests, and final review passes. Publication
-and hosted acceptance remain pending.
+The full locked baseline passes 137 tests, final review passes, and publication
+and exact-checkpoint hosted verification succeed. Hosted tool/runner evidence
+matches the previous checkpoint; no new policy adaptation is needed.

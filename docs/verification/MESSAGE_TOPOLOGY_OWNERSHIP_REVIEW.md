@@ -87,4 +87,23 @@ acceptance is not claimed. Complete source/diff review passes.
 
 Production, public API, dependency, licence, lint configuration, and workflow
 inputs are unchanged. Conditional ADR-0018/0019 probes are unchanged and were
-not rerun. Publication and exact-revision hosted results remain pending.
+not rerun.
+
+## Publication and hosted result
+
+Checkpoint `ab9914618a739d4b7c8a46f0e14d7e12c55b6649` was published by
+ordinary fast-forward and the remote head matched. Hosted
+[push run 37128965033](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
+uses the unchanged `.github/workflows/ci.yml` at that exact revision. Its
+`Record checkout` log matches the checkpoint SHA. The single Windows job and
+every configured step pass, including both new regressions, 137 workspace
+tests in aggregate, 14 focused adapter tests, five focused sample tests,
+warnings-denied rustdoc, the executed sample, and both whitespace checks.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`. Compiler
+1.99.0 (`b940084d7`, 2026-09-28), Cargo 1.99.0 (`5f94df478`, 2026-08-27),
+rustfmt 1.10.0-stable, and Clippy 0.1.99 match the previous hosted checkpoint;
+the existing source-policy re-audit remains recorded in the CI baseline.
+Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+This documentation follow-up records completed exact-revision evidence;
+later revisions need their own CI result. Human v0.1 acceptance remains open.

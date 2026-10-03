@@ -1,7 +1,7 @@
 # Stage 4 copied message-topology ownership
 
 Date: **2026-10-04**
-Status: **Local acceptance complete; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -71,4 +71,18 @@ expectations. All 270 relative links in 56 Markdown files resolve; 101 exact
 traceability test references resolve to the 137 test functions. Six changed
 Markdown documents render with PowerShell and receive HTML structural/content
 review; pixel-level acceptance is not claimed. The complete diff and source
-form are accepted. Publication and hosted CI remain separate pending evidence.
+form are accepted.
+
+## Publication and hosted verification
+
+Checkpoint `ab9914618a739d4b7c8a46f0e14d7e12c55b6649` was published by
+ordinary fast-forward; the remote head matched. Hosted push run
+[37128965033](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
+passes the exact logged checkout, its Windows job, and every configured step:
+137 workspace tests, both new regressions, 14 focused host-adapter tests, five
+focused sample tests, warnings-denied documentation, executed sample, and both
+whitespace checks. Runner 2.337.0 uses `windows-2025-vs2026` image
+`20260925.250.1`; Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99
+match the previous hosted checkpoint. Local tools remain unchanged. This
+documentation-only follow-up records completed evidence; later revisions need
+their own CI result. Human v0.1 acceptance remains open.
