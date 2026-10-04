@@ -252,6 +252,11 @@ the existing cooperative stop policy. The 2026-10-04
 executes original capacity, routing, and standalone FIFO after caller
 configuration/topic mutation and destruction, plus runtime availability,
 saturation, stop clearing, and restart reconnection under the copied topology.
+The 2026-10-05
+[inline payload review](verification/MESSAGE_PAYLOAD_OWNERSHIP_REVIEW.md)
+executes constructor-owned bytes after source-vector reuse/destruction and
+standalone per-destination copies after publisher binding replacement, scope
+exit, and independent consumption. It retains the existing ADR-0010 contract.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.

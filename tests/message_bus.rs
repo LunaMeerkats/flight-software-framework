@@ -54,6 +54,68 @@ fn inline_payload_accepts_its_exact_limit_and_rejects_one_more_byte() {
 }
 
 #[test]
+fn inline_message_owns_payload_after_source_buffer_changes_and_drop() {
+    for expected in [&[][..], &[7, 0], &[1, 2, 3, 4]] {
+        let message = {
+            let mut source = expected.to_vec();
+            let message = Message::<MissionTopic, 4>::try_new(MissionTopic::Command, &source)
+                .expect("each original payload fits");
+            source.fill(99);
+            source.clear();
+            source.extend_from_slice(&[8, 9, 10]);
+            assert_eq!(message.payload(), expected);
+            message
+        };
+        assert_eq!(message.topic(), &MissionTopic::Command);
+        assert_eq!(message.payload(), expected);
+        assert_eq!(message.payload_capacity(), 4);
+    }
+}
+
+#[test]
+fn queued_copies_survive_publisher_replacement_and_independent_consumption() {
+    let application_ids = configured_application_ids::<2>();
+    let mut bus = two_command_subscriber_bus::<4>(application_ids, [2, 2]);
+    let first = Message::try_new(MissionTopic::Command, &[1, 0, 3, 4]).expect("full payload fits");
+    let second = Message::try_new(MissionTopic::Command, &[9]).expect("short payload fits");
+    let replacement = Message::try_new(MissionTopic::Unrouted, &[]).expect("empty payload fits");
+    {
+        let mut publisher_message = first;
+        for next_message in [second, replacement] {
+            let report = bus
+                .publish(&publisher_message)
+                .expect("report storage fits");
+            assert_eq!(report.classification(), PublishClassification::Complete);
+            assert_eq!(report.outcomes().len(), 2);
+            for (outcome, application_id) in report.outcomes().iter().zip(application_ids) {
+                assert_eq!(outcome.application_id(), application_id);
+                assert_eq!(outcome.status(), DeliveryStatus::Delivered);
+            }
+            publisher_message = next_message;
+        }
+        assert_eq!(publisher_message.topic(), &MissionTopic::Unrouted);
+        assert!(publisher_message.payload().is_empty());
+    }
+    for application_id in application_ids {
+        assert_eq!(bus.pending(application_id), Ok(2));
+    }
+
+    let mut consumed = bus
+        .dequeue(application_ids[0])
+        .expect("first inbox exists")
+        .expect("first delivery is queued");
+    assert_eq!(consumed, first);
+    consumed = replacement;
+    assert_eq!(consumed, replacement);
+    assert_eq!(bus.dequeue(application_ids[0]), Ok(Some(second)));
+    assert_eq!(bus.dequeue(application_ids[0]), Ok(None));
+    assert_eq!(bus.pending(application_ids[1]), Ok(2));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(Some(first)));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(Some(second)));
+    assert_eq!(bus.dequeue(application_ids[1]), Ok(None));
+}
+
+#[test]
 fn topology_validation_rejects_invalid_inboxes_without_a_partial_bus() {
     let application_ids = configured_application_ids::<2>();
     assert_eq!(

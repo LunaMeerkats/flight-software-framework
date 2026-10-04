@@ -609,6 +609,26 @@ Arbitrary shared topic
 referents, dynamic subscriptions, allocator accounting, identity provenance,
 API stabilization, and human acceptance remain outside this checkpoint.
 
+## Inline message payload ownership checkpoint
+
+The 2026-10-05 [inline payload review](MESSAGE_PAYLOAD_OWNERSHIP_REVIEW.md)
+supplements RFF-REQ-003 and ADR-0010 without changing their contracts.
+`inline_message_owns_payload_after_source_buffer_changes_and_drop` proves
+original empty, short, and exact-limit payload slices after caller-vector
+overwrite, clear, reuse, and destruction.
+`queued_copies_survive_publisher_replacement_and_independent_consumption`
+proves complete ordered fan-out, exact retained FIFO values after publisher
+binding replacement/scope exit, and peer independence after selected dequeue
+and returned-binding replacement. Both inboxes reach exact exhaustion.
+
+`cargo test --locked --test message_bus` passes 12 tests. This standalone
+checkpoint does not independently execute runtime dispatch with a mutated
+publisher, validate shared topic referents, measure allocator behavior,
+establish secure erasure, or complete human v0.1 acceptance. The final locked
+workspace passes 139 tests with formatting, all-target check, warnings-denied
+Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes;
+publication and exact-revision hosted evidence remain pending.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

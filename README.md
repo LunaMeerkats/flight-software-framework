@@ -76,6 +76,12 @@ topic copying does not establish deep isolation of arbitrary shared referents.
 Checkpoint `ab9914618a739d4b7c8a46f0e14d7e12c55b6649` has successful
 [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37128965033)
 for both regressions, 137 workspace tests, and configured host/sample evidence.
+The [inline payload review](docs/verification/MESSAGE_PAYLOAD_OWNERSHIP_REVIEW.md)
+adds source-vector overwrite and destruction observations for empty, short,
+and exact-limit messages. Standalone fan-out retains exact FIFO values after
+publisher binding replacement and scope exit; consuming and replacing one
+returned message preserves its peer's queued copies. This supplements the
+existing inline-copy contract without adding runtime-specific dispatch claims.
 The
 [messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 also executes the nested standard source chain for a later-inbox capacity
