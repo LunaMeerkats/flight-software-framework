@@ -1,7 +1,7 @@
 # Stage 4 inline message payload ownership
 
 Date: **2026-10-05**
-Status: **Local verification complete; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -77,3 +77,19 @@ acceptance. The temporary inventory is a review aid, not a new adopted checker.
 Complete diff/source review passes. No production, public API, Cargo input,
 licence, lint configuration, or workflow change is made. Conditional
 ADR-0018/0019 probes and sample-only reruns are unchanged and not run locally.
+
+## Publication and hosted verification
+
+Checkpoint `97e590f25d8a9845bb40452a50741639beea3999` was published by
+ordinary fast-forward and the remote head matched. Hosted push run
+[37204799708](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37204799708)
+passes its exact logged checkout, the single Windows job, and every configured
+step. Both new regressions pass among 139 workspace tests; the separate 14
+adapter tests, five sample tests, documentation, sample executable, and both
+whitespace steps pass. Focused reruns do not increase the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the previous
+hosted checkpoint; local tools remain unchanged. This documentation follow-up
+records completed checkpoint evidence; later revisions need their own CI
+result. Human v0.1 acceptance remains open.

@@ -626,8 +626,13 @@ checkpoint does not independently execute runtime dispatch with a mutated
 publisher, validate shared topic referents, measure allocator behavior,
 establish secure erasure, or complete human v0.1 acceptance. The final locked
 workspace passes 139 tests with formatting, all-target check, warnings-denied
-Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes;
-publication and exact-revision hosted evidence remain pending.
+Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes.
+The checkpoint is committed at `97e590f25d8a9845bb40452a50741639beea3999`;
+its [hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37204799708)
+passes the exact logged checkout and every configured step, both new tests,
+139 workspace tests, both focused host targets, and the sample executable.
+This documentation follow-up records that result; later revisions need their
+own CI evidence. Human architecture acceptance remains separate.
 
 ## Evidence policy
 

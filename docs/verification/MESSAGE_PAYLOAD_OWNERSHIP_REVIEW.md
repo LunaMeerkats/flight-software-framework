@@ -83,4 +83,23 @@ structure/content inspection; pixel-level acceptance is not claimed. Complete
 diff and independent source review pass. The temporary inventory is a review
 aid, not an adopted checker. Conditional ADR-0018/0019 probes, workflow inputs,
 and sample source are unchanged; their extra local commands were not run.
-Publication and exact-checkpoint hosted evidence remain pending.
+
+## Publication and hosted result
+
+Checkpoint `97e590f25d8a9845bb40452a50741639beea3999` was published by
+ordinary fast-forward; the remote head matched. Hosted
+[push run 37204799708](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37204799708)
+uses the unchanged workflow at that revision. The `Record checkout` log contains
+the exact checkpoint SHA. Its Windows job and every configured step pass:
+139 workspace tests including both new regressions, 14 focused host-adapter
+tests, five focused sample tests, warnings-denied documentation, the executed
+sample, and both whitespace checks.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`. Compiler
+1.99.0 (`b940084d7`, 2026-09-28), Cargo 1.99.0 (`5f94df478`, 2026-08-27),
+rustfmt 1.10.0-stable, and Clippy 0.1.99 match the previous hosted checkpoint.
+Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, and Clippy 0.1.98.
+The existing source-policy re-audit remains in the CI baseline; no toolchain or
+policy change is made here. This documentation follow-up records exact completed
+evidence; later revisions require their own CI result. Human acceptance remains
+open.

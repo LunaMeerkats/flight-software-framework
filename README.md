@@ -82,6 +82,9 @@ and exact-limit messages. Standalone fan-out retains exact FIFO values after
 publisher binding replacement and scope exit; consuming and replacing one
 returned message preserves its peer's queued copies. This supplements the
 existing inline-copy contract without adding runtime-specific dispatch claims.
+Checkpoint `97e590f25d8a9845bb40452a50741639beea3999` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37204799708)
+for both new regressions, 139 workspace tests, and configured host/sample evidence.
 The
 [messaging-construction diagnostics review](docs/verification/MESSAGING_CONSTRUCTION_DIAGNOSTICS_REVIEW.md)
 also executes the nested standard source chain for a later-inbox capacity

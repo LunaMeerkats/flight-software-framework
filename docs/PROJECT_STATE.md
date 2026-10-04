@@ -18,7 +18,7 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   all-target check, warnings-denied Clippy/rustdoc, and whitespace pass.
   Focused message-bus target passes 12 tests including two new regressions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-- Last verified hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
+- Hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
   Its [source-policy re-audit](verification/CI_BASELINE.md) retains the existing
   format, width, function-size, and waiver policy.
 - Final inventory passes 33 Rust files and 12,545 physical lines with no width
@@ -26,6 +26,10 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   All 275 relative links across 57 Markdown files resolve. Six changed
   documents pass HTML structure/content inspection; no pixel-level acceptance
   is claimed. Complete diff and independent source review pass.
+- Checkpoint `97e590f25d8a9845bb40452a50741639beea3999` is published.
+  [Hosted run 37204799708](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37204799708)
+  passes its exact logged checkout and every configured step: 139 workspace
+  tests, both focused host targets, and the executed sample.
 
 ## Current architecture
 
@@ -39,8 +43,9 @@ public API, dependencies, lint policy, and workflow remain unchanged.
 ## Work in progress
 
 The [inline payload review](verification/MESSAGE_PAYLOAD_OWNERSHIP_REVIEW.md)
-records completed observations. Full local/source/document acceptance passes;
-publication and exact-revision hosted evidence remain pending.
+records completed observations. No unfinished implementation remains. Local
+acceptance and exact-checkpoint hosted CI pass. This documentation follow-up
+records that result; later revisions need their own verification.
 
 ## Highest risks and uncertainties
 
@@ -77,5 +82,6 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 and queued FIFO values after publisher storage reuse and scope exit. No
 production defect was found. Focused tests and the final 139-test locked
 baseline pass after stable rustfmt reformats one expression; no lint exception
-is added. Source/document/diff review passes. Publication and exact-checkpoint
-hosted verification are pending.
+is added. Source/document/diff review passes, and publication and exact-checkpoint
+hosted verification succeed. Hosted tools/runner match the prior checkpoint;
+no policy adaptation is needed. Human v0.1 acceptance remains open.
