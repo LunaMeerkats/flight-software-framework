@@ -257,6 +257,12 @@ The 2026-10-05
 executes constructor-owned bytes after source-vector reuse/destruction and
 standalone per-destination copies after publisher binding replacement, scope
 exit, and independent consumption. It retains the existing ADR-0010 contract.
+The 2026-10-06
+[event-record ownership review](verification/EVENT_RECORD_OWNERSHIP_REVIEW.md)
+adds explicit producer binding replacement and caller-retained full metadata
+after slot reuse and destruction of a nonempty queue. Earlier scheduled replay
+already covers loop-local producer scope exit and an emptied queue's
+destruction; the new standalone observations retain ADR-0013's contract.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.

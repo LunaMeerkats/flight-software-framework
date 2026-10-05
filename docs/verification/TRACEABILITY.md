@@ -634,6 +634,25 @@ passes the exact logged checkout and every configured step, both new tests,
 This documentation follow-up records that result; later revisions need their
 own CI evidence. Human architecture acceptance remains separate.
 
+## Event-record ownership checkpoint
+
+The 2026-10-06 [event-record ownership review](EVENT_RECORD_OWNERSHIP_REVIEW.md)
+supplements RFF-REQ-005 and ADR-0013 without changing their contracts.
+`queued_records_survive_producer_replacement_and_scope_exit` proves exact
+accepted metadata/FIFO after producer binding replacement, full rejection,
+and scope exit. `dequeued_record_survives_slot_reuse_and_queue_destruction`
+proves exact caller-retained metadata after the freed logical slot is reused
+and a nonempty queue is destroyed. Existing scheduled replay already provides
+indirect scope-exit and emptied-queue destruction observations.
+
+`cargo test --locked --test event_queue` passes eight tests. The final locked
+workspace passes 141 tests with formatting, all-target check, warnings-denied
+Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes;
+publication and exact-checkpoint hosted evidence are pending.
+These plain enum observations do not establish shared-referent isolation,
+deallocation instrumentation, whole-process bounds, identity/clock provenance,
+broader event production, or human architecture acceptance.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

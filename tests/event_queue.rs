@@ -193,3 +193,75 @@ fn repeated_saturation_and_reuse_preserve_exact_fifo_and_logical_capacity() {
         }
     }
 }
+
+#[test]
+fn queued_records_survive_producer_replacement_and_scope_exit() {
+    let mut queue = EventQueue::new(2).expect("test storage can be reserved");
+    let first = framework_event(MissionEventId::Started, EventSeverity::Informational, 30);
+    let second = Event::new(
+        EventSource::Application(one_application_id()),
+        EventSeverity::Warning,
+        MissionEventId::Degraded,
+        timestamp(10),
+    );
+    let rejected = framework_event(MissionEventId::Failed, EventSeverity::Error, 20);
+
+    {
+        let mut producer = first;
+        assert_eq!(queue.emit(&producer), EventEmitOutcome::Recorded);
+        producer = second;
+        assert_eq!(queue.emit(&producer), EventEmitOutcome::Recorded);
+        producer = rejected;
+        assert_eq!(
+            queue.emit(&producer),
+            EventEmitOutcome::QueueFull { capacity: 2 }
+        );
+        assert_eq!(producer, rejected);
+    }
+
+    // Complete equality checks the copied fields, including acceptance order
+    // rather than timestamp order, after the borrowed producer leaves scope.
+    assert_eq!(queue.pending(), 2);
+    assert_eq!(queue.dequeue(), Some(first));
+    assert_eq!(queue.dequeue(), Some(second));
+    assert_eq!(queue.dequeue(), None);
+    assert!(queue.is_empty());
+    assert_eq!(queue.capacity(), 2);
+}
+
+#[test]
+fn dequeued_record_survives_slot_reuse_and_queue_destruction() {
+    let expected = Event::new(
+        EventSource::Application(one_application_id()),
+        EventSeverity::Error,
+        MissionEventId::Failed,
+        timestamp(7),
+    );
+    let remaining = framework_event(MissionEventId::Started, EventSeverity::Informational, 9);
+    let replacement = framework_event(MissionEventId::Degraded, EventSeverity::Warning, 5);
+
+    let retained = {
+        let mut queue = EventQueue::new(2).expect("test storage can be reserved");
+        assert_eq!(queue.emit(&expected), EventEmitOutcome::Recorded);
+        assert_eq!(queue.emit(&remaining), EventEmitOutcome::Recorded);
+        let retained = queue
+            .dequeue()
+            .expect("the first accepted event is present");
+        assert_eq!(queue.pending(), 1);
+        assert_eq!(queue.emit(&replacement), EventEmitOutcome::Recorded);
+        assert_eq!(queue.pending(), 2);
+        assert_eq!(retained, expected);
+        assert_eq!(queue.dequeue(), Some(remaining));
+        assert_eq!(queue.pending(), 1);
+        assert!(!queue.is_empty());
+        retained
+    };
+
+    // The queue is gone with replacement still pending. Consumer retention
+    // belongs to the caller and lies outside the queue's logical record bound.
+    assert_eq!(retained, expected);
+    assert_eq!(retained.source(), expected.source());
+    assert_eq!(retained.severity(), EventSeverity::Error);
+    assert_eq!(*retained.identifier(), MissionEventId::Failed);
+    assert_eq!(retained.timestamp().elapsed(), Duration::from_millis(7));
+}
