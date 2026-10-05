@@ -18,7 +18,7 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   all-target check, warnings-denied Clippy/rustdoc, and whitespace pass.
   Focused event-queue target passes eight tests including two new regressions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-- Previous hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
+- Hosted Rust/Cargo: 1.99.0; rustfmt: 1.10.0-stable; Clippy: 0.1.99.
   The [source-policy re-audit](verification/CI_BASELINE.md) retains the existing
   format, width, function-size, and waiver policy.
 - Final inventory passes 33 Rust files and 12,617 physical lines with zero
@@ -26,8 +26,11 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   links across 58 Markdown files and 105 traceability function references resolve.
   Six changed documents pass rendered HTML structure/content inspection;
   no pixel-level acceptance is claimed. Author/independent source/diff review pass.
-- Publication and this checkpoint's hosted verification are pending; a local
-  pass is not hosted evidence.
+- Checkpoint `814adcafe892aad3ecf960054ec1c6ff64ac98c7` is published.
+  [Hosted run 37315061868](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37315061868)
+  passes its exact logged checkout and all 20 steps, including 141 workspace
+  tests, both focused host targets, and the executed sample. Tools/runner match
+  the prior checkpoint; no policy adaptation is needed.
 
 ## Current architecture
 
@@ -42,8 +45,9 @@ dependencies, lint policy, and workflow remain unchanged.
 
 The [event-record review](verification/EVENT_RECORD_OWNERSHIP_REVIEW.md)
 records the observations and their overlap with earlier scheduled replay.
-Local implementation, verification, and review are complete. Publication and
-exact-revision hosted verification are in progress.
+No unfinished implementation remains. Local acceptance and exact-checkpoint
+hosted verification pass. This documentation follow-up records the completed
+result; later revisions need their own verification.
 
 ## Highest risks and uncertainties
 
@@ -81,5 +85,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 after producer replacement and a retained record after slot reuse and
 nonempty-queue destruction. No production defect was found. Focused tests and
 the final 141-test locked baseline pass without a new lint exception.
-Source/document/diff review passes; publication and exact-checkpoint hosted
-verification are pending. Human v0.1 acceptance remains open.
+Source/document/diff review passes, and publication and exact-checkpoint hosted
+verification succeed. Human v0.1 acceptance remains open.

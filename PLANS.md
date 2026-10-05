@@ -1,7 +1,7 @@
 # Stage 4 event-record ownership
 
 Date: **2026-10-06**
-Status: **Locally complete: publication and hosted verification pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -71,6 +71,22 @@ no block comments or allows, and three unchanged fulfilled expectations. All
 function references resolve. Six changed documents pass rendered HTML
 structure/content inspection; no pixel-level acceptance is claimed. Temporary
 review aids remain ignored under `target/review-2026-10-06` and do not adopt
-a new checker. Publication and hosted verification are pending.
+a new checker.
 Unchanged host sample/workflow and conditional ADR probes do not trigger their
 separate local commands; the full suite includes both host test targets.
+
+## Publication and hosted verification
+
+Checkpoint `814adcafe892aad3ecf960054ec1c6ff64ac98c7` was published by
+ordinary fast-forward and the remote head matched. Hosted push run
+[37315061868](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37315061868)
+passes its exact logged checkout, the single Windows job, and all 20 reported
+steps. Both regressions pass among 141 workspace tests; the separate 14 adapter
+tests, five sample tests, documentation, executed sample, and both whitespace
+steps pass. Focused reruns do not increase the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the previous
+hosted checkpoint; local tools remain unchanged. This documentation follow-up
+records the completed checkpoint; later revisions need their own CI result.
+Human v0.1 architecture acceptance remains open.

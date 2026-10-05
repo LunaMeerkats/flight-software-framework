@@ -90,6 +90,21 @@ not triggered. The full suite includes both host test targets.
 
 ## Publication
 
-Local acceptance is complete. Publication and exact-revision hosted
-verification are pending.
-Local execution does not establish hosted or human acceptance.
+Checkpoint `814adcafe892aad3ecf960054ec1c6ff64ac98c7` was published by
+ordinary fast-forward and the remote head matched. Hosted push run
+[37315061868](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37315061868)
+passes the exact logged checkout, the unchanged workflow's single Windows job,
+and all 20 steps. Logs show both new regressions among 141 workspace tests,
+14 separately focused adapter tests, five sample tests, warnings-denied
+documentation, the executed sample, and both whitespace checks. Focused
+reruns do not add to the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the prior
+checkpoint; local tools remain 1.98.0/1.9.0-stable/0.1.98. The existing
+source-policy re-audit remains applicable without a new waiver or adaptation.
+Full JSON and logs are under `target/review-2026-10-06`.
+
+This documentation follow-up records exact checkpoint evidence without
+changing Rust or CI inputs. Later revisions need their own CI result; source
+publication does not complete human v0.1 architecture acceptance.

@@ -647,8 +647,13 @@ indirect scope-exit and emptied-queue destruction observations.
 
 `cargo test --locked --test event_queue` passes eight tests. The final locked
 workspace passes 141 tests with formatting, all-target check, warnings-denied
-Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes;
-publication and exact-checkpoint hosted evidence are pending.
+Clippy/rustdoc, and whitespace passing. Source/document/full-diff review passes.
+The checkpoint is committed at `814adcafe892aad3ecf960054ec1c6ff64ac98c7`;
+its [hosted run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37315061868)
+passes the exact logged checkout, both new regressions, 141 workspace tests,
+both focused host targets, the executed sample, and all configured steps.
+This documentation follow-up records that result; later revisions require
+their own CI evidence.
 These plain enum observations do not establish shared-referent isolation,
 deallocation instrumentation, whole-process bounds, identity/clock provenance,
 broader event production, or human architecture acceptance.
