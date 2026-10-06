@@ -676,9 +676,12 @@ already reject mutable storage and callback-byte escape. This checkpoint
 targets used-length refresh through production ordinary work rather than
 introducing another borrowing claim. The focused target passes 11 tests and
 the final locked baseline passes 141 without a new exception. Source/document/
-diff review passes; exact-revision hosted verification remains pending. It does
-not add
-message/lifecycle callback access, typed decoding, caller-copy resource bounds,
+diff review passes. Checkpoint `16fb457f6ee7a49109ef1e245c59ea5ec9588922`
+has [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
+for the exact logged checkout and all 20 reported steps, including the
+strengthened regression, 141 workspace tests, both focused host targets, and
+the sample executable. It does not add message/lifecycle callback access,
+typed decoding, caller-copy resource bounds,
 allocator instrumentation, API stabilization, or human v0.1 acceptance.
 
 ## Evidence policy

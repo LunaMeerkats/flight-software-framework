@@ -1,7 +1,7 @@
 # Stage 4 configuration work-view refresh
 
 Date: **2026-10-07**
-Status: **Local acceptance passed; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -72,4 +72,22 @@ three unchanged fulfilled expectations. All 286 relative links across 59
 Markdown files and 105 exact traceability function references resolve.
 Author and independent complete-diff/source reviews pass. Six changed documents
 pass rendered HTML structure/content inspection; no pixel-level acceptance is
-claimed. Publication and exact-revision hosted verification are pending.
+claimed.
+
+## Publication and hosted verification
+
+Checkpoint `16fb457f6ee7a49109ef1e245c59ea5ec9588922` was published by
+ordinary fast-forward; the remote head matched. Hosted push run
+[37468611582](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
+passes the exact logged checkout and all 20 reported steps (17 named workflow
+steps plus job lifecycle). Logs show the strengthened regression among 141
+workspace tests, 14 focused adapter tests, five focused sample tests,
+warnings-denied documentation, the executed sample, and both whitespace checks.
+Focused reruns do not increase the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the prior
+checkpoint; local tools remain 1.98.0/1.9.0-stable/0.1.98. The existing
+source-policy re-audit remains applicable. This documentation follow-up records
+checkpoint evidence; later revisions need their own CI result. Human v0.1
+architecture acceptance remains open.

@@ -230,8 +230,11 @@ extends ordinary-work observations from exact-capacity content to shorter,
 empty, and rolled-back snapshots, retaining the complete copied byte/revision
 log after runtime destruction. Existing tests already cover fixed-length
 transitions, and borrowing probes reject escaped callback bytes. Focused and
-full locked checks and source/document/diff review pass. Exact-revision hosted
-verification is pending. No configuration API or policy changes.
+full locked checks and source/document/diff review pass. Checkpoint
+`16fb457f6ee7a49109ef1e245c59ea5ec9588922` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
+for 141 workspace tests and configured host/sample evidence. No configuration
+API or policy changes.
 
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded

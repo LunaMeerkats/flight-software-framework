@@ -270,8 +270,9 @@ shorter, empty, and rolled-back content, then checks the complete copied log
 after runtime destruction. Earlier tests cover standalone length changes,
 fixed-length runtime transitions, and retained host scalar observations;
 borrowing probes already reject callback-byte escape. Focused and full locked
-checks and source/document/diff review pass; exact-revision hosted verification
-is pending.
+checks and source/document/diff review pass. Checkpoint `16fb457` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
+for the exact checkout, 141 workspace tests, and configured host/sample evidence.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.

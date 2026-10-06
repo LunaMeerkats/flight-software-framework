@@ -19,7 +19,7 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   Focused configuration-runtime target passes 11 tests. One existing test is
   strengthened; the test count does not increase.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
-- Previous hosted tools: Rust/Cargo 1.99.0, rustfmt 1.10.0-stable,
+- Hosted tools: Rust/Cargo 1.99.0, rustfmt 1.10.0-stable,
   Clippy 0.1.99. The [source-policy re-audit](verification/CI_BASELINE.md)
   retains existing format, width, function-size, and waiver policy.
 - Final audit passes 33 Rust files and 12,632 physical lines with zero width
@@ -27,7 +27,11 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   across 59 Markdown files and 105 traceability function references resolve.
   Six changed documents pass rendered HTML structure/content inspection;
   author/independent source/diff review pass. No pixel-level acceptance is claimed.
-- Publication and this checkpoint's exact-revision hosted CI are pending.
+- Checkpoint `16fb457f6ee7a49109ef1e245c59ea5ec9588922` is published.
+  [Hosted run 37468611582](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
+  passes the exact logged checkout and all 20 reported steps, including 141
+  workspace tests, focused adapters/sample, documentation, and the executed
+  sample. Tools/runner match the prior checkpoint; no policy adaptation.
 
 ## Current architecture
 
@@ -44,8 +48,9 @@ The [configuration-view review](verification/CONFIGURATION_VIEW_REFRESH_REVIEW.m
 records exact-bound, shorter, empty-configured, and restored-shorter bytes
 through four ordinary callbacks. Exact copied logs are checked after the
 runtime leaves scope. Existing lifetime probes and fixed-length composition
-tests remain their own evidence. Local acceptance passes; publication and
-exact-revision hosted verification are pending.
+tests remain their own evidence. No unfinished implementation remains. Local
+acceptance, publication, and exact-checkpoint hosted verification pass. This
+documentation follow-up records that result; later revisions need their own CI.
 
 ## Highest risks and uncertainties
 
@@ -82,6 +87,6 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 one, zero, and restored one-byte configurations with their exact revisions;
 empty content retains configured presence. Focused 11-test and full 141-test
 locked baselines pass without a new lint exception or production change.
-Source/document/diff review passes. Publication and exact-checkpoint hosted
-verification are pending.
+Source/document/diff review, publication, and exact-checkpoint hosted
+verification pass.
 Human v0.1 acceptance remains open.
