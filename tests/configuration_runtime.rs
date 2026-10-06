@@ -177,16 +177,31 @@ fn zero_byte_configured_runtime_is_distinct_from_absence() {
 
 #[test]
 fn work_context_exposes_only_the_used_configuration_prefix() {
-    let table = ConfigurationTable::<Infallible, 4>::new(&[4, 5], |_| Ok(()))
-        .expect("two bytes fit a four-byte table");
-    let (application, observations, _) = application(None);
-    let mut runtime = Runtime::<ObservingApplication, Infallible, 4>::with_configuration(1, table)
-        .expect("one configured record can be reserved");
-    let application_id = runtime.register(application).expect("application fits");
-    runtime.start(application_id).expect("application starts");
+    let (application, observations, work_calls) = application(None);
+    {
+        let table = ConfigurationTable::<Infallible, 4>::new(&[4, 5, 6, 7], |_| Ok(()))
+            .expect("four bytes fit the exact table bound");
+        let mut runtime =
+            Runtime::<ObservingApplication, Infallible, 4>::with_configuration(1, table)
+                .expect("one configured record can be reserved");
+        let application_id = runtime.register(application).expect("application fits");
+        runtime.start(application_id).expect("application starts");
 
-    assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
-    assert_observation(&observations, 0, 1, &[4, 5]);
+        assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
+        assert_eq!(runtime.replace_configuration(&[8]), Ok(2));
+        assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
+        assert_eq!(runtime.replace_configuration(&[]), Ok(3));
+        assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
+        assert_eq!(runtime.rollback_configuration(), Ok(2));
+        assert_eq!(runtime.work(application_id), Ok(ApplicationState::Running));
+    }
+
+    assert_eq!(work_calls.get(), 4);
+    assert_eq!(observations.borrow().len(), 4);
+    assert_observation(&observations, 0, 1, &[4, 5, 6, 7]);
+    assert_observation(&observations, 1, 2, &[8]);
+    assert_observation(&observations, 2, 3, &[]);
+    assert_observation(&observations, 3, 2, &[8]);
 }
 
 fn assert_failed_construction_preserves_table(capacity: usize, expected: RuntimeCreateError) {

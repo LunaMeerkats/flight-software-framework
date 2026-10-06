@@ -263,6 +263,15 @@ adds explicit producer binding replacement and caller-retained full metadata
 after slot reuse and destruction of a nonempty queue. Earlier scheduled replay
 already covers loop-local producer scope exit and an emptied queue's
 destruction; the new standalone observations retain ADR-0013's contract.
+The 2026-10-07
+[configuration-view refresh review](verification/CONFIGURATION_VIEW_REFRESH_REVIEW.md)
+extends the existing ordinary-work prefix regression through exact-capacity,
+shorter, empty, and rolled-back content, then checks the complete copied log
+after runtime destruction. Earlier tests cover standalone length changes,
+fixed-length runtime transitions, and retained host scalar observations;
+borrowing probes already reject callback-byte escape. Focused and full locked
+checks and source/document/diff review pass; exact-revision hosted verification
+is pending.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.

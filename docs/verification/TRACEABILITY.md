@@ -658,6 +658,29 @@ These plain enum observations do not establish shared-referent isolation,
 deallocation instrumentation, whole-process bounds, identity/clock provenance,
 broader event production, or human architecture acceptance.
 
+## Ordinary-work configuration-view refresh checkpoint
+
+The 2026-10-07
+[configuration-view refresh review](CONFIGURATION_VIEW_REFRESH_REVIEW.md)
+supplements RFF-REQ-006 and ADR-0017/0018 without changing their contracts.
+The extended `work_context_exposes_only_the_used_configuration_prefix`
+regression observes four ordinary callbacks: revision 1 with exact-capacity
+`[4, 5, 6, 7]`, revision 2 with `[8]`, revision 3 with configured empty bytes,
+then revision 2 with `[8]` after rollback. It checks four callback calls and the
+exact complete copied observations after the runtime is destroyed.
+
+Standalone tests already cover shorter snapshot storage, runtime tests cover
+fixed-length activation/rejection/rollback, and the returned host report
+retains copied scalar observations after runtime destruction. Borrowing probes
+already reject mutable storage and callback-byte escape. This checkpoint
+targets used-length refresh through production ordinary work rather than
+introducing another borrowing claim. The focused target passes 11 tests and
+the final locked baseline passes 141 without a new exception. Source/document/
+diff review passes; exact-revision hosted verification remains pending. It does
+not add
+message/lifecycle callback access, typed decoding, caller-copy resource bounds,
+allocator instrumentation, API stabilization, or human v0.1 acceptance.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

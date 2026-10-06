@@ -1,41 +1,43 @@
-# Stage 4 event-record ownership
+# Stage 4 configuration work-view refresh
 
-Date: **2026-10-06**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-07**
+Status: **Local acceptance passed; publication and hosted CI pending**
 
 ## Objective and context
 
-Verify ADR-0013's copied emission and caller-owned dequeue boundaries. Existing
-standalone tests cover metadata, capacity, FIFO, saturation, and repeated reuse
-with unchanged producer bindings. Scheduled replay indirectly covers loop-local
-producer scope exit and a drained queue's destruction. The remaining explicit
-gap is producer binding replacement and retained full records after a nonempty
-queue is destroyed. No production change is expected.
+Verify ADR-0018's current used-byte prefix through the production ordinary-work
+boundary. Standalone tests already cover shrinking storage snapshots. The
+starting runtime baseline covered an initial short prefix and fixed-length
+activation/rollback; the host sample uses one-byte values. Borrow escape and
+copied-observation retention already have evidence. The remaining explicit gap
+is callback visibility across
+exact-bound, shorter, empty, and restored-shorter configuration transitions.
 
-Starting revision: `d5ddb7e0869fe953ff54213d4f5311b21b9124e2`, clean and
-equal to refreshed `origin/codex/nightly`; hosted run 37204967826 succeeded.
-The initial locked local baseline passes 139 tests on Rust/Cargo 1.98.0,
+Starting revision: `b5f1f5dd770ffa8e3e310635dd0d03b678b91892`, clean and
+equal to refreshed `origin/codex/nightly`; hosted run 37315596231 succeeded.
+The initial locked local baseline passes 141 tests on Rust/Cargo 1.98.0,
 rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
 ## Acceptance criteria
 
-- Accepted records retain every structured field and exact FIFO after one
-  producer binding is replaced and leaves scope; a rejected replacement does
-  not overwrite them.
-- A dequeued record retains every field after the queue reuses its freed slot
-  and is destroyed with a record still pending.
-- Focused/full locked checks, whole-tree source form, links, rendered document
-  inspection, and full diff review pass without new exceptions or dependencies.
+- Work observes revision one with four bytes, revision two with one byte,
+  revision three with empty configured content, then restored revision two
+  with one byte; no unused or stale bytes appear.
+- Empty accepted content remains a configured `Some` view. Exact full copies
+  and four callback invocations remain observable after the owner leaves scope.
+- Reuse existing observing applications; change no production/API/dependency,
+  lint, workflow, requirements, accepted decision, or borrowing experiment.
+- Focused/full locked checks, source form, links, rendered documents, and
+  complete diff review pass without new exceptions.
 
 ## Files and verification
 
-Extend `tests/event_queue.rs`; add
-`docs/verification/EVENT_RECORD_OWNERSHIP_REVIEW.md`; reconcile README,
-roadmap, project state, traceability, and this plan. Existing requirements,
-accepted decisions, source register, production code, and workflow suffice.
+Extend `tests/configuration_runtime.rs`; add
+`docs/verification/CONFIGURATION_VIEW_REFRESH_REVIEW.md`; reconcile
+README, roadmap, project state, traceability, and this plan.
 
 ```text
-cargo test --locked --test event_queue
+cargo test --locked --test configuration_runtime
 cargo fmt --all -- --check
 cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -44,49 +46,30 @@ cargo doc --locked --workspace --all-features --no-deps
 git diff --check
 ```
 
-Set `RUSTDOCFLAGS=-D warnings` for rustdoc. Audit physical/comment widths and
-existing expectations separately. Inspect rendered Markdown HTML structure
-and content; do not claim pixel-level visual acceptance. Publish after local
-acceptance, then inspect exact-revision hosted checkout, steps, tools, and logs.
+Set `RUSTDOCFLAGS=-D warnings`. Audit whole-tree physical/comment widths and
+expectations separately; render changed Markdown and inspect its structure and
+content. Publish after applicable local checks and source/diff review, then
+inspect exact-revision hosted checkout, steps, tools, and logs. Unchanged
+ADR-0018/0019 experiments and host sample do not trigger separate local probes.
 
 ## Risks and safe stopping point
 
-Events expose immutable fields: binding replacement proves value independence,
-not in-place mutation. Plain enum identifiers do not prove independence of
-referents within arbitrary copied identifiers. Queue destruction observations
-do not instrument deallocation, bound caller retention, detect identity/clock
-provenance, or establish secure erasure, concurrency, or human v0.1 acceptance.
-Stop after this checkpoint. If a defect emerges, investigate only these owned
-record boundaries and preserve unrelated work.
+Application-owned `Vec` copies and observation logs lie outside runtime storage
+bounds. This is direct ordinary-work prefix-refresh evidence, not a new
+configuration service, mutable runtime view, allocation/deallocation measure,
+secure erasure, messaging-specific retention proof, or human v0.1 acceptance.
+Stop after this checkpoint. If a defect emerges, investigate only the copied
+view boundary and preserve unrelated work.
 
-## Completed local verification
+## Completed local checks
 
-The focused target passes eight tests and the final locked workspace baseline
-passes 141. Formatting, all-target check, warnings-denied Clippy/rustdoc, and
-whitespace pass. Both added tests fit the function-size policy without a new
-expectation. Author and independent source/diff review pass. The whole-tree
-audit covers 33 Rust files and 12,617 physical lines with zero width findings,
-no block comments or allows, and three unchanged fulfilled expectations. All
-280 relative links across 58 Markdown files and 105 exact traceability
-function references resolve. Six changed documents pass rendered HTML
-structure/content inspection; no pixel-level acceptance is claimed. Temporary
-review aids remain ignored under `target/review-2026-10-06` and do not adopt
-a new checker.
-Unchanged host sample/workflow and conditional ADR probes do not trigger their
-separate local commands; the full suite includes both host test targets.
-
-## Publication and hosted verification
-
-Checkpoint `814adcafe892aad3ecf960054ec1c6ff64ac98c7` was published by
-ordinary fast-forward and the remote head matched. Hosted push run
-[37315061868](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37315061868)
-passes its exact logged checkout, the single Windows job, and all 20 reported
-steps. Both regressions pass among 141 workspace tests; the separate 14 adapter
-tests, five sample tests, documentation, executed sample, and both whitespace
-steps pass. Focused reruns do not increase the workspace total.
-
-Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
-Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the previous
-hosted checkpoint; local tools remain unchanged. This documentation follow-up
-records the completed checkpoint; later revisions need their own CI result.
-Human v0.1 architecture acceptance remains open.
+The focused configuration-runtime target passes 11 tests; initial and final
+locked workspace baselines pass 141. Formatting, all-target check,
+warnings-denied Clippy/rustdoc, and whitespace pass. Independent source review
+accepts the strengthened regression without a new exception. Source audit
+covers 33 Rust files and 12,632 physical lines with zero width findings and
+three unchanged fulfilled expectations. All 286 relative links across 59
+Markdown files and 105 exact traceability function references resolve.
+Author and independent complete-diff/source reviews pass. Six changed documents
+pass rendered HTML structure/content inspection; no pixel-level acceptance is
+claimed. Publication and exact-revision hosted verification are pending.

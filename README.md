@@ -225,6 +225,14 @@ automatic recovery, logging policy, or API stabilization. Checkpoint
 [hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/36770444600)
 for the strengthened regressions and configured host/sample evidence.
 
+The [configuration-view refresh review](docs/verification/CONFIGURATION_VIEW_REFRESH_REVIEW.md)
+extends ordinary-work observations from exact-capacity content to shorter,
+empty, and rolled-back snapshots, retaining the complete copied byte/revision
+log after runtime destruction. Existing tests already cover fixed-length
+transitions, and borrowing probes reject escaped callback bytes. Focused and
+full locked checks and source/document/diff review pass. Exact-revision hosted
+verification is pending. No configuration API or policy changes.
+
 A public integration test runs two independently defined applications through
 registration, start, work, stop, restart, and work, completing the bounded
 RFF-REQ-002 lifecycle evidence. The combined routing, lifecycle-availability,
