@@ -702,7 +702,12 @@ The extension checks refresh of a previously stopped callback snapshot.
 The focused target passes six tests and the final locked baseline passes 141
 without a new lint exception or production change. Exact publication-report
 classifications and complete one-destination outcomes are asserted.
-Source/document/diff review passes; publication and hosted acceptance are pending.
+Source/document/diff review passes. Checkpoint
+`44709878005d8b91df8411f9e2ccc8179d21ddde` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
+for the exact logged checkout and all 20 reported steps, including the
+strengthened regression, 141 workspace tests, both focused host targets, and
+the sample executable.
 It does not add automatic retry, failed-record recovery, concurrency, or
 human v0.1 acceptance.
 

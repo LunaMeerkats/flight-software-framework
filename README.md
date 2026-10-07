@@ -64,6 +64,10 @@ message-dispatch tests cover these boundaries; the
 extends callback publication through a peer's running, stopped, and restarted
 states. The stopped snapshot must be refreshed before the next publisher
 callback; only its new reply reaches the reconnected peer inbox.
+Checkpoint `44709878005d8b91df8411f9e2ccc8179d21ddde` has successful
+[hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
+for the strengthened regression, 141 workspace tests, and configured host/sample
+evidence. Production behavior and public APIs remain unchanged.
 The
 [returned-message failure review](docs/verification/MESSAGE_FAILURE_REVIEW.md)
 records the complete retained peer FIFO and post-failure availability boundary.

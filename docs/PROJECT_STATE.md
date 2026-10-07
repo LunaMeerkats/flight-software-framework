@@ -27,6 +27,11 @@ Broader contract review and human v0.1 architecture acceptance remain open.
   across 60 Markdown files and 105 traceability function references resolve.
   Six changed documents pass rendered HTML structure/content inspection;
   author/independent source/diff review pass. No pixel-level acceptance is claimed.
+- Checkpoint `44709878005d8b91df8411f9e2ccc8179d21ddde` is published.
+  [Hosted run 37626284281](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
+  passes the exact logged checkout and all 20 reported steps, including 141
+  workspace tests, focused adapters/sample, documentation, and the executed
+  sample. Tools/runner match the prior checkpoint; no policy adaptation.
 
 ## Current architecture
 
@@ -43,8 +48,9 @@ The [dispatch availability review](verification/DISPATCH_AVAILABILITY_REFRESH_RE
 extends the existing stopped-peer dispatch scenario through successful restart
 and a third publisher callback. It checks exact delivered/unavailable/delivered
 reports, new-only peer reply consumption, and no empty-inbox callback.
-No unfinished implementation remains. Local acceptance passes; publication
-and exact-checkout hosted verification are pending.
+No unfinished implementation remains. Local acceptance, publication, and
+exact-checkpoint hosted verification pass. This documentation follow-up
+records that result; later revisions need their own CI.
 
 ## Highest risks and uncertainties
 
@@ -80,6 +86,6 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 2026-10-08: the strengthened callback-availability regression observes a peer
 as running, stopped, and restarted, with only the new reply consumed after
 restart. Focused six-test and full 141-test locked baselines pass without a new
-lint exception or production change. Source/document/diff review passes;
-publication and exact-checkout hosted verification are pending.
+lint exception or production change. Source/document/diff review, publication,
+and exact-checkpoint hosted verification pass.
 Human v0.1 acceptance remains open.

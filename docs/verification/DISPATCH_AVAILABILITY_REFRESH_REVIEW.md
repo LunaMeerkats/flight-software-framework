@@ -1,7 +1,7 @@
 # Dispatch availability refresh review
 
 Date: **2026-10-08**
-Status: **Local acceptance passed; publication and hosted verification pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Contract and coverage reconciliation
 
@@ -78,4 +78,22 @@ diff/source reviews pass. No pixel-level acceptance is claimed. Review aids/logs
 
 Unchanged ADR-0018/0019 experiments, host adapters/sample, and workflow do not
 trigger their separate local probes. The full workspace suite includes both
-host test targets. Exact-checkout hosted acceptance remains pending.
+host test targets.
+
+## Publication
+
+Checkpoint `44709878005d8b91df8411f9e2ccc8179d21ddde` was published by
+ordinary fast-forward and the remote head matched. Hosted push run
+[37626284281](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
+passes its exact logged checkout, single Windows job, and all 20 reported
+steps. The workflow contains 17 named steps; GitHub adds job lifecycle steps.
+Logs confirm the strengthened regression among 141 workspace tests, separate
+14 adapter/five sample tests, warnings-denied rustdoc, the executed sample,
+and both whitespace checks. Focused reruns do not add to the workspace total.
+
+Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the prior
+checkpoint. Local tools remain 1.98.0/1.9.0-stable/0.1.98; no new policy
+adaptation is required. Full metadata and logs remain in the ignored review
+directory. This documentation follow-up records checkpoint evidence; later
+revisions require their own CI result. Human v0.1 acceptance remains open.

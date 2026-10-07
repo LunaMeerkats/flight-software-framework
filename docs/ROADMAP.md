@@ -278,7 +278,10 @@ The 2026-10-08
 extends the existing callback-publication regression through peer restart
 after an intervening stopped-peer dispatch. It checks delivered/unavailable/
 delivered outcomes and exact new-only reply consumption without changing the
-per-dispatch lifecycle snapshot contract.
+per-dispatch lifecycle snapshot contract. Focused/full locked checks and
+source/document/diff review pass. Checkpoint `4470987` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
+for the exact checkout, 141 workspace tests, and configured host/sample evidence.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.
