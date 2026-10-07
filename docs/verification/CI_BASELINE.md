@@ -154,5 +154,8 @@ Markdown links, rendered-document inspection, physical/comment-only Rust
 widths, naming/cohesion, reasoned expectations, and complete-diff review remain
 local review responsibilities. ADR-0018/0019 standalone probes remain required
 when those decisions or probes change; Cargo does not discover them, and this
-workflow does not claim to execute them. Human entry-point, dependency, scope,
-and architecture review remain v0.1 release gates.
+workflow does not claim to execute them. Recorded entry-point, dependency,
+scope, and architecture reviews remain host v0.1 evidence gates. The user's
+2026-10-08 [delegation](../adr/0024-autonomous-host-review-authority.md) permits
+routine entry-point/architecture acceptance through documented autonomous
+review; it does not establish human review or authorize releases/deployment.

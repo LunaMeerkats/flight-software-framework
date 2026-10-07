@@ -159,7 +159,7 @@ command/telemetry exchange, finite scheduling under manual time, fresh work
 configuration observations through activation/rejection/rollback, and a
 cooperative work failure with exact inbox cleanup, event, and peer progress.
 Five shared-driver integration tests and the executed binary establish the
-sample behavior. CI and human release reviews remain in Stage 4.
+sample behavior. CI and recorded host milestone reviews remain in Stage 4.
 
 Exit evidence: hostile-input and rollback tests for RFF-REQ-006,
 command/telemetry adapter tests for RFF-REQ-007, and sample-mission
@@ -179,6 +179,13 @@ separately; source publication does not complete v0.1 release review.
 - Audit all resource bounds, failure paths, dependency licences, public APIs,
   provenance, and unsupported claims.
 - Record a v0.1 architecture review before widening scope.
+
+The user's 2026-10-08 [delegation](adr/0024-autonomous-host-review-authority.md)
+allows Codex to complete routine host entry-point and architecture acceptance
+without asking for human acceptance. The actual review must still record its
+revision, reviewer, evidence, findings, and limits. This removes the routine
+human blocker; it does not complete Stage 4 or approve consequential scope
+changes, tags, releases, crate publication, or deployment.
 
 The 2026-09-13 [dependency and scope checkpoint](verification/DEPENDENCY_SCOPE_REVIEW.md)
 records an empty external Cargo dependency/feature graph, unchanged approved
@@ -283,8 +290,8 @@ source/document/diff review pass. Checkpoint `4470987` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
 for the exact checkout, 141 workspace tests, and configured host/sample evidence.
 Other lifecycle/service resource,
-failure, and public-API reviews plus human entry-point/architecture acceptance
-remain open.
+failure, and public-API reviews plus documented autonomous entry-point and
+architecture acceptance remain open.
 Stage 4 is not complete.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,

@@ -106,7 +106,7 @@ When changing the host adapters or combined sample, also run
 `cargo test --test host_adapters`, `cargo test --test host_sample`, and
 `cargo run --example host-echo`. These exercise the exact shared mission/driver
 source and the host entry point. The combined sample demonstrates controlled
-host behavior; it does not complete CI or human v0.1 review or guarantee
+host behavior; it does not complete CI or a recorded v0.1 review or guarantee
 physical delivery.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
@@ -263,6 +263,20 @@ warnings.
 
 This standing permission covers source pushes only. Existing tag, release,
 crate-publication, deployment, licence, and scope-expansion gates remain.
+
+## Autonomous milestone review authority
+
+On 2026-10-08 the user delegated routine host v0.1 entry-point and architecture
+acceptance to autonomous review in
+[ADR-0024](docs/adr/0024-autonomous-host-review-authority.md). Do not solicit
+routine human acceptance or stop bounded development because a human has not
+reviewed it. Perform the actual review, record the exact revision, reviewer,
+evidence, findings, and limitations, and continue verified engineering work.
+
+This delegation can satisfy routine host milestone review gates after their
+documented review completes. Permission itself does not complete a review or
+establish human-reviewed status. Preserve truthful Codex provenance and the
+separate consequential authorization gates recorded in ADR-0024.
 
 ## Completion
 

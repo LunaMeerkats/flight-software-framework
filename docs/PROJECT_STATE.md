@@ -6,32 +6,27 @@ Last updated: **2026-10-08**
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, resource, failure, schedule,
-identity, diagnostics, and ownership evidence. This run strengthens callback
-publication's availability refresh after a stopped peer restarts.
-Broader contract review and human v0.1 architecture acceptance remain open.
+identity, diagnostics, and ownership evidence. The user now delegates routine
+host entry-point and architecture acceptance to documented autonomous review.
+The actual reviews remain open; routine human acceptance no longer blocks work.
 
 ## Verified baseline
 
-- Started clean at `b53f680ad938da6913cb774b204816902074322a`, equal to
-  refreshed `origin/codex/nightly`; exact hosted run 37469088813 succeeded.
+- Started clean at `95de6331fb04e7fc489bfcd39a1b98daaebece20`, equal to
+  refreshed `origin/codex/nightly`; exact hosted run 37626703339 succeeded.
 - Initial and final locked local baselines pass 141 tests. Formatting,
   all-target check, warnings-denied Clippy/rustdoc, and whitespace pass.
-  Focused message-dispatch target passes six tests. One existing test is
-  strengthened; the test count does not increase.
+  This authority checkpoint changes documentation and automation instructions.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Hosted tools: Rust/Cargo 1.99.0, rustfmt 1.10.0-stable,
   Clippy 0.1.99. The [source-policy re-audit](verification/CI_BASELINE.md)
   retains existing format, width, function-size, and waiver policy.
-- Final audit passes 33 Rust files and 12,666 physical lines with zero width
-  findings and three unchanged fulfilled expectations. All 291 relative links
-  across 60 Markdown files and 105 traceability function references resolve.
-  Six changed documents pass rendered HTML structure/content inspection;
-  author/independent source/diff review pass. No pixel-level acceptance is claimed.
-- Checkpoint `44709878005d8b91df8411f9e2ccc8179d21ddde` is published.
-  [Hosted run 37626284281](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
-  passes the exact logged checkout and all 20 reported steps, including 141
-  workspace tests, focused adapters/sample, documentation, and the executed
-  sample. Tools/runner match the prior checkpoint; no policy adaptation.
+- Source audit retains 33 Rust files and 12,666 physical lines with zero width
+  findings and three unchanged fulfilled expectations. All 304 relative links
+  across 61 Markdown files and 105 traceability function references resolve.
+  Eleven changed documents pass rendered HTML structure/content inspection;
+  author/independent document/diff review passes; no pixel-level acceptance is
+  claimed. Publication and exact-head hosted CI are pending.
 
 ## Current architecture
 
@@ -39,18 +34,17 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
-This checkpoint changes tests and records only; production behavior and public
-API remain as accepted in ADR-0011/0012.
+Production behavior and public APIs remain unchanged. Review authority is
+recorded separately in ADR-0024; actual host review is not yet complete.
 
 ## Work in progress
 
-The [dispatch availability review](verification/DISPATCH_AVAILABILITY_REFRESH_REVIEW.md)
-extends the existing stopped-peer dispatch scenario through successful restart
-and a third publisher callback. It checks exact delivered/unavailable/delivered
-reports, new-only peer reply consumption, and no empty-inbox callback.
-No unfinished implementation remains. Local acceptance, publication, and
-exact-checkpoint hosted verification pass. This documentation follow-up
-records that result; later revisions need their own CI.
+The [authority decision](adr/0024-autonomous-host-review-authority.md) removes
+the routine human acceptance gate while retaining recorded review, evidence,
+and actual reviewer provenance. The existing nightly automation now carries
+that direction; its schedule, model, reasoning, target, and notification policy
+are preserved and verified. No unfinished implementation remains. Local
+acceptance passes; publication and exact-head hosted CI are pending.
 
 ## Highest risks and uncertainties
 
@@ -70,22 +64,24 @@ records that result; later revisions need their own CI.
 
 ## Important unresolved decisions
 
-Human v0.1 acceptance remains pending, including caller-scoped application and
-clock identity before API stabilization. APIs and local grammar are unfrozen.
+Autonomous v0.1 entry-point/architecture review remains to be completed,
+including disposition of caller-scoped application and clock identity.
+APIs and local grammar are unfrozen; a major API freeze still needs approval.
 MSRV, message/lifecycle configuration access, broader events, external I/O,
 hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 ## Most likely next tasks
 
-1. Reconcile remaining Stage 4 contracts against existing tests and probes,
-   choosing another distinct bounded gap only where evidence warrants it.
-2. Record human entry-point/architecture acceptance before broadening scope.
+1. Complete the documented autonomous host entry-point/architecture review,
+   record the exact revision and dispositions, then select the next host
+   engineering increment. Consequential scope changes retain their own gates.
+2. Use review findings to select a distinct bounded implementation or hardening
+   objective; retain existing verified behavior and accurate limitations.
 
 ## Latest run
 
-2026-10-08: the strengthened callback-availability regression observes a peer
-as running, stopped, and restarted, with only the new reply consumed after
-restart. Focused six-test and full 141-test locked baselines pass without a new
-lint exception or production change. Source/document/diff review, publication,
-and exact-checkpoint hosted verification pass.
-Human v0.1 acceptance remains open.
+2026-10-08 interactive direction: routine host acceptance is delegated to
+autonomous review. Current gates and nightly instructions are reconciled;
+initial/final locked baselines pass 141 tests. Actual review is future
+engineering work, not a request for human acceptance. Source/document/diff
+review passes; publication and exact-head hosted CI are pending.

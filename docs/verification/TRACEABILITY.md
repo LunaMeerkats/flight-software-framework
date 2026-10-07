@@ -17,6 +17,12 @@ at the bounded in-memory ordinary-work boundary.
 Implementation and verification state remain separate so planned evidence is
 not represented as completed behavior.
 
+The user's 2026-10-08 [review delegation](../adr/0024-autonomous-host-review-authority.md)
+permits documented autonomous host entry-point and architecture acceptance.
+Routine human acceptance is no longer a development or milestone-review gate.
+Actual review remains pending where recorded below; historical checkpoints
+retain their original reviewer/evidence limits and do not establish human review.
+
 The standalone configuration implementation is
 `7dd237626f6a1207b6abffe3bee98830e8a9ada7`; runtime integration is
 `9afc85686de192d66e36af950b1b63a29ca541ca`. The 2026-09-02 run passes all 83
@@ -63,7 +69,7 @@ CI, physical delivery, or architecture review.
 
 | Requirement | Implementation state | Planned verification | Exact verification evidence | Last verified commit | Verification state |
 | --- | --- | --- | --- | --- | --- |
-| RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented human checklist covering user-facing docs and sample output | [Autonomous inventory](DEPENDENCY_SCOPE_REVIEW.md) prepares review; it is not human acceptance | `c472c57c1aa241d821b891674ba25f42b25ae723` reviewed input; `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` inventory and notice correction | Pending human review |
+| RFF-REQ-001 | Implemented for current entry points; future entry points remain in scope | Documented autonomous review covering user-facing docs and sample output, with exact revision, reviewer, findings, and disposition under ADR-0024 | [Autonomous inventory](DEPENDENCY_SCOPE_REVIEW.md) prepares review; it does not complete the newly delegated review | `c472c57c1aa241d821b891674ba25f42b25ae723` reviewed input; `e17c5d3363092dbe55ba1fc6bb94a6e66956c667` inventory and notice correction | Pending documented autonomous review |
 | RFF-REQ-002 | Implemented: bounded logical LC1 transitions plus two statically composed applications completing owned registration, start, work, stop, restart, and work | Preserve exhaustive lifecycle and complete two-application scenario regression coverage | `lifecycle::tests::registry_enforces_every_state_operation_pair`; `configured_capacity_bounds_registration_without_mutating_existing_records`; `approved_lc1_sequence_preserves_identity_and_registry_bound`; `invalid_transition_is_typed_and_leaves_state_unchanged`; `two_lifecycle_records_transition_independently`; `two_applications_complete_lifecycle_with_running_work`; `unknown_identity_is_rejected_before_application_code_runs`; `cargo test --workspace --all-features` (83 passed) | `9afc85686de192d66e36af950b1b63a29ca541ca` | Verified |
 | RFF-REQ-003 | Implemented: inline payload bound, immutable positive-capacity topology, registration-order routing, cross-topic FIFO, reject-newest saturation, unaffected fan-out, ordered outcomes, lifecycle unavailability, exact stop/failure clearing, empty restart reconnection, and running-only one-message application dispatch through a publish-only context | Preserve exact-boundary routing, lifecycle ownership, oldest-only dispatch, self-publication, refreshed availability, and callback-error regressions | `inline_payload_accepts_its_exact_limit_and_rejects_one_more_byte`; `topology_validation_rejects_invalid_inboxes_without_a_partial_bus`; `reject_newest_saturation_preserves_older_entries_and_healthy_fan_out`; `publication_distinguishes_all_full_from_no_subscribers`; `one_inbox_preserves_cross_topic_publish_order`; `selective_routing_skips_nonmatching_endpoints_and_preserves_route_order`; `registered_subscribers_are_known_but_unavailable`; `stop_clears_one_inbox_and_restart_reconnects_it_empty`; `lifecycle_gate_and_empty_inbox_never_invoke_application_code`; `dispatch_presents_one_oldest_message_per_call`; `self_publication_uses_the_freed_slot_and_preserves_peer_outcomes`; `dispatch_refreshes_peer_availability_after_lifecycle_change`; `callback_error_clears_selected_queue_but_retains_peer_publication`; `cargo test --workspace --all-features` (83 passed) | `9afc85686de192d66e36af950b1b63a29ca541ca` | Verified |
 | RFF-REQ-004 | Implemented at the finite one-shot boundary: ordered `FrameworkInstant`, injected `Clock`, explicit `ManualClock` advancement, typed non-mutating overflow, fixed nondecreasing `WorkSchedule`, stable equal-time order, one due or overdue attempt per call, exact lifecycle/error outcomes, and identical replayed work/lifecycle/event-timestamp traces | Preserve manual-clock, schedule-order, one-item, lifecycle/error, and complete replay regressions; evaluate recurrence only through a separate decision | `manual_clock_starts_at_origin_and_reads_do_not_advance`; `manual_clock_advances_only_by_explicit_durations`; `advance_overflow_is_typed_and_preserves_current_time`; `schedule_rejects_descending_instants_and_accepts_an_empty_agenda`; `complete_reads_no_clock_and_each_pending_item_decision_reads_once`; `waiting_preserves_the_item_and_manual_clock_until_its_inclusive_instant`; `equal_time_order_is_stable_and_overdue_work_runs_one_item_per_call`; `lifecycle_rejection_consumes_one_item_without_blocking_a_due_peer`; `returned_work_error_consumes_one_item_without_blocking_a_due_peer`; `identical_manual_scenarios_replay_the_same_work_and_event_timestamp_trace`; `cargo test --workspace --all-features` (83 passed) | `9afc85686de192d66e36af950b1b63a29ca541ca` | Verified |
@@ -717,7 +723,8 @@ human v0.1 acceptance.
 
 - an exact test, review artefact, or other observable evidence;
 - the successful command that exercised it when applicable, or the documented
-  procedure and result for a human review;
+  procedure and result for a review, identifying the actual autonomous or human
+  reviewer;
 - the commit hash containing the evidence; and
 - requirement wording that matches what was actually demonstrated.
 

@@ -285,8 +285,10 @@ The package is unpublished and uses stable Rust with no external Cargo
 dependencies or package features. The standard library, host environment,
 toolchain, and CI tooling remain outside that Cargo graph. The
 [dependency and scope review](docs/verification/DEPENDENCY_SCOPE_REVIEW.md)
-records the exact inventory and autonomous review boundary; human v0.1
-entry-point and architecture acceptance remain pending.
+records the exact inventory and autonomous review boundary. Under the user's
+2026-10-08 [review delegation](docs/adr/0024-autonomous-host-review-authority.md),
+routine v0.1 entry-point and architecture acceptance can proceed autonomously.
+The actual documented reviews remain to be completed.
 
 ```text
 cargo fmt --all -- --check
@@ -306,7 +308,8 @@ Windows. [Its verification record](docs/verification/CI_BASELINE.md) separates
 local validation from successful exact-revision hosted execution. Verified
 source pushes to the existing `codex/nightly` branch are authorized without
 per-push human review. Autonomous source/document review and automated checks
-remain required; separate human v0.1 release reviews remain outstanding.
+remain required. Routine host milestone reviews are delegated to Codex;
+publication and completed review remain separate evidence.
 
 ## Combined host sample
 
@@ -346,7 +349,7 @@ validated observation byte; it does not alter the command grammar.
 `cargo test --test host_sample` verifies the same combined driver as the binary,
 including complete fresh-run report equality. See the
 [sample guide](docs/verification/HOST_SAMPLE.md) for exact expected fields and
-resource limits. CI, scope/dependency review, and human v0.1 architecture review
+resource limits. CI, scope/dependency review, and recorded v0.1 architecture review
 remain separate release gates.
 
 ## Start here

@@ -1,7 +1,7 @@
 # v0.1 requirements
 
 Status: **Provisional, partially implemented**
-Last reviewed: **2026-09-12**
+Last reviewed: **2026-10-08**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -28,8 +28,10 @@ flight-qualified, safety-certified, NASA-endorsed, operationally suitable,
 TRL-proven, or automatically compatible with cFS, cFE, OSAL, PSP, CCSDS, or an
 RTOS.
 
-Acceptance: a documented release review checks every user-facing entry point and
-records the reviewed commit.
+Acceptance: a documented entry-point review checks every user-facing entry point
+and records the reviewed commit, actual reviewer, findings, and disposition.
+[ADR-0024](adr/0024-autonomous-host-review-authority.md) permits autonomous
+review; delegation alone does not complete it.
 
 ### RFF-REQ-002 — Explicit application lifecycle
 
@@ -146,7 +148,9 @@ selected local slice/returned-array boundary. The full v0.1 sample gate remains
 unchanged. [ADR-0022](adr/0022-combined-host-sample.md) now demonstrates the
 required services in one executable with a shared, tested scenario driver.
 The [recorded hosted CI run](verification/CI_BASELINE.md) now passes. The
-documented human entry-point/architecture reviews remain pending.
+documented autonomous entry-point/architecture reviews remain pending under
+[ADR-0024](adr/0024-autonomous-host-review-authority.md). Routine human acceptance
+is no longer required for continued host development or milestone review.
 The original ownership probe alone does not establish adapter correctness.
 
 Do not use an implementation's accidental behavior to settle these parameters
@@ -163,7 +167,11 @@ These gates support the requirements but are not additional system behaviors:
   integration tests, and documentation checks pass in CI;
 - important requirements map to exact evidence in the traceability register;
 - dependency licences and enabled features are reviewed;
-- unsupported claims and known limitations receive a human architecture review.
+- unsupported claims and known limitations receive a recorded architecture
+  review, performed autonomously under ADR-0024 with actual reviewer provenance.
+
+These are host milestone evidence gates, not authorization to tag, release,
+publish a crate, or deploy. The separate consequential gates remain unchanged.
 
 Changes to requirement meaning or scope must update this file, the roadmap,
 traceability, and project state in the same coherent increment.
