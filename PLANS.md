@@ -1,43 +1,41 @@
-# Stage 4 configuration work-view refresh
+# Stage 4 dispatch availability refresh after peer restart
 
-Date: **2026-10-07**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-08**
+Status: **Local acceptance passed; publication and hosted verification pending**
 
 ## Objective and context
 
-Verify ADR-0018's current used-byte prefix through the production ordinary-work
-boundary. Standalone tests already cover shrinking storage snapshots. The
-starting runtime baseline covered an initial short prefix and fixed-length
-activation/rollback; the host sample uses one-byte values. Borrow escape and
-copied-observation retention already have evidence. The remaining explicit gap
-is callback visibility across
-exact-bound, shorter, empty, and restored-shorter configuration transitions.
+Verify ADR-0012's per-dispatch lifecycle snapshot through a complete peer
+stop/restart cycle. The existing dispatch regression covers a running peer
+becoming unavailable after stop. External publication already covers restart
+reconnection, but does not populate and then refresh a stopped dispatch
+snapshot. Extend the existing callback-publication scenario to close that gap.
 
-Starting revision: `b5f1f5dd770ffa8e3e310635dd0d03b678b91892`, clean and
-equal to refreshed `origin/codex/nightly`; hosted run 37315596231 succeeded.
+Starting revision: `b53f680ad938da6913cb774b204816902074322a`, clean and
+equal to refreshed `origin/codex/nightly`; hosted run 37469088813 succeeded.
 The initial locked local baseline passes 141 tests on Rust/Cargo 1.98.0,
 rustfmt 1.9.0-stable, and Clippy 0.1.98.
 
 ## Acceptance criteria
 
-- Work observes revision one with four bytes, revision two with one byte,
-  revision three with empty configured content, then restored revision two
-  with one byte; no unused or stale bytes appear.
-- Empty accepted content remains a configured `Some` view. Exact full copies
-  and four callback invocations remain observable after the owner leaves scope.
-- Reuse existing observing applications; change no production/API/dependency,
-  lint, workflow, requirements, accepted decision, or borrowing experiment.
+- Three publisher callbacks observe the peer as delivered, unavailable after
+  stop, and delivered after successful in-place restart.
+- Stop discards the initial queued reply. The stopped publication queues
+  nothing; restart reconnects an empty inbox; the next callback delivers only
+  the new reply, with exact topic/payload/application identity and no replay.
+- Reuse the existing dispatch fixtures and test; retain production behavior,
+  public API, dependencies, requirements, ADRs, lint policy, and workflow.
 - Focused/full locked checks, source form, links, rendered documents, and
-  complete diff review pass without new exceptions.
+  complete diff review pass without a new exception.
 
 ## Files and verification
 
-Extend `tests/configuration_runtime.rs`; add
-`docs/verification/CONFIGURATION_VIEW_REFRESH_REVIEW.md`; reconcile
+Extend `tests/message_dispatch.rs`; add
+`docs/verification/DISPATCH_AVAILABILITY_REFRESH_REVIEW.md`; reconcile
 README, roadmap, project state, traceability, and this plan.
 
 ```text
-cargo test --locked --test configuration_runtime
+cargo test --locked --test message_dispatch
 cargo fmt --all -- --check
 cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
@@ -50,44 +48,26 @@ Set `RUSTDOCFLAGS=-D warnings`. Audit whole-tree physical/comment widths and
 expectations separately; render changed Markdown and inspect its structure and
 content. Publish after applicable local checks and source/diff review, then
 inspect exact-revision hosted checkout, steps, tools, and logs. Unchanged
-ADR-0018/0019 experiments and host sample do not trigger separate local probes.
+ADR-0018/0019 experiments, host sample, and workflow do not trigger extra probes.
 
 ## Risks and safe stopping point
 
-Application-owned `Vec` copies and observation logs lie outside runtime storage
-bounds. This is direct ordinary-work prefix-refresh evidence, not a new
-configuration service, mutable runtime view, allocation/deallocation measure,
-secure erasure, messaging-specific retention proof, or human v0.1 acceptance.
-Stop after this checkpoint. If a defect emerges, investigate only the copied
-view boundary and preserve unrelated work.
+This observes synchronous callback publication against refreshed lifecycle
+state under controlled inputs. It does not add automatic dispatch, retry,
+concurrency, failed-application recovery, identity provenance, real-time
+behavior, or human v0.1 acceptance. Stop after this checkpoint. If a defect
+emerges, investigate only the snapshot refresh boundary and preserve unrelated
+work.
 
 ## Completed local checks
 
-The focused configuration-runtime target passes 11 tests; initial and final
-locked workspace baselines pass 141. Formatting, all-target check,
-warnings-denied Clippy/rustdoc, and whitespace pass. Independent source review
-accepts the strengthened regression without a new exception. Source audit
-covers 33 Rust files and 12,632 physical lines with zero width findings and
-three unchanged fulfilled expectations. All 286 relative links across 59
-Markdown files and 105 exact traceability function references resolve.
-Author and independent complete-diff/source reviews pass. Six changed documents
-pass rendered HTML structure/content inspection; no pixel-level acceptance is
-claimed.
-
-## Publication and hosted verification
-
-Checkpoint `16fb457f6ee7a49109ef1e245c59ea5ec9588922` was published by
-ordinary fast-forward; the remote head matched. Hosted push run
-[37468611582](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
-passes the exact logged checkout and all 20 reported steps (17 named workflow
-steps plus job lifecycle). Logs show the strengthened regression among 141
-workspace tests, 14 focused adapter tests, five focused sample tests,
-warnings-denied documentation, the executed sample, and both whitespace checks.
-Focused reruns do not increase the workspace total.
-
-Runner 2.337.0 uses `windows-2025-vs2026` image `20260925.250.1`.
-Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the prior
-checkpoint; local tools remain 1.98.0/1.9.0-stable/0.1.98. The existing
-source-policy re-audit remains applicable. This documentation follow-up records
-checkpoint evidence; later revisions need their own CI result. Human v0.1
-architecture acceptance remains open.
+The focused message-dispatch target passes six tests; initial and final locked
+workspace baselines pass 141. Formatting, all-target check, warnings-denied
+Clippy/rustdoc, and whitespace pass. The chronological regression uses one
+focused publication-report assertion helper and adds no lint expectation.
+Whole-tree audit covers 33 Rust files and 12,666 physical lines with zero
+width findings and three unchanged fulfilled expectations. All 291 relative
+links across 60 Markdown files and 105 exact traceability function references
+resolve. Six changed documents pass rendered HTML structure/content inspection;
+author and independent complete-diff/source reviews pass. No pixel-level
+acceptance is claimed. Publication and exact-checkout hosted CI are pending.

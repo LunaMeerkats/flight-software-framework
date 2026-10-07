@@ -684,6 +684,28 @@ the sample executable. It does not add message/lifecycle callback access,
 typed decoding, caller-copy resource bounds,
 allocator instrumentation, API stabilization, or human v0.1 acceptance.
 
+## Dispatch availability refresh evidence
+
+The 2026-10-08
+[dispatch availability review](DISPATCH_AVAILABILITY_REFRESH_REVIEW.md)
+supplements RFF-REQ-003 and ADR-0011/0012 without changing their contracts.
+The extended `dispatch_refreshes_peer_availability_after_lifecycle_change`
+regression runs three publisher callbacks while a peer is running, stopped,
+and restarted. Callback reports change from delivered to unavailable
+and back to delivered. Stop clears the initial reply, the unavailable
+publication queues nothing, and the reconnected peer consumes exactly the new
+reply before an empty dispatch produces no additional callback.
+
+External publication already covers empty restart reconnection, and the
+original dispatch regression covers the transition to stopped availability.
+The extension checks refresh of a previously stopped callback snapshot.
+The focused target passes six tests and the final locked baseline passes 141
+without a new lint exception or production change. Exact publication-report
+classifications and complete one-destination outcomes are asserted.
+Source/document/diff review passes; publication and hosted acceptance are pending.
+It does not add automatic retry, failed-record recovery, concurrency, or
+human v0.1 acceptance.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

@@ -384,43 +384,77 @@ fn assert_publish_twice_outcomes(
 #[test]
 fn dispatch_refreshes_peer_availability_after_lifecycle_change() {
     let (publisher, publisher_trace) = application(DispatchBehavior::PublishOnce);
-    let (peer, _peer_trace) = application(DispatchBehavior::Passive);
-    let (mut runtime, application_ids) =
+    let (peer, peer_trace) = application(DispatchBehavior::Passive);
+    let (mut runtime, [publisher_id, peer_id]) =
         configured_runtime([publisher, peer], [1, 1], [&INPUT_ONLY, &REPLY_ONLY]);
-    runtime.start(application_ids[0]).expect("publisher starts");
-    runtime.start(application_ids[1]).expect("peer starts");
+    runtime.start(publisher_id).expect("publisher starts");
+    runtime.start(peer_id).expect("peer starts");
     runtime
         .publish(&message(MissionTopic::Input, 1))
         .expect("first input report can be reserved");
     runtime
-        .dispatch_one(application_ids[0])
+        .dispatch_one(publisher_id)
         .expect("first callback succeeds");
-    assert_eq!(runtime.pending(application_ids[1]), Ok(1));
-    assert_eq!(
-        runtime
-            .stop(application_ids[1])
-            .expect("peer stop succeeds")
-            .discarded_deliveries(),
-        1
-    );
+    assert_eq!(runtime.pending(peer_id), Ok(1));
+    let stopped = runtime.stop(peer_id).expect("peer stop succeeds");
+    assert_eq!(stopped.state(), ApplicationState::Stopped);
+    assert_eq!(stopped.discarded_deliveries(), 1);
+    assert_eq!(runtime.pending(peer_id), Ok(0));
 
     runtime
         .publish(&message(MissionTopic::Input, 2))
         .expect("second input report can be reserved");
     runtime
-        .dispatch_one(application_ids[0])
+        .dispatch_one(publisher_id)
         .expect("second callback succeeds");
-    let trace = publisher_trace.borrow();
-    assert_eq!(trace.publications.len(), 2);
+    assert_eq!(runtime.pending(peer_id), Ok(0));
+    assert_eq!(runtime.restart(peer_id), Ok(ApplicationState::Running));
+    assert_eq!(runtime.pending(peer_id), Ok(0));
+
+    runtime
+        .publish(&message(MissionTopic::Input, 3))
+        .expect("third input report can be reserved");
+    runtime
+        .dispatch_one(publisher_id)
+        .expect("third callback succeeds");
+    assert_eq!(runtime.pending(peer_id), Ok(1));
     assert_eq!(
-        trace.publications[0].outcomes,
-        [(application_ids[1], DeliveryStatus::Delivered)]
+        runtime.dispatch_one(peer_id),
+        Ok(MessageDispatchOutcome::Dispatched)
+    );
+    assert_eq!(runtime.pending(peer_id), Ok(0));
+    assert_eq!(
+        runtime.dispatch_one(peer_id),
+        Ok(MessageDispatchOutcome::InboxEmpty)
     );
     assert_eq!(
-        trace.publications[1].outcomes,
-        [(application_ids[1], DeliveryStatus::Unavailable)]
+        peer_trace.borrow().handled,
+        [HandledMessage {
+            application_id: peer_id,
+            topic: MissionTopic::Reply,
+            payload: 4,
+        }]
     );
-    assert_eq!(runtime.pending(application_ids[1]), Ok(0));
+    assert_lifecycle_publication_outcomes(&publisher_trace.borrow().publications, peer_id);
+}
+
+fn assert_lifecycle_publication_outcomes(
+    publications: &[PublicationObservation],
+    peer_id: ApplicationId,
+) {
+    let expected = [
+        (PublishClassification::Complete, DeliveryStatus::Delivered),
+        (
+            PublishClassification::WhollyUndelivered,
+            DeliveryStatus::Unavailable,
+        ),
+        (PublishClassification::Complete, DeliveryStatus::Delivered),
+    ];
+    assert_eq!(publications.len(), expected.len());
+    for (publication, (classification, status)) in publications.iter().zip(expected) {
+        assert_eq!(publication.classification, classification);
+        assert_eq!(publication.outcomes, [(peer_id, status)]);
+    }
 }
 
 fn assert_callback_failure_error(

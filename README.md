@@ -60,6 +60,11 @@ callback now receives one oldest in-flight delivery plus a publish-only context.
 It can self-publish through the same bounded bus without gaining lifecycle,
 dequeue, or nested-dispatch access. Routing-core, runtime-messaging, and
 message-dispatch tests cover these boundaries; the
+[dispatch availability review](docs/verification/DISPATCH_AVAILABILITY_REFRESH_REVIEW.md)
+extends callback publication through a peer's running, stopped, and restarted
+states. The stopped snapshot must be refreshed before the next publisher
+callback; only its new reply reaches the reconnected peer inbox.
+The
 [returned-message failure review](docs/verification/MESSAGE_FAILURE_REVIEW.md)
 records the complete retained peer FIFO and post-failure availability boundary.
 The [returned-stop failure review](docs/verification/STOP_FAILURE_REVIEW.md)

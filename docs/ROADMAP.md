@@ -273,6 +273,12 @@ borrowing probes already reject callback-byte escape. Focused and full locked
 checks and source/document/diff review pass. Checkpoint `16fb457` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
 for the exact checkout, 141 workspace tests, and configured host/sample evidence.
+The 2026-10-08
+[dispatch availability review](verification/DISPATCH_AVAILABILITY_REFRESH_REVIEW.md)
+extends the existing callback-publication regression through peer restart
+after an intervening stopped-peer dispatch. It checks delivered/unavailable/
+delivered outcomes and exact new-only reply consumption without changing the
+per-dispatch lifecycle snapshot contract.
 Other lifecycle/service resource,
 failure, and public-API reviews plus human entry-point/architecture acceptance
 remain open.

@@ -1,37 +1,32 @@
 # Project state
 
-Last updated: **2026-10-07**
+Last updated: **2026-10-08**
 
 ## Current milestone
 
 Stages 1 through 3 and the first source-quality checkpoint are complete.
 Stage 4 has sample, hosted CI, dependency/scope, resource, failure, schedule,
-identity, diagnostics, and ownership evidence. This run strengthens ordinary
-work's used-configuration-prefix observations across changing content lengths.
+identity, diagnostics, and ownership evidence. This run strengthens callback
+publication's availability refresh after a stopped peer restarts.
 Broader contract review and human v0.1 architecture acceptance remain open.
 
 ## Verified baseline
 
-- Started clean at `b5f1f5dd770ffa8e3e310635dd0d03b678b91892`, equal to
-  refreshed `origin/codex/nightly`; exact hosted run 37315596231 succeeded.
+- Started clean at `b53f680ad938da6913cb774b204816902074322a`, equal to
+  refreshed `origin/codex/nightly`; exact hosted run 37469088813 succeeded.
 - Initial and final locked local baselines pass 141 tests. Formatting,
   all-target check, warnings-denied Clippy/rustdoc, and whitespace pass.
-  Focused configuration-runtime target passes 11 tests. One existing test is
+  Focused message-dispatch target passes six tests. One existing test is
   strengthened; the test count does not increase.
 - Local Rust/Cargo: 1.98.0; rustfmt: 1.9.0-stable; Clippy: 0.1.98.
 - Hosted tools: Rust/Cargo 1.99.0, rustfmt 1.10.0-stable,
   Clippy 0.1.99. The [source-policy re-audit](verification/CI_BASELINE.md)
   retains existing format, width, function-size, and waiver policy.
-- Final audit passes 33 Rust files and 12,632 physical lines with zero width
-  findings and three unchanged fulfilled expectations. All 286 relative links
-  across 59 Markdown files and 105 traceability function references resolve.
+- Final audit passes 33 Rust files and 12,666 physical lines with zero width
+  findings and three unchanged fulfilled expectations. All 291 relative links
+  across 60 Markdown files and 105 traceability function references resolve.
   Six changed documents pass rendered HTML structure/content inspection;
   author/independent source/diff review pass. No pixel-level acceptance is claimed.
-- Checkpoint `16fb457f6ee7a49109ef1e245c59ea5ec9588922` is published.
-  [Hosted run 37468611582](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37468611582)
-  passes the exact logged checkout and all 20 reported steps, including 141
-  workspace tests, focused adapters/sample, documentation, and the executed
-  sample. Tools/runner match the prior checkpoint; no policy adaptation.
 
 ## Current architecture
 
@@ -40,17 +35,16 @@ routing/dispatch, manual time and one-shot scheduling, bounded events, and
 optional runtime configuration with immutable work visibility and one-use
 rollback. The private shared-source host sample composes these services.
 This checkpoint changes tests and records only; production behavior and public
-API remain as accepted in ADR-0017/0018.
+API remain as accepted in ADR-0011/0012.
 
 ## Work in progress
 
-The [configuration-view review](verification/CONFIGURATION_VIEW_REFRESH_REVIEW.md)
-records exact-bound, shorter, empty-configured, and restored-shorter bytes
-through four ordinary callbacks. Exact copied logs are checked after the
-runtime leaves scope. Existing lifetime probes and fixed-length composition
-tests remain their own evidence. No unfinished implementation remains. Local
-acceptance, publication, and exact-checkpoint hosted verification pass. This
-documentation follow-up records that result; later revisions need their own CI.
+The [dispatch availability review](verification/DISPATCH_AVAILABILITY_REFRESH_REVIEW.md)
+extends the existing stopped-peer dispatch scenario through successful restart
+and a third publisher callback. It checks exact delivered/unavailable/delivered
+reports, new-only peer reply consumption, and no empty-inbox callback.
+No unfinished implementation remains. Local acceptance passes; publication
+and exact-checkout hosted verification are pending.
 
 ## Highest risks and uncertainties
 
@@ -83,10 +77,9 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 
 ## Latest run
 
-2026-10-07: the strengthened ordinary-work prefix regression observes four,
-one, zero, and restored one-byte configurations with their exact revisions;
-empty content retains configured presence. Focused 11-test and full 141-test
-locked baselines pass without a new lint exception or production change.
-Source/document/diff review, publication, and exact-checkpoint hosted
-verification pass.
+2026-10-08: the strengthened callback-availability regression observes a peer
+as running, stopped, and restarted, with only the new reply consumed after
+restart. Focused six-test and full 141-test locked baselines pass without a new
+lint exception or production change. Source/document/diff review passes;
+publication and exact-checkout hosted verification are pending.
 Human v0.1 acceptance remains open.
