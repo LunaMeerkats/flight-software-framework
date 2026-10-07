@@ -26,7 +26,12 @@ The actual reviews remain open; routine human acceptance no longer blocks work.
   across 61 Markdown files and 105 traceability function references resolve.
   Eleven changed documents pass rendered HTML structure/content inspection;
   author/independent document/diff review passes; no pixel-level acceptance is
-  claimed. Publication and exact-head hosted CI are pending.
+  claimed.
+- Authority checkpoint `300363fb60343e99fd3ac2989581a3e78f5f65be` is
+  published. [Hosted run 37675094546](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37675094546)
+  passes its exact logged checkout and all 20 reported steps, including 141
+  workspace tests, focused adapters/sample, warnings-denied documentation, the
+  sample executable, and whitespace. Tools/runner match the prior baseline.
 
 ## Current architecture
 
@@ -44,7 +49,8 @@ the routine human acceptance gate while retaining recorded review, evidence,
 and actual reviewer provenance. The existing nightly automation now carries
 that direction; its schedule, model, reasoning, target, and notification policy
 are preserved and verified. No unfinished implementation remains. Local
-acceptance passes; publication and exact-head hosted CI are pending.
+acceptance, publication, and exact-checkpoint hosted CI pass. This follow-up
+records the result; later revisions need their own CI.
 
 ## Highest risks and uncertainties
 
@@ -84,4 +90,5 @@ hardware, RTOS, and no_std remain open; no scope expansion is approved here.
 autonomous review. Current gates and nightly instructions are reconciled;
 initial/final locked baselines pass 141 tests. Actual review is future
 engineering work, not a request for human acceptance. Source/document/diff
-review passes; publication and exact-head hosted CI are pending.
+review, publication, and exact-checkpoint hosted CI pass. The actual host
+milestone review remains the next engineering task.

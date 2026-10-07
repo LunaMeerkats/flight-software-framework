@@ -1,7 +1,7 @@
 # Autonomous host review authority checkpoint
 
 Date: **2026-10-08**
-Status: **Local acceptance passed; publication and hosted verification pending**
+Status: **Complete: authority published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -74,4 +74,21 @@ saved prompt matches the requested delegation; all other persisted settings,
 including daily midnight cadence, model/reasoning, local project target, and
 failed-runs-only notifications, match the starting configuration. Author and
 independent complete-diff/source/document reviews pass, including all eleven
-rendered documents. Publication and exact-head hosted CI are pending.
+rendered documents.
+
+## Publication and hosted verification
+
+Authority checkpoint `300363fb60343e99fd3ac2989581a3e78f5f65be` was
+published by ordinary fast-forward; the remote head matched. Hosted push run
+[37675094546](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37675094546)
+passes the exact logged checkout and all 20 reported steps (17 named workflow
+steps plus job lifecycle). Logs confirm 141 workspace tests, separate 14
+adapter/five sample tests, warnings-denied rustdoc, the executed sample, and
+both whitespace checks. Focused reruns do not increase the workspace total.
+
+Runner 2.337.0, `windows-2025-vs2026` image `20260925.250.1`, and hosted
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99 match the prior
+baseline. Local tools remain 1.98.0/1.9.0-stable/0.1.98; no policy adaptation
+is required. This documentation follow-up records authority-checkpoint evidence;
+later revisions need their own CI. Actual host milestone review remains the
+next engineering task, with no routine human acceptance request.
