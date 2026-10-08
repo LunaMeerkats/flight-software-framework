@@ -13,6 +13,12 @@ fit Rust's ownership, type, error, and testing models.
 
 ## Current status
 
+The experimental serial host v0.1 milestone is accepted by the
+[2026-10-09 Codex review](docs/verification/HOST_V0_1_REVIEW.md), including
+scope entry points, resource/failure contracts, and architecture. This completes
+Stage 4 for the recorded host target. The package stays unpublished at 0.0.0;
+APIs remain provisional and consequential release/scope gates remain separate.
+
 The repository contains an initial research and architecture baseline, five
 bounded Rust lifecycle/work increments, three Stage 2 messaging increments,
 two structured-event increments, an injected manual-time increment, and a
@@ -288,7 +294,8 @@ toolchain, and CI tooling remain outside that Cargo graph. The
 records the exact inventory and autonomous review boundary. Under the user's
 2026-10-08 [review delegation](docs/adr/0024-autonomous-host-review-authority.md),
 routine v0.1 entry-point and architecture acceptance can proceed autonomously.
-The actual documented reviews remain to be completed.
+The [completed review](docs/verification/HOST_V0_1_REVIEW.md) records the exact
+input revision, actual Codex reviewers, evidence, findings, and accepted limits.
 
 ```text
 cargo fmt --all -- --check
@@ -349,8 +356,9 @@ validated observation byte; it does not alter the command grammar.
 `cargo test --test host_sample` verifies the same combined driver as the binary,
 including complete fresh-run report equality. See the
 [sample guide](docs/verification/HOST_SAMPLE.md) for exact expected fields and
-resource limits. CI, scope/dependency review, and recorded v0.1 architecture review
-remain separate release gates.
+resource limits. The [host review](docs/verification/HOST_V0_1_REVIEW.md)
+accepts the combined demonstration with separate CI, dependency, scope, and
+architecture evidence; sample execution alone does not establish those gates.
 
 ## Start here
 
@@ -390,6 +398,7 @@ remain separate release gates.
 - [Lifecycle construction review](docs/verification/LIFECYCLE_CONSTRUCTION_REVIEW.md)
 - [Research sources and provenance](docs/research/SOURCES.md)
 - [Verification traceability](docs/verification/TRACEABILITY.md)
+- [Autonomous host v0.1 review](docs/verification/HOST_V0_1_REVIEW.md)
 - [Source-quality baseline](docs/verification/SOURCE_QUALITY_BASELINE.md)
 - [Contributor and automation guidance](AGENTS.md)
 

@@ -159,3 +159,20 @@ scope, and architecture reviews remain host v0.1 evidence gates. The user's
 2026-10-08 [delegation](../adr/0024-autonomous-host-review-authority.md) permits
 routine entry-point/architecture acceptance through documented autonomous
 review; it does not establish human review or authorize releases/deployment.
+
+## Autonomous host milestone review — 2026-10-09
+
+The [completed host review](HOST_V0_1_REVIEW.md) uses input
+`ba42f800d0b74637b28c833a55192fc541912fe5`. Fresh local locked checks pass
+141 workspace tests, 14 focused adapters, five focused sample tests, the sample
+executable, and warnings-denied documentation. Codex reviews source form,
+resource/failure/API contracts, provenance, dependencies, and entry-point scope.
+These local/manual reviews remain distinct from hosted execution.
+
+[Input run 37675969512](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37675969512)
+is freshly confirmed successful at its exact logged checkout: one Windows job
+and all 20 reported steps. Runner 2.337.0, image `windows-2025-vs2026`
+`20260925.250.1`, Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, and Clippy 0.1.99
+match the prior policy re-audit. Local tools remain on 1.98.0. The actual review
+closes routine host milestone gates; it does not create human-reviewed or
+release-ready status. The review's documentation revisions need their own CI.

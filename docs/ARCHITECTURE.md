@@ -306,9 +306,21 @@ work failure with a structured event. The failed inbox is cleared while the
 peer later works and dispatches its retained telemetry. The binary and tests
 execute the same source and retain a fixed report. The
 [hosted CI baseline](verification/CI_BASELINE.md) now passes at its recorded
-revision; recorded host milestone reviews remain outstanding under
+revision; the [2026-10-09 host review](verification/HOST_V0_1_REVIEW.md)
+accepts the entry points and architecture under
 [ADR-0024](adr/0024-autonomous-host-review-authority.md). This composition
 introduces no library API or new service owner.
+
+## Host v0.1 architecture acceptance
+
+Codex reviewed the exact input `ba42f800d0b74637b28c833a55192fc541912fe5`
+and accepted this experimental serial host architecture. The review records
+resource/failure/API findings, requirement and execution evidence, scope and
+dependency inventory, and explicit dispositions of the risks below. Caller
+discipline for identity/time, logical storage bounds, cooperative-only failure,
+and separate contexts are acceptable for this controlled host milestone.
+Acceptance is not a public API freeze, human review, operational suitability,
+or approval for consequential platform/runtime/security scope changes.
 
 ## Alternatives kept open
 

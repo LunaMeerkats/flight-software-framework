@@ -45,6 +45,13 @@ recorded source revision and public integration tests. It strengthens complete
 peer FIFO, actual returned-error, and refreshed-availability observations.
 No external research, source reuse, new dependency, or upstream claim is added.
 
+The **2026-10-09** [host milestone review](../verification/HOST_V0_1_REVIEW.md)
+uses existing repository contracts, fresh Cargo graph queries, source and
+entry-point inspection, tests, and exact hosted evidence. It introduces no
+external research or reused design. Review corrects the workflow source entry
+below to name the actual `codex/nightly` push filter; historical access dates
+and source-adoption decisions otherwise remain unchanged.
+
 ## SRC-RUST-CARGO-GRAPH — Dependency and feature review semantics
 
 - Titles: cargo metadata; cargo tree — The Cargo Book
@@ -81,7 +88,7 @@ No external research, source reuse, new dependency, or upstream claim is added.
 - Version: public documentation accessed 2026-09-12
 - Informed: ordinary PR merge revisions, default activity types, manual dispatch
   availability, and possible conflicts/approval holds.
-- Local treatment: adopt ordinary PR checks, a default-branch push filter,
+- Local treatment: adopt ordinary PR checks, a `codex/nightly` push filter,
   and manual dispatch. Record the actual checkout SHA; reject privileged PR
   execution or extending a result to an untested revision.
 

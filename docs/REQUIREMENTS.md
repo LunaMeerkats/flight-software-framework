@@ -1,7 +1,7 @@
 # v0.1 requirements
 
-Status: **Provisional, partially implemented**
-Last reviewed: **2026-10-08**
+Status: **Provisional; verified and reviewed within the recorded host boundaries**
+Last reviewed: **2026-10-09**
 
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
@@ -148,9 +148,11 @@ selected local slice/returned-array boundary. The full v0.1 sample gate remains
 unchanged. [ADR-0022](adr/0022-combined-host-sample.md) now demonstrates the
 required services in one executable with a shared, tested scenario driver.
 The [recorded hosted CI run](verification/CI_BASELINE.md) now passes. The
-documented autonomous entry-point/architecture reviews remain pending under
-[ADR-0024](adr/0024-autonomous-host-review-authority.md). Routine human acceptance
-is no longer required for continued host development or milestone review.
+documented [autonomous host review](verification/HOST_V0_1_REVIEW.md) now
+accepts the current entry points and architecture under
+[ADR-0024](adr/0024-autonomous-host-review-authority.md). This closes the host
+milestone gates with actual Codex provenance; requirements and APIs remain
+provisional. Routine human acceptance is not required for continued host work.
 The original ownership probe alone does not establish adapter correctness.
 
 Do not use an implementation's accidental behavior to settle these parameters

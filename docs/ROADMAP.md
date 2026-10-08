@@ -167,6 +167,8 @@ re-demonstration of the narrow RFF-REQ-008 behavior.
 
 ## Stage 4 — v0.1 integration and review
 
+Status: **Complete for the experimental serial host milestone (2026-10-09)**
+
 ADR-0023 configures one Windows GitHub Actions job for the existing baseline
 and sample. Local command replay and workflow validation are a configuration
 checkpoint; the first [hosted run](verification/CI_BASELINE.md) subsequently
@@ -182,10 +184,12 @@ separately; source publication does not complete v0.1 release review.
 
 The user's 2026-10-08 [delegation](adr/0024-autonomous-host-review-authority.md)
 allows Codex to complete routine host entry-point and architecture acceptance
-without asking for human acceptance. The actual review must still record its
-revision, reviewer, evidence, findings, and limits. This removes the routine
-human blocker; it does not complete Stage 4 or approve consequential scope
-changes, tags, releases, crate publication, or deployment.
+without asking for human acceptance. The
+[completed review](verification/HOST_V0_1_REVIEW.md) now records its exact
+revision, Codex reviewers, requirement/resource/failure/API evidence, findings,
+and accepted limits. Delegation alone did not complete Stage 4; the actual
+review and verification do. Consequential scope changes, tags, releases,
+crate publication, and deployment retain their separate authorization gates.
 
 The 2026-09-13 [dependency and scope checkpoint](verification/DEPENDENCY_SCOPE_REVIEW.md)
 records an empty external Cargo dependency/feature graph, unchanged approved
@@ -289,11 +293,19 @@ per-dispatch lifecycle snapshot contract. Focused/full locked checks and
 source/document/diff review pass. Checkpoint `4470987` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37626284281)
 for the exact checkout, 141 workspace tests, and configured host/sample evidence.
-Other lifecycle/service resource,
-failure, and public-API reviews plus documented autonomous entry-point and
-architecture acceptance remain open.
-Stage 4 is not complete.
+The 2026-10-09 [host milestone review](verification/HOST_V0_1_REVIEW.md)
+consolidates the existing lifecycle/service resource, failure, ownership,
+diagnostic, dependency, and public-API evidence. Fresh locked checks pass
+141 workspace tests, focused host targets and the executable; the reviewed
+input has exact hosted CI. Codex accepts RFF-REQ-001 and the routine entry-point
+and architecture gates with explicit limits. Stage 4 is complete for this host
+target; the package remains unpublished and APIs remain provisional.
 
 After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments
 before adding a large feature surface.
+
+The next candidate is a dependency-free bounded model test of message
+publication/dequeue sequences against an independent reference queue. Freeze
+the explored operations and bounds before implementation, and report finite
+coverage honestly. Reassess the candidate against the next run's evidence.

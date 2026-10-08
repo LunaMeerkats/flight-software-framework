@@ -85,6 +85,9 @@ timing, resource exhaustion, panic/hang, or fault-tolerance guarantee.
 The combined demonstration supports the executable host-sample release gate.
 The [recorded CI run](CI_BASELINE.md) also executes it successfully.
 RFF-REQ-001 entry-point review, dependency review, and recorded v0.1
-architecture review remain separate evidence gates. The user's
-[review delegation](../adr/0024-autonomous-host-review-authority.md) permits
-routine host acceptance through documented autonomous review.
+architecture review are separate evidence gates. The
+[2026-10-09 Codex review](HOST_V0_1_REVIEW.md) now accepts them for the
+experimental serial host milestone under the user's
+[review delegation](../adr/0024-autonomous-host-review-authority.md).
+Its exact revision, findings, evidence, and limits do not authorize releases,
+deployment, an API freeze, or broader platform commitments.
