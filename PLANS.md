@@ -1,7 +1,7 @@
 # Autonomous host v0.1 milestone review
 
 Date: **2026-10-09**
-Status: **Review accepted and local verification complete; publication pending**
+Status: **Complete: review published and exact-checkpoint hosted CI passed**
 
 ## Objective and context
 
@@ -91,4 +91,20 @@ All 320 relative links across 62 Markdown files and 105 exact traceability
 function references resolve. Eleven changed documents pass rendered HTML
 structure/content inspection; no pixel-level acceptance is claimed. Primary
 and parallel Codex source, complete-diff, evidence, and rendered-content reviews
-accept the reconciliation. Authorized publication and exact-head CI are pending.
+accept the reconciliation. Publication and exact-checkpoint hosted CI pass below.
+
+## Publication and hosted verification
+
+Review checkpoint `44f85edd4ae8fdcfb6fbcb34b59cea7478d496cb` was published
+by ordinary fast-forward on codex/nightly; local and remote heads matched.
+[Hosted push run 37782350928](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37782350928)
+passes its exact logged checkout, one Windows job, and all 20 reported steps.
+Logs confirm 141 workspace tests, 14 focused adapters, five sample tests,
+warnings-denied rustdoc, executed sample and both whitespace checks.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed baseline. Local
+toolchain stays 1.98.0; source policy is unchanged. This follow-up records that
+checkpoint's completed evidence; later revisions require their own CI.
+Stop after the host review checkpoint; the next candidate is bounded model
+testing of publication/dequeue sequences.

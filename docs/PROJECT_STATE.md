@@ -29,6 +29,10 @@ The package remains unpublished at 0.0.0; APIs and requirements are provisional.
 - All 320 relative links across 62 Markdown files and 105 exact traceability
   function references resolve. Eleven changed documents pass rendered HTML
   structure/content inspection; no pixel-level acceptance is claimed.
+- Review checkpoint `44f85edd4ae8fdcfb6fbcb34b59cea7478d496cb` is published.
+  [Hosted run 37782350928](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37782350928)
+  passes the exact logged checkout and all configured steps with matching
+  runner/tool versions and 141/14/five workspace/adapter/sample counts.
 
 ## Current architecture
 
@@ -41,11 +45,11 @@ introducing runtime, source, dependency, lint, or workflow changes.
 
 ## Work in progress
 
-The actual review, documentation reconciliation, final local baseline, and
-complete-diff acceptance are complete. Authorized publication and exact-head
-hosted evidence are pending for this checkpoint. One nonblocking
-source-register finding corrects the workflow push filter to codex/nightly.
-No unfinished implementation remains.
+The actual review, documentation reconciliation, local and complete-diff
+acceptance, publication, and exact-checkpoint hosted evidence are complete.
+The source register now names the actual codex/nightly push filter. No
+unfinished implementation remains. This follow-up records the published
+checkpoint; later revisions need their own CI.
 
 ## Highest risks and uncertainties
 
@@ -84,6 +88,7 @@ report finite coverage precisely. Reassess if new evidence changes priority.
 
 2026-10-09: actual delegated host v0.1 review accepts RFF-REQ-001 and the routine
 entry-point/architecture gates; Stage 4 is complete for the host target.
-Fresh local checks/sample and exact input hosted evidence pass. Known limits
-receive explicit dispositions; the source-register branch wording is corrected.
+Fresh local checks/sample and exact review-checkpoint hosted evidence pass.
+Known limits receive explicit dispositions; the source-register branch wording
+is corrected.
 This is one review checkpoint, with no implementation or scope expansion.

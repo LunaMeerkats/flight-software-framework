@@ -170,6 +170,22 @@ rendered HTML heading/code/link/table/text and nesting inspection. Review of
 rendered content and the complete diff checks the final wording as well as the
 input. No pixel-level or independent-human acceptance is claimed.
 
+## Publication evidence
+
+The review/documentation checkpoint is
+`44f85edd4ae8fdcfb6fbcb34b59cea7478d496cb`, published by ordinary fast-forward
+from the reviewed input. Local and remote heads matched; the tree was clean.
+[Hosted push run 37782350928](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37782350928)
+passes its exact logged checkout, one Windows job, and all 20 reported steps.
+Logs confirm 141 workspace tests, separate 14/five adapter/sample tests,
+warnings-denied documentation, the executed report, and both whitespace checks.
+Runner, image and hosted tools match the reviewed-input baseline above.
+
+This follow-up records checkpoint evidence without changing reviewed source,
+contracts, or gate dispositions. Later documentation revisions still require
+their own CI. Codex source/diff/rendered-content review remains separate from
+hosted Cargo execution and from independent human review.
+
 ## Milestone disposition and next work
 
 RFF-REQ-001 and the routine host entry-point/architecture gates are accepted.

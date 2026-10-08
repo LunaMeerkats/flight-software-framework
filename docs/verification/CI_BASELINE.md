@@ -176,3 +176,11 @@ and all 20 reported steps. Runner 2.337.0, image `windows-2025-vs2026`
 match the prior policy re-audit. Local tools remain on 1.98.0. The actual review
 closes routine host milestone gates; it does not create human-reviewed or
 release-ready status. The review's documentation revisions need their own CI.
+
+Review checkpoint `44f85edd4ae8fdcfb6fbcb34b59cea7478d496cb` is published.
+[Push run 37782350928](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37782350928)
+passes its exact logged checkout, all 20 reported steps, 141 workspace tests,
+14 focused adapters, five sample tests, warnings-denied documentation, the
+executed sample and whitespace. Runner/image/tools match the reviewed input.
+This follow-up records that exact checkpoint; its own later revision must be
+assessed separately, rather than inheriting the checkpoint's pass.
