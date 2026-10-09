@@ -39,6 +39,7 @@ translate NASA C source.
   Direct and messaging-owned schedules share one private clock/consumption
   decision and delegate ordinary work through their respective owners.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
+  finite standalone publication/dequeue reference-model sequence tests, plus
   application-dispatch, event-queue, manual-clock, and scheduled-work
   integration tests, including direct and messaging-owned ordinary-work event
   reporting, exact inbox clearing, event saturation, and messaging-owned

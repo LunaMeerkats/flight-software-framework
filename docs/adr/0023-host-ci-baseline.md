@@ -107,3 +107,15 @@ scope review, and v0.1 architecture review remain separate. Revisit for an
 observed hosted failure, a default-branch change, a concrete additional host,
 required check policy, dependency growth, or evidence that version drift is
 obstructing review. No push authorization or release decision is changed.
+
+## Default-branch revisit — 2026-10-10
+
+A fresh repository query reports `main` as the default branch. Refreshed
+`origin/main` and the live branch both point to
+`81ca906e97c28db53ca601d34c1b2d1b2e7926fb`. Its workflow matches the local
+blob `02e06e700d95349792636bc94dc4221049766e32`, including `workflow_dispatch`.
+The Context above records the initial 2026-09-12 observation. Codex review
+retains the codex/nightly push filter and ordinary PR trigger; no workflow or
+repository setting change is needed. This verifies the manual-dispatch file
+presence prerequisite only; no manual dispatch was executed. Each later source
+push still needs its own exact-revision hosted evidence.

@@ -305,7 +305,14 @@ After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
 concurrency analysis, API simplification, and measured portability experiments
 before adding a large feature surface.
 
-The next candidate is a dependency-free bounded model test of message
-publication/dequeue sequences against an independent reference queue. Freeze
-the explored operations and bounds before implementation, and report finite
-coverage honestly. Reassess the candidate against the next run's evidence.
+The 2026-10-10 [finite message-sequence checkpoint](verification/MESSAGE_SEQUENCE_REVIEW.md)
+adds independent accepted-history/cursor evidence for standalone publication
+and dequeue. It explores every sequence of up to six operations over one fixed
+three-inbox topology: 55,987 traces and 324,726 generated operations, plus final
+drains. The finite-domain result supplements RFF-REQ-003 without changing its
+contract, lifecycle integration, runtime behavior, or APIs.
+
+The next candidate is a separate bounded model of runtime-owned availability
+and inbox clearing through publication, stop and restart. Freeze the reduced
+alphabet and independent lifecycle model first; reassess priority and avoid
+duplicating standalone routing evidence.

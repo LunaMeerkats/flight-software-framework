@@ -721,6 +721,26 @@ the sample executable.
 It does not add automatic retry, failed-record recovery, concurrency, or
 human v0.1 acceptance.
 
+## Finite standalone message-sequence evidence
+
+The 2026-10-10 [sequence review](MESSAGE_SEQUENCE_REVIEW.md) supplements
+RFF-REQ-003 and ADR-0004/0010. The public integration test
+`all_bounded_publication_dequeue_sequences_match_reference_history` explores
+55,987 traces of lengths zero through six, totaling 324,726 generated
+operations plus final observational drains. One fixed topology uses capacities
+[1,2,2], Command/Telemetry/Unrouted publication and dequeue operations for each inbox.
+An independent accepted-history/cursor oracle checks exact ordered destination
+outcomes, classification, capacities, pending counts, every semantic dequeue
+and all retained FIFO suffixes. Six isolated faulty source copies compile and
+are rejected by test assertions; production source is unchanged.
+
+This adds finite sequence-composition evidence beyond selected traces, not a
+proof of arbitrary sequence lengths, topologies, payloads, lifecycle dispatch,
+allocation failures, concurrency or whole-process resource bounds. Local
+evidence is recorded in the linked review; publication and hosted evidence
+remain pending until actually completed. Existing
+requirements, host review dispositions and consequential gates are unchanged.
+
 ## Evidence policy
 
 "Verified" requires all of the following:
