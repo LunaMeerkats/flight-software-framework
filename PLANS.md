@@ -1,7 +1,7 @@
 # Finite message-bus sequence checkpoint
 
 Date: **2026-10-10**
-Status: **Local checkpoint reviewed; publication and hosted evidence pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -85,7 +85,19 @@ accept enumeration and invariants; the opening comment is wrapped to policy
 and diagnostic context is improved. Source audit finds zero width debt across
 34 Rust files/12,913 lines with three unchanged fulfilled expectations.
 Relative links and 106 exact traceability function references resolve.
-Seven changed rendered documents pass structure/content inspection, and root
+Seven checkpoint documents pass rendered structure/content inspection, and root
 and parallel Codex complete-diff reviews accept the checkpoint. No pixel-level
-acceptance is claimed. Exact publication evidence will follow in the
+acceptance is claimed. Exact publication evidence is recorded in the
 [sequence review](docs/verification/MESSAGE_SEQUENCE_REVIEW.md).
+
+## Publication and stopping point
+
+Checkpoint `82078b3656481ec9527aaa059e159ca446c54aec` was published by
+ordinary fast-forward; local/remote heads matched and the tree was clean.
+[Hosted run 37935055379](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
+passes the exact logged checkout and all 20 reported steps, including 142
+workspace tests, separate 14 adapters/five sample tests, warnings-denied
+rustdoc, executed sample and both whitespace checks. Runner/image/tools match
+the input baseline. This follow-up records that checkpoint's evidence; its
+later revision requires separate hosted verification. Stop after this one
+finite sequence checkpoint; do not start the next model in this run.

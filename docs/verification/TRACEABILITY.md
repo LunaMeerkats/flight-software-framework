@@ -737,8 +737,11 @@ are rejected by test assertions; production source is unchanged.
 This adds finite sequence-composition evidence beyond selected traces, not a
 proof of arbitrary sequence lengths, topologies, payloads, lifecycle dispatch,
 allocation failures, concurrency or whole-process resource bounds. Local
-evidence is recorded in the linked review; publication and hosted evidence
-remain pending until actually completed. Existing
+evidence is recorded in the linked review. Checkpoint
+`82078b3656481ec9527aaa059e159ca446c54aec` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
+for its exact logged checkout and all 20 reported steps, including 142 workspace
+tests and the configured host/sample checks. Existing
 requirements, host review dispositions and consequential gates are unchanged.
 
 ## Evidence policy

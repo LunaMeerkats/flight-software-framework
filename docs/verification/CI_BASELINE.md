@@ -184,3 +184,21 @@ passes its exact logged checkout, all 20 reported steps, 141 workspace tests,
 executed sample and whitespace. Runner/image/tools match the reviewed input.
 This follow-up records that exact checkpoint; its own later revision must be
 assessed separately, rather than inheriting the checkpoint's pass.
+
+## Finite message-sequence checkpoint — 2026-10-10
+
+The [sequence review](MESSAGE_SEQUENCE_REVIEW.md) records checkpoint
+`82078b3656481ec9527aaa059e159ca446c54aec` and its finite-domain limits.
+[Push run 37935055379](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
+passes the exact logged checkout, one Windows job 113834907623 and all 20
+reported steps. Logs confirm 142 workspace tests, including the new
+publication/dequeue model, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, executed sample and both whitespace checks.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the existing reviewed source
+baseline. Fresh local checks remain on 1.98.0, with zero source-policy drift.
+The workflow is unchanged. The dated ADR-0023 default-branch revisit confirms
+main contains the same workflow while nightly push/PR triggers remain intact.
+No manual dispatch or settings change was performed in this run. This evidence
+follow-up needs its own exact-head CI; it does not inherit this checkpoint pass.

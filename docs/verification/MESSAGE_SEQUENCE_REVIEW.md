@@ -1,7 +1,7 @@
 # Finite message publication/dequeue review
 
 Date: **2026-10-10**
-Status: **Local checkpoint reviewed; publication and hosted evidence pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Question, inputs and decision
 
@@ -86,7 +86,11 @@ cargo test --locked --workspace --all-features
 cargo doc --locked --workspace --all-features --no-deps
 cargo test --locked --test message_bus_sequences
 python target/review-2026-10-10-model/mutation_trials.py
+python target/review-2026-10-10-model/inventory_audit.py
+& ./target/review-2026-10-10-model/render.ps1
+python target/review-2026-10-10-model/inspect_rendered.py
 git diff --check
+git show --format= --check --diff-merges=first-parent HEAD
 ```
 
 Initial full baseline passes 141 tests; final full baseline passes 142, with
@@ -100,9 +104,33 @@ exact traceability function references resolve. Seven changed documents pass
 rendered HTML heading/code/link/table/text and nesting inspection. Root and
 parallel Codex source, complete-diff, evidence and rendered-content reviews
 accept the checkpoint after the comment correction. No pixel-level acceptance
-is claimed. Publication evidence remains pending. Unchanged sample/adapters,
+is claimed. Unchanged sample/adapters,
 ADR-0018/0019 experiments and workflow do not trigger extra local
 sample/probe/actionlint commands.
+
+## Publication and hosted evidence
+
+Checkpoint `82078b3656481ec9527aaa059e159ca446c54aec` was published by
+ordinary fast-forward after local source/document/diff acceptance. Local and
+remote heads matched; the tree was clean. Root Codex and parallel Codex
+`durable_state_review` inspect the downloaded completed run/job/log evidence.
+[Hosted push run 37935055379](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
+passes the exact logged checkout, one Windows job 113834907623 and all 20
+reported steps. Logs confirm 142 workspace tests including the finite model,
+separate 14 adapters/five sample tests, warnings-denied documentation, the
+executed sample and both committed-tip/working-tree whitespace checks.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior reviewed baseline.
+Local tools remain 1.98.0/1.9.0-stable/0.1.98; this adds no local 1.99.0 claim.
+The evidence follow-up changes documentation only. Its later revision still
+requires separate CI, rather than inheriting the checkpoint's pass. Source and
+rendered-content review remains separate from hosted execution and human review.
+
+The evidence follow-up regenerates and checks all eight changed rendered
+documents. Their HTML structure/content passes; all 329 relative links across
+63 Markdown files and 106 exact traceability function references resolve.
+Source widths and the three existing expectations remain unchanged.
 
 ## Limits and next candidate
 

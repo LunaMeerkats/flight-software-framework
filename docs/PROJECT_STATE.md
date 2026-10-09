@@ -28,6 +28,11 @@ hardens existing behavior within those boundaries.
 - Source audit covers 34 Rust files and 12,913 physical lines, no width findings,
   and the same three fulfilled function-size expectations. Relative Markdown
   links and all 106 exact traceability function references resolve.
+- Checkpoint `82078b3656481ec9527aaa059e159ca446c54aec` is published.
+  [Hosted run 37935055379](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
+  passes the exact logged checkout/all 20 steps, 142 workspace tests, separate
+  14/five host targets, rustdoc, sample and whitespace. Hosted runner/image/tools
+  match the input baseline; local 1.99.0 execution is not claimed.
 
 ## Current architecture
 
@@ -43,8 +48,9 @@ cursors against the public message-bus API over a frozen finite domain.
 Sequence implementation, focused/full locked checks, and root/parallel Codex
 source and complete-diff review are complete. Seven changed documents pass
 rendered HTML structure/content inspection; no pixel-level acceptance is
-claimed. Publication and exact-head hosted verification remain pending in the
-[sequence review](verification/MESSAGE_SEQUENCE_REVIEW.md). The dated
+claimed. Checkpoint publication and exact-head hosted verification pass in the
+[sequence review](verification/MESSAGE_SEQUENCE_REVIEW.md). This follow-up
+records that completed checkpoint; later revisions need their own CI. The dated
 [ADR-0023 revisit](adr/0023-host-ci-baseline.md) confirms main contains the
 unchanged workflow; no setting or workflow change was needed.
 
@@ -85,5 +91,6 @@ alphabet and bounds first; reassess the priority against fresh evidence.
 
 2026-10-10: adds one finite standalone message-bus sequence test and independent
 oracle, with passing focused/full checks and six selected fault detections.
-Records default-branch revisit with unchanged CI. Source/document/diff reviews
-pass; publication and hosted verification remain pending in the linked review.
+Records default-branch revisit with unchanged CI. Source/document/diff reviews,
+checkpoint publication and exact-checkpoint hosted verification pass.
+No unfinished implementation remains; the linked review records evidence limits.
