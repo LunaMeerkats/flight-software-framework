@@ -744,6 +744,26 @@ for its exact logged checkout and all 20 reported steps, including 142 workspace
 tests and the configured host/sample checks. Existing
 requirements, host review dispositions and consequential gates are unchanged.
 
+## Finite runtime lifecycle sequence evidence
+
+The 2026-10-11 [runtime sequence review](RUNTIME_MESSAGE_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-002/003 and ADR-0003/0004/0011/0012. The public integration
+test `all_bounded_publication_stop_restart_sequences_match_reference_history`
+enumerates 19,531 traces and 112,305 generated operations: publication and stop/
+restart for each of two initially Running successful passive applications,
+capacities [1,2], one shared topic, lengths zero through six. An independent
+Active/Paused model with accepted histories and discard watermarks predicts
+exact ordered reports/classification, selected discard counts, lifecycle
+outcomes, callback suppression, capacities and pending counts. Supplemental
+final dispatch compares each retained topic/payload FIFO suffix, empty outcomes
+and stopped rejection. Every generated prefix is itself enumerated.
+
+This is finite successful-lifecycle composition evidence, not an exhaustive
+dispatch model or coverage of Registered/Failed, callback failure, callback
+publication, work, arbitrary topology, allocation failure or concurrency.
+The linked review distinguishes local/source evidence from later hosted CI.
+Requirement meanings and prior host acceptance remain unchanged.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

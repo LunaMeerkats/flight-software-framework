@@ -312,7 +312,14 @@ three-inbox topology: 55,987 traces and 324,726 generated operations, plus final
 drains. The finite-domain result supplements RFF-REQ-003 without changing its
 contract, lifecycle integration, runtime behavior, or APIs.
 
-The next candidate is a separate bounded model of runtime-owned availability
-and inbox clearing through publication, stop and restart. Freeze the reduced
-alphabet and independent lifecycle model first; reassess priority and avoid
-duplicating standalone routing evidence.
+The 2026-10-11 [runtime lifecycle sequence checkpoint](verification/RUNTIME_MESSAGE_SEQUENCE_REVIEW.md)
+adds the separate reduced model: two initially running successful applications,
+capacities [1,2], one shared topic and publication/stop/restart sequences of
+length zero through six. It checks 19,531 traces and 112,305 generated operations
+against independent lifecycle states, accepted histories and discard watermarks.
+Passive final dispatch observes retained FIFO records separately from generated
+operations. This supplements RFF-REQ-002/003; it changes no production behavior.
+
+The next candidate is a separate reduced model of returned ordinary-work
+failure, terminal unavailability and peer preservation. Freeze its fault/lifecycle
+domain first; do not extend this successful-callback result to Failed states.

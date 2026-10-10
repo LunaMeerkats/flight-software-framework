@@ -1,52 +1,55 @@
-# Finite message-bus sequence checkpoint
+# Runtime-owned lifecycle sequence checkpoint
 
-Date: **2026-10-10**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-11**
+Status: **Local verification and review complete; publication pending**
 
 ## Objective and context
 
-Add one dependency-free public-API reference-model test for composition of
-standalone message publication and dequeue. The completed
-[host review](docs/verification/HOST_V0_1_REVIEW.md) identifies this distinct
-gap beyond selected scenario regressions. Requirements and ADR-0004/0010 define
-the oracle; this checkpoint changes no runtime behavior or API.
-
-Input `81ca906e97c28db53ca601d34c1b2d1b2e7926fb` is clean on codex/nightly,
-equal to refreshed origin. Fresh locked baseline passes 141 workspace tests;
-exact input hosted run 37782992360 succeeds. Local tool versions remain
-Rust/Cargo 1.98.0, rustfmt 1.9.0-stable, Clippy 0.1.98.
+Strengthen RFF-REQ-002/003 with one independent finite model of runtime-owned
+availability and exact selected-inbox clearing. Existing scenario tests and the
+standalone message model do not establish these compositions. Input
+`181cfa913c17177e2696d35fadb790883e4d0ed7` is clean on codex/nightly, equal to
+refreshed origin; hosted run 37935576798 succeeds for that exact head. The fresh
+locked local baseline passes 142 tests on Rust/Cargo 1.98.0, rustfmt
+1.9.0-stable and Clippy 0.1.98, with no width or waiver changes.
 
 ## Frozen exploration contract
 
-- Three registration-ordered inboxes: Command only/capacity 1, Telemetry
-  only/capacity 2, and both topics/capacity 2. All are available.
-- Six operations: publish Command, Telemetry, or Unrouted; dequeue inbox 0,
-  1, or 2. Each publication carries its operation position as one payload byte.
-- Enumerate every operation sequence of lengths zero through six, starting
-  each from empty inboxes: 55,987 traces and 324,726 generated operations.
-  Final observational drains are additional and excluded from that count.
-- Independent explicit routes are Command=[0,2], Telemetry=[1,2], Unrouted=[].
-  Accepted-delivery logs and consumed cursors model outstanding records without
-  reusing production queue, message, report, or routing implementation.
-- Compare every ordered outcome and classification. After every operation
-  compare all logical capacities and pending counts. Compare each dequeue's
-  complete semantic topic/payload. Drain every outstanding suffix at trace end,
-  then assert empty dequeue and zero pending for every inbox.
+- Two successful passive applications, both initially Running after checked
+  start setup, share one subscribed topic with inbox capacities [1,2].
+- Five generated operations: Publish with its operation-position byte, Stop(0),
+  Stop(1), Restart(0), Restart(1). Enumerate every sequence length zero through
+  six: 19,531 traces and 112,305 generated operations.
+- An independent Active/Paused model uses append-only accepted payload histories
+  and discard watermarks. Stop while Active discards exactly the outstanding
+  suffix and sets Paused; restart while Paused sets Active. Rejections preserve
+  state and histories and predict zero discard with no callback.
+- Hard-coded routes [0,1] predict ordered delivery/full/unavailable outcomes and
+  classification. Compare both states, capacities, pending counts and lifecycle
+  callback counters initially and after every generated operation.
+- Supplemental final public dispatches compare complete retained topic/payload
+  FIFO suffixes through passive callback observers. Check empty dispatch and
+  callback suppression; Paused endpoints reject dispatch and remain empty.
+  These observations are outside generated counts. Every prefix is independently
+  enumerated, so final suffix observations cover every generated prefix.
+
+Parallel Codex model_review independently proposed this domain. Adding generated
+Dispatch operations would multiply the domain to 137,257 traces; a length-five
+bound would omit six-step clear/reconnect reuse witnesses. More topics duplicate
+standalone routing evidence. Keep the five-operation length-six contract.
 
 ## Components and acceptance
 
-Add `tests/message_bus_sequences.rs` as one coherent integration target.
-Record finite coverage, reviewers, evidence and limits in
-`docs/verification/MESSAGE_SEQUENCE_REVIEW.md`; update traceability, project
-state, roadmap and this plan. Reconcile ADR-0023's observed default-branch
-revisit without altering the workflow or repository settings.
-
-Root Codex implements; parallel Codex reviewers independently assess the
-contract, durable state, oracle independence and complete diff. Acceptance
-requires the frozen enumeration count, exact reports/FIFO, focused and full
-locked baseline, source-form/width/waiver review, resolving Markdown links,
-exact traceability functions and changed rendered-document inspection. Publish
-only a coherent verified checkpoint, then inspect exact-head hosted CI.
+Add tests/runtime_messaging_sequences.rs, a lifecycle sequence review, and update
+this plan, AGENTS layout, traceability, roadmap and concise project state. Keep
+production source, requirements, public APIs, dependencies and policy unchanged.
+Acceptance requires exact frozen counts and outcomes, observer FIFO, focused and
+full locked checks, source/waiver/width and complete-diff review, resolving links,
+exact traceability references and changed rendered-document structure/content.
+Root Codex implements; parallel Codex reviewers assess model/source/evidence.
+Selected isolated source fault trials check sensitivity without modifying the
+production tree. Publish the accepted checkpoint by ordinary fast-forward and
+inspect exact-head hosted CI, recording its distinct evidence.
 
 ```text
 cargo fmt --all -- --check
@@ -54,50 +57,40 @@ cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo doc --locked --workspace --all-features --no-deps
-cargo test --locked --test message_bus_sequences
+cargo test --locked --test runtime_messaging_sequences
 git diff --check
 git show --format= --check --diff-merges=first-parent HEAD
 ```
 
-Rustdoc runs with `RUSTDOCFLAGS=-D warnings`. Unchanged adapters/sample,
+Rustdoc uses RUSTDOCFLAGS=-D warnings. Unchanged host adapters/sample,
 ADR-0018/0019 experiments and workflow do not trigger extra local commands.
-Temporary audit/render aids remain ignored under target/review-2026-10-10-model.
+Ignored review aids stay under target/review-2026-10-11-lifecycle.
 
-## Risks and safe stopping point
+## Limits and safe stopping point
 
-This is exhaustive only over the declared finite alphabet, topology and length
-bound. It does not prove longer traces, arbitrary capacities/topics/payloads,
-lifecycle/dispatch behavior, allocation failures, concurrency, real-time
-behavior, or whole-process resource bounds. No external research, dependency,
-lint gate, exception, or public API change is needed. If a mismatch appears,
-retain the smallest failing trace and address it within this objective; do not
-hide it by changing the oracle to match accidental behavior. Stop after this
-one tested/documented checkpoint. Revert only current-run edits if necessary.
+The model excludes generated start, Registered/Failed states, callback errors,
+work, callback publication, arbitrary topics/capacities, allocation failures,
+concurrency, real-time and whole-process bounds. Final passive dispatch is only
+an observer, not exhaustive dispatch-composition evidence. If a mismatch appears,
+retain its smallest trace and resolve it within this objective. Stop after this
+one tested/documented checkpoint; preserve unrelated changes and revert only
+current-run implementation if the verified baseline cannot be restored.
 
-## Completed local evidence
+## Completed local baseline
 
-The new integration target passes one test over all frozen traces and both
-asserted counts. Initial/final locked baselines pass 141/142 workspace tests,
-formatting, all-target check, warnings-denied Clippy/rustdoc and whitespace.
-Six isolated source fault trials compile and fail behavioral assertions;
-production source is unchanged. Independent Codex model and source reviews
-accept enumeration and invariants; the opening comment is wrapped to policy
-and diagnostic context is improved. Source audit finds zero width debt across
-34 Rust files/12,913 lines with three unchanged fulfilled expectations.
-Relative links and 106 exact traceability function references resolve.
-Seven checkpoint documents pass rendered structure/content inspection, and root
-and parallel Codex complete-diff reviews accept the checkpoint. No pixel-level
-acceptance is claimed. Exact publication evidence is recorded in the
-[sequence review](docs/verification/MESSAGE_SEQUENCE_REVIEW.md).
-
-## Publication and stopping point
-
-Checkpoint `82078b3656481ec9527aaa059e159ca446c54aec` was published by
-ordinary fast-forward; local/remote heads matched and the tree was clean.
-[Hosted run 37935055379](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/37935055379)
-passes the exact logged checkout and all 20 reported steps, including 142
-workspace tests, separate 14 adapters/five sample tests, warnings-denied
-rustdoc, executed sample and both whitespace checks. Runner/image/tools match
-the input baseline. This follow-up records that checkpoint's evidence; its
-later revision requires separate hosted verification. Stop after this one
-finite sequence checkpoint; do not start the next model in this run.
+The focused model passes one test over all frozen traces and asserted counts.
+Initial/final full locked baselines pass 142/143 workspace tests, formatting,
+all-target check, warnings-denied Clippy/rustdoc and whitespace. Independent Codex
+oracle review accepts the model; its optional final observer lifecycle/counter
+check is included and passes. No function-size exception or production change
+is added. Source audit covers 35 Rust files/13,353 physical lines with zero width
+findings and three unchanged fulfilled expectations. All 331 relative links
+across 64 Markdown files and 107 exact traceability function references resolve.
+Six isolated source faults compile and fail behavioral assertions against final
+test blob `71f5782c215de08f0e8034cacdead2b262c21555`; production is unchanged.
+The [review](docs/verification/RUNTIME_MESSAGE_SEQUENCE_REVIEW.md) records exact
+faults, small detected traces and ignored evidence paths.
+Root and parallel Codex source/complete-diff reviews accept the checkpoint.
+All six changed documents pass rendered HTML structure/content inspection;
+pixel-level acceptance is not claimed. Publication and exact-head CI remain
+separate next actions for this same checkpoint.
