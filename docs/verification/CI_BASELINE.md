@@ -202,3 +202,22 @@ The workflow is unchanged. The dated ADR-0023 default-branch revisit confirms
 main contains the same workflow while nightly push/PR triggers remain intact.
 No manual dispatch or settings change was performed in this run. This evidence
 follow-up needs its own exact-head CI; it does not inherit this checkpoint pass.
+
+## Runtime lifecycle sequence checkpoint — 2026-10-11
+
+The [runtime sequence review](RUNTIME_MESSAGE_SEQUENCE_REVIEW.md) records
+checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` and its successful-callback
+finite domain. It adds one integration target without changing production or CI.
+[Push run 38054603275](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275)
+passes the exact logged checkout, one Windows job 114220376706 and all 20
+reported steps. Logs confirm 143 workspace tests including the new lifecycle
+model, separate 14 adapters/five sample tests, warnings-denied rustdoc, the
+executed sample and both committed-tip/working-tree whitespace checks.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior reviewed hosted baseline.
+Fresh locked local checks remain on 1.98.0. Source review finds no width,
+configuration or waiver drift. Conditional ADR probes and actionlint are
+unchanged and not triggered; the hosted job still runs both focused host
+targets and the sample. This evidence follow-up needs separate exact-head CI,
+and does not inherit the checkpoint's pass or establish human review.

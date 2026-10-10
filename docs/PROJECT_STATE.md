@@ -21,8 +21,14 @@ provisional. Current work hardens existing behavior within those boundaries.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Hosted tools remain separate evidence; no local 1.99.0 execution is claimed.
 - Final source audit covers 35 Rust files/13,353 lines, zero width debt and three
-  unchanged expectations. All 331 relative links and 107 traceability functions
+  unchanged expectations. All 331 checkpoint links and 107 traceability functions
   resolve. Production source, APIs, requirements, dependencies and policy are unchanged.
+- Checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` is published.
+  [Hosted run 38054603275](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275)
+  passes exact logged checkout/all 20 steps, 143 workspace tests, separate
+  14/five host tests, rustdoc, sample and whitespace. Runner/image/tools match
+  the prior hosted baseline: 2.337.0/20260925.250.1, Rust/Cargo 1.99.0,
+  rustfmt 1.10.0-stable and Clippy 0.1.99.
 
 ## Current architecture
 
@@ -40,10 +46,13 @@ one shared topic and publication/stop/restart sequences of lengths zero through
 six. Independent states, accepted histories and discard watermarks predict
 reports, exact clearing, peer retention and callback suppression. Final passive
 dispatch observes retained FIFO at every independently enumerated prefix.
-Independent oracle/source/complete-diff reviews, six isolated fault detections
-and final locked baseline pass. Six changed documents pass rendered HTML
-structure/content inspection; no pixel-level acceptance is claimed. Publication
-and exact-head hosted verification remain pending.
+Implementation, local verification, independent Codex source/diff/document
+reviews, six selected fault detections and exact-checkpoint hosted CI are
+complete. This follow-up records completed publication evidence; its later
+revision needs separate CI. Changed rendered HTML structure/content passes
+separately from hosted execution; no pixel-level acceptance is claimed.
+The final evidence follow-up audit resolves 332 links and 107 exact functions;
+all seven run-changed documents are regenerated and inspected.
 
 ## Highest risks and uncertainties
 
@@ -78,4 +87,5 @@ reassess against fresh evidence and preserve this increment's finite boundary.
 
 2026-10-11: runtime lifecycle model, independent oracle review, six selected
 fault detections and full locked baseline pass with 143 tests. Source/document/
-complete-diff reviews pass; publication and exact-head hosted CI remain pending.
+complete-diff reviews, checkpoint publication and exact-checkpoint hosted CI
+pass. No unfinished implementation remains; the review records finite limits.

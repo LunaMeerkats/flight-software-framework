@@ -1,7 +1,7 @@
 # Runtime-owned lifecycle sequence checkpoint
 
 Date: **2026-10-11**
-Status: **Local verification and review complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -93,4 +93,24 @@ faults, small detected traces and ignored evidence paths.
 Root and parallel Codex source/complete-diff reviews accept the checkpoint.
 All six changed documents pass rendered HTML structure/content inspection;
 pixel-level acceptance is not claimed. Publication and exact-head CI remain
-separate next actions for this same checkpoint.
+separate evidence, completed below.
+
+## Publication and stopping point
+
+Checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` was published by ordinary
+fast-forward. At checkpoint publication, local/remote heads matched and the
+tree was clean.
+[Hosted push run 38054603275](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275)
+passes the exact logged checkout, one Windows job 114220376706 and all 20
+reported steps: 143 workspace tests including this model, separate 14 adapters/
+five sample tests, warnings-denied rustdoc, sample execution and both whitespace
+checks. Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo
+1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior hosted baseline.
+Local tools remain on 1.98.0; no local 1.99.0 claim is made.
+
+This documentation follow-up records that checkpoint. Its later revision needs
+its own hosted CI; it does not inherit this pass. All seven run-changed documents
+are regenerated and pass structure/content inspection. Final audit resolves
+332 relative links across 64 Markdown files and 107 exact traceability functions;
+source widths and the three existing expectations remain unchanged.
+Stop after this one lifecycle sequence checkpoint; begin no failure-model work.

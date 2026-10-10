@@ -128,12 +128,31 @@ are reviewed separately from Cargo. No pixel-level acceptance is claimed.
 Unchanged sample/adapters, ADR-0018/0019 experiments and workflow do not trigger
 extra local sample, probe or actionlint commands.
 
-## Publication boundary
+## Publication and hosted evidence
 
-Local evidence permits the authorized ordinary fast-forward source push.
-The new checkpoint requires its own completed exact-head hosted CI; the input's
-pass cannot establish it. Publication and hosted evidence are recorded after
-their actual completion, with a later documentation revision assessed separately.
+Checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` was published by ordinary
+fast-forward after source/document/diff acceptance. At checkpoint publication,
+local/remote heads matched and the tree was clean. Root Codex inspects run/job metadata
+and logs from
+[push run 38054603275](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275).
+The exact logged checkout, one Windows job 114220376706 and all 20 reported
+steps pass. Logs confirm 143 workspace tests including the new model, separate
+14 adapters/five sample tests, warnings-denied rustdoc, the executed sample and
+both committed-tip/working-tree whitespace checks.
+Parallel Codex sensitivity independently verifies the same saved metadata/logs
+and accepts the exact-checkpoint evidence without a finding.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior reviewed hosted baseline.
+Local tools remain 1.98.0/1.9.0-stable/0.1.98; no local 1.99.0 execution is claimed.
+No workflow, toolchain, lint configuration or source-policy change is needed.
+
+This documentation follow-up records the exact checkpoint's completed evidence.
+Its later revision still needs its own CI. Regenerated final documentation
+inspection remains separate from hosted execution and independent human review.
+All seven run-changed documents pass HTML structure/content inspection, with
+332 relative links across 64 Markdown files and 107 exact traceability functions
+resolving. Source width and waiver evidence is unchanged.
 
 ## Limits and next candidate
 

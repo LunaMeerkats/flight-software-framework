@@ -761,7 +761,11 @@ and stopped rejection. Every generated prefix is itself enumerated.
 This is finite successful-lifecycle composition evidence, not an exhaustive
 dispatch model or coverage of Registered/Failed, callback failure, callback
 publication, work, arbitrary topology, allocation failure or concurrency.
-The linked review distinguishes local/source evidence from later hosted CI.
+Checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275)
+for its exact logged checkout/all 20 steps, 143 workspace tests and the
+configured host/sample checks. The linked review distinguishes local/source
+review from hosted execution and later documentation revisions.
 Requirement meanings and prior host acceptance remain unchanged.
 
 ## Evidence policy
