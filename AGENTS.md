@@ -41,7 +41,8 @@ translate NASA C source.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
   finite standalone publication/dequeue reference-model sequence tests, plus
   a reduced runtime-owned publication/stop/restart history model with passive
-  final-dispatch observations of retained inboxes,
+  final-dispatch observations of retained inboxes, and a separate reduced
+  ordinary-work failure model with both fault roles and retained peer progress,
   application-dispatch, event-queue, manual-clock, and scheduled-work
   integration tests, including direct and messaging-owned ordinary-work event
   reporting, exact inbox clearing, event saturation, and messaging-owned

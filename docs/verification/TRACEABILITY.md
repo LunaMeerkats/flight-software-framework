@@ -768,6 +768,25 @@ configured host/sample checks. The linked review distinguishes local/source
 review from hosted execution and later documentation revisions.
 Requirement meanings and prior host acceptance remain unchanged.
 
+## Finite runtime ordinary-work failure sequence evidence
+
+The 2026-10-12 [failure sequence review](RUNTIME_WORK_FAILURE_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-002/003 and the peer-operability aspect of RFF-REQ-008 under
+ADR-0003/0009/0011. Public integration test
+`all_bounded_work_failure_sequences_match_reference_history` runs both fault
+roles across 39,062 traces and 224,610 generated operations. Independent
+Active/Paused/Terminal states and accepted-history watermarks predict concrete
+errors/source chains, exact selected discards, terminal publication outcomes,
+rejected callback suppression and unchanged peers. Supplemental final healthy
+work and passive topic/payload FIFO observations cover each enumerated prefix.
+The final focused/full locked local checks pass one/144 workspace tests.
+
+This does not add event, schedule, configuration, generated dispatch or arbitrary
+fault-policy evidence. RFF-REQ-008's event aspect retains its existing tests;
+requirements and historical evidence hashes remain unchanged. The linked review
+records exact source blob, actual Codex reviewers, selected fault sensitivity,
+local/source review and separate publication/hosted evidence.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

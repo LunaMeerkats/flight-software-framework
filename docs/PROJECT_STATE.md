@@ -1,91 +1,83 @@
 # Project state
 
-Last updated: **2026-10-11**
+Last updated: **2026-10-12**
 
 ## Current milestone
 
-Stages 1 through 4 and source-quality adoption are complete for the experimental
-serial host v0.1 target. The [actual Codex host review](verification/HOST_V0_1_REVIEW.md)
+Stages 1 through 4 and source-quality adoption are complete for experimental
+serial host v0.1. The [actual Codex host review](verification/HOST_V0_1_REVIEW.md)
 accepts entry points and architecture under ADR-0024 with exact evidence and
-limitations. Package 0.0.0 remains unpublished; APIs and requirements are
-provisional. Current work hardens existing behavior within those boundaries.
+limits. Package 0.0.0 remains unpublished; APIs and requirements are provisional.
+Current work hardens existing behavior within those boundaries.
 
 ## Verified baseline
 
-- Input `181cfa913c17177e2696d35fadb790883e4d0ed7` starts clean and equal to
-  refreshed origin. Exact input hosted run 37935576798 succeeds; it predates
-  this new lifecycle test.
-- Initial/final locked local baselines pass 142/143 tests, formatting, all-target
-  check, warnings-denied Clippy/rustdoc and whitespace. The focused target passes
-  one test: 19,531 traces and 112,305 generated operations plus final observers.
+- Clean input `8705408ee9810470b19c7eef796557b5d2b7ee38` matches refreshed
+  origin; exact input hosted run 38054936905 is freshly successful.
+- Initial/final locked local checks pass 143/144 workspace tests, formatting,
+  all-target check, warnings-denied Clippy/rustdoc and whitespace. The focused
+  model passes one test over 39,062 traces and 224,610 generated operations.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-  Hosted tools remain separate evidence; no local 1.99.0 execution is claimed.
-- Final source audit covers 35 Rust files/13,353 lines, zero width debt and three
-  unchanged expectations. All 331 checkpoint links and 107 traceability functions
-  resolve. Production source, APIs, requirements, dependencies and policy are unchanged.
-- Checkpoint `c3eaa10cb013d1d4f5dbd11f6f0c4a3d4d98d37b` is published.
-  [Hosted run 38054603275](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38054603275)
-  passes exact logged checkout/all 20 steps, 143 workspace tests, separate
-  14/five host tests, rustdoc, sample and whitespace. Runner/image/tools match
-  the prior hosted baseline: 2.337.0/20260925.250.1, Rust/Cargo 1.99.0,
-  rustfmt 1.10.0-stable and Clippy 0.1.99.
+  Hosted execution and tools remain separate evidence.
+- Source audit covers 36 Rust files/13,935 lines, zero widths and three unchanged
+  expectations; 336 relative links/108 traceability functions resolve. Rendered
+  HTML structure/content and source/oracle review pass; no pixel claim is made.
+- Production, API, requirement, dependency, licence, lint and workflow are
+  unchanged. Publication and exact-head hosted evidence are pending.
 
 ## Current architecture
 
 One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events and optional
 runtime configuration with immutable work visibility and one-use rollback. The
-private shared-source host sample composes these services. Separate standalone
-and runtime-owned finite models strengthen existing messaging behavior.
+private shared-source host sample composes these services. Separate finite models
+strengthen standalone messaging, successful lifecycle and ordinary-work failure.
 
 ## Work in progress
 
-The [reduced lifecycle model](verification/RUNTIME_MESSAGE_SEQUENCE_REVIEW.md)
-checks two initially Running successful passive applications, capacities [1,2],
-one shared topic and publication/stop/restart sequences of lengths zero through
-six. Independent states, accepted histories and discard watermarks predict
-reports, exact clearing, peer retention and callback suppression. Final passive
-dispatch observes retained FIFO at every independently enumerated prefix.
-Implementation, local verification, independent Codex source/diff/document
-reviews, six selected fault detections and exact-checkpoint hosted CI are
-complete. This follow-up records completed publication evidence; its later
-revision needs separate CI. Changed rendered HTML structure/content passes
-separately from hosted execution; no pixel-level acceptance is claimed.
-The final evidence follow-up audit resolves 332 links and 107 exact functions;
-all seven run-changed documents are regenerated and inspected.
+The [failure model](verification/RUNTIME_WORK_FAILURE_SEQUENCE_REVIEW.md) uses
+both fault roles, capacities [1,2], one topic and five generated operations through
+length six. Independent states, histories and discard watermarks predict exact
+concrete errors, terminal unavailability, selected clearing and callback counts.
+Final healthy work and passive retained FIFO observations are supplemental.
+Implementation, local checks, independent Codex oracle/source review and six
+compiling isolated fault detections pass.
+
+precedes publication; hosted execution remains separate pending evidence.
 
 ## Highest risks and uncertainties
 
-- Finite models cover only their frozen domains. The new lifecycle model excludes
-  Registered/Failed, callback errors, generated dispatch/work and self-publication.
-- Application/clock origin pairing is caller discipline; positional topology
-  cannot detect swapped valid mission entries. Copied identifiers may share
-  referents. Logical bounds do not bound process bytes, callbacks or duration.
-- Panics/hangs and allocator exhaustion are uncontained/unverified; Failed is
-  terminal. Stop clearing does not prove application/external cleanup.
-- Immediate fan-out is nontransactional; accepted peer deliveries survive later
-  failure. Saturated events may omit a record. One-shot errors are consumed
-  without automatic retry or rollback. Host output does not prove physical delivery.
-- Stable tools/images float. Local source/document and conditional probe reviews
-  remain outside CI. Codex review does not establish independent human review.
+- Each finite model covers only its frozen domain. This failure model excludes
+  events/schedules/configuration, generated dispatch, other callback errors,
+  arbitrary topology and fault policy. Failed remains terminal.
+- Application/clock origins and positional topology pairing are caller duties.
+  Copied identifiers may share referents. Logical bounds do not bound process
+  bytes, callback allocation or duration.
+- Panics/hangs and allocator exhaustion are uncontained/unverified. Queue
+  clearing does not prove application/external cleanup. Immediate fan-out is
+  nontransactional; accepted peer deliveries survive later failure.
+- Saturated events may omit records; one-shot errors are consumed without
+  retry/rollback. Host output does not prove physical delivery. Stable tools/
+  images float; local reviews and conditional probes remain outside CI.
 
 ## Important unresolved decisions
 
 Major API freeze, significant unsafe code, runtime/code-generation/dependency/
 security decisions, platform commitments, identity/licences, tags/releases/crate
-publication and deployment retain separate gates. MSRV, broader contexts/events,
+publication and deployment retain separate gates. MSRV, broader service contexts,
 external I/O, hardware, RTOS and no_std remain undecided. Routine host acceptance
-is complete under ADR-0024.
+is complete; autonomous Codex review does not establish human review.
 
 ## Most likely next task
 
-Consider a separate reduced model of returned ordinary-work failure, terminal
-unavailability and peer retention. Freeze its fault/lifecycle alphabet first;
-reassess against fresh evidence and preserve this increment's finite boundary.
+Assess a separate reduced returned-message-callback failure model, including
+in-flight consumption and retained peer publication. Freeze a small domain only
+after confirming the gap against existing message-failure scenarios.
 
 ## Latest run
 
-2026-10-11: runtime lifecycle model, independent oracle review, six selected
-fault detections and full locked baseline pass with 143 tests. Source/document/
-complete-diff reviews, checkpoint publication and exact-checkpoint hosted CI
-pass. No unfinished implementation remains; the review records finite limits.
+2026-10-12: both-role ordinary-work failure model and full locked local checks
+pass with 144 tests. A planning count typo and one comment width were corrected
+before acceptance. Six isolated fault detections and source/document checks pass;
+publication evidence is pending. No production change or additional feature work
+is planned in this run.

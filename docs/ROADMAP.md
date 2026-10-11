@@ -320,6 +320,16 @@ against independent lifecycle states, accepted histories and discard watermarks.
 Passive final dispatch observes retained FIFO records separately from generated
 operations. This supplements RFF-REQ-002/003; it changes no production behavior.
 
-The next candidate is a separate reduced model of returned ordinary-work
-failure, terminal unavailability and peer preservation. Freeze its fault/lifecycle
-domain first; do not extend this successful-callback result to Failed states.
+The 2026-10-12 [ordinary-work failure sequence checkpoint](verification/RUNTIME_WORK_FAILURE_SEQUENCE_REVIEW.md)
+adds the separately frozen fault domain: both fault roles, two initially Running
+applications, capacities [1,2], one topic, and publication/work/selected-stop/
+selected-restart histories through length six. It checks 39,062 traces and
+224,610 generated operations, plus final healthy work and passive FIFO observers.
+Terminal availability, exact selected clearing, concrete errors, rejected callback
+suppression and retained peer progress supplement RFF-REQ-002/003 and the
+peer-operability aspect of RFF-REQ-008. Existing event evidence remains separate.
+
+The next candidate is a separately frozen reduced model of returned message
+callback failure, including the in-flight delivery, retained peer publication
+and terminal callback suppression. Reassess its gap against existing scenarios
+before extending finite-domain coverage; no new production surface is implied.
