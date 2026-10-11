@@ -99,14 +99,16 @@ are unchanged and not triggered locally. The initial committed-tip whitespace
 command `git show --format= --check --diff-merges=first-parent HEAD` also passes;
 the new committed tip is checked separately before publication.
 
-The complete source audit covers 36 Rust files/13,935 physical lines, zero
+The checkpoint source audit covers 36 Rust files/13,935 physical lines, zero
 physical/comment-width findings and three unchanged fulfilled expectations.
 All 336 relative links across 65 Markdown files and 108 exact traceability
 function references resolve. Changed documents are rendered to HTML and
 inspected for headings, full content, links, tables, code blocks and nesting;
 structure/content passes. This is separate local review, not pixel-level or
 human acceptance. Root and parallel Codex final_review accept the source/oracle
-without a blocking finding; complete diff and durable-record review also pass.
+without a blocking finding. Pre-publication complete-diff/durable-record review
+passes; this follow-up repairs two paragraphs damaged by a later text edit and
+repeats that review. Production and the reviewed test blob are unchanged.
 
 ## Selected isolated sensitivity
 
@@ -136,6 +138,38 @@ Production source is never faulted in the working tree. These six selected
 detections establish assertion sensitivity only, not general mutation adequacy
 or coverage of all possible defects. Root and final_review inspect actual logs
 and provenance separately from the sensitivity agent's summary.
+
+## Publication evidence and acceptance
+
+Checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` retains the exact reviewed
+test blob above. Root Codex and parallel Codex reviewers accept this bounded
+source/oracle increment after actual review and local verification. The final
+documentation follow-up separately corrects and reviews the paragraphs noted
+above. Publication uses an ordinary fast-forward to the existing origin
+codex/nightly; local/remote heads match and the tree is clean at that checkpoint.
+This identifies autonomous Codex review, not human review.
+
+[Push run 38141934356](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38141934356)
+passes its exact logged checkout, Windows job 114477390027 and all 20 steps.
+Actual logs confirm 144 workspace tests including the new model, separate
+14 adapter/five sample tests, warnings-denied rustdoc, the complete executed
+sample report and both committed-tip/working-tree whitespace checks. Root and
+parallel Codex final_review independently check raw logs and JSON; ignored
+inspection output is target/review-2026-10-12-failure/hosted-checkpoint-inspection.json.
+The sample report matches the prior checkpoint's unchanged report in full.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the existing reviewed hosted
+baseline. Source/configuration/width/waiver review finds no drift. Local tools
+remain on 1.98.0. The [CI baseline](CI_BASELINE.md) records this hosted boundary.
+This documentation follow-up has a later revision and needs its own hosted
+result; it cannot inherit the checkpoint's pass. Stop after this one increment.
+
+The final follow-up audit resolves 338 relative links across 65 Markdown files
+and 108 exact traceability functions. Source widths/expectations are unchanged.
+All seven run-changed documents are regenerated and inspected for full rendered
+structure/content, including the repaired prose. Root and final_review repeat
+actual follow-up document/complete-diff review before its commit/publication.
 
 ## Limitations and disposition
 

@@ -787,6 +787,11 @@ requirements and historical evidence hashes remain unchanged. The linked review
 records exact source blob, actual Codex reviewers, selected fault sensitivity,
 local/source review and separate publication/hosted evidence.
 
+Checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38141934356)
+for its exact logged checkout/all 20 steps, 144 workspace tests and the configured
+host/sample checks. Later documentation revisions require their own hosted result.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

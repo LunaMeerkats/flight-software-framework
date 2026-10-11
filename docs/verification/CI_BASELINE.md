@@ -221,3 +221,24 @@ configuration or waiver drift. Conditional ADR probes and actionlint are
 unchanged and not triggered; the hosted job still runs both focused host
 targets and the sample. This evidence follow-up needs separate exact-head CI,
 and does not inherit the checkpoint's pass or establish human review.
+
+## Runtime ordinary-work failure sequence checkpoint — 2026-10-12
+
+The [failure sequence review](RUNTIME_WORK_FAILURE_SEQUENCE_REVIEW.md) records
+checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` and both-role finite limits.
+[Push run 38141934356](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38141934356)
+passes its exact logged checkout, Windows job 114477390027 and all 20 steps.
+Logs confirm 144 workspace tests including the new model, separate 14 adapters/
+five sample tests, warnings-denied rustdoc, the complete executed sample report
+and both whitespace checks. Root and parallel Codex final_review inspect raw
+logs and job JSON separately from local verification; source/document/diff
+review remains a local obligation.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the existing hosted baseline.
+The companion local source review covers 36 Rust files/13,935 lines with no width,
+configuration or waiver changes. Local execution remains on 1.98.0. Production,
+dependencies and workflow are unchanged. Conditional ADR probes and actionlint
+are not triggered; the hosted job still executes both focused host targets and
+the sample. This later evidence follow-up requires its own exact-head hosted
+result rather than inheriting the checkpoint's pass.

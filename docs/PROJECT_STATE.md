@@ -20,10 +20,15 @@ Current work hardens existing behavior within those boundaries.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Hosted execution and tools remain separate evidence.
 - Source audit covers 36 Rust files/13,935 lines, zero widths and three unchanged
-  expectations; 336 relative links/108 traceability functions resolve. Rendered
+  expectations; 338 relative links/108 traceability functions resolve. Rendered
   HTML structure/content and source/oracle review pass; no pixel claim is made.
 - Production, API, requirement, dependency, licence, lint and workflow are
-  unchanged. Publication and exact-head hosted evidence are pending.
+  unchanged. Checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` is published.
+  [Hosted run 38141934356](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38141934356)
+  passes exact checkout/all 20 steps, 144 workspace tests, separate 14/five host
+  tests, rustdoc, the full sample and whitespace. Runner/image/tools match the
+  previous hosted baseline: 2.337.0/20260925.250.1, Rust/Cargo 1.99.0, rustfmt
+  1.10.0-stable and Clippy 0.1.99; no local 1.99.0 claim is made.
 
 ## Current architecture
 
@@ -41,9 +46,11 @@ length six. Independent states, histories and discard watermarks predict exact
 concrete errors, terminal unavailability, selected clearing and callback counts.
 Final healthy work and passive retained FIFO observations are supplemental.
 Implementation, local checks, independent Codex oracle/source review and six
-compiling isolated fault detections pass.
-
-precedes publication; hosted execution remains separate pending evidence.
+compiling isolated fault detections pass. Publication and hosted execution are
+complete for that checkpoint. This follow-up records the result and repairs
+two paragraphs damaged by a post-review text edit; document/diff review is
+repeated. Its later revision needs its own exact-head CI. All seven run-changed
+documents are rendered and inspected for structure/content, separately from tests.
 
 ## Highest risks and uncertainties
 
@@ -79,5 +86,5 @@ after confirming the gap against existing message-failure scenarios.
 2026-10-12: both-role ordinary-work failure model and full locked local checks
 pass with 144 tests. A planning count typo and one comment width were corrected
 before acceptance. Six isolated fault detections and source/document checks pass;
-publication evidence is pending. No production change or additional feature work
-is planned in this run.
+checkpoint publication and exact-checkpoint hosted CI pass. No unfinished
+implementation remains; the review records the finite domain and limits.

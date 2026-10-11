@@ -1,7 +1,7 @@
 # Runtime ordinary-work failure sequence checkpoint
 
 Date: **2026-10-12**
-Status: **Local implementation verified; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and authority
 
@@ -99,10 +99,34 @@ Publication and exact-head hosted execution remain distinct evidence.
 
 Six final-copy isolated faults compile and fail behavioral assertions; exact
 substitutions, small traces and limits are recorded in the review. Root and
-parallel Codex source/oracle review find no blocking issue. The whole-tree audit
+parallel Codex source/oracle review find no blocking issue. The checkpoint audit
 covers 36 Rust files/13,935 physical lines, zero widths and three unchanged
 fulfilled expectations. All 336 relative links across 65 Markdown files and
 108 exact traceability functions resolve. Changed rendered HTML structure and
+content pass; no pixel/human acceptance is claimed. The pre-publication complete
+diff and durable-record review passes. This follow-up repairs two paragraphs
+damaged by a subsequent text edit and repeats the document/diff review.
 
+## Publication and stopping point
 
-diff review are completed before the commit/publication boundary.
+Checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` is published by ordinary
+fast-forward. Local/remote heads match and the tree is clean at checkpoint
+publication. [Hosted push run 38141934356](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38141934356)
+passes the exact logged checkout, one Windows job 114477390027 and all 20
+reported steps. Logs confirm 144 workspace tests including the new model,
+separate 14 adapter/five sample tests, warnings-denied rustdoc, executed sample
+and both whitespace checks. Root and parallel Codex final_review inspect the
+actual job JSON/log and exact sample report, separately from local verification.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior hosted baseline. Local
+tools remain on 1.98.0; no local 1.99.0 execution is claimed. The reviewed test
+blob remains unchanged. This documentation follow-up records the checkpoint;
+its later revision needs its own exact-head hosted result. Stop after this one
+failure-sequence checkpoint; begin no message-failure model work.
+
+The final evidence follow-up audit resolves 338 relative links and 108 exact
+traceability functions; Rust widths/expectations and the test blob are unchanged.
+All seven run-changed documents are regenerated and inspected for rendered
+structure/content. A final locked local replay and actual follow-up document/
+complete-diff review precede its commit and publication.
