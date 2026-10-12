@@ -792,6 +792,24 @@ Checkpoint `d40cd8f3810e41dc5b97e895c21df5bb9635de57` has
 for its exact logged checkout/all 20 steps, 144 workspace tests and the configured
 host/sample checks. Later documentation revisions require their own hosted result.
 
+## Finite runtime message-callback failure sequence evidence
+
+The 2026-10-13 [message sequence review](RUNTIME_MESSAGE_FAILURE_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-002/003 and peer operability under RFF-REQ-008 using ADR-0012.
+Public test `all_bounded_message_failure_sequences_match_reference_history`
+enumerates both fault roles across 2,186 traces and 12,030 generated
+operations: publication and selected/peer dispatch through length six.
+Independent Active/Terminal states and accepted histories/cursors predict oldest
+input, immediate callback publication, selected clearing excluding in-flight,
+exact error/source chains and retained peer FIFO. Final peer drains and already-
+terminal fault rejection are supplemental observations.
+
+Focused/full locked local checks pass one/145 workspace tests. The linked
+review records source/sensitivity review and separate hosted evidence. This fixed
+cooperative fault policy does not add message-error events, recovery, arbitrary
+domains, lifecycle operations, allocation failure or concurrency evidence.
+Existing requirement meanings, event evidence and historical hashes remain.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

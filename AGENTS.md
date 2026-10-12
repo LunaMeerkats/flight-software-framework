@@ -38,13 +38,13 @@ translate NASA C source.
   queue, reporting after owner-specific lifecycle commitment and inbox cleanup.
   Direct and messaging-owned schedules share one private clock/consumption
   decision and delegate ordinary work through their respective owners.
-- `tests/`: public-API lifecycle, runtime, routing, runtime-messaging, and
-  finite standalone publication/dequeue reference-model sequence tests, plus
-  a reduced runtime-owned publication/stop/restart history model with passive
-  final-dispatch observations of retained inboxes, and a separate reduced
-  ordinary-work failure model with both fault roles and retained peer progress,
-  application-dispatch, event-queue, manual-clock, and scheduled-work
-  integration tests, including direct and messaging-owned ordinary-work event
+- `tests/`: public-API lifecycle, runtime, routing, runtime-messaging and
+  finite standalone publication/dequeue reference-model sequence tests; a
+  reduced runtime-owned publication/stop/restart history model with passive
+  final-dispatch observations; separate reduced ordinary-work and message-
+  callback failure models with both fault roles, selected clearing and peer
+  retention. Integration tests also cover application dispatch, event queues,
+  manual clocks and scheduled work, including ordinary-work event
   reporting, exact inbox clearing, event saturation, and messaging-owned
   one-shot schedule consumption with preserved peer queues,
   plus standalone and runtime-integrated configuration validation, revision,

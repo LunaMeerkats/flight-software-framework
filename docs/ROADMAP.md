@@ -329,7 +329,16 @@ Terminal availability, exact selected clearing, concrete errors, rejected callba
 suppression and retained peer progress supplement RFF-REQ-002/003 and the
 peer-operability aspect of RFF-REQ-008. Existing event evidence remains separate.
 
-The next candidate is a separately frozen reduced model of returned message
-callback failure, including the in-flight delivery, retained peer publication
-and terminal callback suppression. Reassess its gap against existing scenarios
-before extending finite-domain coverage; no new production surface is implied.
+The 2026-10-13 [message-callback failure checkpoint](verification/RUNTIME_MESSAGE_FAILURE_SEQUENCE_REVIEW.md)
+freezes a separate reduced model: two initially Running applications, capacities
+[1,2], one shared topic, both fault roles and publication/selected-dispatch/peer-
+dispatch through length six. The fixed fault callback publishes one tagged reply
+before returning its error. The independent history/cursor oracle checks
+2,186 traces and 12,030 generated operations, with passive final peer drains.
+Focused/full locked checks pass one/145 tests. Exact queued discard counts
+exclude in-flight input; peer replies, callback reports and terminal suppression
+match the reference. Production and requirement meanings are unchanged.
+
+After this checkpoint, reassess a reduced one-shot schedule-consumption/failure
+model against existing scenario tests. Freeze timing and operation domains
+separately before expanding verification; no new production surface is implied.
