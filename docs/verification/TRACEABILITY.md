@@ -810,6 +810,11 @@ cooperative fault policy does not add message-error events, recovery, arbitrary
 domains, lifecycle operations, allocation failure or concurrency evidence.
 Existing requirement meanings, event evidence and historical hashes remain.
 
+Checkpoint `fe40d592eb434a0730eac8c14744361e9d685200` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38253819562)
+for its exact logged checkout/all 20 steps, 145 workspace tests and the configured
+host/sample checks. Later documentation revisions require their own hosted result.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

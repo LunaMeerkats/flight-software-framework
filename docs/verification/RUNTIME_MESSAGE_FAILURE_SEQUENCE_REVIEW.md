@@ -1,7 +1,7 @@
 # Finite runtime message-callback failure sequence review
 
 Date: **2026-10-13**
-Status: **Local verification and review accepted; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Contract and reviewed input
 
@@ -138,7 +138,30 @@ files and 109 exact traceability functions resolve. The six changed local
 documents pass rendered HTML structure and complete content comparison:
 headings, code, links, tables, normalized text and balanced nesting. This is
 document evidence, not pixel or human acceptance. Publication and hosted
-execution remain pending; local checks do not establish hosted success.
+execution are recorded separately below; local checks alone establish neither.
+
+## Publication and exact-revision hosted evidence
+
+Checkpoint `fe40d592eb434a0730eac8c14744361e9d685200` contains the accepted
+test blob and reviewed local checkpoint. Ordinary fast-forward publication
+succeeds and remote/head match; the tree is clean at checkpoint publication.
+[Hosted push run 38253819562](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38253819562)
+passes its exact logged checkout, Windows job 114826598201 and all 20 steps.
+Raw logs confirm 145 workspace tests including the new model, separate 14
+adapter/five sample tests, warnings-denied rustdoc, the executed sample's full
+unchanged report and both whitespace checks. Root inspects the raw JSON/logs
+and sample comparison; parallel Codex evidence_review reviews them separately.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the prior hosted baseline.
+Whole-tree source/configuration review finds no policy or waiver drift. Local
+execution remains on 1.98.0; it does not claim local 1.99.0 execution.
+
+This later documentation follow-up records completed checkpoint evidence and
+requires its own exact-head hosted result. Its final audit/render/complete-diff
+review resolves 343 relative links/109 exact functions, inspects all seven
+run-changed rendered documents and preserves the source blob.
+The checkpoint remains finite test evidence, with no expanded capability claim.
 
 ## Limits and next work
 

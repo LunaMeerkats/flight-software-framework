@@ -21,11 +21,16 @@ Current work hardens existing behavior within those boundaries.
   Hosted execution and tools remain separate evidence.
 - Source audit covers 37 Rust files/14,480 lines, zero widths and three unchanged
   expectations. Independent Codex source/oracle review accepts the finite model.
-  Six compiling isolated source faults fail behavioral assertions. All 342
-  relative links/109 traceability functions resolve; complete diff and six
-  changed rendered documents pass structure/content review, with no pixel claim.
+  Six compiling isolated source faults fail behavioral assertions. All 343
+  relative links/109 traceability functions resolve; complete diff and all
+  seven run-changed rendered documents pass structure/content review, with no
+  pixel claim.
 - Production, APIs, requirements, dependencies, licence, lint and workflow are
-  unchanged. Publication and exact-checkpoint hosted verification are pending.
+  unchanged. Published checkpoint `fe40d592eb434a0730eac8c14744361e9d685200` has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38253819562):
+  exact logged checkout, all 20 steps, 145 workspace tests, separate 14/five host
+  tests, rustdoc, full sample and whitespace. Runner/image/tools remain
+  2.337.0/20260925.250.1, Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, Clippy 0.1.99.
 
 ## Current architecture
 
@@ -46,7 +51,9 @@ publication, exact selected discards excluding in-flight, preserved peer replies
 and terminal rejection. Final passive peer drains observe retained FIFO without
 introducing failure into an unfailed prefix. Implementation, focused/full local
 checks, independent source review, selected sensitivity trials and complete
-document/diff review pass. Publication and hosted execution remain pending.
+document/diff review pass. Publication and exact-checkpoint hosted CI pass.
+No unfinished implementation remains. This evidence follow-up receives repeated
+document/diff/render review and needs its own exact-revision CI.
 
 ## Highest risks and uncertainties
 
@@ -82,4 +89,6 @@ only after confirming a meaningful composition gap.
 2026-10-13: both-role returned message-callback failure model and full locked
 local checks pass with 145 workspace tests. Source/oracle review, width audit
 and six isolated compiling fault detections pass. Complete document/diff and
-rendered structure/content review pass. Publication and hosted CI are pending.
+rendered structure/content review pass. Checkpoint publication and exact-checkpoint
+hosted CI pass; all seven run-changed documents are included in final follow-up
+review. Finite-domain limits and the likely next task are recorded above.

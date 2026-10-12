@@ -242,3 +242,25 @@ dependencies and workflow are unchanged. Conditional ADR probes and actionlint
 are not triggered; the hosted job still executes both focused host targets and
 the sample. This later evidence follow-up requires its own exact-head hosted
 result rather than inheriting the checkpoint's pass.
+
+## Runtime message-callback failure sequence checkpoint — 2026-10-13
+
+The [message-failure sequence review](RUNTIME_MESSAGE_FAILURE_SEQUENCE_REVIEW.md)
+records checkpoint `fe40d592eb434a0730eac8c14744361e9d685200`, both fault roles
+and its separate reduced dispatch domain. It adds one integration target without
+changing production, dependencies or workflow.
+[Push run 38253819562](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38253819562)
+passes exact logged checkout, Windows job 114826598201 and all 20 reported steps.
+Logs confirm 145 workspace tests including the new model, separate 14 adapters/
+five sample tests, warnings-denied rustdoc, the exact unchanged full sample report
+and both whitespace checks. Root and parallel Codex evidence_review inspect
+raw logs/job JSON separately from local verification.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the existing hosted baseline.
+The companion whole-tree review covers 37 Rust files/14,480 physical lines, no
+width/configuration/waiver drift and three unchanged fulfilled expectations.
+Local execution remains on 1.98.0. Conditional ADR probes and actionlint are
+unchanged and not triggered; hosted CI still executes both focused host targets
+and the sample. This later evidence follow-up requires its own exact-head hosted
+result rather than inheriting the checkpoint's pass.
