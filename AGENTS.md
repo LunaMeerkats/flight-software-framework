@@ -43,7 +43,9 @@ translate NASA C source.
   reduced runtime-owned publication/stop/restart history model with passive
   final-dispatch observations; separate reduced ordinary-work and message-
   callback failure models with both fault roles, selected clearing and peer
-  retention. Integration tests also cover application dispatch, event queues,
+  retention; a reduced messaging-owned one-shot schedule model combines manual
+  time, publication, final item consumption and returned-work failure.
+  Integration tests also cover application dispatch, event queues,
   manual clocks and scheduled work, including ordinary-work event
   reporting, exact inbox clearing, event saturation, and messaging-owned
   one-shot schedule consumption with preserved peer queues,

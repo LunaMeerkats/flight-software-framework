@@ -339,6 +339,16 @@ Focused/full locked checks pass one/145 tests. Exact queued discard counts
 exclude in-flight input; peer replies, callback reports and terminal suppression
 match the reference. Production and requirement meanings are unchanged.
 
-After this checkpoint, reassess a reduced one-shot schedule-consumption/failure
-model against existing scenario tests. Freeze timing and operation domains
-separately before expanding verification; no new production surface is implied.
+The 2026-10-14 [schedule sequence checkpoint](verification/MESSAGING_SCHEDULE_SEQUENCE_REVIEW.md)
+freezes a separate messaging-owned model: two initially Running applications,
+capacities [1,2], both fault positions, agenda [(0,1s),(1,1s),(0,2s),(1,2s)] and
+Publish/Advance1s/Attempt sequences through length eight. The 19,682 traces and
+147,624 generated operations join timing, final item consumption and returned
+work failure with publication saturation and retained peer queues. Supplemental
+healthy work and passive FIFO drains remain distinct from generated operations.
+Focused/full locked local checks pass one/146 workspace tests. Independent
+source/oracle review accepts the model; selected compiling fault copies fail
+behavioral assertions. Production and requirement meanings are unchanged.
+
+After this checkpoint, assess a reduced configuration replacement/rejection/
+rollback sequence model against existing scenario tests before freezing a domain.

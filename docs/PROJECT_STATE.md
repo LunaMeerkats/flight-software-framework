@@ -1,6 +1,6 @@
 # Project state
 
-Last updated: **2026-10-13**
+Last updated: **2026-10-14**
 
 ## Current milestone
 
@@ -12,25 +12,22 @@ Current work hardens existing behavior within those boundaries.
 
 ## Verified baseline
 
-- Clean input `d672b42bb3eb1dd77f7b907ba6a6f4a8a7e7b4db` matches refreshed
-  origin; exact input hosted run 38142393905 is freshly successful.
-- Initial/final locked local checks pass 144/145 workspace tests, formatting,
-  all-target check, warnings-denied Clippy/rustdoc and whitespace. The focused
-  message-failure model passes one test over 2,186 traces/12,030 operations.
-- Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-  Hosted execution and tools remain separate evidence.
-- Source audit covers 37 Rust files/14,480 lines, zero widths and three unchanged
-  expectations. Independent Codex source/oracle review accepts the finite model.
-  Six compiling isolated source faults fail behavioral assertions. All 343
-  relative links/109 traceability functions resolve; complete diff and all
-  seven run-changed rendered documents pass structure/content review, with no
-  pixel claim.
-- Production, APIs, requirements, dependencies, licence, lint and workflow are
-  unchanged. Published checkpoint `fe40d592eb434a0730eac8c14744361e9d685200` has
-  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38253819562):
-  exact logged checkout, all 20 steps, 145 workspace tests, separate 14/five host
-  tests, rustdoc, full sample and whitespace. Runner/image/tools remain
-  2.337.0/20260925.250.1, Rust/Cargo 1.99.0, rustfmt 1.10.0-stable, Clippy 0.1.99.
+- Clean input `d45d447786f212a17a353771400a844f6d7754c6` matches refreshed
+  origin. Fresh exact-input hosted run 38254355148/job 114828459496 passes all
+  20 steps, 145 workspace tests, separate 14/five host tests, rustdoc, full
+  unchanged sample and both whitespace checks.
+- Initial/final locked local format/check/Clippy/test/warnings-denied rustdoc and
+  whitespace pass 145/146 workspace tests. The focused model and focused Clippy
+  pass; its 19,682 traces/147,624 generated operations match the reference.
+  Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
+- Final source review covers 38 Rust files/15,084 lines, zero width findings and
+  three unchanged reasoned expectations. Independent Codex reviewers accept
+  oracle/source form with no blocking finding. All 348 relative links and
+  110 traceability references resolve. Complete diff and six changed rendered
+  documents pass structure/content review, with no pixel/human claim.
+- Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
+  Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed
+  baseline. Local checks do not claim execution on that hosted toolchain.
 
 ## Current architecture
 
@@ -38,28 +35,29 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events and optional
 runtime configuration with immutable work visibility and one-use rollback. The
 private shared-source host sample composes these services. Separate finite models
-strengthen standalone messaging, successful lifecycle, ordinary-work failure and
-returned message-callback failure.
+strengthen standalone messaging, successful lifecycle, ordinary-work failure,
+returned message-callback failure and messaging-owned one-shot scheduling.
 
 ## Work in progress
 
-The [message-failure model](verification/RUNTIME_MESSAGE_FAILURE_SEQUENCE_REVIEW.md)
-uses both fault roles, capacities [1,2], one topic and three generated operations
-through length six. Independent states, accepted histories/cursors, callback
-receipts and publication observations predict oldest input, freed-slot self-
-publication, exact selected discards excluding in-flight, preserved peer replies
-and terminal rejection. Final passive peer drains observe retained FIFO without
-introducing failure into an unfailed prefix. Implementation, focused/full local
-checks, independent source review, selected sensitivity trials and complete
-document/diff review pass. Publication and exact-checkpoint hosted CI pass.
-No unfinished implementation remains. This evidence follow-up receives repeated
-document/diff/render review and needs its own exact-revision CI.
+The [schedule sequence checkpoint](verification/MESSAGING_SCHEDULE_SEQUENCE_REVIEW.md)
+freezes two Running applications, capacities [1,2], both fault positions,
+agenda [(0,1s),(1,1s),(0,2s),(1,2s)] and Publish/Advance1s/Attempt sequences
+through length eight: 19,682 traces/147,624 generated operations. Independent
+time, consumed-item and accepted-payload histories predict clock reads,
+waiting/due/completion, exact failure/rejection, selected cleanup and peer
+retention. Supplemental healthy work/passive FIFO drains remain separate.
+Implementation, focused/full local verification and independent source review
+pass. Seven selected isolated faults compile then fail behavioral checks.
+Complete document/diff and rendered structure/content review pass. Publication
+and exact-revision hosted evidence are pending. Production, APIs, requirements,
+dependencies, licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
 
-- Each finite model covers only its frozen domain. This model excludes lifecycle
-  operations, arbitrary callback policies, events/schedules/configuration, other
-  errors, domains and longer histories. Failed remains terminal.
+- Finite models cover only their frozen domains. This schedule domain excludes
+  generated lifecycle/dispatch, arbitrary agendas/times and event/configuration
+  composition. Failed remains terminal; no scheduled event path is added.
 - Application/clock origins and positional topology pairing are caller duties.
   Copied identifiers may share referents. Logical bounds do not bound process
   bytes, callback allocation or duration.
@@ -80,15 +78,14 @@ is complete; autonomous Codex review does not establish human review.
 
 ## Most likely next task
 
-Assess a separate reduced one-shot schedule-consumption/returned-work-failure
-model against existing scenario tests. Freeze a small timing and operation domain
-only after confirming a meaningful composition gap.
+Assess a reduced configuration replacement/rejection/rollback sequence model
+against existing scenario tests. Freeze its domain only after confirming a
+meaningful history-composition gap.
 
 ## Latest run
 
-2026-10-13: both-role returned message-callback failure model and full locked
-local checks pass with 145 workspace tests. Source/oracle review, width audit
-and six isolated compiling fault detections pass. Complete document/diff and
-rendered structure/content review pass. Checkpoint publication and exact-checkpoint
-hosted CI pass; all seven run-changed documents are included in final follow-up
-review. Finite-domain limits and the likely next task are recorded above.
+2026-10-14: the messaging-owned schedule model and full locked local baseline
+pass with 146 workspace tests. Independent oracle/source review accepts the
+finite domain; selected compiling fault copies fail behavioral assertions.
+Final document/diff and rendered structure/content review pass. Publication and
+exact-revision hosted evidence are pending.

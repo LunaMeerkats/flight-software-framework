@@ -815,6 +815,27 @@ Checkpoint `fe40d592eb434a0730eac8c14744361e9d685200` has
 for its exact logged checkout/all 20 steps, 145 workspace tests and the configured
 host/sample checks. Later documentation revisions require their own hosted result.
 
+## Finite messaging-owned schedule sequence evidence
+
+The 2026-10-14 [schedule sequence review](MESSAGING_SCHEDULE_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-003/004 and peer operability under RFF-REQ-008 using
+ADR-0015/0021. Public integration test
+`all_bounded_messaging_schedule_sequences_match_reference_history` enumerates
+both fault positions across 19,682 traces/147,624 generated operations:
+Publish/Advance1s/Attempt through length eight with fixed physical agenda
+[(0,1s),(1,1s),(0,2s),(1,2s)] and inbox capacities [1,2]. Independent time,
+consumed-item and accepted-payload histories predict exact timing/clock reads,
+final consumption on failure/rejection, concrete error/source chains, selected
+discard counts, publication outcomes and retained peer progress. Final healthy
+work/passive FIFO probes are supplemental observations.
+
+Focused/full locked local checks pass one/146 workspace tests. Independent
+source/oracle review accepts the model. This finite domain does not add
+event/configuration, arbitrary agenda/clock, generated lifecycle/dispatch,
+allocator-failure or concurrency
+evidence. Existing requirement meanings, event evidence and historical hashes
+remain. The linked review separates local, source and hosted evidence.
+
 ## Evidence policy
 
 "Verified" requires all of the following:
