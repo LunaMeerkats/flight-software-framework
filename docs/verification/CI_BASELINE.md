@@ -264,3 +264,26 @@ Local execution remains on 1.98.0. Conditional ADR probes and actionlint are
 unchanged and not triggered; hosted CI still executes both focused host targets
 and the sample. This later evidence follow-up requires its own exact-head hosted
 result rather than inheriting the checkpoint's pass.
+
+## Messaging-owned schedule sequence checkpoint — 2026-10-14
+
+The [schedule sequence review](MESSAGING_SCHEDULE_SEQUENCE_REVIEW.md) records
+checkpoint `0ca95560041f249911eb9d107cedd06f731ea159`: both fault positions,
+fixed physical agenda, manual-time/publication/attempt histories through length
+eight and supplemental healthy work/FIFO observations. Production, dependencies
+and workflow are unchanged.
+[Push run 38403821340](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
+passes its exact logged checkout, Windows job 115318053007 and all 20 steps.
+Raw logs confirm 146 workspace tests including the new model, separate
+14 adapters/five sample tests, warnings-denied rustdoc, the exact unchanged
+full sample report and both whitespace checks. Root and parallel Codex
+baseline_review inspect raw JSON/logs separately from local verification.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed input. Companion
+whole-tree source/configuration review covers 38 Rust files/15,084 lines, zero
+width findings and three unchanged fulfilled expectations. Local execution
+remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and not
+triggered; hosted CI still executes both focused host targets and the sample.
+Any later documentation revision requires its own completed exact-head hosted
+result; inspect the current branch head rather than inheriting this checkpoint.

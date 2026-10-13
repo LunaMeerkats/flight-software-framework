@@ -1,7 +1,7 @@
 # Messaging-owned one-shot schedule sequence checkpoint
 
 Date: **2026-10-14**
-Status: **Local checkpoint verified; publication and hosted evidence pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and authority
 
@@ -106,4 +106,24 @@ ignored aids. Root and parallel baseline_review accept the complete diff and
 durable records. All 348 relative links across 67 Markdown files and 110 exact
 traceability functions resolve. Six changed documents pass rendered HTML
 structure and complete content inspection, with no pixel/human claim.
-Publication and exact-revision hosted evidence remain separate steps.
+Publication and hosted execution are separate completed evidence below.
+
+## Publication and stopping point
+
+Checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` is published by ordinary
+fast-forward; remote/head match and the tree is clean at checkpoint publication.
+[Push run 38403821340](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
+passes its exact logged checkout, Windows job 115318053007 and all 20 steps.
+Raw logs confirm 146 workspace tests including the new model, separate
+14 adapter/five sample tests, warnings-denied rustdoc, unchanged full sample and
+both whitespace checks. Root and parallel baseline_review inspect raw JSON/logs
+separately from local source/document evidence.
+
+Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 are unchanged.
+Local execution remains on 1.98.0. This documentation follow-up preserves the
+source blob and receives full changed-document/diff review. Follow-up audit
+resolves 349 relative links/110 exact functions and all seven run-changed
+rendered documents pass structure/content inspection. Its own revision
+must receive a completed hosted result; checkpoint CI does not cover later
+documentation. Stop after this one completed checkpoint.

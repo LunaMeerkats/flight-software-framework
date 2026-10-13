@@ -832,9 +832,14 @@ work/passive FIFO probes are supplemental observations.
 Focused/full locked local checks pass one/146 workspace tests. Independent
 source/oracle review accepts the model. This finite domain does not add
 event/configuration, arbitrary agenda/clock, generated lifecycle/dispatch,
-allocator-failure or concurrency
-evidence. Existing requirement meanings, event evidence and historical hashes
+allocator-failure or concurrency evidence. Existing requirement meanings,
+event evidence and historical hashes
 remain. The linked review separates local, source and hosted evidence.
+
+Checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
+for its exact logged checkout/all 20 steps, 146 workspace tests and configured
+host/sample checks. Later documentation revisions require their own hosted result.
 
 ## Evidence policy
 

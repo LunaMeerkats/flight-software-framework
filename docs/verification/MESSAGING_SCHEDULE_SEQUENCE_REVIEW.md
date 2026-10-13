@@ -1,7 +1,7 @@
 # Finite messaging-owned schedule sequence review
 
 Date: **2026-10-14**
-Status: **Local checkpoint verified; publication and hosted evidence pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Contract and reviewed input
 
@@ -136,7 +136,30 @@ All 348 relative links across 67 Markdown files and 110 exact traceability
 functions resolve. Six changed documents pass rendered HTML structure and
 complete content inspection: headings, code, links, tables, text and balanced
 nesting. This is document evidence, not pixel or human acceptance. Publication
-and exact-revision hosted execution remain separate steps.
+and exact-revision hosted execution are separate completed evidence below.
+
+## Publication and exact-revision hosted evidence
+
+Checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` contains the reviewed
+test blob and local evidence. Ordinary fast-forward publication succeeds;
+remote/head match and the tree is clean at checkpoint publication.
+[Push run 38403821340](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
+passes that exact logged checkout, Windows job 115318053007 and all 20 steps.
+Raw logs confirm 146 workspace tests including the new model, separate
+14 adapter/five sample tests, warnings-denied rustdoc, the executed sample's
+unchanged full report and both whitespace checks. Root Codex and parallel
+baseline_review inspect raw JSON/logs independently from local verification.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed input. Whole-tree
+source/configuration review finds no policy or waiver drift. Local execution
+remains on 1.98.0; it does not claim local 1.99.0 execution.
+
+This documentation follow-up records completed checkpoint evidence and preserves
+the source blob. Follow-up audit resolves 349 relative links/110 exact functions;
+all seven run-changed rendered documents pass structure/content inspection.
+Review covers the complete diff. Its own published revision requires a completed
+exact-head hosted result; earlier CI does not cover a later documentation head.
 
 ## Limits and next work
 

@@ -22,12 +22,16 @@ Current work hardens existing behavior within those boundaries.
   Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
 - Final source review covers 38 Rust files/15,084 lines, zero width findings and
   three unchanged reasoned expectations. Independent Codex reviewers accept
-  oracle/source form with no blocking finding. All 348 relative links and
-  110 traceability references resolve. Complete diff and six changed rendered
+  oracle/source form with no blocking finding. All 349 relative links and
+  110 traceability references resolve. Complete diff and seven changed rendered
   documents pass structure/content review, with no pixel/human claim.
 - Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
   Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed
   baseline. Local checks do not claim execution on that hosted toolchain.
+- Published checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340):
+  exact logged checkout, all 20 steps, 146 workspace tests, separate 14/five
+  host tests, rustdoc, full unchanged sample and both whitespace checks.
 
 ## Current architecture
 
@@ -49,8 +53,10 @@ waiting/due/completion, exact failure/rejection, selected cleanup and peer
 retention. Supplemental healthy work/passive FIFO drains remain separate.
 Implementation, focused/full local verification and independent source review
 pass. Seven selected isolated faults compile then fail behavioral checks.
-Complete document/diff and rendered structure/content review pass. Publication
-and exact-revision hosted evidence are pending. Production, APIs, requirements,
+Complete document/diff and rendered structure/content review pass. Checkpoint
+publication and exact-checkpoint hosted CI pass; no unfinished implementation
+remains. This documentation follow-up preserves the source and receives its own
+document/diff review and exact-revision CI. Production, APIs, requirements,
 dependencies, licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
@@ -87,5 +93,7 @@ meaningful history-composition gap.
 2026-10-14: the messaging-owned schedule model and full locked local baseline
 pass with 146 workspace tests. Independent oracle/source review accepts the
 finite domain; selected compiling fault copies fail behavioral assertions.
-Final document/diff and rendered structure/content review pass. Publication and
-exact-revision hosted evidence are pending.
+Final document/diff and rendered structure/content review pass. Checkpoint
+publication and exact-checkpoint hosted CI pass. This evidence follow-up receives
+review of all seven run-changed documents and its own exact-revision hosted CI;
+later revisions cannot inherit the checkpoint result.
