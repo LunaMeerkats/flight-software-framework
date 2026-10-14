@@ -1,7 +1,7 @@
 # Standalone configuration sequence checkpoint
 
 Date: **2026-10-15**
-Status: **Local checkpoint accepted; publication and hosted CI pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -104,4 +104,26 @@ zero width findings and three unchanged fulfilled expectations. All 352
 relative links across 68 Markdown files and 111 exact traceability functions
 resolve. Six changed documents pass complete rendered content/HTML structure
 inspection, with no pixel or human-review claim. Publication and exact-revision
-hosted CI remain separate next steps.
+hosted execution are recorded separately below.
+
+## Publication and stopping point
+
+Checkpoint `56a68a0c7c860dee02ac42e441f9857421aad164` is published by ordinary
+fast-forward; local/remote heads match and the tree is clean at publication.
+[Push run 38569938802](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38569938802)
+passes its exact logged checkout, Windows job 115872183297 and all 20 steps.
+Raw logs confirm 147 workspace tests including this model, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root inspects JSON/logs separately from local checks;
+parallel baseline_review performs the companion independent evidence review.
+
+Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the input.
+Local execution remains on 1.98.0. This evidence follow-up preserves source and
+receives review of all seven run-changed documents and its own exact-revision
+hosted CI. Checkpoint CI does not cover a later documentation revision. Stop
+after this one completed checkpoint.
+
+Follow-up audit resolves 354 relative links/111 exact traceability functions;
+all seven run-changed rendered documents pass complete content/HTML structure
+inspection. Test and production blobs remain unchanged from local acceptance.

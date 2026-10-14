@@ -862,8 +862,13 @@ bounds, initial rejection, runtime composition, allocation failures, panics/hang
 and concurrency are outside this model. Independent oracle/source review
 accepts the frozen scope. Six selected final-copy faults compile then fail model
 assertions; clean isolated control passes. Complete source/document/diff and
-rendered content/structure reviews pass with Codex provenance. Publication and
-exact-revision hosted evidence remain pending.
+rendered content/structure reviews pass with Codex provenance.
+
+Checkpoint `56a68a0c7c860dee02ac42e441f9857421aad164` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38569938802)
+for its exact logged checkout/all 20 steps, 147 workspace tests and configured
+host/sample checks. Later documentation revisions require their own hosted
+result. Existing requirement meanings and historical evidence remain.
 
 ## Evidence policy
 

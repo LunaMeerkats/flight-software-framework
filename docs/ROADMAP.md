@@ -359,6 +359,13 @@ active bytes, exact errors, history eviction and consume-once restoration.
 Supplemental rollback/replacement/rollback probes expose retained history and
 revision allocation after trailing rejected operations. Runtime composition
 and revision exhaustion remain separate existing evidence.
+Focused/full locked checks pass one/147 workspace tests; independent source/
+oracle/document/diff review accepts the frozen scope. Six selected compiling
+fault copies fail behavioral assertions. Published checkpoint
+`56a68a0c7c860dee02ac42e441f9857421aad164` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38569938802)
+at its exact checkout, including all 20 steps and configured host/sample checks.
+Production and requirement meanings are unchanged.
 
 After this checkpoint, assess whether generated runtime configuration/work
 histories expose a meaningful gap beyond existing integration scenarios before

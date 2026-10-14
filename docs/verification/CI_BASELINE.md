@@ -287,3 +287,26 @@ remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and not
 triggered; hosted CI still executes both focused host targets and the sample.
 Any later documentation revision requires its own completed exact-head hosted
 result; inspect the current branch head rather than inheriting this checkpoint.
+
+## Standalone configuration sequence checkpoint — 2026-10-15
+
+The [configuration sequence review](CONFIGURATION_SEQUENCE_REVIEW.md) records
+checkpoint `56a68a0c7c860dee02ac42e441f9857421aad164`: one table with bound two,
+accepted/rejected replacement and consume-once rollback histories through length
+six, plus distinct retained-history/revision probes. Production, dependencies
+and workflow are unchanged.
+[Push run 38569938802](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38569938802)
+passes exact logged checkout, Windows job 115872183297 and all 20 steps.
+Raw logs confirm 147 workspace tests including the model, separate 14 adapters/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root and parallel Codex baseline_review inspect
+raw JSON/logs separately from local checks and source/document/diff review.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed input. Companion
+whole-tree source/configuration review covers 39 Rust files/15,333 lines, zero
+width findings and three unchanged fulfilled expectations. Local execution
+remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and not
+triggered; hosted CI still executes both focused host targets and the sample.
+This later evidence follow-up preserves source and requires its own completed
+exact-head hosted result rather than inheriting the checkpoint's pass.
