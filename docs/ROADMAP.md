@@ -350,5 +350,16 @@ Focused/full locked local checks pass one/146 workspace tests. Independent
 source/oracle review accepts the model; selected compiling fault copies fail
 behavioral assertions. Production and requirement meanings are unchanged.
 
-After this checkpoint, assess a reduced configuration replacement/rejection/
-rollback sequence model against existing scenario tests before freezing a domain.
+The 2026-10-15 [configuration sequence checkpoint](verification/CONFIGURATION_SEQUENCE_REVIEW.md)
+addresses the identified standalone history-composition gap. One table with
+bound two and initial [1] explores ReplaceA=[1], ReplaceB=[2,3], Reject=[0],
+Oversize=[0,0,0] and Rollback through length six. An independent append-only
+acceptance/predecessor and movement history predicts original revisions,
+active bytes, exact errors, history eviction and consume-once restoration.
+Supplemental rollback/replacement/rollback probes expose retained history and
+revision allocation after trailing rejected operations. Runtime composition
+and revision exhaustion remain separate existing evidence.
+
+After this checkpoint, assess whether generated runtime configuration/work
+histories expose a meaningful gap beyond existing integration scenarios before
+selecting another model or widening the domain.

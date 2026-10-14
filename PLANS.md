@@ -1,66 +1,65 @@
-# Messaging-owned one-shot schedule sequence checkpoint
+# Standalone configuration sequence checkpoint
 
-Date: **2026-10-14**
-Status: **Complete: checkpoint published and exact-revision hosted CI passed**
+Date: **2026-10-15**
+Status: **Local checkpoint accepted; publication and hosted CI pending**
 
-## Objective and authority
+## Objective and context
 
-Strengthen existing RFF-REQ-003/004 and the peer-operability aspect of
-RFF-REQ-008 with an independent finite model of messaging-owned one-shot
-schedule consumption and returned ordinary-work failure. Existing scenarios
-cover selected timing, rejection and cleanup traces separately; prior generated
-models exclude scheduling. ADR-0015/0021 supply the contract. No production or
-requirement change is planned.
+Strengthen existing RFF-REQ-006 with an independent finite model of standalone
+configuration replacement, rejection, predecessor eviction and consume-once
+rollback. Existing tests cover selected chronological traces, including runtime
+visibility and revision exhaustion, but do not generate these combined histories.
+ADR-0005/0017 already define the contract; no production or requirement change
+is planned. Existing runtime composition evidence remains separate.
 
-Input `d45d447786f212a17a353771400a844f6d7754c6` is clean on codex/nightly,
-equal to refreshed origin. Fresh input hosted run 38254355148 passes its exact
-checkout and all 20 steps. Initial locked local format/check/Clippy/test/rustdoc
-and whitespace checks pass 145 workspace tests. Local Rust/Cargo 1.98.0,
-rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged. Root Codex and parallel
-gap_review/baseline_review reorient and audit; ADR-0024 authorizes routine review.
-The existing accepted host v0.1 milestone remains separate evidence.
+Input `ecfe954cd7550a933bf08821d9a4154c71023953` is clean on codex/nightly and
+matches refreshed origin. Fresh input hosted run 38404703855 succeeds at that
+exact revision with all 20 steps. Initial locked local format/check/Clippy/test,
+warnings-denied rustdoc and whitespace pass 146 workspace tests. Local
+Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
+Root Codex and parallel config_gap/baseline_review reorient and audit;
+ADR-0024 supplies routine review authority, separate from completed host review.
 
-## Frozen finite domain
+## Frozen domain and oracle
 
-- Two initially Running applications, capacities [1,2], one Command topic,
-  both fixed fault positions. All lifecycle and message callbacks succeed.
-- Fixed physical agenda: application 0 at 1s, application 1 at 1s, application
-  0 at 2s, application 1 at 2s. The first eligible fault work returns a concrete
-  error; healthy ordinary work only records its application position.
-- Three generated operations: Publish with its unique operation-position byte,
-  Advance by one second, Attempt the next scheduled item. Independently
-  initialize lengths zero through eight for each fault position: 19,682 traces
-  and 147,624 generated operations. Assert both aggregate counts.
-- Independent numeric elapsed time, consumed-item history, Active/Terminal
-  states, callback order, accepted payload histories and discard watermarks
-  predict complete/wait/due outcomes, exact errors/source chains, clock reads,
-  final consumption, terminal availability, cleanup and preserved peer queues.
-- Compare initial and every-operation state. Supplemental final healthy work
-  and passive peer FIFO drains expose retained progress without introducing a
-  failure into an unfailed prefix. They are excluded from generated counts.
+- One standalone table, inline bound two, initial accepted bytes [1] at revision
+  one. One pure fixture validator accepts nonempty content with a nonzero first
+  byte and rejects [0] with its concrete mission error.
+- Five operations: ReplaceA=[1], ReplaceB=[2,3], Reject=[0], Oversize=[0,0,0],
+  Rollback. Independently initialize every sequence of length zero through six:
+  19,531 traces and 112,305 generated operations. Assert both aggregate counts.
+- An append-only accepted history with predecessor references and movement
+  history derives active identity and rollback eligibility. Successful acceptance
+  count assigns revisions; the oracle does not reproduce the production
+  active/rollback/high-water storage triple or call production transition logic.
+- Compare exact results, concrete error/source relationships, used bytes and
+  original revision initially and after every generated operation. Equal-content
+  acceptance, exact bound/shorter lengths, failed operations, consumed rollback,
+  history eviction and revision non-reuse compose within this domain.
+- After every trace, supplemental Rollback/ReplaceA/Rollback probes expose
+  retained history and the next unused revision. Their 58,593 observations are
+  excluded from generated lengths and the 112,305 generated-operation count.
 
-Length eight reaches saturated publication, waiting/equality/overdue decisions,
-four item attempts, later terminal rejection and completion. Fixed physical
-order covers healthy equal-time work both before and after failure across roles.
-Role-relative fault-first agendas miss the former; generating stop/restart,
-events or configuration would add separate responsibilities. Direct-owner
-schedule scenarios continue to protect the shared private timing decision.
+Length six reaches replacement, history eviction, rollback, rejection, fresh
+replacement and a consumed rollback. The oversized candidate is also invalid
+under the validator, making error precedence observable. Existing white-box
+tests separately exercise revision exhaustion and validator suppression.
 
 ## Components and acceptance
 
-Add tests/messaging_schedule_sequences.rs and a focused verification review.
-Update AGENTS layout, traceability, roadmap, concise state and CI evidence.
-Root Codex owns records; parallel gap_review implements the test. Separate
-Codex review checks oracle independence, selected isolated source faults,
-source form and the complete diff. Existing repository contracts suffice;
-no external research, source reuse, dependency, API, ADR or lint waiver is needed.
+Add tests/configuration_sequences.rs and a focused verification review. Update
+AGENTS layout, traceability, roadmap, concise state and CI evidence. Root Codex
+owns records; config_gap owns the test. Separate Codex reviewers inspect oracle
+independence, isolated compiling source faults, source form and complete diff.
+Existing repository contracts suffice; no external research, source reuse,
+dependency, public API, ADR, requirement or lint waiver is needed.
 
-Acceptance requires exact frozen counts/outcomes, focused and full locked
-checks, source/diff review, relative-link/traceability resolution, whole-tree
-width/waiver audit and changed rendered-document structure/content inspection.
-Selected isolated faults must compile and fail behavioral assertions without
-editing tracked production. Publication requires reviewed local verification;
-hosted CI must be inspected at each published revision.
+Acceptance requires frozen counts/outcomes, focused and full locked checks,
+whole-tree width/waiver review, relative-link and traceability resolution,
+changed rendered-document inspection and complete source/diff review. Selected
+isolated faults must compile then fail behavioral assertions without changing
+tracked production. Ordinary fast-forward publication follows local acceptance;
+inspect hosted CI at each exact published revision.
 
 ```text
 cargo fmt --all -- --check
@@ -68,62 +67,41 @@ cargo check --locked --workspace --all-targets --all-features
 cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
 cargo test --locked --workspace --all-features
 cargo doc --locked --workspace --all-features --no-deps
-cargo test --locked --test messaging_schedule_sequences
+cargo test --locked --test configuration_sequences
 git diff --check
 git show --format= --check --diff-merges=first-parent HEAD
 ```
 
-Rustdoc uses RUSTDOCFLAGS=-D warnings. Unchanged host sample/adapters,
-ADR-0018/0019 experiments and workflow do not trigger extra local commands.
-Ignored review aids remain under target/review-2026-10-14-schedule.
+Rustdoc uses RUSTDOCFLAGS=-D warnings. Unchanged host adapters/sample,
+ADR-0018/0019 experiments and workflow do not trigger their extra local commands.
+Ignored review aids remain under target/review-2026-10-15-configuration.
 
-## Limits and safe stopping point
+## Risks and safe stopping point
 
-The domain excludes Registered/Stopped/unknown identities, generated dispatch,
-other agendas/timing steps/topics/capacities/callback policies, scheduled events,
-configuration, panics/hangs/allocator failures, concurrency, performance and
-whole-process bounds. Consumption-before-callback remains source inspection
-evidence; tests observe completed outcomes. Failed remains terminal and no
-retry/recovery follows. Existing event evidence remains separate.
+The finite domain excludes other capacities, validators, candidate bytes,
+initial failures, revision exhaustion, runtime lifecycle/work, messaging,
+events/scheduling, allocation failures, panics/hangs and concurrency. Observable
+results do not establish validator purity, termination, physical memory bounds
+or operational suitability. Existing scenarios retain those separate boundaries.
 
-If a mismatch appears, retain its smallest trace and resolve it within this
+If a mismatch appears, retain its smallest witness and resolve it within this
 objective. Preserve unrelated changes. Stop after this one reviewed checkpoint.
 
-## Completed local evidence
+## Local evidence
 
-The focused model and focused warnings-denied Clippy pass. Initial/final full
-locked baselines pass 145/146 workspace tests, formatting, all-target check,
-Clippy, warnings-denied rustdoc and whitespace. Root Codex and parallel
-gap_review/baseline_review/sensitivity accept the oracle and source form with
-no blocking finding. Final test blob is
-`fa4c467828c56f929fd5aeddb0ca522ae16be3d8`. There is no new lint exception.
-Whole-tree review covers 38 Rust files/15,084 lines and 1,098 comment-only lines,
-zero width findings and the same three fulfilled expectations.
-
-Seven selected isolated faults compile then fail behavioral checks. Exact trials,
-source hashes, diagnostics and limits are recorded in the focused review and
-ignored aids. Root and parallel baseline_review accept the complete diff and
-durable records. All 348 relative links across 67 Markdown files and 110 exact
-traceability functions resolve. Six changed documents pass rendered HTML
-structure and complete content inspection, with no pixel/human claim.
-Publication and hosted execution are separate completed evidence below.
-
-## Publication and stopping point
-
-Checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` is published by ordinary
-fast-forward; remote/head match and the tree is clean at checkpoint publication.
-[Push run 38403821340](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
-passes its exact logged checkout, Windows job 115318053007 and all 20 steps.
-Raw logs confirm 146 workspace tests including the new model, separate
-14 adapter/five sample tests, warnings-denied rustdoc, unchanged full sample and
-both whitespace checks. Root and parallel baseline_review inspect raw JSON/logs
-separately from local source/document evidence.
-
-Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
-Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 are unchanged.
-Local execution remains on 1.98.0. This documentation follow-up preserves the
-source blob and receives full changed-document/diff review. Follow-up audit
-resolves 349 relative links/110 exact functions and all seven run-changed
-rendered documents pass structure/content inspection. Its own revision
-must receive a completed hosted result; checkpoint CI does not cover later
-documentation. Stop after this one completed checkpoint.
+The implemented model and focused warnings-denied Clippy pass. Initial/final full
+locked baselines pass 146/147 workspace tests, formatting, all-target check,
+Clippy, warnings-denied rustdoc and both whitespace checks. Root and parallel
+baseline_review accept the independent lineage oracle and complete test source;
+blob `00ca28860a92cffa7af79e6108bf9c40d3d9c231`. The fixture now matches the
+frozen validator policy after a review correction. Six selected final-copy
+faults compile then fail model assertions; clean isolated control passes.
+Root separately inspects logs, witnesses and final hashes; the focused review
+records scope and trial commands. Production is untouched. Root and parallel
+baseline_review accept the complete source/document/diff with no blocker.
+Whole-tree audit covers 39 Rust files/15,333 lines and 1,105 comment-only lines,
+zero width findings and three unchanged fulfilled expectations. All 352
+relative links across 68 Markdown files and 111 exact traceability functions
+resolve. Six changed documents pass complete rendered content/HTML structure
+inspection, with no pixel or human-review claim. Publication and exact-revision
+hosted CI remain separate next steps.

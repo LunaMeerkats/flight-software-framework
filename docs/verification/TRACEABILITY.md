@@ -13,7 +13,9 @@ verify RFF-REQ-004. The runtime-generated event, bounded queue, failed state,
 preserved work error, saturation outcome, and later peer work verify RFF-REQ-005
 and RFF-REQ-008 at opt-in direct and messaging-owned ordinary-work boundaries.
 The standalone table and runtime work-context evidence verify RFF-REQ-006
-at the bounded in-memory ordinary-work boundary.
+at the bounded in-memory ordinary-work boundary. The separate finite standalone
+configuration history model supplements accepted/rejected replacement and
+consume-once rollback evidence without changing that contract.
 Implementation and verification state remain separate so planned evidence is
 not represented as completed behavior.
 
@@ -840,6 +842,28 @@ Checkpoint `0ca95560041f249911eb9d107cedd06f731ea159` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38403821340)
 for its exact logged checkout/all 20 steps, 146 workspace tests and configured
 host/sample checks. Later documentation revisions require their own hosted result.
+
+## Standalone configuration sequence checkpoint
+
+The 2026-10-15 [configuration sequence review](CONFIGURATION_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-006 and ADR-0005/0017 without changing their contracts.
+`all_bounded_configuration_sequences_match_reference_history` independently
+checks accepted/rejected replacement and consume-once rollback against an
+append-only acceptance/predecessor and movement history. One standalone table,
+bound two, initial [1] and five operations through length six produce 19,531
+traces/112,305 generated operations. Supplemental Rollback/ReplaceA/Rollback
+probes add 58,593 observations outside generated counts.
+
+Exact typed outcomes/source relationships, original revisions and used bytes
+match after every step. Focused/full locked local checks pass one/147 workspace
+tests. Runtime integration, exhaustion and validator suppression remain their
+separate existing scenario/private evidence. Arbitrary candidates/validators/
+bounds, initial rejection, runtime composition, allocation failures, panics/hangs
+and concurrency are outside this model. Independent oracle/source review
+accepts the frozen scope. Six selected final-copy faults compile then fail model
+assertions; clean isolated control passes. Complete source/document/diff and
+rendered content/structure reviews pass with Codex provenance. Publication and
+exact-revision hosted evidence remain pending.
 
 ## Evidence policy
 

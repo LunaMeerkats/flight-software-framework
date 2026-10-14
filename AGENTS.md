@@ -50,7 +50,9 @@ translate NASA C source.
   reporting, exact inbox clearing, event saturation, and messaging-owned
   one-shot schedule consumption with preserved peer queues,
   plus standalone and runtime-integrated configuration validation, revision,
-  visibility, retention, and consume-once rollback tests.
+  visibility, retention, and consume-once rollback tests; a separate finite
+  standalone configuration history model composes accepted/rejected replacement
+  and consume-once rollback without reproducing the table's storage layout.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
   children own validation and application/output behavior. `work.rs` owns
