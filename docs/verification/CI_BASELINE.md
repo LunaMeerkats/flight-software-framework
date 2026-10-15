@@ -310,3 +310,26 @@ remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and not
 triggered; hosted CI still executes both focused host targets and the sample.
 This later evidence follow-up preserves source and requires its own completed
 exact-head hosted result rather than inheriting the checkpoint's pass.
+
+## Direct-runtime configuration/work sequence checkpoint — 2026-10-16
+
+The [runtime configuration sequence review](RUNTIME_CONFIGURATION_SEQUENCE_REVIEW.md)
+records checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3`: two initially
+Running applications, bound-two configuration, selected/peer work and selected
+stop/restart through length five for both selected indices, plus separate
+terminal probes. Production, dependencies and workflow are unchanged.
+[Push run 38739984030](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
+passes exact logged checkout, Windows job 116438836697 and all 20 steps.
+Raw logs confirm 148 workspace tests including the model, separate 14 adapters/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root and parallel Codex baseline_review inspect
+raw JSON/logs separately from local checks and source/document/diff review.
+
+Runner 2.337.0, windows-2025-vs2026 image 20260925.250.1, Rust/Cargo 1.99.0,
+rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed input. Companion
+whole-tree review covers 40 Rust files/15,912 lines, zero width findings and
+three unchanged fulfilled expectations. Local execution remains on 1.98.0.
+Conditional ADR probes/actionlint are unchanged and not triggered; hosted CI
+still executes both focused host targets and the sample. This later evidence
+follow-up preserves source and requires its own completed exact-head hosted
+result rather than inheriting the checkpoint pass.

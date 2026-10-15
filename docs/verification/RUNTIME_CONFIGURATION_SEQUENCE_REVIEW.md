@@ -2,7 +2,7 @@
 
 Date: **2026-10-16**
 Reviewer: **Codex**, with parallel gap, baseline and sensitivity review
-Status: **Local acceptance complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Gap and decision
 
@@ -102,7 +102,7 @@ Relative links and 112 exact traceability function references resolve.
 All 357 relative links across 69 Markdown files resolve. Root and parallel
 baseline_review accept the complete source/document/diff; all six changed
 rendered documents preserve full content and HTML structure. This is not pixel
-inspection or human acceptance. Publication and exact-revision CI remain pending.
+inspection or human acceptance. Publication and exact-revision CI are below.
 
 The isolated unmodified control passes this same final test. Six selected
 production faults compile and fail callback-log equality assertions:
@@ -144,3 +144,20 @@ Failed remains terminal; no new recovery, operational, qualification or human
 review claim follows. Production, public APIs, requirements, dependencies,
 licence, lint policy and workflow are unchanged. Existing local contracts supply
 the design; no external research or source reuse is introduced.
+
+## Publication evidence
+
+Checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` is published by ordinary
+fast-forward on codex/nightly. Local and remote heads match with a clean tree
+at publication. [Push run 38739984030](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
+passes that exact logged checkout, Windows job 116438836697 and all 20 steps.
+Root inspects raw JSON/logs: 148 workspace tests including the new model,
+separate 14 adapters/five sample tests, warnings-denied rustdoc, the complete
+unchanged 222-line sample report and both whitespace checks. Parallel
+baseline_review independently reviews this hosted evidence.
+
+Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the input.
+Local execution remains on 1.98.0. This later documentation revision preserves
+source, receives full review and requires its own exact-head CI result. The
+checkpoint pass does not establish a later revision's result or human review.

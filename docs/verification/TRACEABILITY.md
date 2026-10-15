@@ -888,7 +888,13 @@ rollback history and next revision in 524,286 separate supplemental operations.
 Independent acceptance/movement and lifecycle/callback histories supply the
 reference. Existing standalone, exhaustion, service-owner and borrowing evidence
 remains separate; requirement meaning and production behavior are unchanged.
-Verification and publication disposition are recorded in the focused review.
+Focused/full locked checks pass one/148 workspace tests. Independent oracle/
+source/document/diff review accepts the scope; six selected compiling faults
+fail behavioral assertions while the clean isolated control passes.
+Checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
+at its exact logged checkout, all 20 steps and configured host/sample checks.
+This does not establish a later documentation revision's hosted result.
 
 ## Evidence policy
 

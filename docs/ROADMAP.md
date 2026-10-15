@@ -379,3 +379,8 @@ runtime, standalone table and alternate service-owner evidence. Production and
 requirement meanings remain unchanged. Focused/full locked checks pass one/148
 workspace tests; independent source/oracle review and six selected compiling
 fault trials accept their defined expectations. The focused review records limits.
+Published checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
+for its exact logged checkout, all 20 steps and configured host/sample checks.
+Next, assess whether finite structured-event enqueue/dequeue histories add
+meaningful saturation/FIFO evidence beyond existing scenarios.

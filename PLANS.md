@@ -1,7 +1,7 @@
 # Runtime configuration/work sequence checkpoint
 
 Date: **2026-10-16**
-Status: **Local acceptance complete; publication pending**
+Status: **Complete: checkpoint published and exact-revision hosted CI passed**
 
 ## Objective and context
 
@@ -110,4 +110,25 @@ Root and parallel baseline_review accept the complete source/document/diff.
 All 357 relative links across 69 Markdown files and 112 exact function references
 resolve; all six changed rendered documents pass full content/HTML structure
 inspection, with no pixel or human-review claim. Publication and exact-revision
-hosted execution remain pending.
+hosted execution are recorded below.
+
+## Publication and stopping point
+
+Checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` is published by ordinary
+fast-forward; local and remote heads match and the tree is clean at publication.
+[Push run 38739984030](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
+passes its exact logged checkout, Windows job 116438836697 and all 20 steps.
+Raw logs confirm 148 workspace tests including this model, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root inspects raw JSON/logs separately from local
+checks; parallel baseline_review supplies independent review.
+
+Hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
+Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the input.
+Local execution remains on 1.98.0. This documentation follow-up preserves source
+and receives full review and its own exact-revision hosted CI. The checkpoint
+result does not cover a later revision. Stop after this one completed increment.
+
+Follow-up audit resolves 358 relative links/112 exact traceability functions;
+all seven run-changed rendered documents pass complete content/HTML structure
+inspection. Test and production blobs remain unchanged from local acceptance.

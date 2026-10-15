@@ -24,14 +24,18 @@ Current work hardens existing behavior within those boundaries.
 - Whole-tree audit covers 40 Rust files/15,912 lines, zero width findings and
   three unchanged fulfilled expectations. Independent Codex review accepts
   oracle and complete source at blob ca64c5a09f1ab93e046e612fd869937b8b3ecff6.
-  All 357 relative links and 112 exact traceability function references resolve.
-  Six changed rendered documents pass complete content/HTML structure review;
+  All 358 relative links and 112 exact traceability function references resolve.
+  Seven run-changed rendered documents pass complete content/HTML structure review;
   no pixel or human-review claim. Complete diff review accepts this increment.
   Clean isolated control passes; six selected compiling source faults fail
   behavioral assertions. Root separately verifies raw logs, patches and hashes.
 - Input hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
   Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed
   baseline. Local checks do not claim execution on that hosted toolchain.
+- Published checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030):
+  exact logged checkout, all 20 steps, 148 workspace tests, separate 14/five
+  host tests, rustdoc, full unchanged sample and both whitespace checks.
 
 ## Current architecture
 
@@ -54,8 +58,9 @@ views, retained application state, suppression, terminal failure and healthy
 peer progress. Supplemental peer work and table operations expose retained
 lineage after every terminal prefix. Focused/full local checks, independent
 source/oracle/document/diff review and selected isolated fault trials pass their
-defined expectations. No unfinished implementation remains. Publication and
-exact-revision hosted execution are pending.
+defined expectations. No unfinished implementation remains. Checkpoint
+publication and exact-checkpoint hosted CI pass. This documentation follow-up
+preserves source and receives full review and its own exact-revision hosted CI.
 Production, APIs, requirements, dependencies, licence, lint and workflow are
 unchanged.
 
@@ -94,5 +99,8 @@ model. Preserve the current event contract and alternate-owner evidence.
 2026-10-16: the direct-runtime configuration/work history model and full locked
 local baseline pass 148 workspace tests. Independent source/oracle review accepts
 the frozen scope; six selected compiling faults fail behavioral assertions.
-Complete document/diff and rendered content/structure reviews pass. Publication
-and exact-revision hosted execution are pending. Stop after this one checkpoint.
+Complete document/diff and rendered content/structure reviews pass. Checkpoint
+publication and exact-checkpoint hosted CI pass. This documentation follow-up
+receives review of all seven run-changed documents and its own exact-revision
+hosted CI; later revisions cannot inherit the checkpoint result. Stop after
+this one completed checkpoint.
