@@ -367,6 +367,15 @@ fault copies fail behavioral assertions. Published checkpoint
 at its exact checkout, including all 20 steps and configured host/sample checks.
 Production and requirement meanings are unchanged.
 
-After this checkpoint, assess whether generated runtime configuration/work
-histories expose a meaningful gap beyond existing integration scenarios before
-selecting another model or widening the domain.
+The 2026-10-16 [runtime configuration sequence checkpoint](verification/RUNTIME_CONFIGURATION_SEQUENCE_REVIEW.md)
+addresses the integration gap with a separate direct-runtime model. It composes
+accepted/rejected replacement and rollback with selected/peer work and selected
+stop/restart through length five for both selected application indices. The
+selected application fails on its second work callback, allowing the generated
+work/stop/change/restart/work path to observe new configuration and retained
+application state at failure. The frozen 74,898 traces/363,792 generated operations
+and separate 524,286 terminal probes preserve the distinction between direct
+runtime, standalone table and alternate service-owner evidence. Production and
+requirement meanings remain unchanged. Focused/full locked checks pass one/148
+workspace tests; independent source/oracle review and six selected compiling
+fault trials accept their defined expectations. The focused review records limits.

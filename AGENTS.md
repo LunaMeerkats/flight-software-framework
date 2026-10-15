@@ -53,6 +53,9 @@ translate NASA C source.
   visibility, retention, and consume-once rollback tests; a separate finite
   standalone configuration history model composes accepted/rejected replacement
   and consume-once rollback without reproducing the table's storage layout.
+  A separate direct-runtime history model composes configuration changes,
+  ordinary-work observations, selected stop/restart and returned-work failure,
+  with a healthy peer observing retained configuration lineage.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
   children own validation and application/output behavior. `work.rs` owns

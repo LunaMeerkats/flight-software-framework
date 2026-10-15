@@ -16,6 +16,8 @@ The standalone table and runtime work-context evidence verify RFF-REQ-006
 at the bounded in-memory ordinary-work boundary. The separate finite standalone
 configuration history model supplements accepted/rejected replacement and
 consume-once rollback evidence without changing that contract.
+The separate direct-runtime configuration sequence model composes those rules
+with work observations, selected stop/restart and returned-work failure.
 Implementation and verification state remain separate so planned evidence is
 not represented as completed behavior.
 
@@ -869,6 +871,24 @@ Checkpoint `56a68a0c7c860dee02ac42e441f9857421aad164` has
 for its exact logged checkout/all 20 steps, 147 workspace tests and configured
 host/sample checks. Later documentation revisions require their own hosted
 result. Existing requirement meanings and historical evidence remain.
+
+## Runtime configuration/work sequence checkpoint
+
+The 2026-10-16 [runtime configuration sequence review](RUNTIME_CONFIGURATION_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-006 and its lifecycle/peer-operability composition with
+RFF-REQ-002/008. `all_bounded_runtime_configuration_sequences_match_reference_history`
+uses a separate direct-runtime model: two initially Running applications, bound
+two, initial [1], replacements [1]/[2,3], rejection [0], rollback, selected/peer
+work and selected stop/restart, through length five for both selected indices.
+The selected application fails on its second invoked work. The 74,898 traces /
+363,792 generated operations compose changes while stopped or failed, retained
+restart state, fresh copied work views, exact callback suppression and errors,
+and healthy peer progress. Seven terminal probes per trace expose active content,
+rollback history and next revision in 524,286 separate supplemental operations.
+Independent acceptance/movement and lifecycle/callback histories supply the
+reference. Existing standalone, exhaustion, service-owner and borrowing evidence
+remains separate; requirement meaning and production behavior are unchanged.
+Verification and publication disposition are recorded in the focused review.
 
 ## Evidence policy
 
