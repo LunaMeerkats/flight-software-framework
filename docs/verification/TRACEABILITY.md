@@ -912,6 +912,11 @@ pass one/149 workspace tests. Independent oracle/source review accepts test blob
 behavior are unchanged. Whole-tree/rendered-document/complete-diff review and
 six compiling fault trials pass their defined expectations. Publication and
 exact-revision hosted evidence are recorded in the focused checkpoint.
+Checkpoint `7137e924819b8cc35f0c4f3464f80c3d8df1b149` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
+at its exact logged checkout, all 20 steps and configured host/sample checks.
+The [CI baseline](CI_BASELINE.md) records the 1.99.1 hosted toolchain and updated
+image re-audit. A later documentation head requires its own completed result.
 
 ## Evidence policy
 

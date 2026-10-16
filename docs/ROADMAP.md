@@ -396,3 +396,9 @@ oracle/source review accepts the frozen domain. Production and requirement
 meanings remain unchanged. Whole-tree/rendered-document/complete-diff review and
 six compiling fault trials pass their defined expectations. Publication and
 exact-revision hosted evidence are recorded in the focused checkpoint.
+Published checkpoint `7137e924819b8cc35f0c4f3464f80c3d8df1b149` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
+at its exact logged checkout, all 20 steps and configured host/sample checks.
+The 1.99.1 hosted toolchain and updated image receive the required configuration/
+whole-tree policy re-audit. Next, assess whether mixed returned-work failure-event
+histories add meaningful integration evidence beyond existing saturation scenarios.

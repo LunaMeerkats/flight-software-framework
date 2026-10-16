@@ -1,7 +1,7 @@
 # Standalone event-queue history checkpoint
 
 Date: **2026-10-17**
-Status: **Local verification and autonomous review accepted; publication pending**
+Status: **Complete: checkpoint published and exact-revision CI passed**
 
 ## Objective and context
 
@@ -89,4 +89,25 @@ lines/1,120 comment-only lines, zero width findings and three unchanged fulfille
 expectations. All 363 relative links/113 exact test references resolve. All six
 changed rendered documents pass full content/HTML structure inspection; no pixel
 or human-review claim. Root and independent source_review accept the complete
-source/document/diff. Publication and exact-revision hosted execution remain.
+source/document/diff.
+
+## Publication and stopping point
+
+Checkpoint 7137e924819b8cc35f0c4f3464f80c3d8df1b149 is published by ordinary
+fast-forward and its remote head matches. [Push run 38905783350](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
+passes exact logged checkout, job 116988877022 and all 20 steps, 149 workspace
+tests, separate 14 adapter/five sample tests, warnings-denied rustdoc, unchanged
+222-line sample report and both whitespace checks. Root and independent Codex
+review inspect raw hosted JSON/logs separately from local evidence.
+
+Hosted Rust/Cargo advances to 1.99.1, rustfmt remains 1.10.0-stable and Clippy
+0.1.99; runner 2.337.0 image advances to windows-2025-vs2026 20261007.264.1.
+Required configuration and whole-tree re-audit retain the same policy and
+three fulfilled expectations without source or waiver changes. Local tools stay
+on 1.98.0. The focused review and CI baseline record exact environment evidence.
+This documentation follow-up preserves Rust and receives complete review and
+its own exact-revision hosted CI. Stop after this one completed checkpoint.
+
+Follow-up audit resolves 365 relative links/113 exact test references; all seven
+run-changed rendered documents pass full content/HTML structure inspection.
+Root and independent source_review accept the complete follow-up diff.

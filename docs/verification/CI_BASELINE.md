@@ -333,3 +333,36 @@ Conditional ADR probes/actionlint are unchanged and not triggered; hosted CI
 still executes both focused host targets and the sample. This later evidence
 follow-up preserves source and requires its own completed exact-head hosted
 result rather than inheriting the checkpoint pass.
+
+## Standalone event history and toolchain checkpoint — 2026-10-17
+
+The [event sequence review](EVENT_QUEUE_SEQUENCE_REVIEW.md) records checkpoint
+`7137e924819b8cc35f0c4f3464f80c3d8df1b149`: capacities one, two and three,
+mixed emission/dequeue histories through length eight, separate terminal drains
+and selected compiling fault sensitivity. Production, dependencies, lint and
+workflow remain unchanged.
+[Push run 38905783350](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
+passes exact logged checkout, Windows job 116988877022 and all 20 reported steps.
+Raw logs confirm 149 workspace tests including the new model, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root and independent Codex source_review inspect
+raw JSON/logs separately from local checks and source/document/diff review.
+
+Hosted Rust/Cargo changes from 1.99.0 to 1.99.1; compiler commit 58cf8f9c3 is
+dated 2026-10-13. Rustfmt is 1.10.0-stable and Clippy 0.1.99 at that compiler
+commit. Runner 2.337.0 uses windows-2025-vs2026 image 20261007.264.1 instead of
+20260925.250.1. The required configuration and whole-tree source re-audit accepts
+stable max_width=100, comment-only review at 80, too-many-lines-threshold=60,
+unsafe_code=forbid and the individually selected too_many_lines deny lint.
+All-target hosted Clippy completes with warnings denied and three fulfilled
+existing expectations. No new lint group, waiver, exclusion or source change is
+needed. The companion source audit covers 41 Rust files/16,117 physical lines/
+1,120 comment-only lines with zero width findings. This retains the current
+policy without claiming toolchain pinning or a minimum supported Rust version.
+
+Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98;
+there is no local 1.99.1 execution claim. Conditional ADR probes/actionlint are
+unchanged and not triggered; hosted CI executes its configured host/sample
+checks. Ignored raw evidence remains under target/review-2026-10-17-events.
+This documentation follow-up preserves Rust/configuration/workflow blobs and
+requires its own exact-head hosted result rather than inheriting this checkpoint.

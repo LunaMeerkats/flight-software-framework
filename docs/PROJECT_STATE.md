@@ -26,13 +26,20 @@ Current work hardens existing behavior within those boundaries.
   separate. Clean isolated control passes; six selected compiling source faults
   fail behavioral assertions. Root separately inspects raw logs/patches/hashes.
   Whole-tree audit covers 41 Rust files/16,117 lines, zero width findings and
-  three unchanged fulfilled expectations. All 363 relative links and 113 exact
-  test references resolve; six changed rendered documents pass full content/
+  three unchanged fulfilled expectations. All 365 relative links and 113 exact
+  test references resolve; seven changed rendered documents pass full content/
   HTML structure review, without a pixel or human-review claim. Complete
   source/document/diff review accepts the checkpoint.
 - Input hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
   Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the recorded
   baseline. Local checks do not claim execution on that hosted toolchain.
+- Published checkpoint 7137e924819b8cc35f0c4f3464f80c3d8df1b149 has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350):
+  exact logged checkout, all 20 steps, 149 workspace tests, separate 14/five host
+  tests, rustdoc, unchanged 222-line sample and both whitespace checks. Hosted
+  Rust/Cargo advances to 1.99.1; rustfmt 1.10.0-stable/Clippy 0.1.99 remain.
+  Runner image advances to 20261007.264.1. Required configuration/whole-tree
+  re-audit retains the policy with no source or waiver changes.
 
 ## Current architecture
 
@@ -50,9 +57,10 @@ supplements existing saturation and ownership scenarios with mixed emission,
 rejection and dequeue histories at capacities one, two and three. Two fixed
 records differ in all metadata fields and oppose timestamp order; repeated equal
 records remain separate accepted entries. The independent accepted-record ledger
-and consumed ordinal check all histories through length eight. Local acceptance
-is complete; publication and exact-revision hosted execution remain. No
-unfinished implementation remains. Production, APIs, requirements, dependencies,
+and consumed ordinal check all histories through length eight. Local and exact-
+checkpoint hosted acceptance are complete. This documentation follow-up preserves
+Rust and receives complete review and its own exact-revision CI. No unfinished
+implementation remains. Production, APIs, requirements, dependencies,
 licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
@@ -90,4 +98,6 @@ scenarios. Select a new model only if its added evidence justifies its cost.
 pass 149 workspace tests. Independent oracle/source review accepts the frozen
 domain; selected isolated fault trials pass their defined expectations. Whole-tree,
 rendered-document and complete source/document/diff reviews accept the checkpoint.
-Publication and exact-revision hosted execution remain. Stop after this checkpoint.
+Publication and exact-checkpoint hosted CI pass; hosted toolchain/image changes
+receive the required configuration/whole-tree re-audit. This documentation follow-up
+receives its own exact-revision CI. Stop after this one completed checkpoint.

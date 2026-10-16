@@ -1,7 +1,7 @@
 # Standalone event-queue sequence review
 
 Date: **2026-10-17**
-Status: **Local verification and autonomous review accepted; publication pending**
+Status: **Checkpoint published; exact-revision hosted verification accepted**
 Reviewed input: `21a0f02b5f2b23ef19813c7e37812f748157f812`
 Reviewer: **Codex**, with independent event_gap and source_review agents
 
@@ -111,6 +111,34 @@ and owner-specific failure-event evidence remains separate. Test-harness ledger
 retention is bounded by the frozen trace length and is not operational storage.
 
 Production, public APIs, requirements, dependencies, licence, lint configuration
-and workflow are unchanged. Local acceptance is complete; publication and
-exact-revision hosted execution remain pending. This record does not establish
-human review or qualification.
+and workflow are unchanged. Local and exact-checkpoint hosted acceptance are
+complete. This record does not establish human review or qualification.
+
+## Publication and toolchain re-audit
+
+Checkpoint `7137e924819b8cc35f0c4f3464f80c3d8df1b149` is published by ordinary
+fast-forward; remote/local heads match and the tree is clean at publication.
+[Push run 38905783350](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
+passes the exact logged checkout, job 116988877022 and all 20 reported steps.
+Raw logs confirm 149 workspace tests including this model, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root and independent source_review inspect the raw
+JSON/logs separately from local checks and review.
+
+Hosted Rust/Cargo advances from 1.99.0 to 1.99.1, with compiler commit
+58cf8f9c3 dated 2026-10-13. Rustfmt remains 1.10.0-stable and Clippy 0.1.99,
+both at that compiler commit. Runner 2.337.0 uses windows-2025-vs2026 image
+20261007.264.1, replacing 20260925.250.1. The required tracked-configuration and
+41-file whole-tree source re-audit retains stable max_width=100, comment review
+at 80, function threshold 60, the individual deny lint and three fulfilled
+expectations, without source changes, added waivers or a toolchain pin. Local
+execution remains on 1.98.0. Source review and completed hosted all-target checks
+supply distinct evidence; neither claims local execution on the hosted toolchain.
+
+This documentation follow-up records the checkpoint and refreshed environment,
+preserves Rust/configuration/workflow blobs, and receives complete document/diff
+review plus its own exact-revision CI. A later head cannot inherit this result.
+The follow-up audit resolves 365 relative links/113 exact test references;
+all seven run-changed rendered documents pass complete content/HTML structure
+review. Root and independent source_review accept the complete follow-up diff.
+Stop after this one accepted increment.
