@@ -56,6 +56,8 @@ translate NASA C source.
   A separate direct-runtime history model composes configuration changes,
   ordinary-work observations, selected stop/restart and returned-work failure,
   with a healthy peer observing retained configuration lineage.
+  A separate finite standalone event history model checks mixed emission,
+  rejection and dequeue histories with an accepted-record ledger and cursor.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
   children own validation and application/output behavior. `work.rs` owns

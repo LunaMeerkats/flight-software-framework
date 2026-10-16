@@ -1,41 +1,38 @@
 # Project state
 
-Last updated: **2026-10-16**
+Last updated: **2026-10-17**
 
 ## Current milestone
 
 Stages 1 through 4 and source-quality adoption are complete for experimental
-serial host v0.1. The [actual Codex host review](verification/HOST_V0_1_REVIEW.md)
-accepts entry points and architecture under ADR-0024 with exact evidence and
+serial host v0.1. The [Codex host review](verification/HOST_V0_1_REVIEW.md)
+accepts entry points and architecture under ADR-0024 with recorded evidence and
 limits. Package 0.0.0 remains unpublished; APIs and requirements are provisional.
 Current work hardens existing behavior within those boundaries.
 
 ## Verified baseline
 
-- Clean input `ce8bd7e86423a69435c6ba4f71a011df5b62ce99` matches refreshed
-  origin. Fresh exact-input hosted run 38570555687/job 115874303603 passes all
-  20 steps, 147 workspace tests, separate 14/five host tests, rustdoc, full
+- Clean input 21a0f02b5f2b23ef19813c7e37812f748157f812 matches refreshed
+  origin. Fresh exact-input hosted run 38740423411/job 116440378554 passes all
+  20 steps, 148 workspace tests, separate 14 adapter/five sample tests, rustdoc,
   unchanged sample and both whitespace checks.
 - Initial/final locked local format/check/Clippy/test/warnings-denied rustdoc
-  and whitespace pass 147/148 workspace tests. Focused model and focused Clippy
-  pass; 74,898 traces/363,792 generated operations and 524,286 separate terminal
-  probes match the reference. Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and
-  Clippy 0.1.98 are unchanged.
-- Whole-tree audit covers 40 Rust files/15,912 lines, zero width findings and
-  three unchanged fulfilled expectations. Independent Codex review accepts
-  oracle and complete source at blob ca64c5a09f1ab93e046e612fd869937b8b3ecff6.
-  All 358 relative links and 112 exact traceability function references resolve.
-  Seven run-changed rendered documents pass complete content/HTML structure review;
-  no pixel or human-review claim. Complete diff review accepts this increment.
-  Clean isolated control passes; six selected compiling source faults fail
-  behavioral assertions. Root separately verifies raw logs, patches and hashes.
+  and whitespace pass 148/149 workspace tests. Focused event model and focused
+  Clippy pass. Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98
+  are unchanged.
+- Independent source/oracle review accepts test blob
+  d865bbab4187415cd2460c8bd3ab13bfdbd06e54. Exact-count assertions check
+  29,523 traces and 221,436 generated operations; terminal FIFO drains remain
+  separate. Clean isolated control passes; six selected compiling source faults
+  fail behavioral assertions. Root separately inspects raw logs/patches/hashes.
+  Whole-tree audit covers 41 Rust files/16,117 lines, zero width findings and
+  three unchanged fulfilled expectations. All 363 relative links and 113 exact
+  test references resolve; six changed rendered documents pass full content/
+  HTML structure review, without a pixel or human-review claim. Complete
+  source/document/diff review accepts the checkpoint.
 - Input hosted runner 2.337.0, windows-2025-vs2026 image 20260925.250.1,
-  Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the reviewed
+  Rust/Cargo 1.99.0, rustfmt 1.10.0-stable and Clippy 0.1.99 match the recorded
   baseline. Local checks do not claim execution on that hosted toolchain.
-- Published checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
-  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030):
-  exact logged checkout, all 20 steps, 148 workspace tests, separate 14/five
-  host tests, rustdoc, full unchanged sample and both whitespace checks.
 
 ## Current architecture
 
@@ -43,33 +40,26 @@ One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events and optional
 runtime configuration with immutable work visibility and one-use rollback. The
 private shared-source host sample composes these services. Separate finite models
-strengthen standalone messaging/configuration, successful lifecycle, work and
-message-callback failures, messaging-owned scheduling and direct-runtime
-configuration/work/lifecycle histories.
+strengthen messaging, configuration, lifecycle/work failures, messaging-owned
+scheduling, direct-runtime configuration histories and standalone event histories.
 
 ## Work in progress
 
-The [runtime configuration checkpoint](verification/RUNTIME_CONFIGURATION_SEQUENCE_REVIEW.md)
-freezes two initially Running applications, one bound-two table and eight
-configuration/work/selected-stop/restart operations through length five for both
-selected indices. The selected application fails on its second invoked work.
-Independent configuration and lifecycle/callback histories check fresh work
-views, retained application state, suppression, terminal failure and healthy
-peer progress. Supplemental peer work and table operations expose retained
-lineage after every terminal prefix. Focused/full local checks, independent
-source/oracle/document/diff review and selected isolated fault trials pass their
-defined expectations. No unfinished implementation remains. Checkpoint
-publication and exact-checkpoint hosted CI pass. This documentation follow-up
-preserves source and receives full review and its own exact-revision hosted CI.
-Production, APIs, requirements, dependencies, licence, lint and workflow are
-unchanged.
+The [event sequence checkpoint](verification/EVENT_QUEUE_SEQUENCE_REVIEW.md)
+supplements existing saturation and ownership scenarios with mixed emission,
+rejection and dequeue histories at capacities one, two and three. Two fixed
+records differ in all metadata fields and oppose timestamp order; repeated equal
+records remain separate accepted entries. The independent accepted-record ledger
+and consumed ordinal check all histories through length eight. Local acceptance
+is complete; publication and exact-revision hosted execution remain. No
+unfinished implementation remains. Production, APIs, requirements, dependencies,
+licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
 
-- Finite models cover only their frozen domains. This direct-runtime model
-  excludes arbitrary candidates/validators/bounds, initial rejection, exhaustion,
-  unknown/Registered applications, other callback failures and service owners.
-  Existing scenarios retain their separate evidence.
+- Finite models cover only their frozen domains. The event model excludes
+  arbitrary capacities/content/identifier types, construction failures,
+  allocation behavior and runtime event-production ordering.
 - Application/clock origins and positional topology pairing are caller duties.
   Copied identifiers may share referents. Logical bounds do not bound process
   bytes, callback allocation or duration.
@@ -90,17 +80,14 @@ is complete; autonomous Codex review does not establish human review.
 
 ## Most likely next task
 
-Assess whether finite structured-event enqueue/dequeue histories add meaningful
-saturation/FIFO evidence beyond existing scenarios before selecting another
-model. Preserve the current event contract and alternate-owner evidence.
+Assess whether mixed returned-work failure-event histories reveal a meaningful
+integration gap beyond the existing direct and messaging-owned saturation/retry
+scenarios. Select a new model only if its added evidence justifies its cost.
 
 ## Latest run
 
-2026-10-16: the direct-runtime configuration/work history model and full locked
-local baseline pass 148 workspace tests. Independent source/oracle review accepts
-the frozen scope; six selected compiling faults fail behavioral assertions.
-Complete document/diff and rendered content/structure reviews pass. Checkpoint
-publication and exact-checkpoint hosted CI pass. This documentation follow-up
-receives review of all seven run-changed documents and its own exact-revision
-hosted CI; later revisions cannot inherit the checkpoint result. Stop after
-this one completed checkpoint.
+2026-10-17: the standalone event history model and full locked local baseline
+pass 149 workspace tests. Independent oracle/source review accepts the frozen
+domain; selected isolated fault trials pass their defined expectations. Whole-tree,
+rendered-document and complete source/document/diff reviews accept the checkpoint.
+Publication and exact-revision hosted execution remain. Stop after this checkpoint.

@@ -896,6 +896,23 @@ Checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
 at its exact logged checkout, all 20 steps and configured host/sample checks.
 This does not establish a later documentation revision's hosted result.
 
+## Standalone event-queue sequence evidence
+
+The 2026-10-17 [event history review](EVENT_QUEUE_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-005's existing standalone queue evidence. The frozen domain
+explores Emit(A), Emit(B), Dequeue at capacities one, two and three through
+length eight: 29,523 traces and 221,436 generated operations. An append-only
+accepted-record ledger and consumed ordinal predict exact results and retained
+FIFO, including repeated equal records and opposing timestamp order. Terminal
+drains are separate observations; runtime event production, ownership and
+construction scenarios retain their distinct evidence. The public regression
+`all_bounded_event_sequences_match_reference_history` and full locked baseline
+pass one/149 workspace tests. Independent oracle/source review accepts test blob
+`d865bbab4187415cd2460c8bd3ab13bfdbd06e54`. Requirement meaning and production
+behavior are unchanged. Whole-tree/rendered-document/complete-diff review and
+six compiling fault trials pass their defined expectations. Publication and
+exact-revision hosted evidence are recorded in the focused checkpoint.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

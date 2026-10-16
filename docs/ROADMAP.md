@@ -382,5 +382,17 @@ fault trials accept their defined expectations. The focused review records limit
 Published checkpoint `283b07c280746dd6ac7c26b60bdaf0ab14e5bad3` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38739984030)
 for its exact logged checkout, all 20 steps and configured host/sample checks.
-Next, assess whether finite structured-event enqueue/dequeue histories add
-meaningful saturation/FIFO evidence beyond existing scenarios.
+The next selected checkpoint assesses standalone event history composition.
+
+The 2026-10-17 [event sequence checkpoint](verification/EVENT_QUEUE_SEQUENCE_REVIEW.md)
+supplements the existing capacity, FIFO, saturation/retry, reuse and ownership
+scenarios with every mixed Emit(A)/Emit(B)/Dequeue history through length eight
+at capacities one, two and three. An independent accepted-record ledger and
+consumed ordinal predicts 29,523 traces and 221,436 generated operations;
+terminal FIFO drains remain separate observations. Repeated equal records and
+opposing timestamp order exercise acceptance order without deduplication or
+priority. Focused/full locked checks pass one/149 workspace tests; independent
+oracle/source review accepts the frozen domain. Production and requirement
+meanings remain unchanged. Whole-tree/rendered-document/complete-diff review and
+six compiling fault trials pass their defined expectations. Publication and
+exact-revision hosted evidence are recorded in the focused checkpoint.
