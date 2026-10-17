@@ -27,11 +27,17 @@ Current work hardens existing behavior within those boundaries.
   six selected compiling faults fail behavioral assertions. Root separately
   inspects raw logs/patches/hashes. Whole-tree audit covers 42 Rust files/16,520
   lines, zero width findings and three unchanged fulfilled expectations. All
-  370 relative links/114 exact test references resolve; six changed rendered
+  371 relative links/114 exact test references resolve; seven changed rendered
   documents pass content/HTML structure inspection, without pixel/human claims.
 - Input hosted runner 2.337.0, windows-2025-vs2026 image 20261007.264.1,
   Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and Clippy 0.1.99 match the recorded
   baseline. Local checks do not claim execution on that hosted toolchain.
+- Published checkpoint 9fc7e0240b36f7eca76f81c5b48030ff8904a338 has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652):
+  exact logged checkout, job 117402970574, all 20 steps, 150 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, unchanged 222-line sample and
+  both whitespace checks. Root and independent Codex records_review inspect raw
+  logs/JSON separately from local evidence. Hosted tools/image match the input.
 
 ## Current architecture
 
@@ -49,8 +55,10 @@ The [runtime event sequence checkpoint](verification/RUNTIME_EVENT_SEQUENCE_REVI
 composes two distinct application failures, healthy peer work, manual time,
 dequeue and explicit rejected-event retry through length five at event capacities
 one and two. Separate symbolic records and failure history predict all effects.
-Local source/oracle, fault sensitivity and final baseline acceptance are complete;
-final document/diff review precedes publication. Production, APIs,
+Local source/oracle, fault sensitivity, full baseline and complete diff acceptance
+are complete. Publication and exact-checkpoint hosted CI pass. This documentation
+follow-up preserves Rust and receives its own complete review and exact-revision
+CI. No unfinished implementation remains. Production, APIs,
 requirements, dependencies, licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
@@ -87,6 +95,7 @@ Select that model only if its added evidence justifies the oracle machinery.
 2026-10-18: the direct-runtime event/time/retry history model and full locked
 local baseline pass 150 workspace tests. Independent oracle/source review accepts
 the frozen domain; selected compiling fault trials pass their defined expectations.
-Whole-tree and rendered-document review accept the local evidence. Final complete
-diff review precedes publication and exact-revision hosted CI inspection. Stop
-after this one checkpoint.
+Whole-tree, rendered-document and complete diff review accept the checkpoint.
+Publication and exact-checkpoint hosted CI pass; tools/image match the reviewed
+input. This evidence follow-up receives independent review and its own exact-
+revision CI. Stop after this one completed checkpoint.

@@ -411,7 +411,11 @@ Independent symbolic acceptance, failure, invocation and time histories predict
 39,216 traces/189,546 generated operations. Separate terminal peer work and FIFO
 drains remain supplemental observations. Source/oracle review, full locked local
 checks (150 workspace tests), whole-tree/rendered-document review and six selected
-compiling fault trials accept their defined expectations. Complete-diff review
-precedes publication, whose evidence is recorded in the focused review. Production
-and requirement meanings remain unchanged. Next, assess messaging-owned event histories only if they add
+compiling fault trials accept their defined expectations. Complete source/document/
+diff review accepts the checkpoint. Published revision
+`9fc7e0240b36f7eca76f81c5b48030ff8904a338` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652)
+at its exact logged checkout, all 20 steps and configured host/sample checks.
+Production and requirement meanings remain unchanged. Next, assess messaging-owned
+event histories only if they add
 meaningful evidence beyond this model and existing cleanup/event scenarios.

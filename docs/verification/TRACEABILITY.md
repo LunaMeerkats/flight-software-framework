@@ -933,9 +933,12 @@ observations. The public regression
 full locked baseline pass one/150 workspace tests. Independent source/oracle
 review accepts test blob `0a175efa31066e00e05eb6ac7a13203292b1258e`.
 Whole-tree/rendered-document review and six selected compiling fault trials pass
-their defined expectations. Complete-diff review precedes publication, whose
-exact-revision evidence is recorded in the focused checkpoint. Production and
-requirement meanings are unchanged.
+their defined expectations. Complete source/document/diff review accepts the
+checkpoint. Published revision `9fc7e0240b36f7eca76f81c5b48030ff8904a338` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652)
+at its exact logged checkout, all 20 steps and configured host/sample checks.
+This does not establish a later documentation head's hosted result. Production
+and requirement meanings are unchanged.
 Messaging ownership/cleanup and internal commit-before-clock ordering remain
 separate evidence boundaries.
 

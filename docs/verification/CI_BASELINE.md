@@ -366,3 +366,27 @@ unchanged and not triggered; hosted CI executes its configured host/sample
 checks. Ignored raw evidence remains under target/review-2026-10-17-events.
 This documentation follow-up preserves Rust/configuration/workflow blobs and
 requires its own exact-head hosted result rather than inheriting this checkpoint.
+
+## Direct-runtime failure-event history checkpoint — 2026-10-18
+
+The [runtime event sequence review](RUNTIME_EVENT_SEQUENCE_REVIEW.md) records
+checkpoint `9fc7e0240b36f7eca76f81c5b48030ff8904a338`: two distinct first-work
+failures, a healthy peer, event capacities one/two with an older diagnostic, and
+mixed work/time/dequeue/explicit rejected-event retry histories through length
+five. Production, dependencies, lint and workflow remain unchanged.
+[Push run 39035017652](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652)
+passes exact logged checkout, Windows job 117402970574 and all 20 steps. Raw logs
+confirm 150 workspace tests including the model, separate 14 adapter/five sample
+tests, warnings-denied rustdoc, all 222 unchanged sample report lines and both
+whitespace checks. Root and independent Codex records_review inspect raw JSON/logs
+separately from local checks and complete source/document/diff acceptance.
+
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0 and
+windows-2025-vs2026 image 20261007.264.1 match the reviewed input. Companion
+whole-tree review covers 42 Rust files/16,520 physical lines/1,129 comment-only
+lines, zero width findings and three unchanged fulfilled expectations. Local
+execution remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and
+not triggered; hosted CI executes its configured host/sample checks. Ignored raw
+evidence remains under target/review-2026-10-18-work-events. This documentation
+follow-up preserves source/configuration/workflow blobs and requires its own
+exact-head hosted result rather than inheriting the checkpoint pass.

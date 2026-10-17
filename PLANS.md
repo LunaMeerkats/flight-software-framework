@@ -1,7 +1,7 @@
 # Direct-runtime failure-event history checkpoint
 
 Date: **2026-10-18**
-Status: **Local checks complete; final review and publication pending**
+Status: **Complete: checkpoint published and exact-revision CI passed**
 
 ## Objective and context
 
@@ -98,5 +98,25 @@ Whole-tree audit covers 42 Rust files/16,520 physical lines/1,129 comment-only
 lines, zero width findings and three unchanged fulfilled expectations. All 370
 relative links and 114 exact traceability functions resolve. All six changed
 rendered documents pass complete content/HTML structure inspection; this is not
-pixel or human acceptance. Final complete source/document/diff review and exact-
-revision publication evidence follow; no further source change is planned.
+pixel or human acceptance. Root and independent records_review accept the complete
+source/document/diff and independently inspect raw local/fault evidence.
+
+## Publication and stopping point
+
+Checkpoint 9fc7e0240b36f7eca76f81c5b48030ff8904a338 is published by ordinary
+fast-forward; its remote head matches. [Push run 39035017652](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652)
+passes exact logged checkout, job 117402970574 and all 20 steps, 150 workspace
+tests including the model, separate 14 adapter/five sample tests, warnings-denied
+rustdoc, all 222 unchanged sample report lines and both whitespace checks.
+Root and independent Codex records_review inspect the raw hosted evidence
+separately from local source/document/diff acceptance.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match the input. Local execution
+remains on 1.98.0. This evidence follow-up preserves source/configuration/workflow
+blobs and receives complete document/diff review and its own exact-revision hosted
+result. Stop after this one completed checkpoint.
+
+The evidence follow-up audit resolves 371 relative links/114 exact test references.
+All seven run-changed rendered documents pass complete content/HTML structure
+inspection; source/configuration/workflow blobs remain unchanged.

@@ -2,7 +2,7 @@
 
 Date: **2026-10-18**
 Reviewer: **Codex**, with independent event_gap and records_review agents
-Disposition: **Local source/oracle and verification accepted; publication pending**
+Disposition: **Accepted: published checkpoint and exact-revision CI passed**
 
 ## Question and selected boundary
 
@@ -111,7 +111,8 @@ Whole-tree review covers 42 Rust files/16,520 physical lines/1,129 comment-only
 lines, zero width findings and three unchanged fulfilled expectations. All 370
 relative links and 114 exact traceability functions resolve. All six changed
 rendered documents pass complete content/HTML structure inspection, without a
-pixel or human-review claim. Complete source/document/diff review precedes commit.
+pixel or human-review claim. Root and independent records_review accept the
+complete source/document/diff, raw local/fault evidence and source hash identity.
 
 ## Selected fault sensitivity
 
@@ -133,6 +134,27 @@ checks the source replacements, production/test hash identity and behavioral
 witnesses. These are six selected faults, not mutation completeness or evidence
 of a production defect. Source remains unchanged after the final successful
 focused/full checks.
+
+## Publication evidence
+
+Checkpoint 9fc7e0240b36f7eca76f81c5b48030ff8904a338 is published by ordinary
+fast-forward to codex/nightly; the remote head matches.
+[Push run 39035017652](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39035017652)
+passes its exact logged checkout, Windows job 117402970574 and all 20 steps.
+Raw logs confirm 150 workspace tests including this model, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines
+and both whitespace checks. Root and independent Codex records_review inspect
+raw hosted JSON/logs separately from local/source acceptance.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match the input. Local execution
+remains on 1.98.0. No toolchain-policy change or new waiver is needed. This
+evidence follow-up preserves source/configuration/workflow blobs; its hosted
+result must be checked independently rather than inherited from the checkpoint.
+
+The evidence follow-up audit resolves 371 relative links/114 exact test references;
+all seven run-changed rendered documents pass complete content/HTML structure
+inspection. The source/configuration/workflow blobs remain unchanged.
 
 ## Limits and next candidate
 
