@@ -400,5 +400,18 @@ Published checkpoint `7137e924819b8cc35f0c4f3464f80c3d8df1b149` has
 [successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/38905783350)
 at its exact logged checkout, all 20 steps and configured host/sample checks.
 The 1.99.1 hosted toolchain and updated image receive the required configuration/
-whole-tree policy re-audit. Next, assess whether mixed returned-work failure-event
-histories add meaningful integration evidence beyond existing saturation scenarios.
+whole-tree policy re-audit. The following checkpoint assesses mixed direct-runtime
+returned-work failure-event histories beyond existing saturation scenarios.
+
+The 2026-10-18 [runtime event history checkpoint](verification/RUNTIME_EVENT_SEQUENCE_REVIEW.md)
+selects direct Runtime composition: two distinct first-work failures and a healthy
+peer, shared event capacities one/two with an older diagnostic, and generated
+WorkA/WorkB/PeerWork/Advance1s/Dequeue/RetryA/RetryB histories through length five.
+Independent symbolic acceptance, failure, invocation and time histories predict
+39,216 traces/189,546 generated operations. Separate terminal peer work and FIFO
+drains remain supplemental observations. Source/oracle review, full locked local
+checks (150 workspace tests), whole-tree/rendered-document review and six selected
+compiling fault trials accept their defined expectations. Complete-diff review
+precedes publication, whose evidence is recorded in the focused review. Production
+and requirement meanings remain unchanged. Next, assess messaging-owned event histories only if they add
+meaningful evidence beyond this model and existing cleanup/event scenarios.

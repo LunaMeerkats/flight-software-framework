@@ -918,6 +918,27 @@ at its exact logged checkout, all 20 steps and configured host/sample checks.
 The [CI baseline](CI_BASELINE.md) records the 1.99.1 hosted toolchain and updated
 image re-audit. A later documentation head requires its own completed result.
 
+## Direct-runtime failure-event sequence evidence
+
+The 2026-10-18 [runtime event history review](RUNTIME_EVENT_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-005/008 with two distinct returned-work errors, a healthy
+peer, manual time, event dequeue and explicit rejected-event retry. The frozen
+direct Runtime domain covers capacities one/two with an older diagnostic and
+all seven-operation strings through length five: 39,216 traces and 189,546
+generated operations. The symbolic accepted ledger/cursor, failure/invocation
+history and numeric elapsed time remain independent of production storage and
+transition helpers. Terminal peer work and retained FIFO drains are separate
+observations. The public regression
+`all_bounded_runtime_event_sequences_match_reference_history`, focused Clippy and
+full locked baseline pass one/150 workspace tests. Independent source/oracle
+review accepts test blob `0a175efa31066e00e05eb6ac7a13203292b1258e`.
+Whole-tree/rendered-document review and six selected compiling fault trials pass
+their defined expectations. Complete-diff review precedes publication, whose
+exact-revision evidence is recorded in the focused checkpoint. Production and
+requirement meanings are unchanged.
+Messaging ownership/cleanup and internal commit-before-clock ordering remain
+separate evidence boundaries.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

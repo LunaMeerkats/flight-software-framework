@@ -58,6 +58,9 @@ translate NASA C source.
   with a healthy peer observing retained configuration lineage.
   A separate finite standalone event history model checks mixed emission,
   rejection and dequeue histories with an accepted-record ledger and cursor.
+  A separate direct-runtime event history model composes two distinct returned
+  work failures, healthy peer work, advancing time, event dequeue and explicit
+  rejected-event retry using symbolic records and independent failure history.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
   children own validation and application/output behavior. `work.rs` owns
