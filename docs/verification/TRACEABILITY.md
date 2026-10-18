@@ -942,6 +942,29 @@ and requirement meanings are unchanged.
 Messaging ownership/cleanup and internal commit-before-clock ordering remain
 separate evidence boundaries.
 
+## Messaging-owned failure-event sequence evidence
+
+The 2026-10-19 [messaging event history review](MESSAGING_EVENT_SEQUENCE_REVIEW.md)
+supplements RFF-REQ-003/005/008 by joining selected-inbox clearing and healthy
+peer FIFO with event saturation, changing time and explicit rejected-event
+retry. The separate frozen model uses two initially Running applications,
+inbox capacities [1,2], both fault roles and event capacities one/two with an
+older diagnostic. All seven-action strings through length five comprise
+78,432 traces and 379,092 generated operations. Append-only message acceptance
+histories, consumed ordinals/discard watermark, symbolic event ledger/cursor
+and independent failure/time/invocation histories predict effects. Terminal
+healthy peer work and message/event drains are separate observations.
+`all_bounded_messaging_event_sequences_match_reference_histories` is the public
+regression; focused test/Clippy and full locked checks pass one/151 workspace
+tests. Independent oracle/source review accepts blob
+`6d1d8c2dbcd45ca79d3914cdd7cc5ac73c3fa1af`; six selected compiling owner
+faults fail behavioral assertions. Whole-tree/rendered-document and root complete-
+diff review pass with independent Codex records_review acceptance. Publication
+and exact-checkpoint CI remain.
+Existing requirement meanings and production behavior are unchanged. Other lifecycle operations,
+configuration, schedules, arbitrary callbacks and multiple work failures remain
+separate evidence boundaries.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

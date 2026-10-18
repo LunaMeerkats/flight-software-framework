@@ -419,3 +419,17 @@ at its exact logged checkout, all 20 steps and configured host/sample checks.
 Production and requirement meanings remain unchanged. Next, assess messaging-owned
 event histories only if they add
 meaningful evidence beyond this model and existing cleanup/event scenarios.
+
+The 2026-10-19 [messaging event history checkpoint](verification/MESSAGING_EVENT_SEQUENCE_REVIEW.md)
+addresses that gap with two initially Running applications, inbox capacities
+[1,2], both fault roles and event capacities one/two. Seven actions through
+length five join publication, selected failure, peer work/dispatch, advancing
+time, event dequeue and explicit rejected-event retry. Independent message and
+event acceptance histories predict 78,432 traces/379,092 generated operations;
+terminal peer work and FIFO drains remain separate observations. This checks
+owner cleanup and peer retention amid event saturation, without changing
+production behavior or requirement meanings. Focused/full locked checks pass
+one/151 workspace tests; independent oracle/source review accepts the domain.
+Six selected ownership faults compile then fail behavioral assertions. Whole-tree,
+rendered-document and complete-diff review pass with root and independent Codex
+records_review acceptance. Publication and exact-checkpoint CI remain.

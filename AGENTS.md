@@ -61,6 +61,9 @@ translate NASA C source.
   A separate direct-runtime event history model composes two distinct returned
   work failures, healthy peer work, advancing time, event dequeue and explicit
   rejected-event retry using symbolic records and independent failure history.
+  A separate messaging-owned event history model joins publication, selected
+  work failure, peer work/dispatch, time, event dequeue and explicit retry with
+  independent message and event acceptance histories.
 - `examples/host-echo/`: a private multi-file Cargo command/telemetry example.
   `mission.rs` owns composition/ingress; its `codec.rs` and `applications.rs`
   children own validation and application/output behavior. `work.rs` owns
