@@ -28,13 +28,19 @@ Current work hardens existing behavior within those boundaries.
   compiling owner-wiring faults fail behavioral assertions. Root separately
   inspects raw logs/patches/hashes. Whole-tree audit covers 43 Rust files/17,101
   physical lines/1,138 comment-only lines, zero widths and three unchanged
-  fulfilled expectations. All 374 relative links/115 exact test references
-  resolve; six changed rendered documents pass full content/HTML structure
+  fulfilled expectations. All 375 relative links/115 exact test references
+  resolve; seven run-changed rendered documents pass full content/HTML structure
   inspection. Root and independent Codex records_review accept the complete
   source/document diff and raw local/fault evidence.
 - Input hosted runner 2.337.0, windows-2025-vs2026 image 20261007.264.1,
   Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and Clippy 0.1.99 match the recorded
   baseline. Local checks do not claim execution on that hosted toolchain.
+- Published checkpoint 27194287b8670b75efac05f3a3f0a7de38a312d5 has
+  [successful hosted CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285):
+  exact logged checkout, job 117684735602, all 20 steps, 151 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, all 222 unchanged sample report
+  lines and both whitespace checks. Root and independent Codex records_review
+  inspect raw JSON/logs separately from local evidence. Tools/image match input.
 
 ## Current architecture
 
@@ -52,9 +58,11 @@ The [messaging event history checkpoint](verification/MESSAGING_EVENT_SEQUENCE_R
 joins publication, selected work failure, healthy peer work/dispatch, manual time,
 event dequeue and explicit retry through length five. Both fault roles and event
 capacities one/two expose cleanup, exact discard counts, saturation and retained
-peer FIFO. Local implementation, full baseline and source/document review pass;
-complete diff acceptance passes. Publication remains pending. Production, APIs,
-requirements, dependencies, licence, lint and workflow are unchanged.
+peer FIFO. Local implementation, full baseline and complete source/document/diff
+review pass. Publication and exact-checkpoint CI pass. This evidence follow-up
+preserves Rust and receives its own complete review and exact-revision CI.
+No unfinished implementation remains. Production, APIs, requirements,
+dependencies, licence, lint and workflow are unchanged.
 
 ## Highest risks and uncertainties
 
@@ -92,4 +100,6 @@ it closes a demonstrated gap without adding unnecessary machinery.
 locked local baseline pass 151 workspace tests. Independent oracle/source review
 accepts the frozen domain; six selected compiling owner faults fail behavioral
 assertions. Whole-tree and rendered-document audits pass. Root and independent
-Codex records_review accept the complete diff; publication precedes completion.
+Codex records_review accept the complete diff and exact-checkpoint hosted evidence.
+Tools/image match input. This evidence follow-up receives its own review and
+exact-revision CI. Stop after this one completed checkpoint.

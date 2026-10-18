@@ -432,4 +432,7 @@ production behavior or requirement meanings. Focused/full locked checks pass
 one/151 workspace tests; independent oracle/source review accepts the domain.
 Six selected ownership faults compile then fail behavioral assertions. Whole-tree,
 rendered-document and complete-diff review pass with root and independent Codex
-records_review acceptance. Publication and exact-checkpoint CI remain.
+records_review acceptance. Published checkpoint
+`27194287b8670b75efac05f3a3f0a7de38a312d5` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285)
+at its exact logged checkout, all 20 steps and configured host/sample evidence.

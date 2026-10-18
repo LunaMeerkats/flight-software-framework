@@ -390,3 +390,28 @@ not triggered; hosted CI executes its configured host/sample checks. Ignored raw
 evidence remains under target/review-2026-10-18-work-events. This documentation
 follow-up preserves source/configuration/workflow blobs and requires its own
 exact-head hosted result rather than inheriting the checkpoint pass.
+
+## Messaging-owned event history checkpoint — 2026-10-19
+
+The [messaging event history review](MESSAGING_EVENT_SEQUENCE_REVIEW.md) records
+checkpoint `27194287b8670b75efac05f3a3f0a7de38a312d5`: two initially Running
+applications, inbox capacities [1,2], both fault roles, event capacities one/two
+with an older diagnostic, and mixed publication/work/peer-dispatch/time/event-
+dequeue/explicit retry histories through length five. Production, dependencies,
+lint and workflow are unchanged.
+[Push run 39130580285](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285)
+passes exact logged checkout, Windows job 117684735602 and all 20 steps. Raw logs
+confirm 151 workspace tests including the model, separate 14 adapter/five sample
+tests, warnings-denied rustdoc, all 222 unchanged sample report lines and both
+whitespace checks. Root and independent Codex records_review inspect raw metadata/
+logs separately from local source/document/diff acceptance.
+
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0 and
+windows-2025-vs2026 image 20261007.264.1 match the reviewed input. Companion
+whole-tree review covers 43 Rust files/17,101 physical lines/1,138 comment-only
+lines, zero width findings and three unchanged fulfilled expectations. Local
+execution remains on 1.98.0. Conditional ADR probes/actionlint are unchanged and
+not triggered; hosted CI executes its configured host/sample checks. Ignored raw
+evidence remains under target/review-2026-10-19-messaging-events. This later
+documentation follow-up preserves source/configuration/workflow blobs and requires
+its own exact-head hosted result rather than inheriting the checkpoint pass.

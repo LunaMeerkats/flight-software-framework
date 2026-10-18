@@ -2,7 +2,7 @@
 
 Date: **2026-10-19**
 Reviewer: **Codex root, with separate event_gap, records_review and sensitivity agents**
-Status: **Locally verified and reviewed; publication pending**
+Status: **Complete: checkpoint published and exact-revision CI passed**
 
 ## Gap, scope and alternatives
 
@@ -82,7 +82,6 @@ An initial inspection caught unquoted Rust paths losing separators in rendered
 Markdown; code spans fix them and the complete inspection rerun passes. This is
 not pixel or human acceptance. Root and independent Codex records_review accept
 the complete source/document diff, raw local/fault evidence and final rendering.
-Publication and exact-checkpoint CI remain.
 
 Source review of `MessagingRuntime::work_with_failure_event` confirms delegation
 to `Self::work`, which commits the selected failure and clears only that inbox,
@@ -102,3 +101,23 @@ panics, hangs, allocator failure, concurrency and origin provenance remain
 outside the result. No recovery, delivery, qualification or operational claim
 is inferred. Invisible repeated attempts against a full event queue require
 source review; returned state alone cannot count those attempts.
+
+## Publication evidence
+
+Published checkpoint 27194287b8670b75efac05f3a3f0a7de38a312d5 matches the
+refreshed remote after an ordinary fast-forward push. [Run 39130580285](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285)
+passes exact logged checkout, Windows job 117684735602 and all 20 steps. Raw
+logs show 151 workspace tests including the new model, separate 14 adapter/five
+sample tests, warnings-denied rustdoc, all 222 unchanged sample report lines and
+both whitespace checks. Root and independent Codex records_review separately
+inspect raw metadata/logs; this is hosted evidence in addition to local review.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match the input. Local execution
+remains on 1.98.0. This later evidence follow-up preserves source/configuration/
+workflow blobs and receives its own complete review and exact-revision CI; it
+does not inherit the checkpoint's pass.
+
+The follow-up audit resolves 375 relative links and 115 exact test references;
+all seven run-changed rendered documents pass full content/HTML structure review.
+Source, test, configuration and workflow blobs remain unchanged.

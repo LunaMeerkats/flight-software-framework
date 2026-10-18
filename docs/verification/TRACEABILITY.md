@@ -959,9 +959,12 @@ regression; focused test/Clippy and full locked checks pass one/151 workspace
 tests. Independent oracle/source review accepts blob
 `6d1d8c2dbcd45ca79d3914cdd7cc5ac73c3fa1af`; six selected compiling owner
 faults fail behavioral assertions. Whole-tree/rendered-document and root complete-
-diff review pass with independent Codex records_review acceptance. Publication
-and exact-checkpoint CI remain.
-Existing requirement meanings and production behavior are unchanged. Other lifecycle operations,
+diff review pass with independent Codex records_review acceptance. Published
+checkpoint `27194287b8670b75efac05f3a3f0a7de38a312d5` has
+[successful hosted verification](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285)
+at its exact logged checkout, all 20 steps and configured host/sample evidence.
+Later documentation requires its own completed hosted result. Existing
+requirement meanings and production behavior are unchanged. Other lifecycle operations,
 configuration, schedules, arbitrary callbacks and multiple work failures remain
 separate evidence boundaries.
 

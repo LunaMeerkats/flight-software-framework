@@ -1,7 +1,7 @@
 # Messaging-owned failure-event history checkpoint
 
 Date: **2026-10-19**
-Status: **Locally verified and reviewed; publication pending**
+Status: **Complete: checkpoint published and exact-revision CI passed**
 
 ## Objective and context
 
@@ -110,4 +110,24 @@ full content/HTML structure inspection, without pixel or human-review claims.
 An initial rendering inspection found two unquoted Rust paths consumed as
 Markdown syntax; code spans correct them and the complete rerun passes.
 Root and independent Codex records_review accept the complete source/document
-diff and raw local/fault evidence. Publication and exact-checkpoint CI remain.
+diff and raw local/fault evidence.
+
+## Publication and stopping point
+
+Checkpoint 27194287b8670b75efac05f3a3f0a7de38a312d5 is published by ordinary
+fast-forward; refreshed origin/live remote match. [Push run 39130580285](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39130580285)
+passes exact logged checkout, job 117684735602 and all 20 steps, 151 workspace
+tests including the model, separate 14 adapter/five sample tests, warnings-denied
+rustdoc, all 222 unchanged sample report lines and both whitespace checks.
+Root and independent Codex records_review inspect raw hosted JSON/logs separately
+from local source/document/diff acceptance.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match the input; local execution
+remains on 1.98.0. This evidence follow-up preserves source/configuration/workflow
+blobs and receives complete document/diff review and its own exact-revision CI.
+Stop after this one completed checkpoint.
+
+The evidence follow-up resolves 375 relative links/115 exact test references.
+All seven run-changed rendered documents pass full content/HTML structure
+inspection; source/configuration/workflow blobs remain unchanged.
