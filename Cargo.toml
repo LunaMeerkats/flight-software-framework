@@ -17,3 +17,7 @@ too_many_lines = "deny"
 
 [lints]
 workspace = true
+
+[[example]]
+name = "quickstart"
+test = true

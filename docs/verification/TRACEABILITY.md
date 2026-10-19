@@ -1,5 +1,21 @@
 # Verification traceability
 
+## Stage 5 public-API integration — 2026-10-20
+
+RFF-LIB-REQ-001 revision 1 extends consumer integration evidence without changing
+the original v0.1 rows below. The [public-API quickstart](../GETTING_STARTED.md)
+and [ADR-0026](../adr/0026-public-api-quickstart.md) define the selected composition.
+The exact source, commands, hashes, independent workspace/dependency inspection,
+actual Codex reviews and publication evidence are in
+[QUICKSTART_REVIEW.md](QUICKSTART_REVIEW.md).
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-001 | Public-only standard Cargo example, test-enabled target and independent path-dependency recipe | `scenario_retains_older_input_and_reuses_restarted_inbox`; `malformed_commands_fail_before_output_and_leave_terminal_state`; `output_saturation_retains_older_value_after_callback_failure`; full locked baseline; independent package check/Clippy/test/run and exact source-hash/metadata inspection | Local checks pass 154 workspace/three focused/three consumer tests; exact source blob and review/publication evidence in the focused record |
+
+This establishes one controlled consumer composition, not external adoption,
+API stability, broad readiness, physical delivery or flight suitability.
+
 The implemented Rust slices cover bounded logical lifecycle records, owned
 synchronous start/work/stop/in-place-restart, bounded application messaging, a
 bounded structured-event queue, an injected manual clock, a finite one-shot

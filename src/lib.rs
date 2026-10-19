@@ -5,6 +5,11 @@ Experimental host-side building blocks for the Rust Flight Framework.
 The development goal is a practical, reusable Rust library. The reviewed host
 v0.1 baseline is a starting point for continued evidence-led development.
 
+Start with `cargo run --locked --example quickstart` in the repository. The
+`docs/GETTING_STARTED.md` guide explains using this unpublished library as a
+path dependency in an independent Cargo package. The quickstart uses public
+APIs only and shows explicit lifecycle, bounded ingress and one-message dispatch.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are

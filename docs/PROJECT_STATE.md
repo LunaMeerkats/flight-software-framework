@@ -1,113 +1,87 @@
 # Project state
 
-Last updated: **2026-10-19**
+Last updated: **2026-10-20**
 
 ## Current milestone
 
-Stages 1 through 4 and source-quality adoption are complete for experimental
-serial host v0.1. The [Codex host review](verification/HOST_V0_1_REVIEW.md)
-accepts entry points and architecture under ADR-0024 with recorded evidence and
-limits. Package 0.0.0 remains unpublished; APIs and requirements are provisional.
-The [2026-10-19 practical-library direction](adr/0025-practical-library-development.md)
-makes that milestone a baseline rather than a scope ceiling. Stage 5 targets
-downstream use, usable APIs, useful capabilities and integration guidance through
-researched, autonomously reviewed increments. Consumer readiness is still to be
-demonstrated.
+Reviewed experimental serial host v0.1 remains the regression baseline. Stage 5
+advances practical library use under ADR-0025. The first controlled public-API
+consumer is implemented and locally verified: a runnable quickstart plus setup
+instructions and actual independent Cargo path-dependency use. This demonstrates
+one composition, not external adoption or broad consumer readiness. Package
+0.0.0 remains unpublished and APIs provisional.
 
 ## Verified baseline
 
-- Clean input 1809ce3e1cafd390c017debabfd9933146d70b61 has exact hosted
-  run 39130850495/job 117685516290 passing all 20 steps, 151 workspace tests,
-  separate 14 adapter/five sample tests, rustdoc, unchanged 222-line sample and
-  both whitespace checks. The messaging event history evidence remains in its
-  focused verification record.
-- Initial/final locked local format/check/Clippy/test/warnings-denied rustdoc and
-  both whitespace checks pass 151 workspace tests for this direction checkpoint.
-  Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-  Runtime behavior, APIs, dependencies, licence and workflow are unchanged;
-  src/lib.rs changes crate documentation only.
-- Whole-tree review covers 43 Rust files/17,104 physical lines/1,138 comment-only
-  lines, zero widths and three unchanged fulfilled expectations. All 389 relative
-  links/115 exact test references resolve. Eleven run-changed rendered Markdown documents
-  and generated crate documentation pass content/structure review. Codex root and
-  independent library_direction_review accept the complete direction/source diff.
-- The nightly prompt is saved through the supported tool and exactly read back;
-  only prompt/updated_at change. Schedule, model, reasoning effort, project,
-  ACTIVE state and notification preference remain unchanged.
-- Input hosted tools remain Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and
-  Clippy 0.1.99, runner 2.337.0/windows-2025-vs2026 image 20261007.264.1.
-  Local checks do not claim execution on that hosted toolchain.
-- Published direction checkpoint 1e1dd96043494872dbf463642ad8e8d2becca61f has
-  [successful exact-revision CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39247706648):
-  job 118043591010, all 20 steps, 151 workspace/14 adapter/five sample tests,
-  warnings-denied rustdoc, unchanged 222-line sample and both whitespace checks.
-  Root and independent Codex library_direction_review inspect raw hosted metadata/
-  logs separately from local review; tools/image match input. The documentation
-  follow-up receives its own review and exact CI.
+- Clean input 61e3f0e54509ab4a2f45b94648c83d66e245b233 matches refreshed origin;
+  exact hosted run 39248169214/job 118045097712 passes all 20 steps. Prior
+  messaging/event finite-domain evidence is retained in its focused records.
+- Fresh initial/final locked format/check/Clippy/test and warnings-denied rustdoc
+  pass 151/154 workspace tests. Focused quickstart passes three tests and its
+  executable prints the guide's exact seven lines. Both whitespace checks pass.
+- The same quickstart source independently builds/lints/tests/runs in an external
+  Cargo package; metadata confirms its own workspace and sole framework path
+  dependency. Source SHA256 and actual commands are in the
+  [focused verification record](verification/QUICKSTART_REVIEW.md).
+- Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
+  Input hosted tools remain Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
+  runner 2.337.0/windows-2025-vs2026 image 20261007.264.1. Local results do not
+  claim execution on the hosted toolchain.
+- Root and independent Codex quickstart_review accept full source/document/diff,
+  raw local/consumer evidence and generated crate documentation. Whole-tree review
+  finds zero widths/three unchanged expectations; all 409 relative links/118 exact
+  test references resolve and eleven changed rendered documents pass content/
+  structure review. Source publication and exact hosted CI remain pending.
 
 ## Current architecture
 
 One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events and optional
-runtime configuration with immutable work visibility and one-use rollback. The
-private shared-source host sample composes these services. Separate finite models
-strengthen messaging, configuration, lifecycle/work failures, messaging-owned
-scheduling, direct configuration histories, standalone/direct event histories,
-and messaging-owned inbox/event history composition.
+runtime configuration with immutable work visibility and one-use rollback.
+The private combined host sample joins those services. The new standalone tested
+quickstart uses public APIs only; independent consumer verification adds no
+maintained package. Existing finite sequence models retain their frozen domains.
 
 ## Work in progress
 
-The messaging event history checkpoint is complete at 1809ce3 with exact-head
-hosted run 39130850495/job 117685516290 passing all 20 steps, 151 workspace
-tests, separate 14 adapter/five sample tests and unchanged sample output.
-The practical-library direction checkpoint reconciles active instructions,
-charter, roadmap, architecture and nightly prompt. It changes no runtime behavior
-or existing requirement meaning. Initial/final locked baseline passes 151 tests;
-eleven run-changed rendered Markdown documents and generated crate documentation pass
-content/structure review. Exact saved automation readback matches, preserving all
-other settings. Codex root and independent library_direction_review accept the
-direction/source/document diff. Publication and exact-checkpoint CI pass; this
-documentation follow-up receives its own review and exact-revision CI. No unfinished
-implementation remains. Stage 5 consumer readiness remains to be demonstrated.
+The public-API quickstart checkpoint is locally accepted and awaits ordinary
+source publication with exact hosted CI. No new runtime API,
+dependency, platform commitment or workflow change is introduced. RFF-LIB-REQ-001
+and ADR-0026 preserve the original v0.1 requirement meanings.
 
 ## Highest risks and uncertainties
 
-- Finite models cover only frozen domains. The new model has one work fault,
-  fixed capacities/topic and initially Running states. Other lifecycle/service
-  composition retains separate evidence. Cleanup-before-clock and invisible
-  full-queue attempt counts include source review.
-- Application/clock origins and positional topology pairing are caller duties.
-  Copied identifiers may share referents. Logical bounds do not bound process
-  bytes, callback allocation or duration.
-- Panics/hangs and allocator exhaustion are uncontained/unverified. Queue
-  clearing does not prove application/external cleanup. Immediate fan-out is
-  nontransactional; accepted peer deliveries survive later failure.
-- Saturated events may omit records; explicit caller retry is optional. One-shot
-  errors are consumed without retry/rollback. Host output does not prove physical
-  delivery. Stable tools/images float; local reviews/conditional probes are outside CI.
+- One controlled consumer does not prove external adoption, broad usability or API
+  stability. Heterogeneous composition and ordinary-work effects need concrete
+  consumer assessment; the quickstart uses one application and borrowed host slot.
+- Application/clock origins and positional inbox pairing remain caller duties.
+  Logical counts do not bound process bytes, callback allocation or duration.
+- Panics/hangs and allocator exhaustion are uncontained. Cooperative queue cleanup
+  does not prove external cleanup. Immediate fan-out is nontransactional.
+- Saturated events can omit records; retry is caller policy. One-shot errors are
+  consumed. In-process output is not physical delivery. Finite models prove only
+  their frozen domains. Stable hosted tools/images float; local reviews and
+  conditional experiments remain outside CI.
 
 ## Important unresolved decisions
 
 Major API freeze, significant unsafe code, runtime/code-generation/dependency/
 security decisions, platform commitments, identity/licences, tags/releases/crate
 publication and deployment retain separate gates. MSRV, broader service contexts,
-external I/O, hardware, RTOS and no_std remain undecided. Routine host acceptance
-is complete; autonomous Codex review does not establish human review.
+external I/O, hardware, RTOS and no_std remain undecided. Autonomous Codex review
+does not establish human review or operational suitability.
 
 ## Most likely next task
 
-Assess a representative downstream consumer through the public API and current
-getting-started guidance. Rank integration friction, missing capability and
-relevant defect risks, then select one executable improvement. The earlier
-command-ingest coverage candidate remains available if that evidence supports it.
+Assess a consumer needing two independently defined application types or ordinary
+work that produces messages/events. Identify actual composition friction, compare
+consequential alternatives and implement one justified improvement. Avoid adding
+service breadth or another model solely because the first consumer is complete.
 
 ## Latest run
 
-2026-10-19 user follow-up: practical reusable-library development beyond v0.1 is
-authorized. ADR-0025 records the direction and preserves the separate consequential
-gates. Active documents and the nightly prompt are reconciled. Initial/final
-locked checks pass 151 tests; 389 links/115 exact test references and all eleven
-run-changed rendered Markdown documents pass content/structure review. Independent
-Codex review and saved automation readback pass. Source publication and exact-
-checkpoint hosted CI pass; this documentation follow-up receives its own review
-and exact-revision CI. Stop after this one completed direction checkpoint.
+2026-10-20: selected public-API getting started after independent consumer
+assessment. Added the standalone recipe, runnable setup/error/resource guidance,
+requirement and ADR. Three new regression tests run in the unchanged workspace
+baseline; actual independent package checks pass. Full autonomous source/document
+review accepts the checkpoint. Publication and exact hosted CI remain pending.

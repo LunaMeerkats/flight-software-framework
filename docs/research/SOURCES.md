@@ -52,6 +52,24 @@ external research or reused design. Review corrects the workflow source entry
 below to name the actual `codex/nightly` push filter; historical access dates
 and source-adoption decisions otherwise remain unchanged.
 
+## SRC-CARGO-CONSUMER-RECIPE — Path dependency and executable example tests
+
+- Titles: Specifying Dependencies; Cargo Targets; cargo test — The Cargo Book
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html>,
+  <https://doc.rust-lang.org/cargo/reference/cargo-targets.html> and
+  <https://doc.rust-lang.org/cargo/commands/cargo-test.html>
+- Version: current official Cargo documentation, accessed 2026-10-20 local date;
+  actual local commands use Cargo 1.98.0.
+- Informed: an independent package can use a local `path` dependency; examples
+  compile during ordinary tests but need `test = true` for their test harness
+  to execute. Locked commands reject changed dependency resolution.
+- Local treatment: adopt a path-dependency getting-started recipe and opt the
+  quickstart's behavioral tests into the existing workspace baseline. Verify the
+  exact consumer source separately as a temporary independent package; retain one
+  maintained library package. No upstream source code or new dependency is reused.
+  [ADR-0026](../adr/0026-public-api-quickstart.md) compares alternatives and limits.
+
 ## SRC-RUST-CARGO-GRAPH — Dependency and feature review semantics
 
 - Titles: cargo metadata; cargo tree — The Cargo Book

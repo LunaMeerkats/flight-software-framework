@@ -12,6 +12,20 @@ models. The current implementation is experimental host software.
 > safety-critical systems, or human-rated systems. It does not claim automatic
 > compatibility with cFS, cFE, OSAL, PSP, CCSDS, or any RTOS.
 
+## Start using the public API
+
+Follow the [getting-started guide](docs/GETTING_STARTED.md) to run a small
+bounded command handler and use the unpublished library from your own Cargo
+package. The [quickstart source](examples/quickstart.rs) uses public APIs and
+`std` only; it does not load private sample modules.
+
+```text
+cargo run --locked --example quickstart
+```
+
+This first controlled consumer demonstrates explicit lifecycle, publication
+outcomes, dispatch and bounded host observation. APIs remain provisional.
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the

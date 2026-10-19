@@ -182,3 +182,23 @@ publish a crate, or deploy. The separate consequential gates remain unchanged.
 
 Changes to requirement meaning or scope must update this file, the roadmap,
 traceability, and project state in the same coherent increment.
+
+## Stage 5 integration requirements — revision 1 (2026-10-20)
+
+These requirements extend the practical-library programme without changing the
+v0.1 contracts above.
+
+### RFF-LIB-REQ-001 — Public-API getting started
+
+A documented host consumer shall build and run as an independent Cargo package
+using the unpublished library as a path dependency. Its source shall use only
+public library APIs and the standard library, without loading private sample
+modules or modifying framework source. The recipe shall explain setup, explicit
+lifecycle and dispatch, typed failure handling, and configured resource bounds.
+
+Acceptance: the exact runnable quickstart source shall also compile and run in
+an independent consumer package. Tests shall observe successful command handling,
+reject-newest ingress saturation retaining the older command, and explicit
+stop/restart. The workspace baseline shall execute its regression tests. Review
+shall distinguish this controlled composition from external adoption, API
+stability, flight suitability, and release or publication readiness.

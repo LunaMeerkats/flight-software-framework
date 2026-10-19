@@ -1,93 +1,70 @@
-# Practical library direction checkpoint
+# Public-API quickstart checkpoint
 
-Date: **2026-10-19**
-Status: **Complete: direction saved, published and exact-revision CI passed**
+Date: **2026-10-20**
+Status: **Local implementation and review accepted; publication pending**
 
-## Objective and authority
+## Objective and context
 
-Record the user's direction to develop a practical reusable library and progress
-beyond v0.1 using research and engineering judgment. The reviewed host milestone
-is a baseline, not a product ceiling. Current maturity and all separate
-consequential gates remain truthful. No runtime behavior or API is changed.
+Enable a first downstream developer to compose one bounded command handler
+without reverse-engineering the private combined mission. Clean input
+61e3f0e54509ab4a2f45b94648c83d66e245b233 has successful exact-revision hosted
+run 39248169214. Fresh local locked format/check/Clippy/test/rustdoc and both
+whitespace checks pass 151 tests on the unchanged local 1.98.0 toolchain.
+
+RFF-LIB-REQ-001 is established before implementation. ADR-0026 compares a
+public-only example plus independent package verification, a permanent consumer
+crate, and broader ordinary-work service contexts. Select the first: existing
+APIs can satisfy this consumer; the adoption gap is setup and readable composition.
 
 ## Changes and acceptance
 
-Add ADR-0025 and reconcile AGENTS.md, README, charter, requirements context,
-architecture, roadmap, project state, traceability and crate-level documentation.
-Update the existing nightly automation prompt through the supported tool,
-preserving its schedule, model, reasoning effort, project, active state and
-notification preference. Read back the saved prompt and unchanged settings.
+- Add one standalone `examples/quickstart.rs`, importing only the public crate
+  and `std`, with bounded ingress/output and explicit lifecycle/dispatch.
+- Opt its regression tests into the existing workspace test command.
+- Add getting-started instructions for a separate Cargo binary with a local
+  path dependency; compile, test and run that exact copied source independently.
+- Explain expected errors, report-versus-delivery semantics, bounds, teardown
+  policy, owner-local identifiers and scope limitations.
+- Reconcile entry points, requirements, traceability, roadmap and project state;
+  retain previous runtime APIs, tests, dependencies and CI workflow.
 
-Acceptance requires an explicit practical-library objective, autonomous routine
-progression beyond v0.1, consumer-facing work selection, no fixed embedded-fork
-rule, retained qualification/consequential boundaries, resolving links, rendered
-content/structure review, source-width review, complete diff review and independent
-Codex acceptance. Future consumer readiness must remain unclaimed until observed.
+## Verification and review
 
-## Verification
+Replay the required locked baseline with RUSTDOCFLAGS=-D warnings; run
+`cargo test --locked --example quickstart` and
+`cargo run --locked --example quickstart`. Separately build, lint, test and run
+the independent consumer after generating its offline lockfile. Inspect metadata
+and source hashes to confirm an independent workspace with only the library path
+dependency and exactly the same consumer source. Record reproducible commands.
 
-Clean input 1809ce3e1cafd390c017debabfd9933146d70b61 has exact hosted run
-39130850495 success. Establish and replay the locked baseline:
-
-```text
-cargo fmt --all -- --check
-cargo check --locked --workspace --all-targets --all-features
-cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
-cargo test --locked --workspace --all-features
-cargo doc --locked --workspace --all-features --no-deps
-git diff --check
-git show --format= --check --diff-merges=first-parent HEAD
-```
-
-Rustdoc uses RUSTDOCFLAGS=-D warnings. Host adapters/sample, workflow and ADR-0018/
-0019 experiments are unchanged, so their conditional local probes are not triggered.
-No new test is needed for a direction/documentation change. Record exact actual
-results, source/diff review and automation readback before acceptance. Temporary
-review aids and raw evidence belong under target/review-2026-10-19-practical-library.
+Review relative links, changed rendered Markdown, generated crate documentation,
+all handwritten Rust widths and expectations, full source and complete diff.
+Use independent Codex review for implementation, guide and evidence. Existing
+host sample/adapters, workflow and ADR-0018/0019 experiments are unchanged, so
+their conditional local probes are not triggered. Existing CI still exercises
+its configured sample and adapter checks.
 
 ## Risks and stopping point
 
-Practical-library ambition is not evidence of current stability, downstream use,
-qualification or permission to publish a crate. Scope must follow consumer needs
-and research rather than unbounded feature lists. Preserve historical exact-domain
-results. Stop after this one direction checkpoint is reviewed, verified, published
-on codex/nightly by ordinary fast-forward and inspected in exact-revision hosted CI.
+This is one selected consumer composition; it cannot establish general usability
+or independent adoption. The demonstration may tear down on setup failure,
+while an integrating host may recover ownership from the framework errors.
+Keep callback failures and report saturation explicit. No new dependency, API
+freeze, runtime, platform commitment or publication gate is selected.
 
-## Local result and saved instructions
+Safe rollback is removal of this run's example/manifest/document edits only.
+Stop after the coherent checkpoint passes applicable verification and reviews,
+is committed and pushed by ordinary fast-forward on codex/nightly, and its exact
+hosted CI is inspected. A later run chooses the next consumer-driven increment.
 
-Initial/final locked format/check/Clippy/test and warnings-denied rustdoc pass
-151 workspace tests; working-tree and committed-tip whitespace checks pass.
-Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-Whole-tree review covers 43 Rust files/17,104 physical lines/1,138 comment-only
-lines with zero width findings and three unchanged fulfilled expectations.
-All 388 relative links and 115 exact test references resolve. Ten changed Markdown
-documents pass full content/headings/code/links/tables/HTML structure inspection;
-generated crate documentation carries the same practical goal and current limits.
-These are content/structure reviews, not pixel or human acceptance.
+## Local results
 
-The supported automation update succeeds. Exact saved-prompt readback matches;
-only prompt/updated_at change. Schedule, model, reasoning effort, project, ACTIVE
-state and notification preference are preserved. Independent Codex
-library_direction_review accepts the complete direction/source/document diff and
-separately inspects the saved automation. No runtime/API change or new dependency
-is introduced.
-
-## Published evidence
-
-Checkpoint 1e1dd96043494872dbf463642ad8e8d2becca61f is published by ordinary
-fast-forward. [Hosted run 39247706648](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39247706648)
-passes the exact logged checkout, job 118043591010 and all 20 steps: 151 workspace
-tests, separate 14 adapter/five sample tests, warnings-denied rustdoc, unchanged
-222-line sample output and both whitespace checks. Root and independent Codex
-library_direction_review inspect raw metadata/logs separately from local
-document/source acceptance.
-
-Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
-and windows-2025-vs2026 image 20261007.264.1 match the input. Local execution
-remains on 1.98.0. This evidence follow-up changes documentation only and receives
-its own full diff/content review and exact-revision hosted result. Stop after this
-direction checkpoint; downstream consumer implementation is a later increment.
-
-The follow-up resolves 389 relative links/115 exact test references and all eleven
-run-changed rendered Markdown documents pass full content/HTML structure review.
-Source, tests, dependencies, licence and workflow are unchanged by the follow-up.
+Required final locked checks pass 154 workspace tests; three focused quickstart
+tests and both executable forms pass. The independent package is outside this
+checkout, has its own workspace and exactly one path dependency on the library.
+Its main-source SHA256 matches the example byte for byte. Source/design review by
+Codex root and independent quickstart_review has no blocking findings. Exact
+commands, raw evidence locations, source identity and limits are in
+[the focused review](docs/verification/QUICKSTART_REVIEW.md). Final rendered-document,
+source-inventory and complete-diff review pass with independent Codex acceptance.
+Publication and exact hosted CI remain pending.

@@ -97,6 +97,10 @@ translate NASA C source.
   target `tests/host_adapters.rs` loads that same mission through one explicit
   `#[path]`; explicit child paths keep both target forms identical, avoiding
   copied adapters or new library exports.
+- `examples/quickstart.rs`: one independently authored public-API consumer.
+  Its `test = true` target executes behavioral tests in the workspace baseline;
+  `docs/GETTING_STARTED.md` shows the same source as an independent path-dependent
+  Cargo binary. Temporary consumer verification adds no maintained crate.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -149,6 +153,15 @@ When changing the host adapters or combined sample, also run
 source and the host entry point. The combined sample demonstrates controlled
 host behavior; it does not complete CI or a recorded v0.1 review or guarantee
 physical delivery.
+
+When changing the quickstart or its setup guidance, also run
+`cargo test --locked --example quickstart` and
+`cargo run --locked --example quickstart`. Follow the independent-package commands
+in [the getting-started guide](docs/GETTING_STARTED.md), then check/lint/test/run
+that package and compare its main-source hash with the example. Inspect Cargo
+metadata for its independent workspace and sole library path dependency. Record
+the external package path and exact commands/results in the focused verification
+record. This demonstrates that consumer only, not general adoption or stability.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

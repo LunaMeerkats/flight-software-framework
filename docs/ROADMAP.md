@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active direction; initial consumer evidence to be established**
+Status: **Active; first public-API consumer locally verified and reviewed**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -24,6 +24,16 @@ errors/bounds and runnable guidance, or resolve a concrete research uncertainty
 blocking that use. Do not report adoption or practical readiness before those
 observations exist. Release, publication and consequential decisions keep their
 separate gates; routine work beyond v0.1 requires no additional permission.
+
+The first selected increment is the [public-API quickstart](GETTING_STARTED.md):
+one bounded command handler, explicit lifecycle and dispatch, ingress saturation
+and host observation. [ADR-0026](adr/0026-public-api-quickstart.md) selects a
+standard tested example plus actual independent Cargo path-dependency verification,
+avoiding a second maintained crate or unsupported service-context expansion.
+RFF-LIB-REQ-001 defines the new integration evidence without changing v0.1 meanings.
+The [verification record](verification/QUICKSTART_REVIEW.md) carries actual results
+and limits. Later candidates should follow concrete consumer friction observed
+here, including heterogeneous composition and ordinary-work service access.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 
