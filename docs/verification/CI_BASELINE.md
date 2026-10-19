@@ -415,3 +415,28 @@ not triggered; hosted CI executes its configured host/sample checks. Ignored raw
 evidence remains under target/review-2026-10-19-messaging-events. This later
 documentation follow-up preserves source/configuration/workflow blobs and requires
 its own exact-head hosted result rather than inheriting the checkpoint pass.
+
+## Practical-library direction checkpoint — 2026-10-19
+
+[ADR-0025](../adr/0025-practical-library-development.md) records the practical
+reusable-library objective and autonomous progression beyond the v0.1 baseline.
+Checkpoint `1e1dd96043494872dbf463642ad8e8d2becca61f` reconciles active guidance,
+charter, roadmap and crate documentation; runtime behavior and APIs are unchanged.
+The existing nightly prompt is updated and exactly read back with other settings
+preserved. This is direction and documentation evidence, not consumer readiness.
+
+[Push run 39247706648](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39247706648)
+passes its exact logged checkout, Windows job 118043591010 and all 20 steps. Raw
+logs confirm 151 workspace tests, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, the unchanged 222-line sample and both whitespace checks.
+Root and independent Codex library_direction_review inspect raw hosted metadata/
+logs separately from local source/diff review.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match input. Local checks remain on
+Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98. Whole-tree review
+covers 43 Rust files/17,104 physical lines/1,138 comment-only lines, zero width
+findings and three unchanged fulfilled expectations. Unchanged host/experiment/
+workflow sources do not trigger extra conditional local probes; hosted CI runs
+its configured host targets/sample. This documentation follow-up preserves source
+and requires its own complete review and exact-head hosted result.

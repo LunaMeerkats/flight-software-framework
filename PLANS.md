@@ -1,7 +1,7 @@
 # Practical library direction checkpoint
 
 Date: **2026-10-19**
-Status: **Locally verified and independently reviewed; publication pending**
+Status: **Complete: direction saved, published and exact-revision CI passed**
 
 ## Objective and authority
 
@@ -70,4 +70,24 @@ only prompt/updated_at change. Schedule, model, reasoning effort, project, ACTIV
 state and notification preference are preserved. Independent Codex
 library_direction_review accepts the complete direction/source/document diff and
 separately inspects the saved automation. No runtime/API change or new dependency
-is introduced. Publication and exact-checkpoint hosted inspection remain.
+is introduced.
+
+## Published evidence
+
+Checkpoint 1e1dd96043494872dbf463642ad8e8d2becca61f is published by ordinary
+fast-forward. [Hosted run 39247706648](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39247706648)
+passes the exact logged checkout, job 118043591010 and all 20 steps: 151 workspace
+tests, separate 14 adapter/five sample tests, warnings-denied rustdoc, unchanged
+222-line sample output and both whitespace checks. Root and independent Codex
+library_direction_review inspect raw metadata/logs separately from local
+document/source acceptance.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match the input. Local execution
+remains on 1.98.0. This evidence follow-up changes documentation only and receives
+its own full diff/content review and exact-revision hosted result. Stop after this
+direction checkpoint; downstream consumer implementation is a later increment.
+
+The follow-up resolves 389 relative links/115 exact test references and all eleven
+run-changed rendered Markdown documents pass full content/HTML structure review.
+Source, tests, dependencies, licence and workflow are unchanged by the follow-up.

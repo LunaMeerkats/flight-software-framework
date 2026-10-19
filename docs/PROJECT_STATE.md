@@ -27,8 +27,8 @@ demonstrated.
   Runtime behavior, APIs, dependencies, licence and workflow are unchanged;
   src/lib.rs changes crate documentation only.
 - Whole-tree review covers 43 Rust files/17,104 physical lines/1,138 comment-only
-  lines, zero widths and three unchanged fulfilled expectations. All 388 relative
-  links/115 exact test references resolve. Ten changed rendered Markdown documents
+  lines, zero widths and three unchanged fulfilled expectations. All 389 relative
+  links/115 exact test references resolve. Eleven run-changed rendered Markdown documents
   and generated crate documentation pass content/structure review. Codex root and
   independent library_direction_review accept the complete direction/source diff.
 - The nightly prompt is saved through the supported tool and exactly read back;
@@ -36,8 +36,14 @@ demonstrated.
   ACTIVE state and notification preference remain unchanged.
 - Input hosted tools remain Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and
   Clippy 0.1.99, runner 2.337.0/windows-2025-vs2026 image 20261007.264.1.
-  Local checks do not claim execution on that hosted toolchain. This checkpoint
-  still requires its own published exact-revision hosted result.
+  Local checks do not claim execution on that hosted toolchain.
+- Published direction checkpoint 1e1dd96043494872dbf463642ad8e8d2becca61f has
+  [successful exact-revision CI](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39247706648):
+  job 118043591010, all 20 steps, 151 workspace/14 adapter/five sample tests,
+  warnings-denied rustdoc, unchanged 222-line sample and both whitespace checks.
+  Root and independent Codex library_direction_review inspect raw hosted metadata/
+  logs separately from local review; tools/image match input. The documentation
+  follow-up receives its own review and exact CI.
 
 ## Current architecture
 
@@ -57,10 +63,12 @@ tests, separate 14 adapter/five sample tests and unchanged sample output.
 The practical-library direction checkpoint reconciles active instructions,
 charter, roadmap, architecture and nightly prompt. It changes no runtime behavior
 or existing requirement meaning. Initial/final locked baseline passes 151 tests;
-ten changed rendered Markdown documents and generated crate documentation pass
+eleven run-changed rendered Markdown documents and generated crate documentation pass
 content/structure review. Exact saved automation readback matches, preserving all
 other settings. Codex root and independent library_direction_review accept the
-direction/source/document diff. Publication and exact-checkpoint CI remain.
+direction/source/document diff. Publication and exact-checkpoint CI pass; this
+documentation follow-up receives its own review and exact-revision CI. No unfinished
+implementation remains. Stage 5 consumer readiness remains to be demonstrated.
 
 ## Highest risks and uncertainties
 
@@ -98,7 +106,8 @@ command-ingest coverage candidate remains available if that evidence supports it
 2026-10-19 user follow-up: practical reusable-library development beyond v0.1 is
 authorized. ADR-0025 records the direction and preserves the separate consequential
 gates. Active documents and the nightly prompt are reconciled. Initial/final
-locked checks pass 151 tests; 388 links/115 exact test references and all ten
-changed rendered Markdown documents pass content/structure review. Independent
-Codex review and saved automation readback pass; source publication and exact-
-checkpoint hosted inspection remain.
+locked checks pass 151 tests; 389 links/115 exact test references and all eleven
+run-changed rendered Markdown documents pass content/structure review. Independent
+Codex review and saved automation readback pass. Source publication and exact-
+checkpoint hosted CI pass; this documentation follow-up receives its own review
+and exact-revision CI. Stop after this one completed direction checkpoint.
