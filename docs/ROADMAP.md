@@ -3,6 +3,28 @@
 The roadmap is evidence-driven. A later stage may be reordered when repository
 evidence changes, but scope changes must be recorded rather than implied.
 
+## Stage 5 — Practical library use and continued development
+
+Status: **Active direction; initial consumer evidence to be established**
+
+[ADR-0025](adr/0025-practical-library-development.md) records the user's direction
+to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
+below retain their historical evidence; they do not cap the product programme.
+
+First assess a representative downstream consumer against the public API,
+getting-started documentation and current sample. Identify the most consequential
+integration friction or missing capability, then select one executable vertical
+slice. Establish traceable requirements before extending behavior. Use real
+consumer evidence to balance capability development, API simplification,
+documentation, fault testing and portability research.
+
+Entry evidence is the reviewed host baseline. Subsequent checkpoints must show
+the selected consumer use working through supported public APIs, with explicit
+errors/bounds and runnable guidance, or resolve a concrete research uncertainty
+blocking that use. Do not report adoption or practical readiness before those
+observations exist. Release, publication and consequential decisions keep their
+separate gates; routine work beyond v0.1 requires no additional permission.
+
 ## Stage 0 — Foundation and responsibility checkpoint
 
 Status: **Complete (2026-08-05)**
@@ -301,9 +323,11 @@ input has exact hosted CI. Codex accepts RFF-REQ-001 and the routine entry-point
 and architecture gates with explicit limits. Stage 4 is complete for this host
 target; the package remains unpublished and APIs remain provisional.
 
-After v0.1, prefer hardening, property tests, fuzzing where byte parsers exist,
-concurrency analysis, API simplification, and measured portability experiments
-before adding a large feature surface.
+After v0.1, select hardening, new capabilities, public-API simplification,
+integration guidance and measured experiments by their contribution to practical
+consumer use. Property/fault tests and fuzzing should close identified risks;
+feature growth should satisfy recorded needs. ADR-0025 supersedes any reading of
+the original hardening preference as an indefinite restriction on useful growth.
 
 The 2026-10-10 [finite message-sequence checkpoint](verification/MESSAGE_SEQUENCE_REVIEW.md)
 adds independent accepted-history/cursor evidence for standalone publication

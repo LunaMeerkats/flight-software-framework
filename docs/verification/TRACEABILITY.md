@@ -968,6 +968,15 @@ requirement meanings and production behavior are unchanged. Other lifecycle oper
 configuration, schedules, arbitrary callbacks and multiple work failures remain
 separate evidence boundaries.
 
+## Practical-library direction beyond the v0.1 baseline
+
+[ADR-0025](../adr/0025-practical-library-development.md) records the user's
+2026-10-19 product direction and autonomous progression authority. RFF-REQ-001
+through RFF-REQ-008 retain their recorded meanings and exact host evidence.
+They are the first milestone's baseline rather than an exhaustive product scope.
+Later behavior and consumer-readiness claims require versioned requirements and
+actual public-API integration/review evidence; direction alone verifies neither.
+
 ## Evidence policy
 
 "Verified" requires all of the following:

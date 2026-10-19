@@ -2,16 +2,35 @@
 
 ## Purpose
 
-Rust Flight Framework denotes an experimental project to
-investigate a coherent, host-based framework for composing and testing
-flight-software-style applications. NASA cFS informs the responsibility set,
-but this repository designs and verifies its own Rust-native behavior rather
-than pursuing source translation or feature parity.
+Build a practical, reusable Rust library for composing and testing
+flight-software-style applications that other developers can integrate into
+their own projects. NASA cFS informs the responsibility set; the library designs
+and verifies its own Rust-native behavior rather than pursuing source translation
+or feature parity. Current experimental host maturity is a status, not the final
+product ambition.
 
-The near-term goal is a small sample mission whose lifecycle, messaging, time,
-configuration, events, scheduling, command/telemetry boundary, and defined
-failure behavior can be exercised repeatably under controlled simulated time in
-host tests.
+The initial host sample and reviewed v0.1 contracts establish a regression
+baseline. [The user's 2026-10-19 direction](adr/0025-practical-library-development.md)
+authorizes research-led autonomous progression beyond that scope. Later milestones
+may add or refine useful capabilities, APIs and architecture with recorded needs,
+decisions and verification. Each run remains one bounded, defensible increment.
+
+## Practical-library outcomes
+
+Evaluate future work against demonstrated developer use:
+
+- A downstream application can compose the needed behavior through public APIs
+  without copying private sample internals or modifying the library.
+- Getting-started guidance, runnable examples and API documentation explain
+  ownership, setup, errors, resource bounds and supported use cases.
+- Realistic integration scenarios expose missing capabilities and unnecessary
+  complexity; targeted hardening protects behavior those consumers depend on.
+- Requirements, compatibility/version policy and support/toolchain choices are
+  made explicit as evidence warrants them; they are not silently frozen.
+
+These are development outcomes to establish, not claims that current adoption,
+API stability or release readiness has already been demonstrated. Publication
+and the separate consequential decisions retain their authorization gates.
 
 ## Safety, maturity, and affiliation
 

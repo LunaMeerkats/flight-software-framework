@@ -1,9 +1,10 @@
 # Rust Flight Framework
 
-This repository is an experiment in building a small, Rust-native framework for
-host-based flight-software research. It studies responsibilities also addressed
-by NASA's Core Flight System (cFS), while independently choosing designs that
-fit Rust's ownership, type, error, and testing models.
+Rust Flight Framework is being developed into a practical, reusable Rust library
+for composing and testing flight-software-style applications. It studies
+responsibilities also addressed by NASA's Core Flight System (cFS), while
+independently choosing designs that fit Rust's ownership, type, error, and testing
+models. The current implementation is experimental host software.
 
 > **Safety and affiliation notice:** This project is not flight-qualified,
 > safety-certified, a NASA product, or NASA-endorsed. It has no demonstrated
@@ -18,6 +19,11 @@ The experimental serial host v0.1 milestone is accepted by the
 scope entry points, resource/failure contracts, and architecture. This completes
 Stage 4 for the recorded host target. The package stays unpublished at 0.0.0;
 APIs remain provisional and consequential release/scope gates remain separate.
+
+[The practical-library direction](docs/adr/0025-practical-library-development.md)
+makes v0.1 a verified starting point for continued development. The next programme
+targets downstream integration, useful capabilities, API usability, documentation
+and realistic examples through researched, independently reviewed increments.
 
 The repository contains an initial research and architecture baseline, five
 bounded Rust lifecycle/work increments, three Stage 2 messaging increments,

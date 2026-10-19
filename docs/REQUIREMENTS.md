@@ -6,6 +6,11 @@ Last reviewed: **2026-10-09**
 These requirements define host-observable behavior. They do not specify cFS
 compatibility, flight readiness, real-time performance, or certification.
 
+This version records the reviewed v0.1 baseline, not the complete scope of the
+practical library. [ADR-0025](adr/0025-practical-library-development.md) authorizes
+later requirements and milestones. Define and trace new behavior before treating
+it as implemented or verified; preserve the exact scope of existing evidence.
+
 ## Terms
 
 - **Explicit error:** a typed or otherwise programmatically distinguishable

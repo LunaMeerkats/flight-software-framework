@@ -1,9 +1,31 @@
 # Repository guidance
 
+## Product direction and autonomous progression
+
+Build Rust Flight Framework into a practical, reusable Rust library that other
+developers can integrate into real projects. Its current experimental maturity
+describes available evidence; an experiment or sample alone is not the product
+goal. Prioritise usable APIs, clear integration/error/resource documentation,
+realistic examples and verification through downstream public-API use.
+
+The user's 2026-10-19 direction in
+[ADR-0025](docs/adr/0025-practical-library-development.md) makes v0.1 a verified
+baseline, not a scope ceiling. Research, select and implement justified later
+milestones autonomously. Ordinary API, service, adapter and architecture evolution
+does not need renewed permission merely because it exceeds v0.1. Define the
+consumer need, compare consequential alternatives, update requirements/ADRs and
+traceability, and complete one coherent verified increment at a time. Balance
+hardening with functionality and usability; select tests and documentation for
+the concrete risk or adoption gap they close.
+
+The separately listed consequential decisions retain their authorization gates.
+Practical usefulness does not establish qualification, operational suitability,
+compatibility, API stability or permission to release/publish/deploy.
+
 ## Scope and safety
 
-This repository develops an experimental, host-based Rust framework. It is not
-flight-qualified, safety-certified, NASA-affiliated, operationally suitable, or
+The current implementation is an experimental, host-based Rust framework. It is
+not flight-qualified, safety-certified, NASA-affiliated, operationally suitable, or
 proven to a Technology Readiness Level. Never imply compatibility with cFS,
 cFE, OSAL, PSP, CCSDS, or an RTOS. Do not claim real-time behavior, fault
 tolerance, or determinism without a precise definition and supporting evidence.
@@ -286,8 +308,9 @@ warnings.
   notice `Copyright 2026 Daniel Smith`; do not change the licence or notice
   without explicit human approval.
 
-This standing permission covers source pushes only. Existing tag, release,
-crate-publication, deployment, licence, and scope-expansion gates remain.
+This standing permission covers source pushes only. Tag, release,
+crate-publication, deployment, licence and the specifically listed consequential
+decision gates remain. Routine development beyond v0.1 follows ADR-0025.
 
 ## Autonomous milestone review authority
 
@@ -302,6 +325,11 @@ This delegation can satisfy routine host milestone review gates after their
 documented review completes. Permission itself does not complete a review or
 establish human-reviewed status. Preserve truthful Codex provenance and the
 separate consequential authorization gates recorded in ADR-0024.
+
+ADR-0025 extends routine autonomous engineering and documented milestone review
+to the practical-library programme beyond v0.1. Record actual evidence and Codex
+review provenance for each later milestone; do not treat direction as completed
+review or a blanket approval of the separate consequential decisions.
 
 ## Completion
 

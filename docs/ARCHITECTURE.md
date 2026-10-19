@@ -324,14 +324,21 @@ or approval for consequential platform/runtime/security scope changes.
 
 ## Alternatives kept open
 
+[ADR-0025](adr/0025-practical-library-development.md) establishes the practical
+library goal and autonomous progression beyond the reviewed host baseline.
+Evaluate API/service composition against downstream consumer needs; the initial
+sample and separate contexts are revisable choices, not a permanent scope limit.
+
 - One OS thread per application may later help isolate blocking work, but it
   introduces shutdown, joining, scheduling, and queue semantics that need
   explicit evidence first.
 - An async runtime may later suit many concurrent I/O sources, but no current
   workload justifies its dependency, executor, cancellation, or timing model.
-- Future embedded work belongs in a separate concrete-target fork after the
-  host v0.1 architecture review. This repository will not grow speculative
-  `no_std`, RTOS, hardware, or shared-core adapters in preparation for it.
+- A concrete embedded, `no_std` or RTOS need may justify a bounded portability
+  experiment and a proposal comparing in-repository support with a separate
+  target project. Neither placement is predetermined. A target commitment still
+  needs its separate authorization; speculative adapter scaffolding adds no
+  evidence of portability.
 - Standard-library bounded channels are a future option, but publish/subscribe
   fan-out and overflow policy still require framework behavior; selecting a
   primitive is not the same as designing the bus. (`SRC-RUST-CHANNEL`)

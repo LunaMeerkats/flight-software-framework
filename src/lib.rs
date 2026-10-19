@@ -2,10 +2,13 @@
 #![doc = r#"
 Experimental host-side building blocks for the Rust Flight Framework.
 
+The development goal is a practical, reusable Rust library. The reviewed host
+v0.1 baseline is a starting point for continued evidence-led development.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are
-pre-v0.1 experiments and make no real-time or fault-tolerance claim, or claim
+provisional and make no real-time or fault-tolerance claim, or claim
 of compatibility with cFS, cFE, OSAL, PSP, CCSDS, or an RTOS.
 "#]
 
