@@ -440,3 +440,23 @@ findings and three unchanged fulfilled expectations. Unchanged host/experiment/
 workflow sources do not trigger extra conditional local probes; hosted CI runs
 its configured host targets/sample. This documentation follow-up preserves source
 and requires its own complete review and exact-head hosted result.
+
+## Public-API quickstart checkpoint — 2026-10-20
+
+[ADR-0026](../adr/0026-public-api-quickstart.md) selects one public-only example
+and actual independent Cargo path-dependency verification. The manifest opts
+three behavioral example tests into the existing workspace command; workflow
+commands are unchanged. [The focused review](QUICKSTART_REVIEW.md) records exact
+source identity, external-package evidence, actual Codex reviewers and limits.
+
+Checkpoint `c772dd960fe45b8cbc440dd1101587e101d1244d` has successful
+[push run 39258022861](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39258022861)
+at the exact logged checkout, Windows job 118078130174 and all 20 steps. Raw logs
+confirm 154 workspace tests including the three quickstart tests, separate 14
+adapter/five sample tests, warnings-denied rustdoc, unchanged 222-line sample and
+both whitespace checks. Hosted tools/image match input: Rust/Cargo 1.99.1,
+rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0 and windows-2025-vs2026
+20261007.264.1. Local execution remains on 1.98.0. External consumer compilation,
+tests and quickstart executable are local evidence, separate from hosted tests.
+This documentation-only follow-up preserves source/manifest/workflow blobs and
+receives its own review and exact-head CI rather than inheriting a hosted pass.

@@ -29,9 +29,14 @@ one composition, not external adoption or broad consumer readiness. Package
   claim execution on the hosted toolchain.
 - Root and independent Codex quickstart_review accept full source/document/diff,
   raw local/consumer evidence and generated crate documentation. Whole-tree review
-  finds zero widths/three unchanged expectations; all 409 relative links/118 exact
-  test references resolve and eleven changed rendered documents pass content/
-  structure review. Source publication and exact hosted CI remain pending.
+  finds zero widths/three unchanged expectations; all 411 relative links/118 exact
+  test references resolve and twelve run-changed rendered documents pass content/
+  structure review, including the CI baseline evidence follow-up.
+- Published checkpoint c772dd960fe45b8cbc440dd1101587e101d1244d passes exact
+  hosted run 39258022861/job 118078130174: all 20 steps, 154 workspace tests
+  including all three quickstart regressions, separate 14 adapter/five sample
+  tests, rustdoc, unchanged 222-line sample and both whitespace checks. Tools and
+  image match input. The documentation-only follow-up receives its own exact CI.
 
 ## Current architecture
 
@@ -44,10 +49,11 @@ maintained package. Existing finite sequence models retain their frozen domains.
 
 ## Work in progress
 
-The public-API quickstart checkpoint is locally accepted and awaits ordinary
-source publication with exact hosted CI. No new runtime API,
-dependency, platform commitment or workflow change is introduced. RFF-LIB-REQ-001
-and ADR-0026 preserve the original v0.1 requirement meanings.
+The public-API quickstart checkpoint is implemented, reviewed, verified and
+published with successful exact-revision hosted CI. No unfinished implementation
+remains. This documentation-only evidence follow-up receives its own review and
+exact CI. RFF-LIB-REQ-001 and ADR-0026 preserve v0.1 meanings; no new runtime API,
+dependency, platform commitment or workflow change is introduced.
 
 ## Highest risks and uncertainties
 
@@ -84,4 +90,5 @@ service breadth or another model solely because the first consumer is complete.
 assessment. Added the standalone recipe, runnable setup/error/resource guidance,
 requirement and ADR. Three new regression tests run in the unchanged workspace
 baseline; actual independent package checks pass. Full autonomous source/document
-review accepts the checkpoint. Publication and exact hosted CI remain pending.
+review accepts the checkpoint. Source publication and exact-checkpoint hosted CI
+pass; this documentation-only evidence follow-up receives its own review and CI.

@@ -1,7 +1,7 @@
 # Public-API quickstart review
 
 Date: **2026-10-20**
-Status: **Local implementation and autonomous review accepted; publication pending**
+Status: **Complete: local consumer/review and exact published checkpoint CI passed**
 
 ## Objective, inputs and decisions
 
@@ -125,6 +125,37 @@ Review aids, original logs, metadata and source inventory are ignored under
 `target/review-2026-10-20-downstream`. That folder and the temporary consumer may
 be unavailable on another checkout; the commands and source hashes above make
 the evidence repeatable. They are not new adopted checker gates.
+
+## Published checkpoint evidence
+
+Ordinary fast-forward publishes
+`c772dd960fe45b8cbc440dd1101587e101d1244d`. Exact
+[push run 39258022861](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39258022861)
+passes logged checkout, Windows job 118078130174 and all 20 steps. Raw logs
+confirm 154 workspace tests including all three quickstart regressions, separate
+14 adapter/five sample tests, warnings-denied rustdoc, the unchanged 222-line
+combined sample and both whitespace checks. Root inspects metadata/raw logs
+separately from local source/document acceptance. Independent Codex
+quickstart_review separately accepts exact checkout/metadata/raw step results,
+154 workspace/14 adapter/five sample tests, tools/image and an independent ordered
+comparison of all 222 sample lines against input. It finds no blocking issue.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0
+and windows-2025-vs2026 image 20261007.264.1 match input. Local execution remains
+on 1.98.0. The independent package and quickstart executable are locally run;
+hosted CI executes the quickstart tests through the workspace target and the
+existing combined sample executable. These are distinct observations.
+
+The documentation-only evidence follow-up preserves source/test/manifest/lock/
+licence/workflow blobs and receives its own diff/content review and exact-head
+hosted result. It does not inherit a hosted pass from this checkpoint.
+
+The follow-up resolves 411 relative links/118 exact test references. All twelve
+run-changed rendered Markdown documents pass complete content/headings/code/
+links/tables/HTML structure review, including the CI evidence record. Source
+inventory and expectations are unchanged. Root reviews its complete diff;
+independent Codex review inspects the evidence follow-up separately from the
+implementation and hosted-checkpoint acceptance.
 
 ## Limits and likely next step
 

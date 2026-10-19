@@ -1,7 +1,7 @@
 # Public-API quickstart checkpoint
 
 Date: **2026-10-20**
-Status: **Local implementation and review accepted; publication pending**
+Status: **Complete: consumer verified, reviewed, published and exact-revision CI passed**
 
 ## Objective and context
 
@@ -67,4 +67,12 @@ Codex root and independent quickstart_review has no blocking findings. Exact
 commands, raw evidence locations, source identity and limits are in
 [the focused review](docs/verification/QUICKSTART_REVIEW.md). Final rendered-document,
 source-inventory and complete-diff review pass with independent Codex acceptance.
-Publication and exact hosted CI remain pending.
+Checkpoint c772dd960fe45b8cbc440dd1101587e101d1244d is published by ordinary
+fast-forward. Hosted run 39258022861/job 118078130174 passes all 20 steps,
+154 workspace tests including the three quickstart regressions, separate 14
+adapter/five sample tests, rustdoc, unchanged 222-line sample and both whitespace
+checks. Root and independent quickstart_review inspect exact metadata/raw logs
+separately from local acceptance. The evidence follow-up resolves 411 links/118
+exact test references and all twelve run-changed rendered documents pass content/
+structure review; source, manifest and workflow are unchanged from the checkpoint.
+The documentation-only evidence follow-up receives its own review and exact CI.
