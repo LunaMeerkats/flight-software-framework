@@ -460,3 +460,29 @@ rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.337.0 and windows-2025-vs2026
 tests and quickstart executable are local evidence, separate from hosted tests.
 This documentation-only follow-up preserves source/manifest/workflow blobs and
 receives its own review and exact-head CI rather than inheriting a hosted pass.
+
+## Independent application composition checkpoint — 2026-10-21
+
+[ADR-0027](../adr/0027-independent-application-composition.md) selects a public-only
+consumer with two independently implemented applications and mission enum/error
+composition. Its test-enabled example adds four regressions to the unchanged
+workspace CI command. [The focused review](COMPOSITION_REVIEW.md) records actual
+independent-package commands, matching source identity, Codex review and limits.
+
+Checkpoint `d63d4f88d23a70cfd0fd4badf3efeba88ca3bb8d` has successful
+[push run 39429032917](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39429032917)
+at its exact logged checkout, Windows job 118648900866 and all 20 steps. Raw logs
+confirm 158 workspace tests including all four new regressions, separate 14
+adapter/five sample tests, warnings-denied rustdoc, both whitespace checks and
+the unchanged 222-line sample output.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.337.0
+match input. The windows-2025-vs2026 image changes from 20261007.264.1 to
+20261018.275.1. Fresh configuration/whole-tree review retains existing policy:
+45 Rust files, 17,991 physical/1,155 comment-only lines, zero width findings and
+three unchanged fulfilled expectations. Local execution remains Rust/Cargo
+1.98.0; it does not establish a local 1.99.1 run. External consumer tests and
+the new composition executable are local evidence; hosted workspace tests cover
+the shared source through its four regressions. This documentation-only evidence
+follow-up preserves source/manifest/workflow and receives its own complete
+review and exact-head CI.

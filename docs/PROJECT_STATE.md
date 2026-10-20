@@ -22,12 +22,17 @@ message errors. Package 0.0.0 remains unpublished and APIs provisional.
 - Identical composition source passes independent package check/Clippy/test/run;
   metadata and SHA256 confirm its own workspace and sole framework path dependency.
   Root and independent Codex composition_review accept complete source/document/
-  diff and consumer evidence; publication/hosted results are pending. Exact evidence is
+  diff and consumer evidence. Exact evidence is
   in [the focused record](verification/COMPOSITION_REVIEW.md).
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools remain Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
   runner 2.337.0/windows-2025-vs2026 image 20261007.264.1. Local results do not
   claim execution on the hosted toolchain.
+- Published checkpoint d63d4f88d23a70cfd0fd4badf3efeba88ca3bb8d passes exact
+  hosted run 39429032917/job 118648900866: all 20 steps, 158 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
+  unchanged 222-line sample. Hosted tools/runner match input; Windows image is
+  now 20261018.275.1. This documentation-only follow-up receives its own CI.
 
 ## Current architecture
 
@@ -41,10 +46,11 @@ message errors. Existing finite sequence models retain their frozen domains.
 
 ## Work in progress
 
-The RFF-LIB-REQ-002/ADR-0027 consumer and guidance are implemented and locally
-verified and autonomously reviewed. Publication and exact-revision hosted CI
-remain. No new library API, dependency, platform commitment or workflow change
-is introduced.
+The RFF-LIB-REQ-002/ADR-0027 consumer and guidance are implemented, verified,
+autonomously reviewed and published with exact-checkpoint hosted CI success.
+No unfinished implementation remains. The documentation-only evidence follow-up
+receives its own review and CI. No new library API, dependency, platform
+commitment or workflow change is introduced.
 
 ## Highest risks and uncertainties
 
@@ -81,4 +87,5 @@ a generic sum adapter or another finite model.
 Codex source assessment. Requirement and ADR precede implementation. The example
 and guide are implemented; full locked local and independent-package checks pass.
 Complete autonomous source/document/diff review passes. Source publication and
-exact-revision hosted evidence remain.
+exact-checkpoint hosted verification pass; this documentation-only evidence
+follow-up receives its own review and CI.

@@ -1,7 +1,7 @@
 # Independent application composition review
 
 Date: **2026-10-21**
-Status: **Local consumer and complete review passed; publication/hosted CI pending**
+Status: **Complete: consumer/review and exact published checkpoint CI passed**
 
 ## Objective and input
 
@@ -132,7 +132,7 @@ does not claim pixel or human review. Root and independent composition_review
 accept the complete source/document/diff and raw local evidence with no blocking
 findings. The final module-comment clarification preserves behavior; its source
 identity and copied consumer are checked again. Exact published hosted results
-remain a separate pending gate for this checkpoint.
+are recorded separately below.
 
 Raw logs and temporary review aids are under
 `target/review-2026-10-21-composition`. These are generated review output, not a
@@ -142,6 +142,32 @@ consumer inspector ran before the workspace run log existed and was rerun after
 completion. Final whitespace review caught an extra plan EOF blank line; it was
 removed and both whitespace checks pass. These were review-aid/document findings,
 not suppressed runtime failures.
+
+## Source publication and hosted evidence
+
+Ordinary fast-forward publishes checkpoint
+`d63d4f88d23a70cfd0fd4badf3efeba88ca3bb8d` on codex/nightly after local checks
+and root/independent Codex complete review. Exact
+[push run 39429032917](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39429032917)
+passes its logged checkout, Windows job 118648900866 and all 20 steps. Raw logs
+confirm all four composition and three quickstart regressions in 158 workspace
+tests, separate 14 adapter/five sample tests, warnings-denied rustdoc, both
+whitespace checks and the unchanged 222-line combined sample output.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.337.0
+match input. The windows-2025-vs2026 image changes to 20261018.275.1. Root checks
+exact metadata and raw logs independently of local acceptance; the fresh whole-
+tree source/configuration review retains the same policy without new findings,
+waivers or exclusions. Local execution remains on Rust/Cargo 1.98.0.
+
+Independent Codex composition_review separately accepts the exact hosted checkout,
+all step/test results, source blob and ordered comparison of all 222 sample lines.
+The follow-up resolves all 431 relative links/122 exact test references and all
+thirteen run-changed rendered documents pass content/structure inspection.
+
+The documentation-only evidence follow-up preserves source/manifest/workflow
+blobs and receives its own complete review and exact-revision hosted result.
+This records engineering evidence, not human review, release or operational use.
 
 ## Limits and next candidate
 

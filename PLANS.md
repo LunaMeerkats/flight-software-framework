@@ -1,7 +1,7 @@
 # Independently implemented application composition
 
 Date: **2026-10-21**
-Status: **Local consumer and complete review passed; publication/hosted CI pending**
+Status: **Complete: consumer verified, reviewed, published and exact CI passed**
 
 ## Objective and context
 
@@ -61,6 +61,13 @@ passes four tests and quickstart three; both executables pass. Identical source
 checks/lints/tests/runs in an external package whose metadata and SHA256 confirm
 one independent workspace and sole framework path dependency. Root and independent
 Codex composition_review accept the complete source/document/diff and raw consumer
-evidence. Source publication and exact-revision hosted inspection remain. Exact
-identities, commands and
+evidence. Exact identities, commands and
 limits are in [the focused record](docs/verification/COMPOSITION_REVIEW.md).
+
+Ordinary fast-forward publishes d63d4f88d23a70cfd0fd4badf3efeba88ca3bb8d.
+Hosted run 39429032917/job 118648900866 passes all 20 steps, 158 workspace tests
+including all four new composition regressions, separate 14 adapter/five sample
+tests, rustdoc, both whitespace checks and the unchanged 222-line sample. Hosted
+tools/runner match input; the Windows image advances to 20261018.275.1. Source,
+manifest and workflow are unchanged by the documentation-only evidence follow-up,
+which receives its own review and exact hosted result.

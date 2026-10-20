@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; first public-API consumer verified locally and in hosted CI**
+Status: **Active; two public-API consumers verified locally and in hosted CI**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -44,6 +44,9 @@ It tests two independently implemented applications, explicit mission enum
 delegation, typed error-source retention and bounded peer progress after failure,
 including actual independent Cargo package execution. The
 [focused record](verification/COMPOSITION_REVIEW.md) carries results and limits.
+Checkpoint d63d4f88d23a70cfd0fd4badf3efeba88ca3bb8d passes exact hosted
+run 39429032917, all 20 steps and 158 workspace tests including its four new
+regressions. Complete autonomous source/document/diff and consumer review passes.
 Assess further adapter or service capability from concrete consumer friction;
 do not infer a generic adapter need from this pair alone.
 
