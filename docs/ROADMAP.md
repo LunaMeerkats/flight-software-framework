@@ -37,6 +37,16 @@ hosted run 39258022861, all 20 steps and 154 workspace tests. Later candidates
 should follow concrete consumer friction observed
 here, including heterogeneous composition and ordinary-work service access.
 
+The second selected checkpoint is
+[independent application composition](COMPOSING_APPLICATIONS.md), under
+RFF-LIB-REQ-002 and [ADR-0027](adr/0027-independent-application-composition.md).
+It tests two independently implemented applications, explicit mission enum
+delegation, typed error-source retention and bounded peer progress after failure,
+including actual independent Cargo package execution. The
+[focused record](verification/COMPOSITION_REVIEW.md) carries results and limits.
+Assess further adapter or service capability from concrete consumer friction;
+do not infer a generic adapter need from this pair alone.
+
 ## Stage 0 — Foundation and responsibility checkpoint
 
 Status: **Complete (2026-08-05)**

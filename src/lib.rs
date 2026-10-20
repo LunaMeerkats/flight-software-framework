@@ -10,6 +10,10 @@ Start with `cargo run --locked --example quickstart` in the repository. The
 path dependency in an independent Cargo package. The quickstart uses public
 APIs only and shows explicit lifecycle, bounded ingress and one-message dispatch.
 
+`cargo run --locked --example composition` and `docs/COMPOSING_APPLICATIONS.md`
+extend that recipe to two independently implemented application types with
+mission-owned enum delegation, typed errors and bounded peer publication.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are

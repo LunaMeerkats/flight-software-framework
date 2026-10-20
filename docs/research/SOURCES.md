@@ -13,6 +13,26 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-TYPED-COMPOSITION — Enum composition and concrete error causes
+
+- Titles: The Rust Reference — Enumerated types; std::error::Error
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/reference/types/enum.html> and
+  <https://doc.rust-lang.org/std/error/trait.Error.html#method.source>
+- Version: public Reference and standard-library 1.99.1 documentation accessed
+  2026-10-21; local execution uses Rust 1.98.0, not a newly selected MSRV
+- Informed: enums represent heterogeneous disjoint unions; a wrapper can expose
+  its concrete lower-level error through `Error::source`. Enum storage depends
+  on the largest variant and representation overhead.
+- Local treatment: adopt explicit mission enum forwarding and source-preserving
+  message-error variants for the ADR-0027 consumer. Retain existing runtime
+  behavior. Do not infer dynamic registration, whole-process memory bounds or
+  interoperability of arbitrary application/topic/error definitions. No upstream
+  implementation is reused. The Cargo example target documentation at
+  <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#examples> is
+  rechecked on the same date for `test = true`; retain the existing
+  SRC-CARGO-CONSUMER-RECIPE policy and independent-package verification.
+
 The **2026-09-10** messaging-owned work failure-event checkpoint uses only
 existing repository contracts: ADR-0011's inbox cleanup, ADR-0016's event
 attempt, and ADR-0018's ordinary-work configuration visibility.

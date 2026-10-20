@@ -16,6 +16,24 @@ actual Codex reviews and publication evidence are in
 This establishes one controlled consumer composition, not external adoption,
 API stability, broad readiness, physical delivery or flight suitability.
 
+## Stage 5 independent application composition — 2026-10-21
+
+RFF-LIB-REQ-002 revision 1 and
+[ADR-0027](../adr/0027-independent-application-composition.md) extend the controlled
+consumer evidence to two independent application implementations. The
+[composition guide](../COMPOSING_APPLICATIONS.md) explains mission-owned enum
+delegation and concrete error unification. Source identity, exact commands,
+independent package inspection and actual Codex review are recorded in
+[COMPOSITION_REVIEW.md](COMPOSITION_REVIEW.md).
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-002 | Public-only composition example with independent relay/sink implementations, mission enum delegation, typed error causes and finite peer/output queues | `distinct_applications_forward_lifecycle_work_and_messages`; `relay_failure_preserves_typed_source_and_peer_delivery`; `sink_failure_preserves_older_output_and_leaves_relay_operable`; `both_applications_reject_invalid_input_before_output`; full locked baseline; identical independent package check/Clippy/test/run and metadata/hash inspection | Local checks pass: 158 workspace/four focused/four consumer tests; autonomous complete source/document/diff and consumer review accepts exact source identity in the focused record; publication/hosted evidence pending |
+
+Existing v0.1 and RFF-LIB-REQ-001 meanings and exact evidence are retained.
+The new composition fixes shared topics/payload bounds and infallible lifecycle/
+work errors; it does not establish interoperability of arbitrary applications.
+
 The implemented Rust slices cover bounded logical lifecycle records, owned
 synchronous start/work/stop/in-place-restart, bounded application messaging, a
 bounded structured-event queue, an injected manual clock, a finite one-shot

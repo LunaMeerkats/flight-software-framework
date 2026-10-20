@@ -26,6 +26,13 @@ cargo run --locked --example quickstart
 This first controlled consumer demonstrates explicit lifecycle, publication
 outcomes, dispatch and bounded host observation. APIs remain provisional.
 
+Next, [compose two independent application types](docs/COMPOSING_APPLICATIONS.md)
+using a mission-owned enum, typed error mapping and bounded peer messaging:
+
+```text
+cargo run --locked --example composition
+```
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the

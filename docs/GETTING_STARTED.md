@@ -118,3 +118,8 @@ and [quickstart verification](verification/QUICKSTART_REVIEW.md) for exact
 contracts and evidence. This demonstrates one independently packaged composition,
 not external adoption, general consumer readiness, API stability or release
 readiness. Publication and deployment retain their separate authorization gates.
+
+For a second controlled recipe, see
+[composing independently implemented applications](COMPOSING_APPLICATIONS.md).
+It demonstrates mission enum delegation and distinct concrete message errors
+with peer progress after a selected failure.

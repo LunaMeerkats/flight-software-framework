@@ -21,3 +21,7 @@ workspace = true
 [[example]]
 name = "quickstart"
 test = true
+
+[[example]]
+name = "composition"
+test = true

@@ -1,78 +1,66 @@
-# Public-API quickstart checkpoint
+# Independently implemented application composition
 
-Date: **2026-10-20**
-Status: **Complete: consumer verified, reviewed, published and exact-revision CI passed**
+Date: **2026-10-21**
+Status: **Local consumer and complete review passed; publication/hosted CI pending**
 
 ## Objective and context
 
-Enable a first downstream developer to compose one bounded command handler
-without reverse-engineering the private combined mission. Clean input
-61e3f0e54509ab4a2f45b94648c83d66e245b233 has successful exact-revision hosted
-run 39248169214. Fresh local locked format/check/Clippy/test/rustdoc and both
-whitespace checks pass 151 tests on the unchanged local 1.98.0 toolchain.
+Demonstrate two independently implemented applications through existing public
+APIs without extracting private host-sample internals. Clean input
+f539755e50b0f15aaa4361cba2e2eae4e7b3dca9 matches refreshed origin and completed
+hosted run 39258514095. Fresh locked format/check/Clippy/test and warnings-denied
+rustdoc pass 154 workspace tests; both whitespace checks pass. Toolchain remains
+Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
 
-RFF-LIB-REQ-001 is established before implementation. ADR-0026 compares a
-public-only example plus independent package verification, a permanent consumer
-crate, and broader ordinary-work service contexts. Select the first: existing
-APIs can satisfy this consumer; the adoption gap is setup and readable composition.
+Root Codex and independent consumer_assessment find that Runtime documents enum
+composition, but the private sample implements framework traits only on its
+wrapper. The quickstart demonstrates one concrete type. RFF-LIB-REQ-002 revision
+1 establishes acceptance before source implementation. ADR-0027 selects explicit
+mission composition over a public sum adapter or erased application boundary.
 
-## Changes and acceptance
+## Acceptance and components
 
-- Add one standalone `examples/quickstart.rs`, importing only the public crate
-  and `std`, with bounded ingress/output and explicit lifecycle/dispatch.
-- Opt its regression tests into the existing workspace test command.
-- Add getting-started instructions for a separate Cargo binary with a local
-  path dependency; compile, test and run that exact copied source independently.
-- Explain expected errors, report-versus-delivery semantics, bounds, teardown
-  policy, owner-local identifiers and scope limitations.
-- Reconcile entry points, requirements, traceability, roadmap and project state;
-  retain previous runtime APIs, tests, dependencies and CI workflow.
+- Add `examples/composition.rs`: two types independently implementing the public
+  traits, mission enum delegation, concrete message-error mapping, bounded
+  command-to-peer-output flow and explicit caller orchestration.
+- Include focused regressions for delegation, distinct error source chains,
+  selected failure/cleanup and retained peer progress; test-enable the example.
+- Provide a composition guide and actually check/lint/test/run identical source
+  in an external Cargo package; inspect its source hash and metadata.
+- Update requirements, traceability, roadmap, entry points, source register and
+  project state with truthful evidence and autonomous review attribution.
 
 ## Verification and review
 
-Replay the required locked baseline with RUSTDOCFLAGS=-D warnings; run
-`cargo test --locked --example quickstart` and
-`cargo run --locked --example quickstart`. Separately build, lint, test and run
-the independent consumer after generating its offline lockfile. Inspect metadata
-and source hashes to confirm an independent workspace with only the library path
-dependency and exactly the same consumer source. Record reproducible commands.
-
-Review relative links, changed rendered Markdown, generated crate documentation,
-all handwritten Rust widths and expectations, full source and complete diff.
-Use independent Codex review for implementation, guide and evidence. Existing
-host sample/adapters, workflow and ADR-0018/0019 experiments are unchanged, so
-their conditional local probes are not triggered. Existing CI still exercises
-its configured sample and adapter checks.
+Run the complete locked baseline with RUSTDOCFLAGS=-D warnings, focused example
+tests/run, external package check/Clippy/test/run and metadata/source comparison.
+Inspect changed rendered Markdown and generated crate documentation, resolving
+relative links, whole-tree handwritten Rust widths and lint expectations, full
+source and complete diff. Obtain independent Codex review. Existing quickstart,
+combined host adapters/sample, workflow and ADR-0018/0019 probes are unchanged;
+their conditional additional commands do not apply. Existing CI retains its
+host checks and executes the new example's tests through the workspace command.
 
 ## Risks and stopping point
 
-This is one selected consumer composition; it cannot establish general usability
-or independent adoption. The demonstration may tear down on setup failure,
-while an integrating host may recover ownership from the framework errors.
-Keep callback failures and report saturation explicit. No new dependency, API
-freeze, runtime, platform commitment or publication gate is selected.
+This consumer fixes one mission topology and shared topic/payload vocabulary.
+Forwarding boilerplate is explicit integration cost, not proof of a generic
+adapter need. Application failures remain terminal and callback effects are not
+rolled back. No new library API, dependency, platform or consequential gate is
+selected. Preserve all previous contracts and exact-domain evidence.
 
-Safe rollback is removal of this run's example/manifest/document edits only.
-Stop after the coherent checkpoint passes applicable verification and reviews,
-is committed and pushed by ordinary fast-forward on codex/nightly, and its exact
-hosted CI is inspected. A later run chooses the next consumer-driven increment.
+Rollback only this run's source/manifest/document edits if needed. Stop after
+one coherent verified and autonomously reviewed checkpoint, ordinary fast-forward
+source publication and inspection of completed exact-revision hosted CI. Record
+any remaining work explicitly; do not continue into ordinary-work service design.
 
 ## Local results
 
-Required final locked checks pass 154 workspace tests; three focused quickstart
-tests and both executable forms pass. The independent package is outside this
-checkout, has its own workspace and exactly one path dependency on the library.
-Its main-source SHA256 matches the example byte for byte. Source/design review by
-Codex root and independent quickstart_review has no blocking findings. Exact
-commands, raw evidence locations, source identity and limits are in
-[the focused review](docs/verification/QUICKSTART_REVIEW.md). Final rendered-document,
-source-inventory and complete-diff review pass with independent Codex acceptance.
-Checkpoint c772dd960fe45b8cbc440dd1101587e101d1244d is published by ordinary
-fast-forward. Hosted run 39258022861/job 118078130174 passes all 20 steps,
-154 workspace tests including the three quickstart regressions, separate 14
-adapter/five sample tests, rustdoc, unchanged 222-line sample and both whitespace
-checks. Root and independent quickstart_review inspect exact metadata/raw logs
-separately from local acceptance. The evidence follow-up resolves 411 links/118
-exact test references and all twelve run-changed rendered documents pass content/
-structure review; source, manifest and workflow are unchanged from the checkpoint.
-The documentation-only evidence follow-up receives its own review and exact CI.
+Required final locked baseline passes 158 workspace tests. Focused composition
+passes four tests and quickstart three; both executables pass. Identical source
+checks/lints/tests/runs in an external package whose metadata and SHA256 confirm
+one independent workspace and sole framework path dependency. Root and independent
+Codex composition_review accept the complete source/document/diff and raw consumer
+evidence. Source publication and exact-revision hosted inspection remain. Exact
+identities, commands and
+limits are in [the focused record](docs/verification/COMPOSITION_REVIEW.md).

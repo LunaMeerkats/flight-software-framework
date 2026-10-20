@@ -202,3 +202,20 @@ reject-newest ingress saturation retaining the older command, and explicit
 stop/restart. The workspace baseline shall execute its regression tests. Review
 shall distinguish this controlled composition from external adoption, API
 stability, flight suitability, and release or publication readiness.
+
+### RFF-LIB-REQ-002 — Independently implemented application composition
+
+Revision 1 (2026-10-21). A documented public-API consumer shall compose two
+distinct application types that each independently implement `Application` and
+`MessagingApplication`. A mission-owned enum shall delegate lifecycle, ordinary
+work and message callbacks, preserving each application's concrete message
+failure through a typed mission error and its `Error::source` chain.
+
+Acceptance: a bounded command-to-peer-output scenario shall run both as a tested
+workspace example and as the identical source in an independent path-dependent
+Cargo package. Tests shall observe delegated lifecycle/work behavior, distinct
+application error attribution, selected failure/queued-inbox cleanup and retained
+healthy peer progress. Guidance shall explain error unification, ownership,
+resource limits and report handling. This verifies this composition only; it
+does not establish external adoption, dynamic registration, API stability or
+general application interoperability.

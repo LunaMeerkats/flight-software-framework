@@ -101,6 +101,10 @@ translate NASA C source.
   Its `test = true` target executes behavioral tests in the workspace baseline;
   `docs/GETTING_STARTED.md` shows the same source as an independent path-dependent
   Cargo binary. Temporary consumer verification adds no maintained crate.
+- `examples/composition.rs`: a second public-only consumer with two independently
+  implemented application types, mission enum delegation and typed message-error
+  mapping. Its test-enabled target and independent-package verification retain
+  the same ownership and evidence boundary as the quickstart.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -162,6 +166,13 @@ that package and compare its main-source hash with the example. Inspect Cargo
 metadata for its independent workspace and sole library path dependency. Record
 the external package path and exact commands/results in the focused verification
 record. This demonstrates that consumer only, not general adoption or stability.
+
+When changing the composition example or its guidance, likewise run
+`cargo test --locked --example composition` and
+`cargo run --locked --example composition`, then follow the independent-package
+commands in [the composition guide](docs/COMPOSING_APPLICATIONS.md). Check, lint,
+test and run that package, inspect metadata and compare source hashes. Record
+its path and exact results in the focused composition verification record.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in
