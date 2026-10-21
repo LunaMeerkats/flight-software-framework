@@ -33,6 +33,13 @@ using a mission-owned enum, typed error mapping and bounded peer messaging:
 cargo run --locked --example composition
 ```
 
+[Produce output during ordinary work](docs/ORDINARY_WORK_OUTPUT.md) using
+validated configuration, a finite schedule and explicit bounded host transfer:
+
+```text
+cargo run --locked --example work_output
+```
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the

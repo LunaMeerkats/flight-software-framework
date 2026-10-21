@@ -14,6 +14,10 @@ APIs only and shows explicit lifecycle, bounded ingress and one-message dispatch
 extend that recipe to two independently implemented application types with
 mission-owned enum delegation, typed errors and bounded peer publication.
 
+`cargo run --locked --example work_output` and `docs/ORDINARY_WORK_OUTPUT.md`
+show configured ordinary work staging a bounded output for explicit host
+publication and retry to one subscriber, including finite scheduled work.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are

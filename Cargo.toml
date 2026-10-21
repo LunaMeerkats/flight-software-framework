@@ -25,3 +25,7 @@ test = true
 [[example]]
 name = "composition"
 test = true
+
+[[example]]
+name = "work_output"
+test = true

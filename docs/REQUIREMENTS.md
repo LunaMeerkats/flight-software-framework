@@ -219,3 +219,22 @@ healthy peer progress. Guidance shall explain error unification, ownership,
 resource limits and report handling. This verifies this composition only; it
 does not establish external adoption, dynamic registration, API stability or
 general application interoperability.
+
+### RFF-LIB-REQ-003 — Ordinary-work output with explicit host transfer
+
+Revision 1 (2026-10-22). A public-only consumer shall produce an output value
+from caller-selected and finite scheduled ordinary work using immutable validated
+configuration. It shall stage at most one pending value without silently
+overwriting it. Ordinary work shall not publish; the host shall explicitly
+transfer the value to exactly one bounded subscriber and clear the pending slot
+only after verifying that destination accepted it.
+
+Acceptance: the identical source shall pass as a tested workspace example and
+an independent path-dependent Cargo package. Tests shall observe staging before
+publication, full/unavailable destination retention and explicit retry without
+failing the producer, lifecycle-rejected work without callback effects,
+stop/restart retention, and typed full-slot work failure preserving the older
+value and healthy peer progress. Scheduled attempts shall retain the existing
+one-shot consumption contract. Guidance shall distinguish this frozen
+single-subscriber retry policy from general fan-out, transactional delivery,
+automatic recovery, external adoption and physical I/O.

@@ -1,5 +1,23 @@
 # Verification traceability
 
+## Stage 5 ordinary-work output — 2026-10-22
+
+RFF-LIB-REQ-003 revision 1 and
+[ADR-0028](../adr/0028-host-mediated-work-output.md) select configured ordinary
+work with bounded caller-owned staging and explicit host transfer. The
+[guide](../ORDINARY_WORK_OUTPUT.md) fixes one subscriber and distinguishes
+retained retry from terminal work failure and post-publication topology error.
+Exact source, independent package, commands and actual autonomous review are in
+[WORK_OUTPUT_REVIEW.md](WORK_OUTPUT_REVIEW.md).
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-003 | Public-only tested work-output example; immutable configuration, one pending record, one subscriber and explicit host report check | `ordinary_work_stages_before_host_publication`; `configuration_changes_do_not_rewrite_pending_output`; `full_destination_retains_pending_for_explicit_retry`; `unavailable_destination_and_producer_restart_retain_output`; `pending_full_work_failure_retains_typed_source_and_peer_progress`; `schedule_waits_then_produces_once`; `scheduled_full_slot_failure_consumes_and_allows_peer_progress`; `scheduled_lifecycle_rejection_consumes_without_running_callback`; `invalid_delivery_and_full_host_output_preserve_older_values`; `unexpected_destination_never_clears_pending`; independent package check/Clippy/test/run and metadata/hash inspection | Full locked 168 workspace tests, ten focused/ten consumer tests, matching source hash and independent metadata checks pass; complete root/independent Codex source/document/diff review accepts; exact committed/publication evidence pending |
+
+Existing requirement meanings and frozen finite-model evidence are retained.
+This does not verify general fan-out retry, immediate work publication access,
+external adoption, physical delivery or API stability.
+
 ## Stage 5 public-API integration — 2026-10-20
 
 RFF-LIB-REQ-001 revision 1 extends consumer integration evidence without changing

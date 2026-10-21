@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; two public-API consumers verified locally and in hosted CI**
+Status: **Active; ordinary-work output consumer in verification**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -49,6 +49,17 @@ run 39429032917, all 20 steps and 158 workspace tests including its four new
 regressions. Complete autonomous source/document/diff and consumer review passes.
 Assess further adapter or service capability from concrete consumer friction;
 do not infer a generic adapter need from this pair alone.
+
+The third selected checkpoint is
+[ordinary-work output](ORDINARY_WORK_OUTPUT.md), under RFF-LIB-REQ-003 and
+[ADR-0028](adr/0028-host-mediated-work-output.md). A configured producer stages
+one value during ordinary or scheduled work. The host explicitly transfers it
+to one subscriber, retaining it on full/unavailable outcomes. This tests the
+existing public API before adding a work publication context. The
+[focused record](verification/WORK_OUTPUT_REVIEW.md) separates actual consumer,
+review and hosted evidence from planned verification. Revisit service access
+when a consumer needs acceptance feedback inside its work callback or ordering
+that explicit host mediation cannot express coherently.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

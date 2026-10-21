@@ -105,6 +105,10 @@ translate NASA C source.
   implemented application types, mission enum delegation and typed message-error
   mapping. Its test-enabled target and independent-package verification retain
   the same ownership and evidence boundary as the quickstart.
+- `examples/work_output.rs`: a public-only configured ordinary-work producer
+  with a capacity-one pending slot and explicit host transfer to one subscriber.
+  Its test-enabled target and independent-package recipe verify this mission
+  policy, including saturation retry; it adds no ordinary-work service context.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -173,6 +177,14 @@ When changing the composition example or its guidance, likewise run
 commands in [the composition guide](docs/COMPOSING_APPLICATIONS.md). Check, lint,
 test and run that package, inspect metadata and compare source hashes. Record
 its path and exact results in the focused composition verification record.
+
+When changing the ordinary-work output example or its guidance, run
+`cargo test --locked --example work_output` and
+`cargo run --locked --example work_output`, then execute the independent-package
+recipe in [its guide](docs/ORDINARY_WORK_OUTPUT.md). Check, lint, test and run the
+identical source, inspect metadata and compare hashes. Record the package path
+and exact results in the focused work-output record. Its explicit retry policy
+requires exactly one subscriber and does not support partial fan-out retries.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

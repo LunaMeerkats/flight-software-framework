@@ -322,6 +322,16 @@ and separate contexts are acceptable for this controlled host milestone.
 Acceptance is not a public API freeze, human review, operational suitability,
 or approval for consequential platform/runtime/security scope changes.
 
+## Ordinary-work producer integration
+
+[ADR-0028](adr/0028-host-mediated-work-output.md) demonstrates ordinary-work
+production through a caller-owned capacity-one pending slot. The host publishes
+after work and clears the slot only on verified acceptance by its sole
+subscriber. This uses existing configuration, schedule and lifecycle APIs.
+Retained retry is explicit mission policy; partial fan-out could duplicate
+deliveries and is outside this recipe. Immediate callback feedback remains a
+concrete trigger for reconsidering a narrow work service capability.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical

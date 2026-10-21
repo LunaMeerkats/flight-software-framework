@@ -13,6 +13,24 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-WORK-OUTPUT — Bounded caller-owned ordinary-work staging
+
+- Titles: Cell; Cargo targets — Examples
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/cell/struct.Cell.html> and
+  <https://doc.rust-lang.org/cargo/reference/cargo-targets.html#examples>
+- Version: Rust 1.99.1/current Cargo documentation, accessed 2026-10-22;
+  local execution remains Rust/Cargo 1.98.0.
+- Informed: Cell supports copying a Copy value through shared references and
+  mutation of interior storage; Cargo runs example tests when test is true.
+- Local treatment: adopt a caller-owned Cell containing one optional output
+  value, with explicit occupancy checking, and a test-enabled standard example.
+  The mission's frozen single-subscriber report check controls clearing and
+  retry. Reject interpreting Cell as a synchronized queue, or this mission
+  bridge as automatic delivery, transactional fan-out or a new framework API.
+  ADR-0028 compares work service access and an event emitter. No upstream source
+  is copied and no new dependency is introduced.
+
 ## SRC-RUST-TYPED-COMPOSITION — Enum composition and concrete error causes
 
 - Titles: The Rust Reference — Enumerated types; std::error::Error
