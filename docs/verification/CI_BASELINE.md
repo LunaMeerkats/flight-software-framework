@@ -486,3 +486,32 @@ the new composition executable are local evidence; hosted workspace tests cover
 the shared source through its four regressions. This documentation-only evidence
 follow-up preserves source/manifest/workflow and receives its own complete
 review and exact-head CI.
+
+## Ordinary-work output consumer checkpoint — 2026-10-22
+
+[ADR-0028](../adr/0028-host-mediated-work-output.md) selects ordinary-work
+production through a bounded caller-owned pending record and explicit host
+transfer to exactly one subscriber. The test-enabled standard example adds ten
+regressions to the unchanged workspace CI command. The
+[focused review](WORK_OUTPUT_REVIEW.md) records independent-package commands,
+source identity, actual root/independent Codex review and evidence limits.
+
+Checkpoint `f354ba2ad0061ce7687855cb8f166f0c543edd08` has successful
+[push run 39605633954](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39605633954)
+at its exact logged checkout, Windows job 119240975638 and all 20 steps. Raw logs
+confirm 168 workspace tests including all ten new regressions, separate 14
+adapter/five sample tests, warnings-denied rustdoc, both whitespace checks and
+an exactly unchanged 222-line sample report compared with input run 39429862057.
+Root and independent Codex independent_review separately inspect raw metadata/logs
+and match the accepted source blob to the committed checkpoint.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and Clippy 0.1.99 match input.
+Runner changes from 2.337.0 to 2.338.0; windows-2025-vs2026 image 20261007.264.1
+is unchanged. Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and
+Clippy 0.1.98. Whole-tree source/configuration review retains existing policy:
+46 Rust files, 18,794 physical/1,164 comment-only lines, no width findings and
+three unchanged fulfilled expectations. External consumer compilation/tests/run
+are separate local evidence; hosted workspace tests execute the shared example
+source. No workflow, runtime API, dependency or licence change is introduced.
+This documentation-only evidence follow-up receives its own review and exact
+hosted inspection; no later revision inherits an unobserved pass.

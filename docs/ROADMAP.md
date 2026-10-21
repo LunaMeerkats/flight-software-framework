@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; ordinary-work output consumer in verification**
+Status: **Active; three public-API consumers verified locally and in hosted CI**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -57,7 +57,11 @@ one value during ordinary or scheduled work. The host explicitly transfers it
 to one subscriber, retaining it on full/unavailable outcomes. This tests the
 existing public API before adding a work publication context. The
 [focused record](verification/WORK_OUTPUT_REVIEW.md) separates actual consumer,
-review and hosted evidence from planned verification. Revisit service access
+review and hosted evidence from planned verification. Checkpoint
+f354ba2ad0061ce7687855cb8f166f0c543edd08 passes exact hosted run 39605633954,
+all 20 steps and 168 workspace tests, including all ten new consumer regressions.
+Root and independent Codex source/document/diff and consumer review pass.
+Revisit service access
 when a consumer needs acceptance feedback inside its work callback or ordering
 that explicit host mediation cannot express coherently.
 

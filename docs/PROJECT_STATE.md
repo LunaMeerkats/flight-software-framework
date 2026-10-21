@@ -8,6 +8,7 @@ Reviewed experimental serial host v0.1 remains the regression baseline. Stage 5
 advances practical library use under ADR-0025. Two public-only consumers are
 verified, reviewed and published. The third selected consumer demonstrates
 configured ordinary-work output, finite scheduling and explicit host transfer.
+All three have local consumer evidence and exact-checkpoint hosted success.
 Package 0.0.0 remains unpublished and APIs provisional.
 
 ## Verified baseline
@@ -20,13 +21,17 @@ Package 0.0.0 remains unpublished and APIs provisional.
   workspace tests, ten focused tests/run and ten identical-source external tests.
 - External metadata confirms one independent workspace member, two graph packages
   and the sole framework path dependency. Matching SHA256 and stdout are checked.
-  Whole-tree widths, relative links, test mappings and twelve rendered Markdown
+  Whole-tree widths, relative links, test mappings and thirteen rendered Markdown
   documents pass content/structure inspection. Actual evidence is in
   [the focused record](verification/WORK_OUTPUT_REVIEW.md).
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
   runner 2.337.0/windows-2025-vs2026 image 20261007.264.1. Local results do not
   claim execution on the hosted toolchain.
+- Published checkpoint f354ba2ad0061ce7687855cb8f166f0c543edd08 passes exact
+  hosted run 39605633954/job 119240975638: all 20 steps, 168 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
+  unchanged 222-line sample. Hosted tools/image match input; runner is 2.338.0.
 
 ## Current architecture
 
@@ -44,8 +49,10 @@ RFF-LIB-REQ-003 and ADR-0028 are established before source implementation.
 The work-output consumer and guide are implemented and locally verified.
 Root and independent Codex independent_review accept complete source/document/
 diff, external-package and raw baseline evidence with no blocking findings.
-Exact publication/hosted evidence remains. No implementation, local verification
-or routine autonomous review is unfinished.
+Ordinary source publication and exact-checkpoint hosted verification pass.
+No unfinished implementation or routine autonomous review remains. The
+documentation-only evidence follow-up receives its own review and exact hosted
+inspection, preserving source, manifest, lockfile, licences and workflow.
 
 ## Highest risks and uncertainties
 
@@ -83,4 +90,5 @@ is justified; avoid another example or model without a concrete adoption gap.
 locked local baseline passes. Root and independent consumer_need assess the
 ordinary-work output gap; requirement and ADR precede source. Implementation,
 full local and independent-package verification pass. Source/consumer/baseline
-review passes; source publication and exact hosted evidence are pending.
+review passes. Source publication and exact-checkpoint hosted evidence pass.
+The evidence follow-up receives its own document/diff and exact hosted review.

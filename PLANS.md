@@ -1,7 +1,7 @@
 # Bounded plan: ordinary-work output consumer
 
 Date: **2026-10-22**
-Status: **Locally verified and autonomously reviewed; publication pending**
+Status: **Complete: consumer verified, reviewed, published and exact CI passed**
 
 ## Objective and context
 
@@ -51,7 +51,12 @@ broader service-context design during this run.
 The implementation and independent Cargo consumer pass all checks: 168 workspace
 tests, ten focused and ten external tests, identical source/expected output,
 sole path dependency and independent metadata. Whole-tree width/link/test-name
-and twelve rendered Markdown inspections pass. Root and independent review
+and thirteen rendered Markdown inspections pass. Root and independent review
 inspect actual source, errors, bounds and raw command evidence. Final staged
-review accepts the checkpoint with no blocking findings. Exact source-publication
-and hosted evidence are the remaining steps.
+review accepts the checkpoint with no blocking findings. Ordinary fast-forward
+publishes f354ba2ad0061ce7687855cb8f166f0c543edd08. Exact hosted run 39605633954,
+job 119240975638 passes all 20 steps, 168 workspace tests, separate 14 adapter/
+five sample tests, rustdoc, both whitespace checks and unchanged 222-line sample.
+Hosted tools/image match input; runner changes to 2.338.0. Source, manifest and
+workflow are unchanged by the documentation-only evidence follow-up, which
+receives its own document/diff and exact hosted review. Stop after this checkpoint.

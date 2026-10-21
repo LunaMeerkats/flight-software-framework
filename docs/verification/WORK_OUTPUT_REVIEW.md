@@ -1,7 +1,7 @@
 # Ordinary-work output consumer review
 
 Date: **2026-10-22**
-Status: **Local verification and autonomous review complete; publication pending**
+Status: **Complete: consumer/review and exact published checkpoint CI passed**
 
 ## Objective and input
 
@@ -28,9 +28,9 @@ The producer stages a record containing configuration acceptance revision and
 one percentage byte; only the value byte is transmitted. Both application
 inboxes have capacity one, only the sink subscribes, one host output slot holds
 the delivered byte, and two separate observation cells retain work observations.
-The pending, output and observation cells are caller-owned. Work observes
-the current configuration even when
-pending-slot saturation subsequently returns an error. The old pending record
+The pending, output and observation cells are caller-owned. Work observes the
+current configuration even when pending-slot saturation subsequently returns
+an error. The old pending record
 survives configuration replacement, stop/restart and terminal producer failure.
 
 Transfer publishes a copy, then checks sole-destination identity and acceptance
@@ -125,7 +125,7 @@ not suppressed baseline failures.
 Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
 Whole-tree inventory covers 46 Rust files, 18,794 physical/1,164 comment-only
 lines, zero width findings and three unchanged fulfilled expectations. Relative
-links and exact traceability test names resolve. Twelve changed Markdown
+links and exact traceability test names resolve. Thirteen changed Markdown
 documents pass full rendered text, headings, code, table, link and HTML structure
 inspection. This is content/structure review, not pixel or human acceptance.
 Generated crate documentation is inspected separately. Host sample, workflow
@@ -135,9 +135,38 @@ commands are not triggered. Hosted CI still executes its configured host checks.
 Root Codex reviews the complete new source, retained tests, ownership/error
 contracts, source form and complete diff. Independent Codex independent_review
 accepts the design/source, actual external metadata/hashes/command logs and raw
-168-test baseline. Its findings correct
-scheduled-instant terminology and explicitly enumerate all caller-owned cells.
+168-test baseline. Its findings correct scheduled-instant terminology and
+explicitly enumerate all caller-owned cells.
 Root and independent_review accept complete source/document/diff and actual
 baseline/consumer evidence with no remaining blocking findings. The staged diff
 and refreshed rendered documents are checked before the publication commit.
 No runtime capability, licence, dependency, lint or workflow change is made.
+
+## Publication and exact hosted evidence
+
+Ordinary fast-forward publishes implementation checkpoint
+`f354ba2ad0061ce7687855cb8f166f0c543edd08` after refreshed origin ancestry and
+complete staged review. Local HEAD, origin/codex/nightly and live remote head
+match; working tree is clean. Independent_review confirms that the committed
+diff exactly matches the reviewed staged diff and the source blob is unchanged.
+
+[Push run 39605633954](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39605633954)
+passes at that exact logged checkout. Windows job 119240975638 completes all
+20 steps successfully. Raw metadata/log inspection confirms 168 workspace tests,
+including all ten new regressions, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and the unchanged 222-line
+combined sample report. External-package execution and the new example's
+standalone stdout are local evidence; hosted workspace tests exercise the same
+source via its ten regressions.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and Clippy 0.1.99 match input.
+The runner changes from 2.337.0 to 2.338.0; windows-2025-vs2026 image
+20261007.264.1 is unchanged. Local execution remains 1.98.0. No toolchain pin or
+new source policy is inferred. Root and independent_review separately inspect
+and accept the raw hosted evidence, independently of local results.
+
+This documentation-only evidence follow-up preserves source, manifest, lockfile,
+licences and workflow. It receives its own document/diff review and exact hosted
+inspection; it does not inherit an unobserved later-head pass. The checkpoint
+verifies this frozen single-subscriber mission, not external adoption, stable
+APIs, general reliable delivery, physical I/O, release readiness or qualification.
