@@ -1,73 +1,70 @@
 # Project state
 
-Last updated: **2026-10-22**
+Last updated: **2026-10-24**
 
 ## Current milestone
 
 Reviewed experimental serial host v0.1 remains the regression baseline. Stage 5
-advances practical library use under ADR-0025. Two public-only consumers are
-verified, reviewed and published. The third selected consumer demonstrates
-configured ordinary-work output, finite scheduling and explicit host transfer.
-All three have local consumer evidence and exact-checkpoint hosted success.
+advances practical library use under ADR-0025. Three public-only example consumers
+remain verified. RFF-LIB-REQ-004 now adds runtime-issued ordinary-work identity
+with public-only diagnostic consumer tests and independent-package evidence.
 Package 0.0.0 remains unpublished and APIs provisional.
 
 ## Verified baseline
 
-- Clean input 0848e32821046b91048ad607a7aba267a8850fb4 matches refreshed origin.
-  Re-read exact hosted run 39429862057/job 118651777288 passes all 20 steps and
-  158 workspace tests. Earlier focused evidence retains its exact boundaries.
-- Fresh initial locked format/check/Clippy/test and warnings-denied rustdoc pass
-  158 workspace tests and both whitespace checks. Final locked checks pass 168
-  workspace tests, ten focused tests/run and ten identical-source external tests.
-- External metadata confirms one independent workspace member, two graph packages
-  and the sole framework path dependency. Matching SHA256 and stdout are checked.
-  Whole-tree widths, relative links, test mappings and thirteen rendered Markdown
-  documents pass content/structure inspection. Actual evidence is in
-  [the focused record](verification/WORK_OUTPUT_REVIEW.md).
+- Input HEAD a9afb328905eb2d413a868bc7e0371a06b5c6c20 matches refreshed origin.
+  Exact input run 39606324526/job 119243331220 passes all 20 steps, 168 workspace
+  tests, separate 14 adapter/five sample tests and the 222-line sample report.
+  Prior unfinished requirement/ADR/guide/source changes are preserved.
+- The unfinished source's initial formatting failure is corrected. Fresh locked
+  initial/final format/check/Clippy/test and warnings-denied rustdoc pass with
+  168/176 workspace tests. Eight focused and eight identical-source independent
+  consumer tests pass. Metadata confirms one independent workspace member, two
+  graph packages and the sole library path dependency; source bytes/hashes match.
+- The composition guide's identity correction passes four focused and four
+  independent tests, check/Clippy/run, metadata and source/output comparison.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
-  runner 2.337.0/windows-2025-vs2026 image 20261007.264.1. Local results do not
-  claim execution on the hosted toolchain.
-- Published checkpoint f354ba2ad0061ce7687855cb8f166f0c543edd08 passes exact
-  hosted run 39605633954/job 119240975638: all 20 steps, 168 workspace tests,
-  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
-  unchanged 222-line sample. Hosted tools/image match input; runner is 2.338.0.
+  runner 2.338.0/windows-2025-vs2026 image 20261018.275.1. Local results do not
+  claim execution on the hosted toolchain. New hosted evidence remains pending.
+  Actual commands, source identities and limitations are in
+  [the focused record](verification/WORK_IDENTITY_REVIEW.md).
 
 ## Current architecture
 
 One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time and one-shot scheduling, bounded events and optional
 runtime configuration with immutable work visibility and one-use rollback.
-The private combined host sample joins those services. Public-only quickstart
-and composition examples use the supported APIs. The new consumer keeps one
-caller-owned pending output slot and explicitly publishes after ordinary work;
-it adds no library service context, dependency or workflow change.
+The ordinary-work context now exposes selected runtime-local identity alongside
+configuration, through one construction path shared by all work owners. The
+diagnostic consumer uses checked mission-owned services and separate diagnostic
+and framework failure-report queues. No new framework service owner, trait,
+dependency, maintained crate, workflow or lint exception is introduced.
 
 ## Work in progress
 
-RFF-LIB-REQ-003 and ADR-0028 are established before source implementation.
-The work-output consumer and guide are implemented and locally verified.
-Root and independent Codex independent_review accept complete source/document/
-diff, external-package and raw baseline evidence with no blocking findings.
-Ordinary source publication and exact-checkpoint hosted verification pass.
-No unfinished implementation or routine autonomous review remains. The
-documentation-only evidence follow-up receives its own review and exact hosted
-inspection, preserving source, manifest, lockfile, licences and workflow.
+The unfinished 2026-10-23 item is implemented and locally verified. Root Codex
+and independent context_review accept the complete staged source/document/diff,
+baseline, rendered and independent consumer evidence with no findings. Authorized
+source publication with exact hosted inspection is in progress. No broader service
+or scheduling capability is started in this run.
 
 ## Highest risks and uncertainties
 
-- Controlled consumers do not prove external adoption, broad usability or API
-  stability. Immediate in-callback publication feedback remains unprovided.
-- Retained retry is safe only for this frozen sole subscriber. General partial
-  fan-out can duplicate deliveries. Caller-owned output can outlive producer
-  stop/failure; transfer is explicit mission policy, not automatic recovery.
+- Controlled consumers do not prove adoption, broad usability or API stability.
+  Immediate in-callback message publication feedback remains unprovided.
 - Application/clock origins and positional inbox pairing remain caller duties.
-  Logical counts do not bound process bytes, callback allocation or duration.
-- Panics/hangs and allocator exhaustion are uncontained. Cooperative queue cleanup
-  does not prove external cleanup. Event saturation can omit records; retries are
-  caller policy. One-shot errors are consumed. In-process output is not physical
-  delivery. Finite models prove only their frozen domains. Hosted stable tools
-  and images float; local reviews and conditional probes remain outside CI.
+  Copied context identity is not authenticated, persistent or origin-checked.
+  Logical queue counts do not bound process memory, callback allocation or time.
+- Cell/RefCell sharing is serial mission policy. Busy/full diagnostics are
+  terminal work failures in this fixture; recording before an effect is not
+  atomic delivery. This fixture uses a separate report queue for framework
+  failure wrappers.
+- Panics/hangs and allocation exhaustion are uncontained. Cooperative inbox
+  cleanup does not prove external cleanup. Event saturation can omit records;
+  retries remain caller policy. One-shot errors are consumed. In-process output
+  is not physical delivery. Finite models prove only their frozen domains.
+  Hosted tools/images float; manual reviews and conditional probes remain local.
 
 ## Important unresolved decisions
 
@@ -79,16 +76,15 @@ does not establish human review or operational suitability.
 
 ## Most likely next task
 
-After this checkpoint, assess a concrete ordinary-work event producer needing
-immediate saturation feedback before callback success, or another independently
-valuable capability. Use that need to decide whether a narrow service capability
-is justified; avoid another example or model without a concrete adoption gap.
+Assess a concrete consumer needing repeated work without rebuilding finite
+one-shot agendas. Compare explicit host re-arming with a narrow periodic
+scheduling policy before selecting any API change; preserve the current one-shot
+contract and avoid a generic executor or model without a demonstrated need.
 
 ## Latest run
 
-2026-10-22: initial safety, remote and exact input hosted checks pass. The full
-locked local baseline passes. Root and independent consumer_need assess the
-ordinary-work output gap; requirement and ADR precede source. Implementation,
-full local and independent-package verification pass. Source/consumer/baseline
-review passes. Source publication and exact-checkpoint hosted evidence pass.
-The evidence follow-up receives its own document/diff and exact hosted review.
+2026-10-24: resumed preserved unfinished identity work, corrected formatting and
+queue-borrow guidance, and completed public-only consumer tests. Initial/final
+locked baseline and actual identity/composition independent packages pass.
+Complete autonomous review passes; publication and exact hosted inspection
+are in progress.

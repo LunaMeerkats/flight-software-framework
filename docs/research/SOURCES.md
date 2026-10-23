@@ -13,6 +13,25 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-WORK-IDENTITY — Checked mission-owned diagnostic services
+
+- Titles: RefCell, especially try_borrow_mut; Cell
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/cell/struct.RefCell.html#method.try_borrow_mut>
+  and <https://doc.rust-lang.org/std/cell/struct.Cell.html>
+- Version: official standard-library 1.99.1 documentation, accessed 2026-10-23
+  and rechecked 2026-10-24;
+  local checks remain on Rust/Cargo 1.98.0.
+- Informed: RefCell checks borrowing dynamically; try_borrow_mut returns an error
+  on conflicting borrows instead of panicking. Cell permits copied observations
+  and controlled clock values through shared references. Neither is Sync.
+- Local treatment: use these types only in the public-API identity consumer's
+  explicit serial mission policy. A busy or full event queue returns a typed
+  work error before the demonstrated effect. The runtime supplies the selected
+  identity through its existing work context under ADR-0029. Reject treating
+  interior mutability as synchronization, source authentication or atomic
+  event/effect delivery. No new dependency or upstream implementation is reused.
+
 ## SRC-RUST-WORK-OUTPUT — Bounded caller-owned ordinary-work staging
 
 - Titles: Cell; Cargo targets — Examples

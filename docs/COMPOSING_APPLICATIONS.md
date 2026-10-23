@@ -43,7 +43,8 @@ to the caller and outlive the runtime.
 The wrapper is mission code: it chooses this application's set, shared topic
 enum and one-byte payload bound. Its applications communicate through the
 message context, without calling each other. Only message callbacks receive
-publication access; ordinary work currently receives configuration only.
+publication access; ordinary work receives immutable configuration and its
+runtime-local identity through `ApplicationWorkContext::application_id()`.
 
 Distinct associated error types need a common mission vocabulary. The
 `MissionError` variants wrap each concrete message error, and `Error::source`

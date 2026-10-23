@@ -238,3 +238,22 @@ value and healthy peer progress. Scheduled attempts shall retain the existing
 one-shot consumption contract. Guidance shall distinguish this frozen
 single-subscriber retry policy from general fan-out, transactional delivery,
 automatic recovery, external adoption and physical I/O.
+
+### RFF-LIB-REQ-004 — Runtime-issued ordinary-work identity
+
+Revision 1 (2026-10-23). Every invoked ordinary-work callback shall receive the
+selected runtime-local `ApplicationId` through `ApplicationWorkContext`, alongside
+the existing optional immutable configuration view. Applications shall not need
+post-registration identity injection to attribute their own structured events.
+Direct work, messaging-owned work, their failure-event wrappers and both finite
+scheduled-work paths shall expose the same selected identity. Rejected work shall
+invoke no callback. In-place stop/restart shall retain that identity.
+
+Acceptance: public-API tests shall use the context identity as an event source,
+distinguish two applications, retain configuration visibility, and cover each work
+entry path. A producer shall observe caller-owned event-queue saturation inside
+its callback before committing its demonstrated effect; typed failure shall
+retain older events and allow peer progress. Verify the identical consumer tests
+in an independent path-dependent Cargo package. Identity remains runtime-local,
+not authenticated or globally unique; event ownership, clock origin and saturation
+policy remain explicit mission responsibilities.

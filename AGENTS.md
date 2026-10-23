@@ -109,6 +109,9 @@ translate NASA C source.
   with a capacity-one pending slot and explicit host transfer to one subscriber.
   Its test-enabled target and independent-package recipe verify this mission
   policy, including saturation retry; it adds no ordinary-work service context.
+- `tests/work_identity.rs`: public-only diagnostic consumer and context-identity
+  integration evidence across every ordinary-work entry path. Its guide verifies
+  identical tests in an independent Cargo package without another example target.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -185,6 +188,13 @@ recipe in [its guide](docs/ORDINARY_WORK_OUTPUT.md). Check, lint, test and run t
 identical source, inspect metadata and compare hashes. Record the package path
 and exact results in the focused work-output record. Its explicit retry policy
 requires exactly one subscriber and does not support partial fan-out retries.
+
+When changing ordinary-work identity or its consumer guidance, run
+`cargo test --locked --test work_identity`, then follow the independent-package
+recipe in [the identity guide](docs/APPLICATION_WORK_IDENTITY.md). Check, lint
+and test the identical test source; inspect metadata and compare SHA256 hashes.
+Record the actual package path and results in the focused identity review.
+This verifies the controlled consumer, not general adoption or identity origin.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

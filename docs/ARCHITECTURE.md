@@ -155,8 +155,9 @@ does not mutate peer records or prevent subsequent peer work. A complete
 two-application lifecycle integration test now verifies RFF-REQ-002. The
 runtime has no automatic dispatch or general service context. The private host
 sample composes its existing caller-selected operations as described below.
-Its ordinary lifecycle/work operations emit no events; the opt-in returned-work
-operations below provide failure reporting.
+The runtime emits no automatic events during ordinary lifecycle/work;
+applications can perform injected mission effects. The opt-in returned-work
+operations below provide framework failure reporting.
 
 `MessageBus<Topic, MAX_PAYLOAD_BYTES>` remains a standalone available-endpoint
 routing core. It copies a caller-supplied contiguous-prefix application
@@ -332,6 +333,15 @@ Retained retry is explicit mission policy; partial fan-out could duplicate
 deliveries and is outside this recipe. Immediate callback feedback remains a
 concrete trigger for reconsidering a narrow work service capability.
 
+[ADR-0029](adr/0029-ordinary-work-identity.md) supplies the selected runtime-local
+identity through the existing ordinary-work context. A diagnostic producer can
+attribute its own event without post-registration identity wiring. The
+[public-only consumer](APPLICATION_WORK_IDENTITY.md) borrows mission-owned
+services, checks event acceptance before its demonstrated effect, and uses
+separate application and framework failure-report queues. This is explicit
+serial mission policy; the context grants no event service, source
+authentication, cross-runtime identity provenance or event/effect transaction.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical
@@ -355,8 +365,9 @@ sample and separate contexts are revisable choices, not a permanent scope limit.
 
 ## Major technical risks
 
-- The pre-v0.1 application surface has separate narrow contexts: ordinary work
-  sees optional configuration, while message dispatch sees publication only.
+- The provisional application surface has separate narrow contexts: ordinary
+  work sees runtime-local identity and optional configuration, while message
+  dispatch sees runtime-local identity and publication.
   Lifecycle callbacks remain context-free. The opt-in failure-event methods
   borrow services for one ordinary work operation but provide no general
   application service-context shape. A later shared context could still cause

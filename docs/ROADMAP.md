@@ -65,6 +65,15 @@ Revisit service access
 when a consumer needs acceptance feedback inside its work callback or ordering
 that explicit host mediation cannot express coherently.
 
+The fourth selected increment supplies
+[runtime-issued ordinary-work identity](APPLICATION_WORK_IDENTITY.md), under
+RFF-LIB-REQ-004 and [ADR-0029](adr/0029-ordinary-work-identity.md). A public-only
+diagnostic consumer uses checked mission-owned services and the selected ID to
+attribute events before committing its effect. All work owners retain one
+context-construction path. The [focused record](verification/WORK_IDENTITY_REVIEW.md)
+separates local and independent-package evidence, autonomous review and hosted
+results. No new framework service, queue owner or maintained example is needed.
+
 ## Stage 0 — Foundation and responsibility checkpoint
 
 Status: **Complete (2026-08-05)**

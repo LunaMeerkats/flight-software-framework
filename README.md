@@ -40,6 +40,10 @@ validated configuration, a finite schedule and explicit bounded host transfer:
 cargo run --locked --example work_output
 ```
 
+[Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
+the selected runtime-local identity from `ApplicationWorkContext`. The public-API
+consumer tests demonstrate immediate feedback from a caller-owned event queue.
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the

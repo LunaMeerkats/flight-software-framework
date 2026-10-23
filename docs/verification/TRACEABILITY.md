@@ -1,5 +1,23 @@
 # Verification traceability
 
+## Stage 5 runtime-issued work identity — 2026-10-24
+
+RFF-LIB-REQ-004 revision 1 and
+[ADR-0029](../adr/0029-ordinary-work-identity.md) add the selected runtime-local
+identity to the existing ordinary-work context. The
+[guide](../APPLICATION_WORK_IDENTITY.md) explains checked caller-owned event
+services, explicit saturation/busy policies and identity scope. Exact source,
+commands, consumer metadata and actual reviews are in
+[WORK_IDENTITY_REVIEW.md](WORK_IDENTITY_REVIEW.md).
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-004 | Read-only context identity populated by Runtime::work, shared by every existing owner; public-only diagnostic consumer | `direct_work_retains_identity_configuration_and_lifecycle_suppression`; `unconfigured_work_exposes_both_selected_identities_without_a_configuration`; `messaging_work_keeps_both_inboxes_and_restart_retains_the_selected_identity`; `checked_busy_queue_preserves_records_and_returns_the_selected_typed_error`; `direct_failure_event_wrapper_preserves_full_queue_error_and_peer_progress`; `messaging_failure_event_wrapper_clears_only_the_selected_inbox`; `direct_schedule_issues_both_identities_only_when_each_item_is_due`; `messaging_schedule_retains_fault_identity_and_allows_the_queued_peer_to_progress`; identical independent consumer check/Clippy/test/metadata/hash | Local baseline passes 176 workspace/eight focused/eight independent tests; source hash and metadata match; root and independent Codex complete review accepts; publication and exact hosted inspection pending |
+
+Existing requirement meanings and exact-domain evidence remain unchanged.
+This does not establish source authentication, origin-checked identities,
+transactional event/effect delivery, external adoption or API stability.
+
 ## Stage 5 ordinary-work output — 2026-10-22
 
 RFF-LIB-REQ-003 revision 1 and

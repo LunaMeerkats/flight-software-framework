@@ -2,9 +2,10 @@
 //!
 //! This module adds synchronous start, caller-selected work, stop, and in-place
 //! restart boundaries over the LC1 lifecycle vocabulary. Ordinary work receives
-//! one narrow immutable view of optional runtime-owned configuration. This
-//! module deliberately omits automatic dispatch, a general service context,
-//! factories, threads, executors, panic containment, and recovery policy.
+//! its runtime-local identity and one narrow immutable view of optional
+//! runtime-owned configuration. This module deliberately omits automatic
+//! dispatch, a general service context, factories, threads, executors, panic
+//! containment, and recovery policy.
 
 use std::convert::Infallible;
 use std::error::Error;
@@ -43,31 +44,52 @@ impl<'a> ApplicationConfigurationView<'a> {
 
 /// Framework access available during one ordinary application work callback.
 ///
+/// The identity names the selected record in the runtime that invoked work and
+/// remains unchanged across that record's in-place stop/restart cycle. It is
+/// neither globally unique nor an authenticated identity.
+///
 /// Configuration is absent when the runtime was constructed with
 /// [`Runtime::new`]. This context exposes no activation, rollback, lifecycle,
 /// nested-work, clock, event, or messaging capability.
 #[derive(Debug)]
 pub struct ApplicationWorkContext<'a> {
+    application_id: ApplicationId,
     configuration: Option<ApplicationConfigurationView<'a>>,
 }
 
 impl<'a> ApplicationWorkContext<'a> {
+    /// Returns the invoking application's runtime-local identity.
+    ///
+    /// Scope the returned key to the runtime that issued it. Equal-position
+    /// keys from separate runtimes can compare equal; the key provides no
+    /// authentication or persistent mission identity.
+    #[must_use]
+    pub const fn application_id(&self) -> ApplicationId {
+        self.application_id
+    }
+
     /// Returns the active immutable configuration view, when one is owned.
     #[must_use]
     pub const fn configuration(&self) -> Option<ApplicationConfigurationView<'a>> {
         self.configuration
     }
 
-    const fn new(configuration: Option<ApplicationConfigurationView<'a>>) -> Self {
-        Self { configuration }
+    const fn new(
+        application_id: ApplicationId,
+        configuration: Option<ApplicationConfigurationView<'a>>,
+    ) -> Self {
+        Self {
+            application_id,
+            configuration,
+        }
     }
 }
 
 /// The lifecycle and work behavior currently required by the owned runtime.
 ///
 /// The runtime invokes these methods synchronously and starts no hidden work.
-/// Only ordinary work receives a narrow configuration context. Broader service
-/// and recovery behaviors remain deliberately absent.
+/// Only ordinary work receives its identity and a narrow configuration
+/// context. Broader service and recovery behaviors remain deliberately absent.
 pub trait Application {
     /// The concrete error returned by this application's start operation.
     type StartError: Error + 'static;
@@ -690,7 +712,7 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
                 bytes: snapshot.bytes(),
             }
         });
-        let context = ApplicationWorkContext::new(configuration);
+        let context = ApplicationWorkContext::new(application_id, configuration);
 
         match invoke_running_record(records, application_id, |application| {
             application.work(context)?;
