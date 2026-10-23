@@ -515,3 +515,30 @@ are separate local evidence; hosted workspace tests execute the shared example
 source. No workflow, runtime API, dependency or licence change is introduced.
 This documentation-only evidence follow-up receives its own review and exact
 hosted inspection; no later revision inherits an unobserved pass.
+
+## Runtime-issued ordinary-work identity checkpoint — 2026-10-24
+
+[ADR-0029](../adr/0029-ordinary-work-identity.md) adds a read-only selected
+identity to the existing work context. Eight public-only diagnostic consumer
+tests run in the unchanged workspace command. The
+[focused review](WORK_IDENTITY_REVIEW.md) records actual independent consumer
+commands, source hashes, ownership/error scope, complete Codex review and limits.
+
+Checkpoint `b3ebba331e73d2d4b46189accfc75e9ef9a6281b` passes exact
+[push run 39959273438](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39959273438)
+at its logged checkout, Windows job 120432846468 and all 20 steps. Raw logs
+confirm 176 workspace tests including all eight new tests, separate 14 adapter/
+five sample tests, warnings-denied rustdoc, both whitespace checks and the
+222-line sample report exactly matching input run 39606324526. External-package
+check/Clippy/test and metadata/hash inspection remain separate local evidence.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.0
+match input. Windows image changes from 20261018.275.1 to 20261021.278.1 under
+windows-2025-vs2026. Source/configuration review retains existing policy across
+47 Rust files, 19,499 physical/1,176 comment-only lines, no width findings and
+three unchanged fulfilled expectations. Local tools remain Rust/Cargo 1.98.0,
+rustfmt 1.9.0-stable and Clippy 0.1.98; no local hosted-toolchain pass is claimed.
+Root and independent context_review inspect exact hosted evidence and unchanged
+reviewed source identities. This six-document evidence follow-up preserves
+source, manifest, lockfile, licences and workflow, receives complete document/
+diff review and its own exact hosted inspection, and inherits no unobserved pass.

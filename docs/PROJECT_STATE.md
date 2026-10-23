@@ -26,9 +26,14 @@ Package 0.0.0 remains unpublished and APIs provisional.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
   runner 2.338.0/windows-2025-vs2026 image 20261018.275.1. Local results do not
-  claim execution on the hosted toolchain. New hosted evidence remains pending.
+  claim execution on the hosted toolchain.
   Actual commands, source identities and limitations are in
   [the focused record](verification/WORK_IDENTITY_REVIEW.md).
+- Published checkpoint b3ebba331e73d2d4b46189accfc75e9ef9a6281b passes exact
+  hosted run 39959273438/job 120432846468: all 20 steps, 176 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
+  unchanged 222-line sample. Hosted tools/runner match input; image is
+  20261021.278.1. Whole-tree source and configuration policy remains unchanged.
 
 ## Current architecture
 
@@ -43,11 +48,12 @@ dependency, maintained crate, workflow or lint exception is introduced.
 
 ## Work in progress
 
-The unfinished 2026-10-23 item is implemented and locally verified. Root Codex
-and independent context_review accept the complete staged source/document/diff,
-baseline, rendered and independent consumer evidence with no findings. Authorized
-source publication with exact hosted inspection is in progress. No broader service
-or scheduling capability is started in this run.
+The unfinished 2026-10-23 item is complete. Root Codex and independent
+context_review accept complete source/document/diff, baseline, rendered and
+independent consumer evidence with no findings. Source publication and exact
+checkpoint hosted inspection pass. No unfinished implementation remains. The
+documentation-only evidence follow-up receives its own review and exact hosted
+inspection. No broader service or scheduling capability is started in this run.
 
 ## Highest risks and uncertainties
 
@@ -86,5 +92,6 @@ contract and avoid a generic executor or model without a demonstrated need.
 2026-10-24: resumed preserved unfinished identity work, corrected formatting and
 queue-borrow guidance, and completed public-only consumer tests. Initial/final
 locked baseline and actual identity/composition independent packages pass.
-Complete autonomous review passes; publication and exact hosted inspection
-are in progress.
+Complete autonomous review, ordinary source publication and exact checkpoint
+hosted inspection pass. Evidence follow-up receives its own document/diff and
+exact hosted review; no unrelated work is begun.

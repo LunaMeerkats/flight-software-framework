@@ -1,7 +1,7 @@
 # Runtime-issued ordinary-work identity review
 
 Date: **2026-10-24**
-Status: **Local consumer verification and autonomous review complete**
+Status: **Complete: consumer/review and exact published checkpoint CI passed**
 
 ## Objective and input
 
@@ -139,8 +139,8 @@ current-library evidence, separate from its original checkpoint.
 
 ## Autonomous review and publication
 
-Whole-tree review covers 47 Rust files, 19,499 physical/1,176 comment-only lines,
-zero width findings and three unchanged fulfilled application-runtime
+Implementation-checkpoint review covers 47 Rust files, 19,499 physical/1,176
+comment-only lines, zero width findings and three unchanged fulfilled application-runtime
 expectations. All 470 relative links in 85 Markdown files and 140 exact mapped
 test names resolve. Thirteen changed rendered Markdown documents pass full
 text, heading, code-block, table, link and HTML-structure inspection. This is
@@ -161,6 +161,34 @@ active composition documentation's stale configuration-only description.
 
 Root and independent context_review accept the complete 15-file staged
 source/document/diff and actual baseline/consumer/rendered evidence with no
-outstanding findings. Source hashes remain unchanged. Ordinary source
-publication and exact hosted inspection remain pending; no new hosted result
-is inferred from the input checkpoint.
+outstanding findings. Source hashes remain unchanged. The committed diff is
+compared with the reviewed staged diff and matches. Ordinary fast-forward
+publication follows refreshed origin ancestry; local HEAD, origin/codex/nightly
+and the live remote head match the checkpoint with a clean working tree.
+
+## Publication and exact hosted evidence
+
+Published checkpoint: `b3ebba331e73d2d4b46189accfc75e9ef9a6281b`.
+[Push run 39959273438](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/39959273438)
+passes at that exact logged checkout. Windows job 120432846468 completes all
+20 steps successfully. Raw metadata/log inspection confirms 176 workspace tests,
+including all eight new tests, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and an exactly unchanged
+222-line sample report compared with input run 39606324526. Independent-package
+execution and metadata/hash checks are local evidence; hosted workspace tests
+exercise the identical diagnostic test source without the external package.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.0
+match input. Windows image changes from 20261018.275.1 to 20261021.278.1 under
+windows-2025-vs2026. Local execution remains on 1.98.0. Existing source-form
+policy/configuration remains unchanged after full-tree review. Root and
+independent context_review separately inspect exact hosted evidence and source
+identity; Codex review does not establish independent human acceptance.
+
+This six-document evidence follow-up preserves source, manifests, lockfile,
+licences and workflow. It receives its own complete document/diff review and
+exact hosted inspection; no later revision inherits an unobserved hosted pass.
+Its refreshed review covers all fourteen run-changed rendered documents,
+472 resolving relative links and the unchanged source/test inventory.
+No further capability is started in this run. The consumer and API remain
+experimental, with the scope and qualification limits recorded above.

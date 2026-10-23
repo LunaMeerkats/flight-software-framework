@@ -1,7 +1,7 @@
 # Bounded plan: runtime-issued ordinary-work identity
 
 Date: **2026-10-24** (continuing the unfinished 2026-10-23 item)
-Status: **Verified and reviewed locally; source publication pending**
+Status: **Complete: verified, reviewed, published and exact checkpoint CI passed**
 
 ## Objective and context
 
@@ -56,7 +56,7 @@ push and exact hosted inspection. If verification cannot pass, remove only this
 run's implementation edits while preserving useful decisions and the blocker.
 Do not start broader event-capability or service-context work in this run.
 
-## Result to date
+## Results
 
 All acceptance behavior is implemented. Full locked local baseline passes 176
 workspace tests; focused and identical-source independent tests each pass eight.
@@ -64,5 +64,11 @@ Metadata, hashes, full-tree source widths, relative links, exact test mappings,
 thirteen rendered documents and generated context API documentation pass review.
 The required composition-guide refresh passes its unchanged independent recipe.
 Root and independent context_review accept the complete staged source/document/
-diff and actual consumer/baseline/rendered evidence with no findings. Source
-publication and exact hosted inspection remain pending.
+diff and actual consumer/baseline/rendered evidence with no findings. Ordinary
+fast-forward publishes b3ebba331e73d2d4b46189accfc75e9ef9a6281b. Exact hosted
+run 39959273438/job 120432846468 passes all 20 steps, 176 workspace tests,
+separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
+unchanged 222-line sample. Hosted tools/runner match input; Windows image is
+20261021.278.1. This documentation-only evidence follow-up preserves source,
+manifests and workflow and receives its own review and exact hosted inspection.
+Stop after this completed identity checkpoint.

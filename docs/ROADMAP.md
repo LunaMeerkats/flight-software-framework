@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; three public-API consumers verified locally and in hosted CI**
+Status: **Active; three examples and ordinary-work identity verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -72,7 +72,11 @@ diagnostic consumer uses checked mission-owned services and the selected ID to
 attribute events before committing its effect. All work owners retain one
 context-construction path. The [focused record](verification/WORK_IDENTITY_REVIEW.md)
 separates local and independent-package evidence, autonomous review and hosted
-results. No new framework service, queue owner or maintained example is needed.
+results. Checkpoint b3ebba331e73d2d4b46189accfc75e9ef9a6281b passes exact hosted
+run 39959273438, all 20 steps and 176 workspace tests including eight diagnostic
+consumer regressions. Local identical-source consumer tests and complete
+root/independent Codex review pass. No new framework service, queue owner or
+maintained example is needed.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 
