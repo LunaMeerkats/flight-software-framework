@@ -257,3 +257,26 @@ retain older events and allow peer progress. Verify the identical consumer tests
 in an independent path-dependent Cargo package. Identity remains runtime-local,
 not authenticated or globally unique; event ownership, clock origin and saturation
 policy remain explicit mission responsibilities.
+
+### RFF-LIB-REQ-005 — Bounded recurring work releases
+
+Revision 1 (2026-10-25). A host-owned periodic release cursor shall retain one
+application, a positive interval and at most one next release without agenda
+allocation or growth. Each caller poll shall observe the injected clock once
+when active, return Waiting without mutation before the release, or consume one
+due release and re-arm at observed time plus interval. Delayed polls shall
+coalesce missed intervals rather than accumulate a catch-up backlog. Overflow
+shall still release the valid due item and explicitly exhaust the cursor.
+Exhausted polls shall not read the clock.
+
+Acceptance: public-API tests shall cover zero-interval rejection, exact and
+overdue release, subsecond arithmetic, repeated same-time polls, final release
+at arithmetic exhaustion and repeatable manual-time replay. A public-only
+consumer shall explicitly delegate released work through the existing direct
+and messaging owners, retaining identity/configuration, lifecycle rejection,
+typed work failure, exact selected-inbox clearing and healthy peer progress.
+The identical tests shall pass in an independent path-dependent Cargo package.
+Guidance shall distinguish release from callback execution, host-selected error
+and timer-disposal policy, observation-based delay from phase/completion timing,
+and logical storage from process-memory or real-time guarantees. Existing
+one-shot scheduling requirements and APIs retain their meaning.

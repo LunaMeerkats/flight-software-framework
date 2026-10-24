@@ -60,6 +60,8 @@ translate NASA C source.
   queue, reporting after owner-specific lifecycle commitment and inbox cleanup.
   Direct and messaging-owned schedules share one private clock/consumption
   decision and delegate ordinary work through their respective owners.
+  `src/scheduling/periodic.rs` owns one inline host-polled recurring release
+  cursor; it supplies items without invoking or wrapping either work owner.
 - `tests/`: public-API lifecycle, runtime, routing, runtime-messaging and
   finite standalone publication/dequeue reference-model sequence tests; a
   reduced runtime-owned publication/stop/restart history model with passive
@@ -112,6 +114,9 @@ translate NASA C source.
 - `tests/work_identity.rs`: public-only diagnostic consumer and context-identity
   integration evidence across every ordinary-work entry path. Its guide verifies
   identical tests in an independent Cargo package without another example target.
+- `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
+  evidence. Its guide verifies identical tests in an independent Cargo package;
+  host delegation preserves each existing owner's lifecycle and cleanup boundary.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -195,6 +200,13 @@ recipe in [the identity guide](docs/APPLICATION_WORK_IDENTITY.md). Check, lint
 and test the identical test source; inspect metadata and compare SHA256 hashes.
 Record the actual package path and results in the focused identity review.
 This verifies the controlled consumer, not general adoption or identity origin.
+
+When changing periodic releases or their consumer guidance, run
+`cargo test --locked --test periodic_work`, then follow the independent-package
+recipe in [the periodic-work guide](docs/PERIODIC_WORK.md). Check, lint and test
+the identical test source, inspect metadata and compare SHA256 hashes. Record
+the actual package path/results in the focused periodic-work review. A released
+item is not evidence that the host invoked or completed its callback.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

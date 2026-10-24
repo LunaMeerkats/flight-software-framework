@@ -1,9 +1,15 @@
-//! Finite caller-driven scheduling of owned application work.
+//! Caller-driven one-shot scheduling and recurring work releases.
 //!
-//! A schedule is an immutable, one-shot agenda ordered by elapsed framework
-//! instants. Each runtime call observes an injected clock and attempts at most
-//! one due item. This module adds no periodic generation, automatic draining,
-//! wall-clock access, concurrency, or execution-time guarantee.
+//! A [`WorkSchedule`] is an immutable, one-shot agenda ordered by elapsed
+//! framework instants. Each runtime call observes an injected clock and
+//! attempts at most one due item. [`PeriodicWork`] releases one recurring item
+//! for explicit host execution and re-arms from observed time. Neither path
+//! adds automatic draining, wall-clock access, concurrency or an execution-time
+//! guarantee.
+
+mod periodic;
+
+pub use periodic::{PeriodicWork, PeriodicWorkCreateError, PeriodicWorkOutcome};
 
 use std::error::Error;
 use std::fmt;

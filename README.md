@@ -44,6 +44,10 @@ cargo run --locked --example work_output
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.
 
+[Release repeated ordinary work](docs/PERIODIC_WORK.md) using an inline
+host-owned cursor, positive interval and explicit late-poll/overflow policy.
+The host delegates each chosen release to the existing work owner.
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the
@@ -297,7 +301,7 @@ capacity-one self-publication, per-dispatch availability refresh, and exact
 selected-queue clearing after a returned message error. The runtime still has
 no automatic or batch dispatch. The private combined sample now composes these
 services with a fixed caller-driven scenario.
-Periodic scheduling, application-authored events, other
+Runtime-owned periodic execution, application-authored event services, other
 callback event paths, and application configuration access outside ordinary
 work remain unimplemented.
 The private `host-echo` example preserves ADR-0019's two-byte validated echo

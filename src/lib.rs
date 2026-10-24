@@ -18,6 +18,10 @@ mission-owned enum delegation, typed errors and bounded peer publication.
 show configured ordinary work staging a bounded output for explicit host
 publication and retry to one subscriber, including finite scheduled work.
 
+`docs/PERIODIC_WORK.md` shows a host-owned recurring release cursor composed
+with the existing direct and messaging work boundaries. Polling releases at
+most one item; the host explicitly invokes work and chooses error policy.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are
@@ -66,5 +70,6 @@ pub use runtime::{
 };
 pub use runtime_events::{FailureEventAttempt, RuntimeWorkEventError};
 pub use scheduling::{
-    ScheduledWork, ScheduledWorkError, ScheduledWorkOutcome, WorkSchedule, WorkScheduleCreateError,
+    PeriodicWork, PeriodicWorkCreateError, PeriodicWorkOutcome, ScheduledWork, ScheduledWorkError,
+    ScheduledWorkOutcome, WorkSchedule, WorkScheduleCreateError,
 };

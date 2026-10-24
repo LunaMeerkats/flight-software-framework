@@ -252,7 +252,7 @@ registration position. The runtime-event integration plus existing bounded
 queue evidence verifies RFF-REQ-005 and RFF-REQ-008 for opt-in direct and
 messaging-owned cooperative ordinary-work errors. There is still no automatic
 or batch message dispatch,
-periodic or dynamic work generation, multi-application fairness policy,
+runtime-owned periodic or dynamic work generation, multi-application fairness policy,
 application-authored event API, other callback
 event path, or host event drain adapter.
 
@@ -342,6 +342,23 @@ separate application and framework failure-report queues. This is explicit
 serial mission policy; the context grants no event service, source
 authentication, cross-runtime identity provenance or event/effect transaction.
 
+## Host-owned recurring releases
+
+PeriodicWork under [ADR-0030](adr/0030-host-owned-periodic-releases.md) is a
+standalone inline cursor, separate from the finite one-shot agenda. It retains
+one optional ScheduledWork and a positive interval, returning at most one item
+per injected-clock poll. Late polls coalesce without backlog and re-arm from
+the observed instant. Checked addition overflow releases the valid final item
+with explicit exhaustion. It allocates no storage and invokes no application.
+
+The host delegates selected releases to Runtime::work or MessagingRuntime::work,
+preserving their existing identity/configuration and cleanup boundaries. Release
+and execution are separate: dropping an item, disposing a timer after error,
+polling order and output drain remain host policy. No periodic execution wrapper,
+automatic retry, fixed phase, fairness or deadline guarantee is added. The
+[consumer guide](PERIODIC_WORK.md) and
+[focused review](verification/PERIODIC_WORK_REVIEW.md) record actual evidence.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical
@@ -392,9 +409,9 @@ sample and separate contexts are revisable choices, not a permanent scope limit.
   leaves a caller-owned event copy outside the queue's retained-record bound.
   The messaging-owned path also finishes selected-inbox clearing before that
   observation. Message dispatch and scheduled work do not emit failure events.
-- A work schedule cannot detect an identity from another same-shaped runtime or
-  an instant from another clock origin. It retains consumed one-shot items until
-  drop, has no periodic or reconfiguration policy, and schedules ordinary work
+- The finite WorkSchedule cannot detect an identity from another same-shaped
+  runtime or an instant from another clock origin. It retains consumed items until
+  drop, has no recurrence or reconfiguration policy, and schedules ordinary work
   only. Each owner retains its own work behavior; the messaging owner preserves
   exact selected-inbox clearing.
 - Direct standalone routing-core construction can still be paired with a

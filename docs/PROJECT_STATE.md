@@ -1,97 +1,86 @@
 # Project state
 
-Last updated: **2026-10-24**
+Last updated: **2026-10-25**
 
 ## Current milestone
 
 Reviewed experimental serial host v0.1 remains the regression baseline. Stage 5
-advances practical library use under ADR-0025. Three public-only example consumers
-remain verified. RFF-LIB-REQ-004 now adds runtime-issued ordinary-work identity
-with public-only diagnostic consumer tests and independent-package evidence.
+advances practical library use under ADR-0025. Three public-only examples and
+runtime-issued ordinary-work identity remain verified. RFF-LIB-REQ-005 now adds
+host-owned periodic releases with ten public-only consumer regressions.
 Package 0.0.0 remains unpublished and APIs provisional.
 
 ## Verified baseline
 
-- Input HEAD a9afb328905eb2d413a868bc7e0371a06b5c6c20 matches refreshed origin.
-  Exact input run 39606324526/job 119243331220 passes all 20 steps, 168 workspace
-  tests, separate 14 adapter/five sample tests and the 222-line sample report.
-  Prior unfinished requirement/ADR/guide/source changes are preserved.
-- The unfinished source's initial formatting failure is corrected. Fresh locked
-  initial/final format/check/Clippy/test and warnings-denied rustdoc pass with
-  168/176 workspace tests. Eight focused and eight identical-source independent
-  consumer tests pass. Metadata confirms one independent workspace member, two
-  graph packages and the sole library path dependency; source bytes/hashes match.
-- The composition guide's identity correction passes four focused and four
-  independent tests, check/Clippy/run, metadata and source/output comparison.
+- Clean input 86d82c9b336ba013f7e460fc309a6fb8fcfe08b6 matches refreshed
+  origin/codex/nightly. Exact input run 39959863270/job 120434842528 passes
+  all 20 steps; live metadata/steps/logs are inspected again.
+- Initial locked format/check/Clippy/test and warnings-denied rustdoc pass all
+  176 workspace tests; working-tree and committed-tip whitespace checks pass.
+- Final locked baseline passes 186 workspace tests. Ten focused and ten identical
+  independent-package tests pass, along with check/Clippy, actual metadata and
+  matching source hashes. Full-tree widths, links and rendered-document review
+  pass; root and independent Codex complete review accepts with no findings.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
-  runner 2.338.0/windows-2025-vs2026 image 20261018.275.1. Local results do not
-  claim execution on the hosted toolchain.
-  Actual commands, source identities and limitations are in
-  [the focused record](verification/WORK_IDENTITY_REVIEW.md).
-- Published checkpoint b3ebba331e73d2d4b46189accfc75e9ef9a6281b passes exact
-  hosted run 39959273438/job 120432846468: all 20 steps, 176 workspace tests,
-  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and
-  unchanged 222-line sample. Hosted tools/runner match input; image is
-  20261021.278.1. Whole-tree source and configuration policy remains unchanged.
+  runner 2.338.0/windows-2025-vs2026 image 20261021.278.1. Local results do not
+  claim execution on that hosted toolchain. Actual results and limitations are
+  in [the focused record](verification/PERIODIC_WORK_REVIEW.md).
 
 ## Current architecture
 
 One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
-routing/dispatch, manual time and one-shot scheduling, bounded events and optional
-runtime configuration with immutable work visibility and one-use rollback.
-The ordinary-work context now exposes selected runtime-local identity alongside
-configuration, through one construction path shared by all work owners. The
-diagnostic consumer uses checked mission-owned services and separate diagnostic
-and framework failure-report queues. No new framework service owner, trait,
-dependency, maintained crate, workflow or lint exception is introduced.
+routing/dispatch, manual time, finite one-shot scheduling, bounded events and
+optional runtime configuration with immutable work visibility/one-use rollback.
+All ordinary work shares one selected-identity/context construction path.
+PeriodicWork adds a separate inline host-polled release cursor: one due item,
+observed-time re-arm, coalesced late polls and explicit overflow exhaustion.
+It executes no callback; the host delegates to the existing work owner.
 
 ## Work in progress
 
-The unfinished 2026-10-23 item is complete. Root Codex and independent
-context_review accept complete source/document/diff, baseline, rendered and
-independent consumer evidence with no findings. Source publication and exact
-checkpoint hosted inspection pass. No unfinished implementation remains. The
-documentation-only evidence follow-up receives its own review and exact hosted
-inspection. No broader service or scheduling capability is started in this run.
+RFF-LIB-REQ-005/ADR-0030 precede source changes. Production API and public-only
+consumer tests, final locked baseline and actual independent Cargo verification
+are complete. Root Codex and independent repeated_work_assessment accept the
+complete source/document/diff and actual evidence with no remaining findings.
+Authorized source publication and exact hosted inspection remain pending.
 
 ## Highest risks and uncertainties
 
-- Controlled consumers do not prove adoption, broad usability or API stability.
-  Immediate in-callback message publication feedback remains unprovided.
+- Controlled consumers do not prove external adoption, broad usability or API
+  stability. Immediate ordinary-work publication remains mission composition.
 - Application/clock origins and positional inbox pairing remain caller duties.
-  Copied context identity is not authenticated, persistent or origin-checked.
-  Logical queue counts do not bound process memory, callback allocation or time.
-- Cell/RefCell sharing is serial mission policy. Busy/full diagnostics are
-  terminal work failures in this fixture; recording before an effect is not
-  atomic delivery. This fixture uses a separate report queue for framework
-  failure wrappers.
-- Panics/hangs and allocation exhaustion are uncontained. Cooperative inbox
-  cleanup does not prove external cleanup. Event saturation can omit records;
-  retries remain caller policy. One-shot errors are consumed. In-process output
-  is not physical delivery. Finite models prove only their frozen domains.
-  Hosted tools/images float; manual reviews and conditional probes remain local.
+  Identity is not authenticated, persistent or origin-checked. Logical bounds
+  do not bound process memory, callback allocation or time.
+- Periodic release is not work execution. Future independent releases remain
+  after work errors until host disposal; phase/drift, polling order, output
+  drain and error policy are explicit host responsibilities. No fixed phase,
+  catch-up backlog, fairness or completion-time measurement is provided.
+- Panics/hangs and allocator exhaustion are uncontained. Cooperative cleanup
+  does not prove external cleanup. Event saturation can omit records; retries
+  remain caller policy. In-process output is not physical delivery. Finite
+  models prove their frozen domains. Hosted tools/images float; manual reviews
+  and conditional probes remain outside the CI job.
 
 ## Important unresolved decisions
 
-Major API freeze, significant unsafe code, runtime/code-generation/dependency/
-security decisions, platform commitments, identity/licences, tags/releases/crate
-publication and deployment retain separate gates. MSRV, broader service contexts,
-external I/O, hardware, RTOS and no_std remain undecided. Autonomous Codex review
-does not establish human review or operational suitability.
+Major API freeze, unsafe/runtime/code-generation/dependency/security decisions,
+platform commitments, identity/licences, tags/releases/crate publication and
+deployment retain separate gates. MSRV, broader service contexts, external I/O,
+hardware, RTOS and no_std remain undecided. Codex review does not establish
+human review or operational suitability.
 
 ## Most likely next task
 
-Assess a concrete consumer needing repeated work without rebuilding finite
-one-shot agendas. Compare explicit host re-arming with a narrow periodic
-scheduling policy before selecting any API change; preserve the current one-shot
-contract and avoid a generic executor or model without a demonstrated need.
+Reassess concrete consumer friction after this release-policy increment. A
+consumer needing safe explicit dispatch/recovery policy or bounded event
+filtering is a candidate; establish need before adding another abstraction or
+model. Fixed-phase/multi-timer execution needs separate consumer evidence.
 
 ## Latest run
 
-2026-10-24: resumed preserved unfinished identity work, corrected formatting and
-queue-borrow guidance, and completed public-only consumer tests. Initial/final
-locked baseline and actual identity/composition independent packages pass.
-Complete autonomous review, ordinary source publication and exact checkpoint
-hosted inspection pass. Evidence follow-up receives its own document/diff and
-exact hosted review; no unrelated work is begun.
+2026-10-25: selected a host-owned recurring release cursor after comparing host
+arithmetic, rebuilt agendas and execution wrappers. Requirement/ADR established
+before implementation; source and ten consumer regressions implemented. Full
+local/independent verification and complete autonomous review pass. Source
+publication and exact hosted inspection remain in progress.

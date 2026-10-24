@@ -1,5 +1,22 @@
 # Verification traceability
 
+## Stage 5 host-owned periodic releases — 2026-10-25
+
+RFF-LIB-REQ-005 revision 1 and
+[ADR-0030](../adr/0030-host-owned-periodic-releases.md) establish a one-item
+observed-time release cursor without changing the finite one-shot API. The
+[guide](../PERIODIC_WORK.md) explains explicit work delegation, late polls,
+overflow and host timer disposal. Exact source/consumer/actual review results
+are in [PERIODIC_WORK_REVIEW.md](PERIODIC_WORK_REVIEW.md).
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-005 | Inline PeriodicWork cursor and public-only direct/messaging producer | `construction_rejects_only_zero_interval_and_retains_the_first_item`; `future_polls_read_once_without_mutation_and_equality_releases_once`; `subsecond_release_adds_exactly_across_a_second_boundary`; `final_representable_release_exhausts_without_later_clock_reads`; `late_release_coalesces_backlog_and_regression_keeps_the_future_release`; `manual_time_replay_repeats_the_same_release_history`; `direct_owner_produces_bounded_output_with_identity_and_current_configuration`; `messaging_owner_preserves_successful_work_configuration_and_queued_messages`; `lifecycle_rejection_consumes_a_release_and_host_can_discard_the_next_one`; `returned_work_error_clears_only_selected_inbox_and_host_disposes_its_timer`; identical independent consumer check/Clippy/test/metadata/hash | Local verified: 186 workspace/ten focused/ten independent tests, matching source/metadata and source/document review; root/independent Codex complete review accepts; publication evidence pending |
+
+Release does not establish execution or completion. One-shot contracts and
+exact-domain evidence remain unchanged; no general timing or adoption claim is
+added.
+
 ## Stage 5 runtime-issued work identity — 2026-10-24
 
 RFF-LIB-REQ-004 revision 1 and

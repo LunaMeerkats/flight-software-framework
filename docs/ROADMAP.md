@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; three examples and ordinary-work identity verified**
+Status: **Active; periodic releases pass local and independent verification**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -77,6 +77,18 @@ run 39959273438, all 20 steps and 176 workspace tests including eight diagnostic
 consumer regressions. Local identical-source consumer tests and complete
 root/independent Codex review pass. No new framework service, queue owner or
 maintained example is needed.
+
+The fifth selected increment is [host-owned periodic releases](PERIODIC_WORK.md)
+under RFF-LIB-REQ-005 and [ADR-0030](adr/0030-host-owned-periodic-releases.md).
+One inline cursor supplies recurring work without rebuilding agendas. It
+coalesces late polls, re-arms from observed time and exposes arithmetic
+exhaustion after the final valid release. The host explicitly delegates chosen
+items to existing work owners. Public-only consumer tests, independent Cargo
+verification and actual autonomous/hosted results are recorded in
+[the focused review](verification/PERIODIC_WORK_REVIEW.md). The full locked
+baseline passes 186 tests and the identical independent consumer passes all ten
+new regressions. Root and independent Codex complete source/document/diff review
+accepts with no findings. Source publication and exact hosted evidence are pending.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

@@ -13,6 +13,24 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-PERIODIC-RELEASE — Checked recurring-release arithmetic
+
+- Titles: Duration, especially checked_add and is_zero
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/time/struct.Duration.html#method.checked_add>
+  and <https://doc.rust-lang.org/std/time/struct.Duration.html#method.is_zero>
+- Version: official standard-library 1.99.1 documentation, accessed 2026-10-25;
+  local checks remain on Rust/Cargo 1.98.0.
+- Informed: checked addition returns None on overflow; zero duration can be
+  tested without floating-point conversion. Duration retains seconds and
+  nanoseconds rather than requiring lossy scalar time conversion.
+- Local treatment: adopt checked observed-time-plus-interval arithmetic and
+  typed zero-interval rejection in PeriodicWork under ADR-0030. Release the valid
+  final item before explicit exhaustion. The observed-time re-arm/coalescing
+  policy is locally chosen, not prescribed by Rust or an upstream framework.
+  Reject saturating addition, hidden catch-up and new dependencies. No upstream
+  implementation is copied; no scheduling guarantee follows from these methods.
+
 ## SRC-RUST-WORK-IDENTITY — Checked mission-owned diagnostic services
 
 - Titles: RefCell, especially try_borrow_mut; Cell
