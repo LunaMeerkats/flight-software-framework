@@ -1,6 +1,6 @@
 # Project state
 
-Last updated: **2026-10-25**
+Last updated: **2026-10-26**
 
 ## Current milestone
 
@@ -21,6 +21,10 @@ Package 0.0.0 remains unpublished and APIs provisional.
   independent-package tests pass, along with check/Clippy, actual metadata and
   matching source hashes. Full-tree widths, links and rendered-document review
   pass; root and independent Codex complete review accepts with no findings.
+- Published checkpoint 53ac9cb7a41af36a6f123be884399562db2ee245 passes exact
+  hosted run 40097187490/job 120881785371: all 20 steps, 186 workspace tests,
+  separate 14 adapter/five sample tests, rustdoc, both whitespace checks and the
+  unchanged 222-line sample report. Tools/runner/image match the input below.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
   runner 2.338.0/windows-2025-vs2026 image 20261021.278.1. Local results do not
@@ -43,7 +47,11 @@ RFF-LIB-REQ-005/ADR-0030 precede source changes. Production API and public-only
 consumer tests, final locked baseline and actual independent Cargo verification
 are complete. Root Codex and independent repeated_work_assessment accept the
 complete source/document/diff and actual evidence with no remaining findings.
-Authorized source publication and exact hosted inspection remain pending.
+Source publication and exact checkpoint hosted inspection pass. No unfinished
+implementation remains. The six-document completion/evidence follow-up was
+preserved across an interrupted run. Fresh baseline and independent-consumer
+checks pass on resumption; its own review and exact hosted inspection complete
+this checkpoint without starting another capability.
 
 ## Highest risks and uncertainties
 
@@ -79,8 +87,10 @@ model. Fixed-phase/multi-timer execution needs separate consumer evidence.
 
 ## Latest run
 
-2026-10-25: selected a host-owned recurring release cursor after comparing host
-arithmetic, rebuilt agendas and execution wrappers. Requirement/ADR established
-before implementation; source and ten consumer regressions implemented. Full
-local/independent verification and complete autonomous review pass. Source
-publication and exact hosted inspection remain in progress.
+2026-10-26: resumed six preserved evidence documents at published 53ac9cb.
+Refreshed remote and exact implementation CI agree. Fresh full locked baseline
+passes 186 tests; focused and identical external-consumer tests pass ten each,
+with check/Clippy, actual metadata and matching hashes. Root Codex and independent
+periodic_review review this completion, including widths, links, rendered
+documents and the full diff. This documentation-only completion receives its own
+source publication and exact hosted inspection; no unrelated capability begins.

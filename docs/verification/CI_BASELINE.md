@@ -542,3 +542,32 @@ Root and independent context_review inspect exact hosted evidence and unchanged
 reviewed source identities. This six-document evidence follow-up preserves
 source, manifest, lockfile, licences and workflow, receives complete document/
 diff review and its own exact hosted inspection, and inherits no unobserved pass.
+
+## Host-owned periodic release checkpoint — 2026-10-25
+
+[ADR-0030](../adr/0030-host-owned-periodic-releases.md) adds an inline host-owned
+release cursor without modifying either ordinary-work owner or finite one-shot
+scheduling semantics. Ten public-only integration tests execute in the unchanged
+workspace command. The [focused review](PERIODIC_WORK_REVIEW.md) records actual
+independent-package commands, source hashes, Codex review and release/execution
+boundaries.
+
+Checkpoint `53ac9cb7a41af36a6f123be884399562db2ee245` passes exact
+[push run 40097187490](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40097187490)
+at its logged checkout, Windows job 120881785371 and all 20 steps. Raw logs
+confirm 186 workspace tests including all ten new regressions, separate 14
+adapter/five sample tests, warnings-denied rustdoc, both whitespace checks and
+the unchanged 222-line sample report compared with input run 39959863270.
+Connector job/step summaries agree; root and independent Codex inspect actual
+evidence and committed source identities. The controlled external consumer's
+check/Clippy/ten tests and metadata/hash inspection remain separate local evidence.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Configuration/whole-tree
+review retains existing policy across 49 Rust files, 20,260 physical and 1,241
+comment-only lines, no width findings and three unchanged fulfilled expectations.
+Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable/Clippy 0.1.98; no local
+hosted-toolchain execution is claimed. This six-document completion/evidence
+follow-up preserves source, manifests, lockfile, licences and workflow, receives
+complete document/diff review and its own exact hosted inspection, and inherits
+no unobserved pass.

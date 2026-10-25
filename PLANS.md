@@ -1,7 +1,7 @@
 # Bounded plan: host-owned periodic work releases
 
 Date: **2026-10-25** (run started before local midnight)
-Status: **Local verification and complete review passed; publication pending**
+Status: **Complete: verified, reviewed, published and checkpoint CI passed**
 
 ## Objective and context
 
@@ -61,5 +61,17 @@ independent package check/Clippy/metadata/source-hash inspection passes. Whole-t
 source widths/waivers, links and rendered-document content/structure review pass.
 Root Codex and independent repeated_work_assessment accept the complete 16-file
 source/document/diff and actual evidence with no remaining findings. The
-capacity-two inbox documentation correction is incorporated. Authorized source
-publication with exact hosted inspection remains pending.
+capacity-two inbox documentation correction is incorporated. Ordinary
+fast-forward publication of 53ac9cb7a41af36a6f123be884399562db2ee245 passes exact
+hosted run 40097187490/job 120881785371: all 20 steps, 186 workspace tests,
+separate 14 adapter/five sample tests, rustdoc, both whitespace checks and the
+unchanged 222-line sample. Hosted tools/runner/image match input. This
+six-document evidence follow-up changes no source/configuration and receives
+its own complete review and exact hosted inspection. No further capability is
+started; stop after this completed periodic-release checkpoint.
+
+Completion resumed **2026-10-26** at the published implementation with these six
+evidence documents preserved. A fresh locked baseline passes 186 tests; focused
+and identical external-consumer checks pass ten each. Root Codex and independent
+periodic_review recheck source identity, evidence, documents and the complete
+follow-up diff before its authorized publication and exact hosted inspection.

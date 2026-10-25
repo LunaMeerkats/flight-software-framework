@@ -1,7 +1,7 @@
 # Host-owned periodic work release review
 
 Date: **2026-10-25** (run started before local midnight)
-Status: **Local verification and complete review passed; publication pending**
+Status: **Complete: verified, reviewed, published and checkpoint CI passed**
 
 ## Objective and input
 
@@ -119,8 +119,8 @@ Whole-tree temporary review aids report 49 handwritten Rust files, 20,260
 physical lines, 1,241 comment-only lines and zero width findings. All three
 existing item-level expectations are unchanged and fulfilled under Clippy;
 no new lint, threshold, dependency, unsafe code or checker policy is introduced.
-88 Markdown files have 490 resolving relative links and all 150 exact
-traceability test references resolve uniquely. Twelve changed Markdown documents
+The implementation inventory covers 88 Markdown files, 490 resolving relative
+links and 150 uniquely resolving exact test references. Twelve changed documents
 are rendered and inspected for complete text, headings, code, tables, links and
 HTML structure. Generated public API text is also inspected. This is structural
 and content review, not pixel-level or human acceptance.
@@ -131,4 +131,66 @@ remaining findings. The capacity-two inbox documentation correction is
 incorporated. Independent review verifies the completed 186-test baseline,
 ten focused/ten independent tests, metadata/hashes, whole-tree policy and
 rendered/generated API evidence. This is actual Codex review, not human review.
-Authorized publication and exact hosted evidence remain pending.
+The accepted staged diff equals the committed checkpoint diff. Root and
+independent review verify the source identities above at the actual commit.
+
+## Published checkpoint and exact hosted evidence
+
+An ordinary fast-forward push publishes
+`53ac9cb7a41af36a6f123be884399562db2ee245` to origin/codex/nightly. The live
+remote matches. Exact
+[push run 40097187490](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40097187490)
+at its logged checkout passes Windows job 120881785371 and all 20 steps.
+Connector step summaries and raw metadata/logs agree. Inspection confirms all
+186 workspace tests including each new regression, separate 14 adapter/five
+sample tests, warnings-denied rustdoc, both whitespace checks and the 222-line
+sample report exactly matching input run 39959863270. Hosted run listing/log
+capture uses GitHub CLI because the connector's commit-run listing is limited
+to pull-request runs; its job/step tools independently confirm this push run.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Source/configuration
+policy remains unchanged after whole-tree review; local tools remain 1.98.0.
+No local hosted-toolchain execution is claimed. External consumer compilation
+and tests remain separate local evidence. The unchanged workflow executes the
+consumer as an ordinary workspace integration target.
+
+Root Codex inspects exact hosted evidence and source identity; independent
+Codex repeated_work_assessment separately inspects the same raw evidence. This
+six-document completion/evidence follow-up changes no Rust, manifest, lockfile,
+licence, policy configuration or workflow. Its source/document/diff review and
+exact hosted inspection are separate from the implementation checkpoint; no
+later revision inherits an unobserved hosted pass. The final thirteen changed
+Markdown documents are rendered and content/structure-reviewed, with all
+relative links and exact test mappings checked again. Stop after this increment.
+
+## Completion resumption — 2026-10-26
+
+The run resumes on codex/nightly at published implementation
+`53ac9cb7a41af36a6f123be884399562db2ee245`, with only the six unfinished evidence
+documents modified. The automation memory ends at the preceding identity
+checkpoint; the live repository, retained logs and exact hosted run establish
+the newer state. No preserved source or evidence is discarded or silently
+treated as a new implementation.
+
+Fresh execution of the seven baseline/whitespace commands listed above passes
+on unchanged local tools, with 186 workspace tests. The focused command passes
+ten tests. The existing external package above is rechecked with the same
+check, Clippy, ten-test, metadata and SHA256 commands; every command passes and
+the independent workspace/sole path dependency and identical bytes are retained.
+Live hosted metadata, connector steps and freshly captured logs reconfirm
+40097187490 at the exact implementation revision, all 20 steps, 186/14/five tests
+and the unchanged 222-line sample. No extra conditional commands are triggered.
+
+Root Codex and independent Codex periodic_review inspect this completion's
+source identity, retained and fresh evidence, rendered documents and complete
+diff. Temporary review aids/logs are under
+target/review-2026-10-25-periodic-completion (started before local midnight).
+Final whole-tree review retains 49 Rust files, 20,260 physical/1,241 comment-only
+lines, zero width findings and three unchanged fulfilled expectations. The final
+88 Markdown files have 492 resolving relative links and 150 uniquely resolving
+exact test references; all thirteen run-changed documents receive fresh rendered
+content/structure review. This follows the implementation's earlier 490-link
+inventory and does not claim pixel or human acceptance. The documentation-only
+commit receives its own exact hosted inspection; its final identity/result are
+also retained in the automation memory to avoid a self-referential commit hash.

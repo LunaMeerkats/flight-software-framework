@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; periodic releases pass local and independent verification**
+Status: **Active; host-owned periodic release checkpoint verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -88,7 +88,10 @@ verification and actual autonomous/hosted results are recorded in
 [the focused review](verification/PERIODIC_WORK_REVIEW.md). The full locked
 baseline passes 186 tests and the identical independent consumer passes all ten
 new regressions. Root and independent Codex complete source/document/diff review
-accepts with no findings. Source publication and exact hosted evidence are pending.
+accepts with no findings. Checkpoint 53ac9cb7a41af36a6f123be884399562db2ee245
+passes exact hosted run 40097187490, all 20 steps and the configured host/sample
+evidence. No one-shot contract, work owner or workflow changes. The documentation
+evidence follow-up receives separate review and exact hosted inspection.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 
