@@ -19,6 +19,10 @@ and runtime failure reporting. Package 0.0.0 stays unpublished; APIs provisional
   186/193 tests. Seven focused and seven identical independent tests pass, as
   do external check/Clippy, actual metadata and matching source hashes. The
   guide snippet passes one standalone Markdown rustdoc test.
+- Published implementation db994e776c68fb5432e646afb2ae5344cb2444e5 passes
+  exact hosted run 40329281385/job 121594066549: all 20 steps, 193 workspace
+  tests, separate 14 adapter/five sample tests and the unchanged 222-line sample.
+  Hosted tools/runner/image match input. Complete Codex source/diff review passes.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99,
   runner 2.338.0/windows-2025-vs2026 image 20261021.278.1. Local results do not
@@ -41,9 +45,10 @@ existing bounded FIFO emission. The queue retains no filter or admission history
 RFF-LIB-REQ-006/ADR-0031 precede source changes. Production API, public-only
 consumer tests, final locked baseline and actual independent Cargo verification
 are complete. Root and independent filter_review accept the complete source,
-documents, full diff and actual evidence with no remaining findings. Ordinary
-source publication and exact hosted inspection remain; no further capability
-is being started.
+documents, full diff and actual evidence with no remaining findings. Source
+publication and exact implementation hosted inspection pass. This evidence-only
+completion receives its own review, source publication and exact hosted check;
+no unfinished implementation or further capability remains in this work item.
 
 ## Highest risks and uncertainties
 
@@ -81,5 +86,7 @@ mission composition before adding policy, queues or service contexts.
 2026-10-27: selected and implemented one explicit event-admission increment.
 Initial/final locked baselines pass 186/193; focused/identical external tests
 pass seven each, with metadata/hash inspection and one guide doctest. Existing
-unfiltered contracts and prior tests are retained. Finish complete autonomous
-review, ordinary source publication and exact hosted inspection, then stop.
+unfiltered contracts and prior tests are retained. Complete autonomous review,
+ordinary publication and exact implementation hosted inspection pass. The
+documentation completion receives its own exact hosted check, then the run
+stops without beginning another capability.

@@ -1,7 +1,7 @@
 # Bounded plan: explicit event severity filtering
 
 Date: **2026-10-27**
-Status: **Implemented, locally verified and reviewed; publication pending**
+Status: **Complete: verified, reviewed, published and implementation CI passed**
 
 ## Objective and context
 
@@ -77,5 +77,10 @@ in 50 Rust files and no new waivers. All 510 relative links/157 exact test
 references resolve. Twelve changed documents pass rendered content/structure
 review, and generated APIs are inspected. Root and independent Codex filter_review
 accept the complete frozen 15-file source/document/diff and actual evidence with
-no remaining findings. Exact hosted inspection follows the authorized push; no later
-revision inherits an unobserved hosted pass.
+no remaining findings. Ordinary fast-forward publication of
+db994e776c68fb5432e646afb2ae5344cb2444e5 passes exact hosted run 40329281385,
+job 121594066549 and all 20 steps, 193 workspace/14 adapter/five sample tests,
+rustdoc, both whitespace checks and the unchanged 222-line sample. Hosted tools
+and runner image match input. This documentation-only completion receives its
+own full review and exact hosted inspection; no later revision inherits an
+unobserved pass. Stop after this checkpoint without unrelated work.

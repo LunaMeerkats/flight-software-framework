@@ -92,8 +92,9 @@ The [consumer guide](../EVENT_FILTERING.md) and
 truth-table, queue-preservation and consumer tests, seven identical independent
 Cargo tests, metadata/source identity and the complete locked 193-test baseline.
 The guide snippet passes one standalone doctest. Complete root and independent
-Codex source/diff review passes; exact hosted evidence will be recorded after
-execution, separately from the design decision.
+Codex source/diff review passes. Implementation db994e776c68fb5432e646afb2ae5344cb2444e5
+passes exact hosted run 40329281385, all 20 steps and 193 workspace tests. The
+focused record separates these executed results from the design decision.
 
 ## Risks and revisit conditions
 

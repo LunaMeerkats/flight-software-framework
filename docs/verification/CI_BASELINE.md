@@ -571,3 +571,28 @@ hosted-toolchain execution is claimed. This six-document completion/evidence
 follow-up preserves source, manifests, lockfile, licences and workflow, receives
 complete document/diff review and its own exact hosted inspection, and inherits
 no unobserved pass.
+
+## Explicit optional-event filtering checkpoint — 2026-10-27
+
+RFF-LIB-REQ-006 and ADR-0031 add opt-in per-attempt severity admission, preserving
+unfiltered queue outcomes and runtime failure reporting. The
+[focused review](EVENT_FILTERING_REVIEW.md) records exact source identity,
+local 193-test baseline, seven focused/seven identical external-consumer tests,
+one guide doctest, metadata/hashes and complete autonomous source/diff review.
+
+Checkpoint db994e776c68fb5432e646afb2ae5344cb2444e5 passes exact
+[push run 40329281385](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40329281385)
+at its logged checkout, job 121594066549 and all 20 steps. Raw logs and connector
+steps agree: 193 workspace tests including all seven new regressions, separate
+14 adapter/five sample tests, warnings-denied rustdoc, both whitespace checks
+and the unchanged 222-line sample compared with input run 40195931334.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Whole-tree source review
+covers 50 Rust files, 20,707 physical and 1,271 comment-only lines, zero width
+findings and three unchanged fulfilled expectations. The same source-quality
+configuration remains appropriate; no dependency or workflow change is made.
+Local tools remain 1.98.0 and no local hosted-toolchain execution is claimed.
+The completion changes only evidence documents and receives separate complete
+review and exact hosted inspection; the final revision/result is retained in
+automation memory rather than claiming an inherited pass.

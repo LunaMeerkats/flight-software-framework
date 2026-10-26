@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; explicit optional-event filtering in progress**
+Status: **Active; explicit optional-event filtering checkpoint verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -101,7 +101,9 @@ minimum-severity admission. The original unfiltered queue and failure-event
 outcomes retain their meaning. The
 [focused review](verification/EVENT_FILTERING_REVIEW.md) records the actual
 consumer, independent package and complete Codex review. Exact hosted evidence
-will be recorded after execution.
+passes at db994e776c68fb5432e646afb2ae5344cb2444e5, run 40329281385 and all
+20 steps with 193 workspace tests. The evidence-only documentation completion
+receives its own review and exact hosted inspection.
 Filtering supplies no reserved capacity, priority or guaranteed error delivery.
 
 ## Stage 0 — Foundation and responsibility checkpoint

@@ -1,7 +1,7 @@
 # Explicit event filtering review
 
 Date: **2026-10-27**
-Status: **Local verification and complete Codex review pass; publication pending**
+Status: **Verified, reviewed and published; exact implementation hosted CI passes**
 
 ## Objective, contract and source identity
 
@@ -141,3 +141,39 @@ does not skip caller event construction or clock reads, grant RefCell access,
 authenticate source identities, reserve error capacity or guarantee delivery.
 No human review, qualification, compatibility, operational suitability, API
 stability, release, crate publication or deployment is established.
+
+## Published implementation and completion
+
+Ordinary fast-forward publication sends
+db994e776c68fb5432e646afb2ae5344cb2444e5 to origin/codex/nightly; the live
+remote matches. The committed diff equals the accepted staged snapshot and its
+committed-tip whitespace check passes. Exact
+[push run 40329281385](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40329281385)
+at the logged checkout passes Windows job 121594066549 and all 20 steps.
+Raw logs confirm 193 workspace tests including each of the seven new tests,
+separate 14 adapter/five sample tests, warnings-denied rustdoc, both whitespace
+checks and the 222-line sample exactly matching input run 40195931334. Connector
+step summaries independently confirm all successful steps. Root Codex inspects
+the actual source and hosted evidence; filter_review separately inspects it.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. The whole-tree audit
+retains the same source-quality policy with no new waivers. The independent
+consumer and guide doctest remain separate local evidence. No local 1.99.1
+execution is claimed.
+
+This documentation-only completion records the observed implementation result
+and updates current state/traceability. Source, test, dependency, licence and
+workflow bytes remain unchanged. Root and independent Codex review its complete
+diff and rendered documents before its own ordinary source push. Its exact
+hosted result and final revision are retained in automation memory after
+inspection, avoiding a self-referential commit hash. No further capability is
+started; stop after this filtering checkpoint.
+
+Final documentation audit covers 91 Markdown files, 511 resolving relative
+links and 157 exact test references. All thirteen run-changed documents pass
+fresh rendered content/structure inspection. This follows the implementation's
+earlier twelve-document/510-link audit. The complete follow-up diff is confined
+to seven evidence documents; the three source SHA256 values remain unchanged.
+Root Codex and independent filter_review accept this complete follow-up diff,
+actual checkpoint logs and final rendered audit with no remaining findings.
