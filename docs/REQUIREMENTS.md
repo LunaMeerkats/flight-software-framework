@@ -280,3 +280,31 @@ Guidance shall distinguish release from callback execution, host-selected error
 and timer-disposal policy, observation-based delay from phase/completion timing,
 and logical storage from process-memory or real-time guarantees. Existing
 one-shot scheduling requirements and APIs retain their meaning.
+
+### RFF-LIB-REQ-006 — Explicit event severity filtering
+
+Revision 1 (2026-10-27). A caller-selected immutable EventFilter shall allow
+events at or above its minimum in the local order Informational < Warning <
+Error, without adding a general ordering contract to EventSeverity. The filter
+shall retain one copied severity with no allocation, history or growth. It shall
+expose its minimum and allow callers to inspect the severity decision directly.
+
+EventQueue::emit_filtered shall apply the supplied filter before capacity
+checking. An excluded event shall return FilteredOut without queue mutation,
+including when the queue is full. An allowed event shall delegate to existing
+unfiltered emission and return Emitted with its exact Recorded or QueueFull
+outcome. The caller shall retain the borrowed event after every outcome. Existing
+unfiltered emission, FIFO retention and runtime failure-event behavior shall
+retain their meaning; the queue shall not retain a filter between attempts.
+
+Acceptance: public-API tests shall cover all nine minimum/severity combinations,
+suppression in empty, partially occupied and full queues, allowed saturation,
+unchanged complete records/FIFO and explicit retry after dequeue. A public-only
+ordinary-work consumer shall distinguish optional diagnostic suppression from
+actual recording and capacity rejection, preserve selected runtime identity and
+show that suppression leaves capacity for a later allowed error. It shall also
+show that a queue full of allowed records can still reject an error. The identical
+tests shall pass in an independent path-dependent Cargo package. Guidance shall
+explain per-attempt policy, host drain and the difference between suppression,
+acceptance and physical delivery. This adds no reserved capacity, priority,
+automatic retry, source authentication, external adoption or stability claim.

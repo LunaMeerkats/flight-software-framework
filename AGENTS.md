@@ -117,6 +117,10 @@ translate NASA C source.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
+- `tests/event_filter.rs`: public-only optional-diagnostic consumer and explicit
+  severity-filter evidence. Its guide verifies identical tests in an independent
+  Cargo package; unfiltered emission and failure-event wrappers retain their
+  existing contracts.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -207,6 +211,13 @@ recipe in [the periodic-work guide](docs/PERIODIC_WORK.md). Check, lint and test
 the identical test source, inspect metadata and compare SHA256 hashes. Record
 the actual package path/results in the focused periodic-work review. A released
 item is not evidence that the host invoked or completed its callback.
+
+When changing event filtering or its consumer guidance, run
+`cargo test --locked --test event_filter`, then follow the independent-package
+recipe in [the filtering guide](docs/EVENT_FILTERING.md). Check, lint and test the
+identical test source; inspect metadata and compare SHA256 hashes. Record the
+actual package path and results in the focused filtering review. Filtering is
+optional admission policy, not reserved capacity or guaranteed event delivery.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

@@ -1,77 +1,81 @@
-# Bounded plan: host-owned periodic work releases
+# Bounded plan: explicit event severity filtering
 
-Date: **2026-10-25** (run started before local midnight)
-Status: **Complete: verified, reviewed, published and checkpoint CI passed**
+Date: **2026-10-27**
+Status: **Implemented, locally verified and reviewed; publication pending**
 
 ## Objective and context
 
-Enable recurring ordinary-work producers without reconstructing finite agendas.
-Input is clean codex/nightly at 86d82c9b336ba013f7e460fc309a6fb8fcfe08b6,
-matching refreshed origin. Initial locked baseline passes all 176 workspace
-tests, format/check/Clippy, warnings-denied rustdoc and both whitespace checks.
-Exact input hosted run 39959863270 has 20 successful steps. Local Rust/Cargo
-1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
+Enable a recurring diagnostic producer to omit optional low-severity events
+before they occupy bounded event storage. Select one immutable severity filter
+and explicit suppression result; retain unfiltered queue and runtime failure
+contracts. Root Codex and independent consumer_assessment assess current source
+friction and alternatives. This is controlled consumer evidence, not adoption.
 
-Root Codex and independent repeated_work_assessment compare explicit host
-arithmetic, reconstructed one-shot agendas and periodic execution wrappers.
-RFF-LIB-REQ-005 and ADR-0030 select one allocation-free release cursor, with
-observed-time re-arming and explicit exhaustion, before implementation.
+Input is clean codex/nightly at 1759cbe2139220126fe4030c9b1d2b39f7745883.
+The initial locked local format/check/Clippy/test and warnings-denied rustdoc
+baseline passes all 186 workspace tests. Local Rust/Cargo 1.98.0, rustfmt
+1.9.0-stable and Clippy 0.1.98 are unchanged. RFF-LIB-REQ-006 revision 1 and
+ADR-0031 establish scope and acceptance before implementation.
 
-## Acceptance and files
+## Acceptance and components
 
-- src/scheduling/periodic.rs owns positive-interval validation and one-item
-  polling; scheduling.rs/lib.rs expose it without changing one-shot behavior.
-- tests/periodic_work.rs exercises boundary arithmetic, clock reads, late polls,
-  repeatable replay and public-only direct/messaging work delegation.
-- A bounded configured producer records selected identity/output; host drains
-  between releases. Typed work failure clears only its messaging inbox and does
-  not prevent healthy peer delivery/work. Lifecycle rejection cannot retry the
-  same release. Host timer disposal is explicit policy.
-- The same test source passes check/Clippy/test as an independent Cargo package;
-  metadata and hashes confirm the sole framework path dependency and exact bytes.
-- docs/PERIODIC_WORK.md explains setup, release versus execution, errors, timing,
-  resources and disposal; requirements/ADR/research/traceability/state agree.
-- Full baseline, source widths/waivers, links, rendered Markdown/generated API
-  review and complete independent Codex source/document/diff review pass.
+- src/events.rs defines EventFilter, its minimum accessor and allows decision,
+  FilteredEventOutcome, and explicit EventQueue::emit_filtered. src/lib.rs
+  exposes the small surface. No general EventSeverity ordering is added.
+- Excluded events return FilteredOut before capacity inspection or mutation;
+  allowed events delegate to existing emit and retain exact outcomes/FIFO.
+  Each call supplies its filter; no persistent queue policy or storage is added.
+- tests/event_filter.rs covers all nine severity decisions; empty, partial
+  and full queue suppression; allowed saturation; record/FIFO retention and
+  explicit retry. Existing event and runtime failure tests remain regressions.
+- A public-only ordinary-work producer attributes events using its selected
+  context ID and treats optional suppression explicitly. Tests distinguish
+  omission, recording and rejection, including later allowed error acceptance
+  and error rejection when allowed records already fill the queue.
+- Identical consumer tests pass in an independent Cargo package. Inspect its
+  metadata for one independent member and sole framework path dependency, and
+  compare SHA256 source hashes.
+- docs/EVENT_FILTERING.md explains setup, policy, errors, resources and host
+  drain. The focused EVENT_FILTERING_REVIEW.md records actual results and
+  limits; requirements, ADR, sources, traceability, roadmap and state agree.
 
-## Verification and risks
+## Verification and review
 
-Run AGENTS.md locked baseline plus cargo test --locked --test periodic_work and
-its independent-package recipe. Old one-shot tests remain baseline regressions.
-No workflow, host sample, existing consumer guide or borrowing probe changes
-are planned. Conditional focused commands remain conditional on actual changes.
+Run the full AGENTS.md locked baseline and
+`cargo test --locked --test event_filter`, followed by independent-package
+check/Clippy/test, metadata and
+source-hash inspection. Inspect whole-tree handwritten source widths and touched
+waivers, resolving relative Markdown links, rendered Markdown/generated API
+documents and the complete diff. Complete root and independent Codex source,
+document, consumer and evidence review before commit/publication.
 
-Release is consumed before host work and does not prove callback execution.
-No fixed phase, catch-up backlog, automatic retry, fairness, synchronization,
-deadline/real-time guarantee or origin authentication is introduced. Overflow
-releases the final valid item once, then exposes exhaustion.
+Official Rust Reference match expressions and VecDeque documentation inform
+language branching and existing FIFO operations only. Severity selection is
+local policy. No workflow, host sample, existing consumer source, dependency or
+borrowing-experiment change is planned; conditional checks follow actual scope.
 
-## Safe stopping point
+## Risks and safe stopping point
 
-Stop after this one coherent verified increment, autonomous review, ordinary
-fast-forward source push and exact hosted inspection. If checks cannot pass,
-remove only this run's implementation while retaining useful decisions and the
-exact blocker. Do not start unrelated service or scheduling work.
+Suppression is deliberate omission, not acceptance or delivery. Allowed records
+can still fill storage and reject errors. Unfiltered callers and runtime failure
+reporting bypass the per-attempt policy. No priority, reservation, all-off state,
+counter, source rule, retry or new event service is added. Existing diagnostic
+identity tests keep their acceptance-before-effect contract.
 
-## Results
+Stop after this coherent increment passes applicable verification/review,
+ordinary fast-forward source publication and exact hosted inspection. If checks
+cannot pass, remove only this run's implementation where safe and retain useful
+decisions and the exact blocker. Do not start unrelated dispatch, recovery or
+scheduling work. Record actual results before marking this plan complete.
 
-The cursor and ten public-only consumer tests are implemented. Full locked
-baseline passes 186 tests, focused and independent tests pass ten each, and the
-independent package check/Clippy/metadata/source-hash inspection passes. Whole-tree
-source widths/waivers, links and rendered-document content/structure review pass.
-Root Codex and independent repeated_work_assessment accept the complete 16-file
-source/document/diff and actual evidence with no remaining findings. The
-capacity-two inbox documentation correction is incorporated. Ordinary
-fast-forward publication of 53ac9cb7a41af36a6f123be884399562db2ee245 passes exact
-hosted run 40097187490/job 120881785371: all 20 steps, 186 workspace tests,
-separate 14 adapter/five sample tests, rustdoc, both whitespace checks and the
-unchanged 222-line sample. Hosted tools/runner/image match input. This
-six-document evidence follow-up changes no source/configuration and receives
-its own complete review and exact hosted inspection. No further capability is
-started; stop after this completed periodic-release checkpoint.
+## Actual results
 
-Completion resumed **2026-10-26** at the published implementation with these six
-evidence documents preserved. A fresh locked baseline passes 186 tests; focused
-and identical external-consumer checks pass ten each. Root Codex and independent
-periodic_review recheck source identity, evidence, documents and the complete
-follow-up diff before its authorized publication and exact hosted inspection.
+Final locked baseline passes 193 workspace tests, seven focused and seven
+identical independent tests; check/Clippy, metadata, source hashes and the guide's
+one standalone Markdown doctest pass. Source review finds zero width findings
+in 50 Rust files and no new waivers. All 510 relative links/157 exact test
+references resolve. Twelve changed documents pass rendered content/structure
+review, and generated APIs are inspected. Root and independent Codex filter_review
+accept the complete frozen 15-file source/document/diff and actual evidence with
+no remaining findings. Exact hosted inspection follows the authorized push; no later
+revision inherits an unobserved hosted pass.

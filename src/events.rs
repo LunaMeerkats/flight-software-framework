@@ -3,8 +3,9 @@
 //! This module defines the first standalone event path for RFF-REQ-005. It
 //! stores only structured metadata, reserves a positive record bound during
 //! construction, and reports saturation directly instead of recursively
-//! emitting another event. An injected clock can now supply a timestamp, but
-//! runtime integration remains outside this slice.
+//! emitting another event. Callers can explicitly filter optional records
+//! before enqueue. An injected clock supplies timestamps; runtime failure
+//! reporting composes the unfiltered queue through separate entry points.
 
 use std::collections::VecDeque;
 use std::error::Error;
@@ -27,8 +28,8 @@ pub enum EventSource {
 
 /// The local importance category carried by one event.
 ///
-/// These categories do not imply a response, priority, filtering policy, or
-/// compatibility with another event system.
+/// These categories do not imply a response, priority, or compatibility with
+/// another event system. [`EventFilter`] defines an opt-in admission order.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum EventSeverity {
     /// Expected operation or useful state information.
@@ -37,6 +38,45 @@ pub enum EventSeverity {
     Warning,
     /// A defined operation or behavior reported an error.
     Error,
+}
+
+/// Immutable minimum-severity admission for one explicit emission attempt.
+///
+/// The local order is Informational, Warning, then Error. This policy retains
+/// one severity without allocation or history. It does not reserve capacity,
+/// evict records, or change unfiltered emission or runtime failure reporting.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct EventFilter {
+    minimum_severity: EventSeverity,
+}
+
+impl EventFilter {
+    /// Creates a filter admitting the selected severity and all higher ones.
+    #[must_use]
+    pub const fn new(minimum_severity: EventSeverity) -> Self {
+        Self { minimum_severity }
+    }
+
+    /// Returns the configured minimum admitted severity.
+    #[must_use]
+    pub const fn minimum_severity(self) -> EventSeverity {
+        self.minimum_severity
+    }
+
+    /// Returns whether this policy admits the supplied severity.
+    ///
+    /// Informational admits all categories, Warning admits Warning and Error,
+    /// and Error admits only Error. Queue capacity is not inspected.
+    #[must_use]
+    pub const fn allows(self, severity: EventSeverity) -> bool {
+        match self.minimum_severity {
+            EventSeverity::Informational => true,
+            EventSeverity::Warning => {
+                matches!(severity, EventSeverity::Warning | EventSeverity::Error)
+            }
+            EventSeverity::Error => matches!(severity, EventSeverity::Error),
+        }
+    }
 }
 
 /// Elapsed framework time captured for one event.
@@ -175,6 +215,20 @@ pub enum EventEmitOutcome {
     },
 }
 
+/// Caller-visible result of one explicitly filtered event emission attempt.
+#[must_use = "distinguish intentional filtering from recording or queue saturation"]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FilteredEventOutcome {
+    /// The supplied filter excluded this event before capacity inspection.
+    ///
+    /// The queue is unchanged, even when full. No record was accepted.
+    FilteredOut,
+    /// The filter admitted the event and unfiltered emission was attempted.
+    ///
+    /// The contained result distinguishes recording from saturation.
+    Emitted(EventEmitOutcome),
+}
+
 /// A positive-capacity FIFO queue for structured event records.
 ///
 /// Construction reserves storage for the configured number of records. The
@@ -240,6 +294,27 @@ impl<EventId: Copy> EventQueue<EventId> {
 
         self.events.push_back(*event);
         EventEmitOutcome::Recorded
+    }
+
+    /// Filters one event before attempting bounded FIFO emission.
+    ///
+    /// An excluded severity returns [`FilteredEventOutcome::FilteredOut`]
+    /// without queue mutation or capacity inspection, even when full. An
+    /// admitted event delegates to [`Self::emit`] with its exact outcome.
+    /// The borrowed event remains caller-owned after every result.
+    ///
+    /// The queue does not retain the filter or revisit older records. No
+    /// priority, reserved capacity, retry, clock read, or diagnostic is added.
+    pub fn emit_filtered(
+        &mut self,
+        event: &Event<EventId>,
+        filter: EventFilter,
+    ) -> FilteredEventOutcome {
+        if !filter.allows(event.severity()) {
+            return FilteredEventOutcome::FilteredOut;
+        }
+
+        FilteredEventOutcome::Emitted(self.emit(event))
     }
 
     /// Removes and returns the oldest accepted event, if any.

@@ -359,6 +359,18 @@ automatic retry, fixed phase, fairness or deadline guarantee is added. The
 [consumer guide](PERIODIC_WORK.md) and
 [focused review](verification/PERIODIC_WORK_REVIEW.md) record actual evidence.
 
+## Explicit optional-event filtering
+
+Under [ADR-0031](adr/0031-explicit-event-severity-filtering.md), a copied
+EventFilter selects a minimum severity for one EventQueue::emit_filtered call.
+Filtering precedes capacity inspection and returns a distinct FilteredOut result.
+Admitted events delegate to existing unfiltered emission; FIFO, reject-newest,
+event ownership and runtime failure-event wrappers retain their contracts.
+The queue stores no policy or filter history. This lets optional recurring
+diagnostics leave capacity available without reserving it for errors. The
+[consumer guide](EVENT_FILTERING.md) distinguishes optional suppression from
+recording and explains admitted saturation. There is no priority or eviction.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical

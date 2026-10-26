@@ -22,6 +22,9 @@ publication and retry to one subscriber, including finite scheduled work.
 with the existing direct and messaging work boundaries. Polling releases at
 most one item; the host explicitly invokes work and chooses error policy.
 
+`docs/EVENT_FILTERING.md` shows explicit severity admission for optional event
+records, with distinct suppression, recording and queue-saturation outcomes.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are
@@ -46,8 +49,8 @@ pub use application_messaging::{
 pub use clock::{Clock, FrameworkInstant, ManualClock, ManualClockAdvanceError};
 pub use configuration::{ConfigurationError, ConfigurationSnapshot, ConfigurationTable};
 pub use events::{
-    Event, EventEmitOutcome, EventQueue, EventQueueCreateError, EventSeverity, EventSource,
-    EventTimestamp,
+    Event, EventEmitOutcome, EventFilter, EventQueue, EventQueueCreateError, EventSeverity,
+    EventSource, EventTimestamp, FilteredEventOutcome,
 };
 pub use lifecycle::{
     ApplicationId, ApplicationState, LifecycleError, LifecycleOperation, LifecycleRegistry,

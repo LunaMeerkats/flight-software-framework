@@ -13,6 +13,24 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-EVENT-FILTERING — Explicit admission and unchanged FIFO storage
+
+- Titles: Match expressions, The Rust Reference; VecDeque, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/reference/expressions/match-expr.html>
+  and <https://doc.rust-lang.org/std/collections/struct.VecDeque.html>
+- Version: live Reference and std 1.99.1 documentation, accessed 2026-10-27;
+  local verification remains on Rust 1.98.0
+- Informed: explicit enum pattern branches can express admission policy, while
+  push_back/pop_front retain FIFO queue usage. A growable deque alone does not
+  impose a logical record bound or severity policy.
+- Local treatment: adopt a copied minimum-severity policy evaluated before
+  existing bounded emission, under ADR-0031. The ordering and distinct filtered
+  result are local choices. Preserve unfiltered enums and failure-event behavior;
+  reject discriminant-based ordering, eviction, mutable queue policy and rule
+  registries for this need. No upstream implementation is copied. This supports
+  optional diagnostic admission, not guaranteed high-severity delivery.
+
 ## SRC-RUST-PERIODIC-RELEASE — Checked recurring-release arithmetic
 
 - Titles: Duration, especially checked_add and is_zero

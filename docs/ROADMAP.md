@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; host-owned periodic release checkpoint verified**
+Status: **Active; explicit optional-event filtering in progress**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -92,6 +92,17 @@ accepts with no findings. Checkpoint 53ac9cb7a41af36a6f123be884399562db2ee245
 passes exact hosted run 40097187490, all 20 steps and the configured host/sample
 evidence. No one-shot contract, work owner or workflow changes. The documentation
 evidence follow-up receives separate review and exact hosted inspection.
+
+The sixth selected increment is [explicit event filtering](EVENT_FILTERING.md)
+under RFF-LIB-REQ-006 and
+[ADR-0031](adr/0031-explicit-event-severity-filtering.md). Optional recurring
+diagnostics can leave bounded queue capacity available through per-attempt
+minimum-severity admission. The original unfiltered queue and failure-event
+outcomes retain their meaning. The
+[focused review](verification/EVENT_FILTERING_REVIEW.md) records the actual
+consumer, independent package and complete Codex review. Exact hosted evidence
+will be recorded after execution.
+Filtering supplies no reserved capacity, priority or guaranteed error delivery.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

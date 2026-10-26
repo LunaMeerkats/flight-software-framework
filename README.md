@@ -48,6 +48,10 @@ consumer tests demonstrate immediate feedback from a caller-owned event queue.
 host-owned cursor, positive interval and explicit late-poll/overflow policy.
 The host delegates each chosen release to the existing work owner.
 
+[Filter optional events](docs/EVENT_FILTERING.md) before enqueue with an explicit
+severity threshold. Suppression, recording and saturation remain distinct;
+admitted events retain the queue's existing FIFO and reject-newest behavior.
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the

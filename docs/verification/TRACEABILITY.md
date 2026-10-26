@@ -1,5 +1,21 @@
 # Verification traceability
 
+## Stage 5 explicit event severity filtering — 2026-10-27
+
+RFF-LIB-REQ-006 revision 1 and
+[ADR-0031](../adr/0031-explicit-event-severity-filtering.md) add per-attempt
+minimum-severity admission with distinct omission and enqueue results. The
+[guide](../EVENT_FILTERING.md) and
+[focused record](EVENT_FILTERING_REVIEW.md) explain policy and actual evidence.
+
+| Requirement | Implementation | Verification | Evidence state |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-006 | Copied EventFilter and opt-in EventQueue::emit_filtered; public-only optional-diagnostic consumer | `severity_minima_have_an_explicit_nine_case_selection_table`; `suppression_preserves_empty_partial_and_full_queue_records`; `allowed_full_rejection_retains_the_borrowed_record_for_explicit_retry`; `mixed_filtered_and_unfiltered_emissions_do_not_install_queue_policy`; `changing_each_attempts_filter_does_not_prune_older_accepted_records`; `optional_diagnostics_allow_work_and_leave_room_for_a_later_error`; `allowed_saturation_is_terminal_but_preserves_older_records_and_peer_work`; identical independent consumer check/Clippy/test/metadata/hash | Local full locked baseline passes 193 workspace tests, seven focused/seven identical independent tests and one guide doctest; complete root/independent Codex review passes; exact hosted inspection pending publication |
+
+Original event contracts, runtime failure reporting and finite-model domains
+retain their meaning. Filtering supplies no reserved capacity, delivery guarantee
+or external-adoption evidence.
+
 ## Stage 5 host-owned periodic releases — 2026-10-25
 
 RFF-LIB-REQ-005 revision 1 and
