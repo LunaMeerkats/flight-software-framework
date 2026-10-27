@@ -1,6 +1,6 @@
 # ADR-0032: Bounded host event presentation
 
-- Status: Accepted and implemented; final local/independent verification passes
+- Status: Accepted and implemented; local/independent review and exact hosted verification pass
 - Date: 2026-10-28
 - Scope: Public-only example; library event APIs retain their contracts
 

@@ -19,6 +19,10 @@ unpublished; APIs remain provisional.
   and the exact runnable output. The final identical independent Cargo consumer
   passes check/Clippy/eight tests/run and normalized metadata/byte/hash inspection.
   Source-form review corrects three width findings without a waiver.
+- Published implementation a47c5eafd7d822d53684dfa9f777da0d9f4b39b0 passes exact
+  hosted run 40510502171/job 122210821488, all 20 steps, 201 workspace tests,
+  separate 14 adapter/five sample tests and the unchanged 222-line sample.
+  Root/independent Codex and connector inspection agree; tools/image match input.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
   2.338.0/windows-2025-vs2026 image 20261021.278.1. Local checks do not claim
@@ -38,12 +42,12 @@ queue, with one write attempt per turn. No library API or runtime changes.
 
 ## Work in progress
 
-RFF-LIB-REQ-007/ADR-0032 precede source changes. Implementation, final full
-baseline and independent consumer verification pass. Source-form corrections and precise
-sample error-exit guidance are complete. Root and independent output_review
-accept the complete 14-file source/document diff and actual final evidence,
-with no remaining findings. Source publication and exact hosted inspection
-remain to complete.
+RFF-LIB-REQ-007/ADR-0032 precede source changes. Implementation, final baseline,
+independent consumer verification and complete root/independent Codex review
+pass with no remaining findings. Ordinary source publication and exact
+implementation hosted inspection pass. This documentation-only evidence
+completion receives its own review/publication and exact hosted inspection.
+No unfinished implementation or additional capability remains in this work item.
 
 ## Highest risks and uncertainties
 
@@ -76,6 +80,8 @@ service context or new queue policy; do not add more model machinery by default.
 
 2026-10-28: selected bounded event presentation after source-based consumer
 assessment and official Rust writer research. Implemented public-only composition
-with retained partial-write progress and explicit flush/error boundaries. Finish
-actual verification, autonomous review and exact source-publication evidence,
-then stop after this checkpoint.
+with retained partial-write progress and explicit flush/error boundaries. Final
+locked checks pass 201/eight focused/eight identical independent tests. Complete
+Codex review, ordinary publication and exact implementation hosted inspection
+pass. The evidence-only completion receives its own exact hosted check, then
+the run stops without beginning another capability.

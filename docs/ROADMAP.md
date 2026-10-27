@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; bounded host event presentation in progress**
+Status: **Active; bounded host event presentation checkpoint verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -115,7 +115,10 @@ flush policy. This composes the existing queue without a new library sink API.
 Final local checks pass 201 workspace/eight focused tests; the identical
 independent package passes check/Clippy/eight tests/run and metadata/hash review.
 The [focused record](verification/EVENT_OUTPUT_REVIEW.md) separates actual local,
-independent-package, Codex review and hosted results; publication review remains.
+independent-package, Codex review and hosted results. Complete root/independent
+Codex review passes. Published implementation a47c5eafd7d822d53684dfa9f777da0d9f4b39b0
+passes exact run 40510502171 and all 20 steps with 201 workspace tests; the
+documentation completion receives its own review and exact hosted inspection.
 Writer acceptance does not establish physical or durable delivery.
 
 ## Stage 0 — Foundation and responsibility checkpoint

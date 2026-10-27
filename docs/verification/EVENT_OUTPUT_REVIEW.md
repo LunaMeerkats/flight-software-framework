@@ -1,7 +1,7 @@
 # Bounded host event presentation review
 
 Date: **2026-10-28**
-Status: **Final local/independent verification and Codex review pass; hosted inspection pending**
+Status: **Verified, reviewed and published; exact implementation hosted CI passes**
 
 ## Objective, contract and source identity
 
@@ -116,10 +116,29 @@ under ignored target/review-2026-10-28-event-presentation.
 Root Codex and independent output_review accept the complete 14-file staged
 source/document diff and actual final consumer/baseline/rendered evidence, with
 no remaining findings. Root also accepts this review-attribution wording.
-Ordinary fast-forward source publication and exact hosted inspection follow. No later revision inherits an
-unobserved pass. The final documentation-only evidence completion receives its
-own source/diff review and hosted inspection; exact final head/result is retained
-in automation memory.
+Ordinary fast-forward publication of implementation
+`a47c5eafd7d822d53684dfa9f777da0d9f4b39b0` passes exact
+[push run 40510502171](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40510502171),
+job 122210821488. All 20 steps pass, including 201 workspace tests with all eight
+new regressions, separate 14 adapter/five sample tests, warnings-denied rustdoc
+and both whitespace checks. The combined sample's 222 lines exactly match input.
+Root raw-log review and connector step summaries agree; independent output_review
+separately inspects actual metadata/logs, checkout, tests, source and remote head
+with no findings. The committed patch equals the accepted staged diff exactly.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Local tools remain on
+1.98.0; no local execution of hosted tools is claimed. Source/configuration review
+retains the existing policy. No later revision inherits this pass. This seven-
+document evidence completion preserves source/configuration, receives complete
+document/diff review and its own exact hosted inspection; the final head/result
+is retained in automation memory rather than claiming an unobserved pass.
+
+The final completion audit covers 94 Markdown files, 532 resolving relative links
+and 165 exact test references. All 13 run-changed rendered documents preserve
+content and structure. Source SHA256 and the three existing expectations remain
+unchanged. Root Codex and independent output_review accept this complete seven-
+document evidence diff and actual checkpoint logs, with no remaining findings.
 
 ## Limitations
 

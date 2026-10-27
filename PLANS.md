@@ -1,6 +1,6 @@
 # Bounded host event presentation
 
-Status: In progress — 2026-10-28
+Status: Complete implementation checkpoint — 2026-10-28
 
 ## Objective and context
 
@@ -51,5 +51,11 @@ normalized metadata and byte/hash inspection. Whole-tree review finds zero width
 issues and no new waiver. All 531 relative links/165 exact test references
 resolve; all 12 changed rendered documents pass content/structure inspection.
 Root and independent Codex output_review accept the complete 14-file source,
-document and diff with actual evidence and no remaining findings. Source
-publication and exact hosted inspection remain before checkpoint completion.
+document and diff with actual evidence and no remaining findings. Ordinary
+fast-forward publication of a47c5eafd7d822d53684dfa9f777da0d9f4b39b0 passes exact
+run 40510502171/job 122210821488 and all 20 steps, 201 workspace/14 adapter/five
+sample tests, rustdoc, both whitespace checks and the unchanged 222-line sample.
+Hosted tools/image match input. Root and independent Codex inspect actual logs
+and exact source; connector step summaries agree. This documentation-only
+completion receives separate review/publication and exact hosted inspection.
+Stop after this checkpoint without another capability.

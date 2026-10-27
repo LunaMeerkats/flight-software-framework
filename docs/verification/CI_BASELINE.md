@@ -596,3 +596,31 @@ Local tools remain 1.98.0 and no local hosted-toolchain execution is claimed.
 The completion changes only evidence documents and receives separate complete
 review and exact hosted inspection; the final revision/result is retained in
 automation memory rather than claiming an inherited pass.
+
+## Bounded host event presentation checkpoint — 2026-10-28
+
+RFF-LIB-REQ-007 and ADR-0032 compose the public event APIs into a tested example
+with fixed line storage and retained partial-write progress. The
+[focused review](EVENT_OUTPUT_REVIEW.md) records the exact source, final local
+201-test baseline, eight focused/eight identical independent-consumer tests,
+metadata/hashes, runnable output and complete autonomous source/document review.
+
+Checkpoint a47c5eafd7d822d53684dfa9f777da0d9f4b39b0 passes exact
+[push run 40510502171](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40510502171)
+at its logged checkout, job 122210821488 and all 20 steps. Root raw logs and
+connector step summaries agree: 201 workspace tests including all eight new
+regressions, separate 14 adapter/five sample tests, warnings-denied rustdoc,
+both whitespace checks and the unchanged 222-line combined sample compared with
+input run 40329895459. Independent Codex output_review inspects actual logs,
+metadata, source and remote head with no findings. Staged and committed patches
+match exactly.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Whole-tree source review
+covers 51 Rust files, 21,222 physical and 1,284 comment-only lines, zero width
+findings and three unchanged fulfilled expectations. Configuration retains the
+existing source-quality policy. Local tools remain on 1.98.0; no local hosted-
+toolchain execution is claimed. This seven-document evidence completion changes
+no source, manifest, lockfile, licence or workflow and receives complete review
+and its own exact hosted inspection. Final head/result remain in automation
+memory; no later revision inherits an unobserved pass.
