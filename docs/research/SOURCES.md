@@ -13,6 +13,30 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-EVENT-OUTPUT — Partial byte output and fixed presentation storage
+
+- Titles: Write and ErrorKind, std::io; Cursor, std::io; Write, std::fmt
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/io/trait.Write.html>,
+  <https://doc.rust-lang.org/std/io/enum.ErrorKind.html>,
+  <https://doc.rust-lang.org/std/io/struct.Cursor.html> and
+  <https://doc.rust-lang.org/std/fmt/trait.Write.html>
+- Version: official standard-library 1.99.1 documentation, commit
+  58cf8f9c3 (2026-10-13), accessed 2026-10-28; local execution remains on
+  Rust/Cargo 1.98.0.
+- Informed: byte writes report accepted prefixes; an error consumes none of
+  that call's supplied bytes. Short writes are valid, while write_all may make
+  multiple calls before returning an error. Flush is separate from write
+  acceptance. ErrorKind can gain variants. Cursor supports fixed array storage;
+  fmt::Write reports formatting failure without an underlying error cause.
+- Local treatment: adopt one explicit sink write per host turn, a retained
+  event/fixed line/offset, exact concrete errors and explicit host flush under
+  ADR-0032. Reject whole-line retry after write_all failure and a new library
+  sink service for this consumer. The caller chooses retries, presentation
+  labels and the line format. Fixed rendering may make multiple in-memory
+  writes; it does not make extra sink calls. No source implementation is copied,
+  dependency added or physical/durable delivery established.
+
 ## SRC-RUST-EVENT-FILTERING — Explicit admission and unchanged FIFO storage
 
 - Titles: Match expressions, The Rust Reference; VecDeque, Rust standard library

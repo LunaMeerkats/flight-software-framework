@@ -121,6 +121,10 @@ translate NASA C source.
   severity-filter evidence. Its guide verifies identical tests in an independent
   Cargo package; unfiltered emission and failure-event wrappers retain their
   existing contracts.
+- `examples/event_output.rs`: a public-only host event presenter that owns one
+  writer, pending event, fixed rendered line and accepted-byte cursor. Its
+  test-enabled target and independent-package recipe verify partial writes,
+  explicit errors and host flush without adding a library sink service.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -218,6 +222,14 @@ recipe in [the filtering guide](docs/EVENT_FILTERING.md). Check, lint and test t
 identical test source; inspect metadata and compare SHA256 hashes. Record the
 actual package path and results in the focused filtering review. Filtering is
 optional admission policy, not reserved capacity or guaranteed event delivery.
+
+When changing the event-output example or its guidance, run
+`cargo test --locked --example event_output` and
+`cargo run --locked --example event_output`, then execute the independent-package
+recipe in [the event-output guide](docs/EVENT_OUTPUT.md). Check, lint, test and
+run the identical source; inspect metadata and compare SHA256 hashes. Record
+the actual package path and results in the focused event-output review. Writer
+acceptance and explicit flush do not establish physical or durable delivery.
 
 When changing ADR-0018 or its borrowing experiment, also run the explicit
 build and standalone Markdown `rustdoc --test` commands in

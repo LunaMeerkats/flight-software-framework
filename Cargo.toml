@@ -29,3 +29,7 @@ test = true
 [[example]]
 name = "work_output"
 test = true
+
+[[example]]
+name = "event_output"
+test = true

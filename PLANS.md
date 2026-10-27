@@ -1,86 +1,55 @@
-# Bounded plan: explicit event severity filtering
+# Bounded host event presentation
 
-Date: **2026-10-27**
-Status: **Complete: verified, reviewed, published and implementation CI passed**
+Status: In progress — 2026-10-28
 
 ## Objective and context
 
-Enable a recurring diagnostic producer to omit optional low-severity events
-before they occupy bounded event storage. Select one immutable severity filter
-and explicit suppression result; retain unfiltered queue and runtime failure
-contracts. Root Codex and independent consumer_assessment assess current source
-friction and alternatives. This is controlled consumer evidence, not adoption.
+Complete RFF-LIB-REQ-007/ADR-0032: a public-only event-output consumer with one
+fixed pending line and explicit partial-write progress. The clean input is
+6ab84023892b19642b76705bd184a95bb43754df. Initial locked checks pass 193 tests;
+the input's exact hosted run 40329895459 passes all 20 steps. Existing filtering
+and FIFO APIs suffice; no library API or runtime change is planned.
 
-Input is clean codex/nightly at 1759cbe2139220126fe4030c9b1d2b39f7745883.
-The initial locked local format/check/Clippy/test and warnings-denied rustdoc
-baseline passes all 186 workspace tests. Local Rust/Cargo 1.98.0, rustfmt
-1.9.0-stable and Clippy 0.1.98 are unchanged. RFF-LIB-REQ-006 revision 1 and
-ADR-0031 establish scope and acceptance before implementation.
+## Acceptance criteria and components
 
-## Acceptance and components
+- examples/event_output.rs owns a writer, one pending event, fixed line and byte
+  offset. One host turn attempts at most one write. Tests cover FIFO bytes,
+  short writes, errors and no progress, idle behavior, rendering rejection,
+  maximum timestamps and optional filtering.
+- The example and identical independent Cargo source pass check/Clippy/test/run;
+  metadata and SHA256 hashes confirm a sole library path dependency and matching
+  source. No maintained consumer crate or dependency is added.
+- docs/EVENT_OUTPUT.md documents setup, errors, resources and delivery limits.
+  Focused verification, requirements, ADR, sources, traceability, roadmap, state
+  and entry points agree. Full baseline, source form, rendered docs, links and
+  complete diff receive root and independent Codex review before publication.
 
-- src/events.rs defines EventFilter, its minimum accessor and allows decision,
-  FilteredEventOutcome, and explicit EventQueue::emit_filtered. src/lib.rs
-  exposes the small surface. No general EventSeverity ordering is added.
-- Excluded events return FilteredOut before capacity inspection or mutation;
-  allowed events delegate to existing emit and retain exact outcomes/FIFO.
-  Each call supplies its filter; no persistent queue policy or storage is added.
-- tests/event_filter.rs covers all nine severity decisions; empty, partial
-  and full queue suppression; allowed saturation; record/FIFO retention and
-  explicit retry. Existing event and runtime failure tests remain regressions.
-- A public-only ordinary-work producer attributes events using its selected
-  context ID and treats optional suppression explicitly. Tests distinguish
-  omission, recording and rejection, including later allowed error acceptance
-  and error rejection when allowed records already fill the queue.
-- Identical consumer tests pass in an independent Cargo package. Inspect its
-  metadata for one independent member and sole framework path dependency, and
-  compare SHA256 source hashes.
-- docs/EVENT_FILTERING.md explains setup, policy, errors, resources and host
-  drain. The focused EVENT_FILTERING_REVIEW.md records actual results and
-  limits; requirements, ADR, sources, traceability, roadmap and state agree.
+## Verification approach
 
-## Verification and review
-
-Run the full AGENTS.md locked baseline and
-`cargo test --locked --test event_filter`, followed by independent-package
-check/Clippy/test, metadata and
-source-hash inspection. Inspect whole-tree handwritten source widths and touched
-waivers, resolving relative Markdown links, rendered Markdown/generated API
-documents and the complete diff. Complete root and independent Codex source,
-document, consumer and evidence review before commit/publication.
-
-Official Rust Reference match expressions and VecDeque documentation inform
-language branching and existing FIFO operations only. Severity selection is
-local policy. No workflow, host sample, existing consumer source, dependency or
-borrowing-experiment change is planned; conditional checks follow actual scope.
+Run the AGENTS.md locked baseline, cargo test/run --locked --example event_output,
+and the independent-package guide recipe. Preserve raw logs under ignored
+target/review-2026-10-28-event-presentation. Conditional host/probe/workflow checks
+follow actual touched scope. Refresh origin, ordinary fast-forward push, verify
+remote head and inspect exact hosted checkout/results. Local success does not
+establish hosted success.
 
 ## Risks and safe stopping point
 
-Suppression is deliberate omission, not acceptance or delivery. Allowed records
-can still fill storage and reject errors. Unfiltered callers and runtime failure
-reporting bypass the per-attempt policy. No priority, reservation, all-off state,
-counter, source rule, retry or new event service is added. Existing diagnostic
-identity tests keep their acceptance-before-effect contract.
+Short writes are valid; do not retry accepted bytes. Err consumes no bytes under
+the Write contract. Writer calls may block; no timing guarantee is introduced.
+Flush is separate and its failure cannot safely reconstruct cleared records.
+Keep the original event on render failure and never skip past a pending record.
+Stop after this coherent reviewed checkpoint, without another capability. If
+checks fail, preserve decisions/evidence and remove only current-run implementation
+where safe; do not discard other work or weaken checks.
 
-Stop after this coherent increment passes applicable verification/review,
-ordinary fast-forward source publication and exact hosted inspection. If checks
-cannot pass, remove only this run's implementation where safe and retain useful
-decisions and the exact blocker. Do not start unrelated dispatch, recovery or
-scheduling work. Record actual results before marking this plan complete.
+## Actual local acceptance
 
-## Actual results
-
-Final locked baseline passes 193 workspace tests, seven focused and seven
-identical independent tests; check/Clippy, metadata, source hashes and the guide's
-one standalone Markdown doctest pass. Source review finds zero width findings
-in 50 Rust files and no new waivers. All 510 relative links/157 exact test
-references resolve. Twelve changed documents pass rendered content/structure
-review, and generated APIs are inspected. Root and independent Codex filter_review
-accept the complete frozen 15-file source/document/diff and actual evidence with
-no remaining findings. Ordinary fast-forward publication of
-db994e776c68fb5432e646afb2ae5344cb2444e5 passes exact hosted run 40329281385,
-job 121594066549 and all 20 steps, 193 workspace/14 adapter/five sample tests,
-rustdoc, both whitespace checks and the unchanged 222-line sample. Hosted tools
-and runner image match input. This documentation-only completion receives its
-own full review and exact hosted inspection; no later revision inherits an
-unobserved pass. Stop after this checkpoint without unrelated work.
+Final locked baseline passes 201 workspace/eight focused tests and the runnable
+output. The identical independent package passes check/Clippy/eight tests/run,
+normalized metadata and byte/hash inspection. Whole-tree review finds zero width
+issues and no new waiver. All 531 relative links/165 exact test references
+resolve; all 12 changed rendered documents pass content/structure inspection.
+Root and independent Codex output_review accept the complete 14-file source,
+document and diff with actual evidence and no remaining findings. Source
+publication and exact hosted inspection remain before checkpoint completion.

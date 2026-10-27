@@ -371,6 +371,19 @@ diagnostics leave capacity available without reserving it for errors. The
 [consumer guide](EVENT_FILTERING.md) distinguishes optional suppression from
 recording and explains admitted saturation. There is no priority or eviction.
 
+## Bounded host event presentation
+
+Under [ADR-0032](adr/0032-bounded-host-event-presentation.md), the public-only
+event_output consumer owns a writer, one pending event, a fixed rendered line
+and a byte cursor. Each host turn dequeues at most one record and makes at most
+one sink write. Short writes advance only the accepted prefix; rendering and
+write errors retain the pending record. No next FIFO event is removed until
+that line is accepted. Queue capacity plus one pending event bounds record
+retention, while writer blocking and allocation remain outside that bound.
+The [guide](EVENT_OUTPUT.md) explains mission-owned source naming, stream
+continuity, concrete errors and separate explicit flush. This composition adds
+no library service, protocol, physical delivery or durability guarantee.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical

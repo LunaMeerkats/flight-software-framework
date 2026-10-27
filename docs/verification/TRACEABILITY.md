@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 bounded host event presentation — 2026-10-28
+
+RFF-LIB-REQ-007 revision 1 and
+[ADR-0032](../adr/0032-bounded-host-event-presentation.md) establish public-only
+host output through the existing event queue. The
+[guide](../EVENT_OUTPUT.md) and [focused review](EVENT_OUTPUT_REVIEW.md) record
+partial-write progress, retained errors, logical bounds and independent consumer
+evidence. Library event and failure-reporting contracts retain their meaning.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-007 | Public-only event_output example; fixed pending line/cursor and owned standard writer | `partial_writes_and_transient_errors_preserve_exact_fifo_bytes`; `zero_and_permanent_write_errors_retain_the_unwritten_suffix`; `rendering_rejection_retains_the_raw_event_without_sink_calls`; `maximum_timestamp_and_every_label_fit_the_fixed_line`; `filtered_omission_and_idle_turns_do_not_call_the_writer`; `dequeued_pending_record_is_additional_to_refilled_queue_capacity`; `sample_writes_exact_lines_and_flushes_only_after_acceptance`; `flush_failure_reports_after_bytes_have_left_the_presenter`; identical independent consumer check/Clippy/test/run/metadata/hash | Final locked baseline passes 201 workspace/eight focused/eight identical independent tests plus check/Clippy/run/metadata/hash; complete root/independent Codex source/document/diff review passes; source publication and exact hosted inspection pending |
+
 ## Stage 5 explicit event severity filtering — 2026-10-27
 
 RFF-LIB-REQ-006 revision 1 and

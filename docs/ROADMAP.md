@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; explicit optional-event filtering checkpoint verified**
+Status: **Active; bounded host event presentation in progress**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -105,6 +105,18 @@ passes at db994e776c68fb5432e646afb2ae5344cb2444e5, run 40329281385 and all
 20 steps with 193 workspace tests. The evidence-only documentation completion
 receives its own review and exact hosted inspection.
 Filtering supplies no reserved capacity, priority or guaranteed error delivery.
+
+The seventh selected increment is [bounded host event presentation](EVENT_OUTPUT.md)
+under RFF-LIB-REQ-007 and
+[ADR-0032](adr/0032-bounded-host-event-presentation.md). A public-only example
+owns one writer and retains a fixed line and cursor across partial writes or
+errors. One host turn makes at most one sink write; the host chooses retry and
+flush policy. This composes the existing queue without a new library sink API.
+Final local checks pass 201 workspace/eight focused tests; the identical
+independent package passes check/Clippy/eight tests/run and metadata/hash review.
+The [focused record](verification/EVENT_OUTPUT_REVIEW.md) separates actual local,
+independent-package, Codex review and hosted results; publication review remains.
+Writer acceptance does not establish physical or durable delivery.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

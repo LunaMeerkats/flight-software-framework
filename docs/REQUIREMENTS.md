@@ -308,3 +308,23 @@ tests shall pass in an independent path-dependent Cargo package. Guidance shall
 explain per-attempt policy, host drain and the difference between suppression,
 acceptance and physical delivery. This adds no reserved capacity, priority,
 automatic retry, source authentication, external adoption or stability claim.
+
+### RFF-LIB-REQ-007 — Bounded host event presentation
+
+Revision 1 (2026-10-28). A public-only consumer shall transfer structured events
+from EventQueue to an owned standard Write sink through explicit host turns.
+It shall retain at most one dequeued event, one fixed-capacity rendered line and
+one byte cursor. Each turn shall attempt at most one sink write; positive short
+writes shall advance only the accepted prefix. Write errors and zero progress
+shall preserve the event and unwritten suffix. The next queued event shall not
+be removed until the pending line is completely accepted by that writer.
+
+Acceptance: the identical source shall pass as a tested workspace example and
+an independent path-dependent Cargo package. Tests shall observe exact FIFO bytes
+across partial writes, Interrupted/WouldBlock and other errors; zero progress;
+idle turns without sink calls; retained events on rendering rejection; maximum
+timestamp precision and fixed storage; and explicit filtering before presentation.
+Guidance shall explain queue-plus-pending storage, caller-scoped source naming,
+writer continuity, explicit flush/failure policy and the absence of physical,
+durable or record-atomic delivery guarantees. This is mission composition, not
+a new library sink service, queue policy or wire-format commitment.

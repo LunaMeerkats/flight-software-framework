@@ -52,6 +52,13 @@ The host delegates each chosen release to the existing work owner.
 severity threshold. Suppression, recording and saturation remain distinct;
 admitted events retain the queue's existing FIFO and reject-newest behavior.
 
+[Present queued events](docs/EVENT_OUTPUT.md) through explicit host turns with
+one pending record and retained progress across short writes and output errors:
+
+```text
+cargo run --locked --example event_output
+```
+
 ## Current status
 
 The experimental serial host v0.1 milestone is accepted by the
