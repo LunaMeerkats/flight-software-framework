@@ -328,3 +328,24 @@ Guidance shall explain queue-plus-pending storage, caller-scoped source naming,
 writer continuity, explicit flush/failure policy and the absence of physical,
 durable or record-atomic delivery guarantees. This is mission composition, not
 a new library sink service, queue policy or wire-format commitment.
+
+### RFF-LIB-REQ-008 — Backpressure-aware recurring host coordination
+
+Revision 1 (2026-10-29). The public-only work-output consumer shall compose
+recurring work, sole-subscriber transfer and deferred host observation through
+bounded host turns. A turn shall dispatch at most one sink message only when
+its output slot is empty and the sink is Running, attempt at most one pending
+transfer, then poll at most one periodic release and invoke at most one work
+callback only if the pending slot is empty. Newly produced output shall remain
+pending until a later turn. Host observation/draining shall remain separate.
+
+Acceptance: tests shall fill output, inbox and pending storage without failing
+either application; blocked turns shall retain FIFO values, pending revision,
+next release and zero clock reads. Draining shall permit bounded progress;
+resumed overdue work shall coalesce and re-arm from observed time. Configuration
+replacement during blockage shall affect resumed work without rewriting older
+output. Unavailable sinks shall preserve pending output; work errors shall retain
+their concrete source and disable the selected timer. Verify the identical
+source in an independent Cargo package. Existing direct-work/full-output failure
+contracts remain unchanged. This mission policy adds no framework runner,
+automatic drain/retry, fairness, timing or physical-delivery guarantee.

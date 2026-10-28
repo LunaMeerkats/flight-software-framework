@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; bounded host event presentation checkpoint verified**
+Status: **Active; recurring host coordination locally verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -120,6 +120,16 @@ Codex review passes. Published implementation a47c5eafd7d822d53684dfa9f777da0d9f
 passes exact run 40510502171 and all 20 steps with 201 workspace tests; the
 documentation completion receives its own review and exact hosted inspection.
 Writer acceptance does not establish physical or durable delivery.
+
+The eighth selected increment extends [ordinary-work output](ORDINARY_WORK_OUTPUT.md)
+with bounded recurring host turns under RFF-LIB-REQ-008 and
+[ADR-0033](adr/0033-backpressure-aware-host-coordination.md). Dispatch waits for
+an empty host output slot; transfer preserves the existing sole-subscriber
+policy; recurrence stays unpolled while pending output blocks production.
+Resuming coalesces overdue work without losing older FIFO values or turning
+ordinary backpressure into a callback failure. The
+[focused review](verification/HOST_COORDINATION_REVIEW.md) records actual
+verification and limitations. Existing direct-call failure semantics remain.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

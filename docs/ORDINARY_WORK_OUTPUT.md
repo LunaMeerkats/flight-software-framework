@@ -27,6 +27,7 @@ Expected stdout:
 Experimental host work output; not flight-qualified or safety-certified.
 No NASA affiliation, demonstrated TRL, operational suitability, or compatibility.
 ordinary/scheduled work -> host -> sink: [42, 7]
+recurring work with deferred host drain -> sink: [42, 7, 9, 11]
 ```
 
 ## Ownership and transfer
@@ -75,6 +76,58 @@ scheduled instant does nothing. A due item is consumed before work invocation,
 including a lifecycle rejection or returned application error. Retrying host output does
 not restore a consumed scheduled item or create a periodic schedule.
 
+## Coordinate recurring work
+
+The same source also composes [PeriodicWork](PERIODIC_WORK.md) with a slow host
+consumer. Calling work whenever a release is due can hit PendingFull; dispatching
+while the host output slot is occupied can hit OutputFull. Those strict direct
+call contracts remain useful and unchanged. This host policy checks capacity
+before invoking either callback.
+
+Each `host_turn` performs these stages in order:
+
+| Stage | Capacity/lifecycle guard | Maximum operation count |
+| --- | --- | --- |
+| Sink dispatch | Output slot empty and sink Running | One oldest message |
+| Pending transfer | Existing sole-subscriber report validation | One publication |
+| Recurring production | Pending slot empty after transfer | One poll and one work callback |
+
+The report separates skipped/attempted dispatch, transfer and production.
+In this host report, Polled(Released) is returned only after work succeeds;
+the underlying PeriodicWork release alone still does not establish execution.
+Newly produced output waits for a later turn. The caller explicitly takes an
+output value between turns when ready to observe it; the turn never drains it.
+An occupied output slot can therefore fill the inbox and then the pending slot.
+Further turns preserve all three older values without invoking producer work
+or reading the clock while its pending slot remains occupied. There is no loop
+that drains until empty and no automatic retry worker.
+
+When capacity returns, a turn can dispatch an older message, transfer the older
+pending value and produce one new value. Deferred polling leaves the original
+next release intact. A resumed overdue poll releases one item and re-arms from
+the newly observed time, coalescing missed intervals. It does not execute a
+burst or restore phase. Configuration replacement while blocked preserves the
+pending value's original revision and affects only the resumed work observation.
+
+The selected timer is an Option. A work error disables it before returning the
+existing concrete error chain, including lifecycle rejection; successful earlier
+dispatch/publication remains committed. Disabled or exhausted production does
+not prevent later dispatch/transfer turns. A stopped sink is explicitly skipped
+for dispatch; publication reports it unavailable and retains pending output.
+The host must choose whether to restart it, drain accepted output or stop.
+Dispatch or transfer errors stop the turn before polling; they do not silently
+disable the timer. Unexpected topology may already have delivered: diagnose it
+before considering another transfer. No stage rollback or automatic recovery
+is implied.
+
+[ADR-0033](adr/0033-backpressure-aware-host-coordination.md) compares paused
+polling with explicitly dropping blocked releases and adding a library runner.
+This selected serial pipeline needs no new framework API. Use the exact matching
+runtime, IDs and slots; the function cannot authenticate their origin. It is one
+mission policy, not fairness, a callback-time bound or a general fan-out retry
+solution. The finite runnable scenario deliberately fills the pipeline, replaces
+configuration, drains in FIFO order and resumes one overdue observation.
+
 ## Bounds and the next API question
 
 This mission fixes two runtime records, one inbox per application, one pending
@@ -102,7 +155,7 @@ the framework checkout, stopping on any failure:
 
 ```powershell
 $framework = (Get-Location).Path
-$consumer = Join-Path (Split-Path $framework -Parent) 'rff-work-output-consumer'
+$consumer = Join-Path $env:TEMP ('rff-work-output-' + [guid]::NewGuid().ToString('N'))
 cargo new --bin --edition 2024 --vcs none $consumer
 cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
 Copy-Item -LiteralPath "$framework/examples/work_output.rs" -Destination "$consumer/src/main.rs"
@@ -120,3 +173,6 @@ maintained crate is required. The [focused review](verification/WORK_OUTPUT_REVI
 records the actual package, commands, observations and autonomous Codex review
 for RFF-LIB-REQ-003. Controlled host evidence does not establish API stability,
 release readiness, qualification or operational use.
+The same recipe now checks the recurring composition under RFF-LIB-REQ-008;
+[its focused review](verification/HOST_COORDINATION_REVIEW.md) retains current
+source hashes, package path, commands and actual review/publication evidence.

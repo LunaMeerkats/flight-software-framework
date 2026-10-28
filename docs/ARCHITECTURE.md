@@ -384,6 +384,17 @@ The [guide](EVENT_OUTPUT.md) explains mission-owned source naming, stream
 continuity, concrete errors and separate explicit flush. This composition adds
 no library service, protocol, physical delivery or durability guarantee.
 
+## Backpressure-aware recurring host coordination
+
+The [backpressure-aware host coordination decision](adr/0033-backpressure-aware-host-coordination.md)
+extends the existing work-output consumer without a library runner. A bounded
+turn dispatches only into an empty observation slot, transfers older pending
+output, then polls/invokes recurring work only when that pending slot is empty.
+The caller drains separately. Backpressure leaves the cursor unpolled; resuming
+coalesces overdue releases through existing PeriodicWork behavior. Earlier turn
+effects remain committed if a later stage fails. This policy is serial mission
+composition, not a new scheduling, transactional or synchronization contract.
+
 ## Alternatives kept open
 
 [ADR-0025](adr/0025-practical-library-development.md) establishes the practical

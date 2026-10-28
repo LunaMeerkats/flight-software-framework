@@ -40,6 +40,11 @@ validated configuration, a finite schedule and explicit bounded host transfer:
 cargo run --locked --example work_output
 ```
 
+The same [work-output guide](docs/ORDINARY_WORK_OUTPUT.md#coordinate-recurring-work)
+also composes recurring work with deferred host consumption. Bounded host turns
+pause production while older output is pending, then resume without a catch-up
+burst when capacity becomes available.
+
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.

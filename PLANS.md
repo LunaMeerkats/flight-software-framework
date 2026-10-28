@@ -1,61 +1,48 @@
-# Bounded host event presentation
+# Backpressure-aware recurring host coordination
 
-Status: Complete implementation checkpoint — 2026-10-28
+Status: Local and independent-consumer verification passed — 2026-10-29
 
 ## Objective and context
 
-Complete RFF-LIB-REQ-007/ADR-0032: a public-only event-output consumer with one
-fixed pending line and explicit partial-write progress. The clean input is
-6ab84023892b19642b76705bd184a95bb43754df. Initial locked checks pass 193 tests;
-the input's exact hosted run 40329895459 passes all 20 steps. Existing filtering
-and FIFO APIs suffice; no library API or runtime change is planned.
+Complete RFF-LIB-REQ-008/ADR-0033 in the existing public-only work_output example.
+Clean input c899aef39a8df854d14b48484bd044ee14bba120 matches refreshed origin.
+Initial locked format/check/Clippy/test/rustdoc and whitespace checks pass,
+including 201 workspace tests. Exact input hosted run 40511047519 passes all
+20 steps; raw logs and connector steps agree. No toolchain/configuration change.
 
-## Acceptance criteria and components
+## Acceptance and components
 
-- examples/event_output.rs owns a writer, one pending event, fixed line and byte
-  offset. One host turn attempts at most one write. Tests cover FIFO bytes,
-  short writes, errors and no progress, idle behavior, rendering rejection,
-  maximum timestamps and optional filtering.
-- The example and identical independent Cargo source pass check/Clippy/test/run;
-  metadata and SHA256 hashes confirm a sole library path dependency and matching
-  source. No maintained consumer crate or dependency is added.
-- docs/EVENT_OUTPUT.md documents setup, errors, resources and delivery limits.
-  Focused verification, requirements, ADR, sources, traceability, roadmap, state
-  and entry points agree. Full baseline, source form, rendered docs, links and
-  complete diff receive root and independent Codex review before publication.
+- One host turn gates dispatch on empty output/Running sink, attempts existing
+  sole-subscriber transfer once, and polls/invokes recurrence only with empty
+  pending storage. New output waits for a later turn; caller drains separately.
+- Tests fill the three-stage pipeline, retain FIFO/configuration/timer while
+  blocked, resume one overdue release, handle unavailable sinks and disable
+  recurrence on work failure. Existing strict direct-call tests remain.
+- Update the work-output guide/entry points, requirements, ADR, source register,
+  traceability, focused verification, roadmap and current state. Verify identical
+  source in an independent Cargo package; no library API/dependency changes.
 
-## Verification approach
+## Verification and risks
 
-Run the AGENTS.md locked baseline, cargo test/run --locked --example event_output,
-and the independent-package guide recipe. Preserve raw logs under ignored
-target/review-2026-10-28-event-presentation. Conditional host/probe/workflow checks
-follow actual touched scope. Refresh origin, ordinary fast-forward push, verify
-remote head and inspect exact hosted checkout/results. Local success does not
-establish hosted success.
+Run the locked AGENTS.md baseline, focused work_output test/run and the guide's
+independent-package check/Clippy/test/run/metadata/hash recipe. Inspect source
+widths/waivers, relative links, changed rendered docs and complete diff with root
+and independent Codex review. Raw aids/logs stay in ignored
+target/review-2026-10-29-host-coordination. Refresh origin, publish by ordinary
+fast-forward push and inspect exact hosted checkout/results.
 
-## Risks and safe stopping point
+Single-subscriber retry, serial caller pairing and nontransactional effects stay
+explicit. A bounded operation count does not bound callback time. Stop after this
+coherent checkpoint. If implementation fails, preserve evidence and remove only
+current-run changes where safe; never discard unrelated work or weaken gates.
 
-Short writes are valid; do not retry accepted bytes. Err consumes no bytes under
-the Write contract. Writer calls may block; no timing guarantee is introduced.
-Flush is separate and its failure cannot safely reconstruct cleared records.
-Keep the original event on render failure and never skip past a pending record.
-Stop after this coherent reviewed checkpoint, without another capability. If
-checks fail, preserve decisions/evidence and remove only current-run implementation
-where safe; do not discard other work or weaken checks.
+## Actual local evidence
 
-## Actual local acceptance
-
-Final locked baseline passes 201 workspace/eight focused tests and the runnable
-output. The identical independent package passes check/Clippy/eight tests/run,
-normalized metadata and byte/hash inspection. Whole-tree review finds zero width
-issues and no new waiver. All 531 relative links/165 exact test references
-resolve; all 12 changed rendered documents pass content/structure inspection.
-Root and independent Codex output_review accept the complete 14-file source,
-document and diff with actual evidence and no remaining findings. Ordinary
-fast-forward publication of a47c5eafd7d822d53684dfa9f777da0d9f4b39b0 passes exact
-run 40510502171/job 122210821488 and all 20 steps, 201 workspace/14 adapter/five
-sample tests, rustdoc, both whitespace checks and the unchanged 222-line sample.
-Hosted tools/image match input. Root and independent Codex inspect actual logs
-and exact source; connector step summaries agree. This documentation-only
-completion receives separate review/publication and exact hosted inspection.
-Stop after this checkpoint without another capability.
+Final locked baseline passes 208 workspace tests, 17 focused tests and both
+runnable scenarios. The identical independent package passes check/Clippy/17
+tests/run and normalized metadata/hash/byte inspection. Whole-tree source audit
+finds zero width issues and three unchanged fulfilled expectations. Links,
+traceability and changed rendered documents pass content/structure inspection.
+Root and independent coordination_review accept the complete 13-file source,
+document and diff with actual raw evidence and no remaining findings.
+Exact hosted results remain separate and will be recorded after execution.

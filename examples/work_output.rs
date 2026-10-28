@@ -2,6 +2,7 @@
 //!
 //! Work stages one value; the host publishes it to one frozen subscriber.
 //! No work callback publishes, and rejected transfers retain the pending value.
+//! Recurring host turns defer production while that pending slot is occupied.
 
 #![forbid(unsafe_code)]
 
@@ -13,10 +14,11 @@ use std::io::{self, Write};
 use std::time::Duration;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationMessageContext, ApplicationWorkContext,
-    ConfigurationTable, DeliveryStatus, FrameworkInstant, ManualClock, Message, MessageCreateError,
-    MessagingApplication, MessagingRuntime, PublishClassification, PublishError, PublishReport,
-    Runtime, RuntimeInboxConfig, ScheduledWork, ScheduledWorkOutcome, WorkSchedule,
+    Application, ApplicationId, ApplicationMessageContext, ApplicationState,
+    ApplicationWorkContext, Clock, ConfigurationTable, DeliveryStatus, FrameworkInstant,
+    ManualClock, Message, MessageCreateError, MessageDispatchOutcome, MessagingApplication,
+    MessagingRuntime, PeriodicWork, PeriodicWorkOutcome, PublishClassification, PublishError,
+    PublishReport, Runtime, RuntimeInboxConfig, ScheduledWork, ScheduledWorkOutcome, WorkSchedule,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -84,6 +86,27 @@ enum TransferOutcome {
         observation: Produced,
         report: PublishReport,
     },
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum DispatchTurn {
+    OutputOccupied,
+    Unavailable(ApplicationState),
+    Attempted(MessageDispatchOutcome),
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum ProductionTurn {
+    Backpressured,
+    Disabled,
+    Polled(PeriodicWorkOutcome),
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct HostTurnReport {
+    dispatch: DispatchTurn,
+    transfer: TransferOutcome,
+    production: ProductionTurn,
 }
 
 impl Application for MissionApplication<'_> {
@@ -229,6 +252,7 @@ impl Error for TransferError {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let values = run()?;
+    let recurring = run_recurring()?;
     let mut output = io::stdout().lock();
     writeln!(
         output,
@@ -241,6 +265,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     writeln!(
         output,
         "ordinary/scheduled work -> host -> sink: {values:?}"
+    )?;
+    writeln!(
+        output,
+        "recurring work with deferred host drain -> sink: {recurring:?}"
     )?;
     Ok(())
 }
@@ -271,6 +299,91 @@ fn run() -> Result<[u8; 2], Box<dyn Error>> {
         runtime.stop(id)?;
     }
     Ok([first, second])
+}
+
+fn run_recurring() -> Result<[u8; 4], Box<dyn Error>> {
+    let pending = Cell::new(None);
+    let output = Cell::new(None);
+    let observed = [Cell::new(None), Cell::new(None)];
+    let (mut runtime, ids) = compose(&pending, &output, &observed)?;
+    for id in ids {
+        runtime.start(id)?;
+    }
+    let mut clock = ManualClock::new();
+    let mut timer = Some(PeriodicWork::new(
+        ScheduledWork::new(ids[0], clock.now()),
+        Duration::from_secs(1),
+    )?);
+    host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock)?;
+    for value in [7, 9] {
+        runtime.replace_configuration(&[value])?;
+        clock.advance(Duration::from_secs(1))?;
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock)?;
+    }
+    clock.advance(Duration::from_secs(1))?;
+    let blocked = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock)?;
+    if blocked.production != ProductionTurn::Backpressured {
+        return Err(io::Error::other("expected a full output pipeline").into());
+    }
+    runtime.replace_configuration(&[11])?;
+    clock.advance(Duration::from_secs(7))?;
+    let first = output
+        .take()
+        .ok_or_else(|| io::Error::other("missing first recurring output"))?;
+    host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock)?;
+    // End production explicitly after the one overdue observation resumes.
+    timer = None;
+    let mut values = [first, 0, 0, 0];
+    for value in &mut values[1..] {
+        *value = output
+            .take()
+            .ok_or_else(|| io::Error::other("missing recurring output"))?;
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock)?;
+    }
+    for id in ids {
+        runtime.stop(id)?;
+    }
+    Ok(values)
+}
+
+// The order protects the two application slots without changing their errors.
+// Earlier stages stay committed if a later stage fails; this is not atomic.
+fn host_turn<C: Clock>(
+    runtime: &mut MissionRuntime<'_>,
+    ids: [ApplicationId; 2],
+    pending: &Cell<Option<Produced>>,
+    output: &Cell<Option<u8>>,
+    timer: &mut Option<PeriodicWork>,
+    clock: &C,
+) -> Result<HostTurnReport, Box<dyn Error>> {
+    let dispatch = if output.get().is_some() {
+        DispatchTurn::OutputOccupied
+    } else {
+        match runtime.state(ids[1])? {
+            ApplicationState::Running => DispatchTurn::Attempted(runtime.dispatch_one(ids[1])?),
+            state => DispatchTurn::Unavailable(state),
+        }
+    };
+    let transfer = transfer(runtime, ids[1], pending)?;
+    let production = if pending.get().is_some() {
+        ProductionTurn::Backpressured
+    } else if let Some(cursor) = timer.as_mut() {
+        let outcome = cursor.poll(clock);
+        if let PeriodicWorkOutcome::Released { scheduled_work, .. } = outcome
+            && let Err(error) = runtime.work(scheduled_work.application_id())
+        {
+            *timer = None;
+            return Err(error.into());
+        }
+        ProductionTurn::Polled(outcome)
+    } else {
+        ProductionTurn::Disabled
+    };
+    Ok(HostTurnReport {
+        dispatch,
+        transfer,
+        production,
+    })
 }
 
 fn compose<'a>(
@@ -795,5 +908,409 @@ mod tests {
         assert_eq!(pending.get(), retained);
         // A topology error may follow delivery: do not retry this error.
         assert_eq!(runtime.pending(ids[1]), Ok(1));
+    }
+}
+
+#[cfg(test)]
+mod recurring_tests {
+    use rust_flight_framework::{MessagingOperationError, RuntimeWorkError};
+
+    use super::*;
+
+    struct CountingClock {
+        instant: Cell<FrameworkInstant>,
+        reads: Cell<usize>,
+    }
+
+    impl CountingClock {
+        fn new(seconds: u64) -> Self {
+            Self {
+                instant: Cell::new(at(seconds)),
+                reads: Cell::new(0),
+            }
+        }
+    }
+
+    impl Clock for CountingClock {
+        fn now(&self) -> FrameworkInstant {
+            self.reads.set(self.reads.get() + 1);
+            self.instant.get()
+        }
+    }
+
+    fn at(seconds: u64) -> FrameworkInstant {
+        FrameworkInstant::from_elapsed(Duration::from_secs(seconds))
+    }
+
+    fn recurring(id: ApplicationId) -> Option<PeriodicWork> {
+        Some(PeriodicWork::new(ScheduledWork::new(id, at(0)), Duration::from_secs(1)).unwrap())
+    }
+
+    fn fill_pipeline(
+        runtime: &mut MissionRuntime<'_>,
+        ids: [ApplicationId; 2],
+        pending: &Cell<Option<Produced>>,
+        output: &Cell<Option<u8>>,
+        timer: &mut Option<PeriodicWork>,
+        clock: &CountingClock,
+    ) {
+        for id in ids {
+            runtime.start(id).unwrap();
+        }
+        host_turn(runtime, ids, pending, output, timer, clock).unwrap();
+        for (seconds, value) in [(1, 7), (2, 9)] {
+            clock.instant.set(at(seconds));
+            runtime.replace_configuration(&[value]).unwrap();
+            host_turn(runtime, ids, pending, output, timer, clock).unwrap();
+        }
+    }
+
+    #[test]
+    fn recurring_pipeline_backpressure_preserves_slots_timer_and_clock_reads() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(ids[0]);
+        fill_pipeline(&mut runtime, ids, &pending, &output, &mut timer, &clock);
+        assert_eq!(output.get(), Some(42));
+        assert_eq!(runtime.pending(ids[1]), Ok(1));
+        let retained = Produced {
+            revision: 3,
+            value: 9,
+        };
+        assert_eq!(pending.get(), Some(retained));
+        assert_eq!(observed[0].get(), Some(retained));
+        let next = timer.as_ref().unwrap().next_scheduled_work();
+        assert_eq!(next, Some(ScheduledWork::new(ids[0], at(3))));
+        assert_eq!(clock.reads.get(), 3);
+        runtime.replace_configuration(&[11]).unwrap();
+        for seconds in [3, 10, 100] {
+            clock.instant.set(at(seconds));
+            let report =
+                host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+            assert_eq!(report.dispatch, DispatchTurn::OutputOccupied);
+            assert_eq!(report.production, ProductionTurn::Backpressured);
+            let TransferOutcome::Retained {
+                observation,
+                report,
+            } = report.transfer
+            else {
+                panic!("full sink must retain the producer output");
+            };
+            assert_eq!(observation, retained);
+            assert_eq!(report.outcomes()[0].status(), DeliveryStatus::InboxFull);
+            assert_eq!(pending.get(), Some(retained));
+            assert_eq!(observed[0].get(), Some(retained));
+            assert_eq!(timer.as_ref().unwrap().next_scheduled_work(), next);
+            assert_eq!(clock.reads.get(), 3);
+            assert_eq!(output.get(), Some(42));
+            assert_eq!(runtime.pending(ids[1]), Ok(1));
+            for id in ids {
+                assert_eq!(runtime.state(id), Ok(ApplicationState::Running));
+            }
+        }
+    }
+
+    #[test]
+    fn deferred_drain_resumes_one_overdue_release_with_current_configuration() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(ids[0]);
+        fill_pipeline(&mut runtime, ids, &pending, &output, &mut timer, &clock);
+        runtime.replace_configuration(&[11]).unwrap();
+        clock.instant.set(at(10));
+        assert_eq!(output.take(), Some(42));
+        let report = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(
+            report.dispatch,
+            DispatchTurn::Attempted(MessageDispatchOutcome::Dispatched)
+        );
+        assert_eq!(
+            report.transfer,
+            TransferOutcome::Delivered(Produced {
+                revision: 3,
+                value: 9
+            })
+        );
+        assert_eq!(
+            report.production,
+            ProductionTurn::Polled(PeriodicWorkOutcome::Released {
+                scheduled_work: ScheduledWork::new(ids[0], at(3)),
+                observed_at: at(10),
+                next_scheduled_at: Some(at(11)),
+            })
+        );
+        assert_eq!(clock.reads.get(), 4);
+        assert_eq!(
+            pending.get(),
+            Some(Produced {
+                revision: 4,
+                value: 11
+            })
+        );
+        assert_eq!(runtime.pending(ids[1]), Ok(1));
+        timer = None;
+        for expected in [7, 9, 11] {
+            assert_eq!(output.take(), Some(expected));
+            host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        }
+        assert_eq!(output.get(), None);
+        assert_eq!(pending.get(), None);
+        assert_eq!(runtime.pending(ids[1]), Ok(0));
+        assert_eq!(clock.reads.get(), 4);
+        assert_eq!(run_recurring().unwrap(), [42, 7, 9, 11]);
+    }
+
+    #[test]
+    fn stopped_sink_retains_output_without_polling_until_restart() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        for id in ids {
+            runtime.start(id).unwrap();
+        }
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(ids[0]);
+        let first = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(first.transfer, TransferOutcome::Empty);
+        assert_eq!(output.get(), None);
+        assert_eq!(runtime.pending(ids[1]), Ok(0));
+        runtime.stop(ids[1]).unwrap();
+        clock.instant.set(at(10));
+        let report = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(
+            report.dispatch,
+            DispatchTurn::Unavailable(ApplicationState::Stopped)
+        );
+        assert_eq!(report.production, ProductionTurn::Backpressured);
+        let TransferOutcome::Retained { report, .. } = report.transfer else {
+            panic!("stopped sink must retain output");
+        };
+        assert_eq!(report.outcomes()[0].status(), DeliveryStatus::Unavailable);
+        assert_eq!(clock.reads.get(), 1);
+        runtime.replace_configuration(&[7]).unwrap();
+        runtime.restart(ids[1]).unwrap();
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(clock.reads.get(), 2);
+        assert_eq!(
+            pending.get(),
+            Some(Produced {
+                revision: 2,
+                value: 7
+            })
+        );
+        assert_eq!(runtime.pending(ids[1]), Ok(1));
+        timer = None;
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(output.take(), Some(42));
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(output.take(), Some(7));
+    }
+
+    #[test]
+    fn lifecycle_work_error_disables_timer_after_prior_turn_effects() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        for id in ids {
+            runtime.start(id).unwrap();
+        }
+        runtime
+            .publish(&Message::try_new(Topic::Output, &[88]).unwrap())
+            .unwrap();
+        runtime.work(ids[0]).unwrap();
+        runtime.stop(ids[0]).unwrap();
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(ids[0]);
+        let error =
+            host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap_err();
+        let failure = error
+            .downcast_ref::<MessagingOperationError<RuntimeWorkError<WorkError>>>()
+            .unwrap();
+        assert!(matches!(
+            failure.operation_error(),
+            RuntimeWorkError::Lifecycle(_)
+        ));
+        assert_eq!(failure.discarded_deliveries(), 0);
+        assert!(timer.is_none());
+        assert_eq!(output.get(), Some(88));
+        assert_eq!(runtime.pending(ids[1]), Ok(1));
+        assert_eq!(pending.get(), None);
+        assert_eq!(runtime.state(ids[0]), Ok(ApplicationState::Stopped));
+        let report = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(report.production, ProductionTurn::Disabled);
+        assert_eq!(clock.reads.get(), 1);
+        assert_eq!(output.take(), Some(88));
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(output.take(), Some(42));
+    }
+
+    #[test]
+    fn returned_work_error_keeps_concrete_source_and_disables_timer() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        // Fault injection bypasses the mission validator, not the work parser.
+        let table = ConfigurationTable::new(&[101], |_| Ok::<(), ValueError>(())).unwrap();
+        let mut owner = Runtime::with_configuration(2, table).unwrap();
+        let producer = owner
+            .register(MissionApplication::Producer {
+                pending: &pending,
+                observed: &observed[0],
+            })
+            .unwrap();
+        let sink = owner
+            .register(MissionApplication::Sink {
+                output: &output,
+                observed: &observed[1],
+            })
+            .unwrap();
+        let inboxes = [
+            RuntimeInboxConfig::new(1, &[]),
+            RuntimeInboxConfig::new(1, &[Topic::Output]),
+        ];
+        let mut runtime = MessagingRuntime::new(owner, &inboxes).unwrap();
+        for id in [producer, sink] {
+            runtime.start(id).unwrap();
+        }
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(producer);
+        let error = host_turn(
+            &mut runtime,
+            [producer, sink],
+            &pending,
+            &output,
+            &mut timer,
+            &clock,
+        )
+        .unwrap_err();
+        let failure = error
+            .downcast_ref::<MessagingOperationError<RuntimeWorkError<WorkError>>>()
+            .unwrap();
+        let operation = failure.source().unwrap();
+        assert_eq!(
+            operation.downcast_ref::<RuntimeWorkError<WorkError>>(),
+            Some(failure.operation_error())
+        );
+        let work = operation
+            .source()
+            .unwrap()
+            .downcast_ref::<WorkError>()
+            .unwrap();
+        assert_eq!(
+            *work,
+            WorkError::Configuration(ValueError::Percent { actual: 101 })
+        );
+        assert_eq!(
+            work.source().unwrap().downcast_ref::<ValueError>(),
+            Some(&ValueError::Percent { actual: 101 })
+        );
+        assert!(timer.is_none());
+        assert_eq!(runtime.state(producer), Ok(ApplicationState::Failed));
+        assert_eq!(runtime.state(sink), Ok(ApplicationState::Running));
+    }
+
+    #[test]
+    fn topology_error_stops_before_timer_poll_even_after_publication() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        for id in ids {
+            runtime.start(id).unwrap();
+        }
+        runtime.work(ids[0]).unwrap();
+        let retained = pending.get();
+        let clock = CountingClock::new(0);
+        let mut timer = recurring(ids[0]);
+        // Wrong destination pairing is a deliberate host topology defect.
+        let error = host_turn(
+            &mut runtime,
+            [ids[0], ids[0]],
+            &pending,
+            &output,
+            &mut timer,
+            &clock,
+        )
+        .unwrap_err();
+        let TransferError::UnexpectedDestination(report) =
+            error.downcast_ref::<TransferError>().unwrap()
+        else {
+            panic!("expected a topology error");
+        };
+        assert_eq!(report.outcomes()[0].status(), DeliveryStatus::Delivered);
+        assert_eq!(pending.get(), retained);
+        assert_eq!(runtime.pending(ids[1]), Ok(1));
+        assert_eq!(clock.reads.get(), 0);
+        assert_eq!(
+            timer.as_ref().unwrap().next_scheduled_work(),
+            Some(ScheduledWork::new(ids[0], at(0)))
+        );
+    }
+
+    #[test]
+    fn idle_turns_distinguish_waiting_exhausted_and_disabled_recurring_work() {
+        let pending = Cell::new(None);
+        let output = Cell::new(None);
+        let observed = [Cell::new(None), Cell::new(None)];
+        let (mut runtime, ids) = compose(&pending, &output, &observed).unwrap();
+        for id in ids {
+            runtime.start(id).unwrap();
+        }
+        let clock = CountingClock::new(0);
+        let mut timer = Some(
+            PeriodicWork::new(ScheduledWork::new(ids[0], at(1)), Duration::from_secs(1)).unwrap(),
+        );
+        let waiting = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(
+            waiting.dispatch,
+            DispatchTurn::Attempted(MessageDispatchOutcome::InboxEmpty)
+        );
+        assert_eq!(waiting.transfer, TransferOutcome::Empty);
+        assert_eq!(
+            waiting.production,
+            ProductionTurn::Polled(PeriodicWorkOutcome::Waiting {
+                next: ScheduledWork::new(ids[0], at(1)),
+                observed_at: at(0),
+            })
+        );
+        clock
+            .instant
+            .set(FrameworkInstant::from_elapsed(Duration::MAX));
+        host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(clock.reads.get(), 2);
+        assert_eq!(
+            pending.get(),
+            Some(Produced {
+                revision: 1,
+                value: 42
+            })
+        );
+        let exhausted =
+            host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(
+            exhausted.production,
+            ProductionTurn::Polled(PeriodicWorkOutcome::Exhausted)
+        );
+        timer = None;
+        let disabled = host_turn(&mut runtime, ids, &pending, &output, &mut timer, &clock).unwrap();
+        assert_eq!(disabled.production, ProductionTurn::Disabled);
+        assert_eq!(clock.reads.get(), 2);
+        assert_eq!(output.take(), Some(42));
+        assert_eq!(pending.get(), None);
+        assert_eq!(
+            observed[0].get(),
+            Some(Produced {
+                revision: 1,
+                value: 42
+            })
+        );
     }
 }

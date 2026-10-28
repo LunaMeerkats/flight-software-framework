@@ -110,7 +110,8 @@ translate NASA C source.
 - `examples/work_output.rs`: a public-only configured ordinary-work producer
   with a capacity-one pending slot and explicit host transfer to one subscriber.
   Its test-enabled target and independent-package recipe verify this mission
-  policy, including saturation retry; it adds no ordinary-work service context.
+  policy, including saturation retry and bounded recurring host turns that gate
+  work/dispatch on downstream capacity; it adds no ordinary-work service context.
 - `tests/work_identity.rs`: public-only diagnostic consumer and context-identity
   integration evidence across every ordinary-work entry path. Its guide verifies
   identical tests in an independent Cargo package without another example target.

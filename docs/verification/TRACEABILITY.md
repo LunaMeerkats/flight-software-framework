@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 recurring host coordination — 2026-10-29
+
+RFF-LIB-REQ-008 revision 1 and
+[ADR-0033](../adr/0033-backpressure-aware-host-coordination.md) compose the
+existing work-output consumer with recurrence and deferred host consumption.
+The [guide](../ORDINARY_WORK_OUTPUT.md) and
+[focused review](HOST_COORDINATION_REVIEW.md) retain actual evidence and limits.
+Library contracts and the original strict direct-call tests remain unchanged.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-008 | Mission-owned bounded host turn; guarded dispatch, sole-subscriber transfer and paused recurring poll | `recurring_pipeline_backpressure_preserves_slots_timer_and_clock_reads`; `deferred_drain_resumes_one_overdue_release_with_current_configuration`; `stopped_sink_retains_output_without_polling_until_restart`; `lifecycle_work_error_disables_timer_after_prior_turn_effects`; `returned_work_error_keeps_concrete_source_and_disables_timer`; `topology_error_stops_before_timer_poll_even_after_publication`; `idle_turns_distinguish_waiting_exhausted_and_disabled_recurring_work`; identical independent consumer check/Clippy/test/run/metadata/hash | Final locked baseline passes 208 workspace/17 focused/17 identical independent tests, check/Clippy/run and metadata/hash; review/publication boundary in focused record |
+
 ## Stage 5 bounded host event presentation — 2026-10-28
 
 RFF-LIB-REQ-007 revision 1 and

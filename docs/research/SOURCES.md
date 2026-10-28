@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-HOST-COORDINATION — Serial slots and explicit recurrence ownership
+
+- Titles: Cell, std::cell; Option, std::option
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/cell/struct.Cell.html> and
+  <https://doc.rust-lang.org/std/option/enum.Option.html>
+- Version: official standard-library 1.99.1 documentation, commit
+  58cf8f9c3 (2026-10-13), accessed 2026-10-29; local execution uses 1.98.0
+- Informed: Cell supports shared interior mutation without Sync; Option makes
+  retained/disabled timer ownership explicit. These are standard-library
+  contracts, not agency guidance or evidence of synchronization.
+- Local treatment: retain existing serial caller-owned slots and represent
+  disabled recurrence explicitly. Adopt locally designed bounded host ordering,
+  comparing paused polling with dropped releases and a library runner in ADR-0033.
+  No upstream source is copied, dependency added or general runner API inferred.
+
 ## SRC-RUST-EVENT-OUTPUT — Partial byte output and fixed presentation storage
 
 - Titles: Write and ErrorKind, std::io; Cursor, std::io; Write, std::fmt
