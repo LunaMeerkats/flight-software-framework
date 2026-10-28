@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; recurring host coordination locally verified**
+Status: **Active; recurring host coordination checkpoint verified**
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4
@@ -129,7 +129,11 @@ policy; recurrence stays unpolled while pending output blocks production.
 Resuming coalesces overdue work without losing older FIFO values or turning
 ordinary backpressure into a callback failure. The
 [focused review](verification/HOST_COORDINATION_REVIEW.md) records actual
-verification and limitations. Existing direct-call failure semantics remain.
+verification and limitations. Root/independent complete review and identical
+consumer verification pass; exact implementation beb1d1294aebac190956b6d9ba7bdc2080c123d3
+passes hosted run 40694345405, all 20 steps and 208 workspace tests. Existing
+direct-call failure semantics remain. Evidence completion receives its own
+review and exact hosted inspection.
 
 ## Stage 0 — Foundation and responsibility checkpoint
 

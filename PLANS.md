@@ -1,6 +1,6 @@
 # Backpressure-aware recurring host coordination
 
-Status: Local and independent-consumer verification passed — 2026-10-29
+Status: Complete implementation checkpoint — 2026-10-29
 
 ## Objective and context
 
@@ -45,4 +45,9 @@ finds zero width issues and three unchanged fulfilled expectations. Links,
 traceability and changed rendered documents pass content/structure inspection.
 Root and independent coordination_review accept the complete 13-file source,
 document and diff with actual raw evidence and no remaining findings.
-Exact hosted results remain separate and will be recorded after execution.
+Ordinary publication of beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
+hosted run 40694345405/job 122837012923: all 20 steps, 208 workspace/14 adapter/
+five sample tests and the unchanged 222-line sample. Raw logs and connector steps
+agree; hosted tools/image match input. Evidence-only completion receives its
+own document/diff review, ordinary publication and exact hosted inspection.
+Stop after this checkpoint without another capability.

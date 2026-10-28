@@ -17,7 +17,12 @@ work_output consumer. Package 0.0.0 remains unpublished and APIs provisional.
   Root raw logs and connector step inspection agree.
 - Fresh initial/final locked format/check/Clippy/test/warnings-denied rustdoc and
   both whitespace checks pass, with 201/208 workspace tests. All 17 work_output
-  tests and its runnable ordinary/recurring scenarios pass.
+  tests and its runnable ordinary/recurring scenarios pass. Identical independent
+  consumer check/Clippy/17 tests/run and metadata/byte/hash inspection pass.
+- Published implementation beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
+  hosted run 40694345405/job 122837012923, all 20 steps, 208 workspace/14 adapter/
+  five sample tests and the unchanged 222-line sample. Root raw logs and connector
+  steps agree; tools/image match input.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
   2.338.0/windows-2025-vs2026 image 20261021.278.1. Local checks do not claim
@@ -38,10 +43,12 @@ It holds no hidden worker and changes no library contract or dependency.
 
 ## Work in progress
 
-RFF-LIB-REQ-008/ADR-0033 precede implementation. Source and seven new regressions
-pass the full local baseline and identical independent-package verification.
-Root/independent Codex complete source/document/diff review accepts with no
-remaining findings. Ordinary publication and exact hosted inspection follow. No additional capability is selected for this run.
+RFF-LIB-REQ-008/ADR-0033 precede source changes. Implementation, final baseline,
+identical independent consumer and complete root/independent Codex review pass
+with no remaining findings. Ordinary publication and exact implementation hosted
+inspection pass. This documentation-only completion receives its own review,
+publication and exact hosted inspection. No unfinished implementation or further
+capability remains in this work item.
 
 ## Highest risks and uncertainties
 
@@ -73,5 +80,6 @@ with retry ownership needs; do not add a generic runner or more models by defaul
 2026-10-29: implemented bounded host coordination to prevent ordinary downstream
 backpressure from invoking full producer/sink callbacks. Seven new regressions
 and the runnable four-value recurring scenario pass. Identical independent
-consumer and complete root/independent review pass; exact publication/hosted
-evidence follows actual execution.
+consumer and complete root/independent review pass. Ordinary publication and
+exact implementation hosted verification pass; the evidence-only completion
+receives its own exact hosted check, then the run stops.

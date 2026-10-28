@@ -624,3 +624,27 @@ toolchain execution is claimed. This seven-document evidence completion changes
 no source, manifest, lockfile, licence or workflow and receives complete review
 and its own exact hosted inspection. Final head/result remain in automation
 memory; no later revision inherits an unobserved pass.
+
+## Recurring host coordination checkpoint — 2026-10-29
+
+RFF-LIB-REQ-008/ADR-0033 extends the existing work_output consumer with bounded
+host turns and paused polling under backpressure. The
+[focused review](HOST_COORDINATION_REVIEW.md) records the final source hash,
+208-test locked baseline, 17 focused/17 identical independent tests, metadata,
+runnable FIFO output and complete root/independent Codex source/document review.
+
+Implementation beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
+[push run 40694345405](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40694345405),
+job 122837012923 and all 20 steps. Root raw metadata/logs and connector summaries
+agree: 208 workspace/14 adapter/five sample tests, warnings-denied rustdoc, both
+whitespace checks and the unchanged 222-line sample versus input run 40511047519.
+Source SHA256 and reviewed staged/committed patch identity are retained.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. Configuration/whole-tree
+review covers 51 Rust files, 21,739 physical and 1,290 comment-only lines, zero
+width findings and three unchanged fulfilled expectations. No source-quality,
+dependency or workflow policy changes. Local tools remain 1.98.0; no local
+hosted-toolchain execution is claimed. This evidence-only completion preserves
+source/configuration and receives complete review and its own exact hosted
+inspection; final head/result remains in automation memory.

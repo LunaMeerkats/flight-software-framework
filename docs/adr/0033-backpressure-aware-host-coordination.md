@@ -1,6 +1,6 @@
 # ADR-0033: Backpressure-aware recurring host coordination
 
-- Status: Implemented; local and independent-consumer verification passed
+- Status: Implemented; autonomous review and exact hosted verification passed
 - Date: 2026-10-29
 - Scope: Existing public-only work_output consumer; library contracts unchanged
 
@@ -45,7 +45,8 @@ Official Rust Cell and Option documentation informs shared serial slots and
 explicit timer removal only; scheduling/backpressure policy is locally chosen.
 SRC-RUST-HOST-COORDINATION records provenance. The identical complete example
 must pass the independent-package recipe and the full repository baseline.
-Actual tests, review and publication belong in the focused verification record.
+Actual tests, autonomous review and exact hosted publication evidence are in
+[the focused record](../verification/HOST_COORDINATION_REVIEW.md).
 
 The pipeline holds at most one output, one sink-inbox message and one pending
 producer value. A turn is not transactional: successful earlier stages remain

@@ -1,7 +1,7 @@
 # Recurring host coordination review
 
 Date: **2026-10-29**
-Status: **Local and independent-consumer verification passed; publication pending**
+Status: **Implementation, autonomous review and exact hosted verification passed**
 
 ## Objective and input
 
@@ -101,10 +101,40 @@ rendered documents preserve content, headings, code, links, tables and nesting;
 this is content/structure inspection, not pixel or human acceptance.
 
 Root Codex and independent coordination_review accept the complete 13-file
-source/document/diff and actual raw evidence with no remaining findings. The exact accepted patch is retained in ignored
-review aids. Ordinary fast-forward publication and exact hosted inspection follow
-local acceptance; no hosted pass is claimed here before that execution. Previous
+source/document/diff and actual raw evidence with no remaining findings. The
+exact accepted patch is retained in ignored review aids. Ordinary fast-forward
+publication and exact hosted inspection pass as recorded below. Previous
 evidence stays historical in [the original review](WORK_OUTPUT_REVIEW.md).
+
+## Publication and exact hosted evidence
+
+Published implementation beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
+[push run 40694345405](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/40694345405),
+job 122837012923. Root raw-log/metadata inspection and connector step summaries
+agree: all 20 steps pass, 208 workspace tests including all 17 consumer tests,
+separate 14 adapter/five sample tests, warnings-denied rustdoc and both whitespace
+checks. The 222-line combined sample exactly matches input. The committed patch
+byte-matches the reviewed staged diff; local/origin/live remote match and the
+tree is clean at publication. Source SHA256 above is unchanged; Git blob is
+ccd08836e5222e3063ac089b8410b3d57bb6d48c.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0
+and windows-2025-vs2026 image 20261021.278.1 match input. The configuration and
+whole-tree source review retain the existing policy. Local execution remains
+on 1.98.0; no local hosted-toolchain run is claimed. Independent
+coordination_review accepts actual exact-revision raw evidence with no findings.
+This evidence-only completion changes no source/configuration and receives
+complete document/diff review and its own exact hosted inspection. Final
+head/result is retained in automation
+memory; no later revision inherits an unobserved CI pass.
+
+The final completion audit covers 96 Markdown files, 547 resolving relative
+links, 172 exact test references and all 13 run-changed rendered documents.
+Source hash and expectations are unchanged. The audit caught a temporary
+document-script encoding error; explicit UTF-8 output restores the affected
+heading before successful rendering/link/whitespace review. Root Codex and
+independent coordination_review accept the complete seven-document evidence
+diff and actual implementation logs with no remaining findings.
 
 ## Limitations
 
