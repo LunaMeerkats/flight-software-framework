@@ -10,7 +10,9 @@ history to 74b1b2398accb1435416f89bd38b4c1dfee762ce without discarding commits.
 Current guidance, automation and CI push trigger now use main; historical branch
 evidence remains unchanged. Library source and consumer bytes are intact. Local
 locked baseline (217 tests), reviewed actionlint and document/source checks pass;
-ordinary main publication and exact hosted inspection remain pending.
+ordinary main publication of 0de96233f8a3dec98b347ba93e942ff4f0160387 passes
+exact main run 41136002509/job 124338483258, all 20 steps. Raw logs and connector
+steps agree. Tools/image match prior evidence; runner is now 2.338.2.
 
 ## Current milestone
 
@@ -54,12 +56,11 @@ owners, with no report allocation, retry history or callback-context expansion.
 
 ## Work in progress
 
-RFF-LIB-REQ-009/ADR-0034 precede source changes. Implementation, public-only
-consumer and identical independent-package verification pass. Complete root and
-independent Codex source/document/evidence/diff review passes. Ordinary source
-publication and exact implementation hosted inspection pass. This evidence-only
-completion receives its own complete review, publication and exact hosted check.
-No unfinished implementation or further capability remains in this work item.
+RFF-LIB-REQ-009/ADR-0034 implementation, public-only consumer and independent
+verification are complete. The requested main-branch transition passes local
+checks, complete root/independent Codex review and exact configuration hosted
+inspection. Its record-only completion receives its own review, publication and
+exact hosted check. No unfinished implementation or further capability remains.
 
 ## Highest risks and uncertainties
 
@@ -87,9 +88,7 @@ or further model machinery without a demonstrated consumer need.
 
 ## Latest run
 
-2026-10-31: selected one subscribed-destination publication over blind whole-topic
-retry, separate destination topics and subset APIs. Input local/hosted baseline
-passes. Final local baseline and identical retry-consumer verification pass;
-complete review passes. Ordinary source publication and exact implementation
-hosted verification pass; evidence-only completion receives its own hosted
-inspection, then the run stops.
+2026-10-31: user directed continued work on main. Preserved 40 verified commits,
+updated active guidance/automation/CI filter, passed the local baseline and
+complete Codex review, and published main with exact hosted acceptance. This
+record-only completion receives its own hosted inspection, then the run stops.

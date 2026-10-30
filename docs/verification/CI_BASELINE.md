@@ -13,9 +13,17 @@ Reviewed actionlint 1.7.12 passes; the retained archive matches the recorded
 SHA256. All 16 nonempty PowerShell bodies parse as unchanged single native
 commands, preserving existing wrapper failure propagation. The locked local
 baseline passes 217 workspace tests, including warnings-denied Clippy/rustdoc.
-Whole-tree source and changed rendered documents pass review; exact hosted
-main-head acceptance remains pending publication. See [the plan](../../PLANS.md)
-for ancestry and automation-setting preservation evidence.
+Whole-tree source and changed rendered documents pass review. Configuration
+0de96233f8a3dec98b347ba93e942ff4f0160387 is published by ordinary fast-forward
+to origin/main; exact main push
+[run 41136002509](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41136002509),
+job 124338483258 passes all 20 steps: 217 workspace/14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and unchanged 222-line sample.
+Root raw metadata/logs and connector steps agree. Rust/Cargo 1.99.1, rustfmt
+1.10.0-stable, Clippy 0.1.99 and image 20261021.278.1 match prior evidence;
+runner is now 2.338.2. See [the plan](../../PLANS.md) for ancestry, actual Codex
+review and automation-setting preservation. Record-only completion receives its
+own exact hosted inspection in automation memory/report, with source unchanged.
 
 ## Selective-publication checkpoint — 2026-10-31
 

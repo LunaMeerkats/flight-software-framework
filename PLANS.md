@@ -1,6 +1,6 @@
 # Continue verified development on main
 
-Status: Local verification passed; publication pending — 2026-10-31
+Status: Complete branch-policy transition — 2026-10-31
 
 ## Objective and authority
 
@@ -41,6 +41,13 @@ checksum verified. All 16 nonempty PowerShell run bodies parse and remain one
 unchanged native command each; existing failure propagation is preserved.
 Whole-tree width/waiver audit, links/traceability and changed rendered documents
 pass; source and consumers are unchanged. Root and independent main_branch_audit
-Codex review accept the complete eight-file diff with no findings. Exact hosted
-main-head publication verification remains before completion. Raw aids/logs:
-target/review-2026-10-31-main-branch. No new product behavior is selected.
+Codex review accept the complete eight-file diff with no findings. Committed
+configuration 0de96233f8a3dec98b347ba93e942ff4f0160387 exactly matches the
+reviewed staged diff and is published by ordinary fast-forward to origin/main.
+Exact main push run 41136002509/job 124338483258 passes all 20 steps, 217
+workspace/14 adapter/five sample tests and the unchanged 222-line sample.
+Root raw logs and connector summaries agree. Tools/image match prior evidence;
+runner is now 2.338.2. This record-only completion receives its own review,
+ordinary main publication and exact hosted inspection, recorded in automation
+memory/report. Raw aids/logs: target/review-2026-10-31-main-branch. No new
+product behavior is selected; no further implementation remains.
