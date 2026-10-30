@@ -4,6 +4,16 @@
 - Date: 2026-09-12
 - Scope: Stage 4 execution of existing checks and the combined sample
 
+## Development branch amendment — 2026-10-31
+
+The user directed continued development on `main` instead of `codex/nightly`.
+The workflow now triggers on pushes to `main`; pull-request/manual triggers,
+permissions, actions and all command bodies remain unchanged. Verified ordinary
+fast-forward source publication now targets `origin/main`. This supersedes the
+branch-specific publication/trigger clauses below; their original dates and
+exact-revision evidence remain historical. Tags, releases, crate publication,
+deployment and the other consequential gates remain separate.
+
 ## Source publication amendment — 2026-09-12
 
 After the initial local checkpoint, the user approved publication without

@@ -4,6 +4,13 @@
 - Date: 2026-10-08
 - Scope: Host v0.1 entry-point and architecture acceptance
 
+## Development branch amendment — 2026-10-31
+
+The user's new instruction selects `main` for continued development and verified
+ordinary source publication to `origin/main`. It supersedes this ADR's earlier
+`codex/nightly` publication-path clause. Autonomous review and all separate
+consequential gates retain their meaning; historical review evidence is unchanged.
+
 ## Context and authority
 
 The user directed on 2026-10-08:

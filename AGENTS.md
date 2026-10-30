@@ -379,16 +379,18 @@ warnings.
 
 ## Git expectations
 
-- Autonomous work occurs only on `codex/nightly`.
+- Autonomous work occurs only on `main`. The user's 2026-10-31 instruction
+  replaces the earlier `codex/nightly` development and publication policy.
 - Preserve unexpected local changes and generated work; never reset or discard
   them to obtain a clean tree.
 - Make small local commits only after the bounded increment is coherent and its
   applicable checks pass.
 - The user authorized source publication without per-push human review on
   2026-09-12. After applicable local verification and autonomous source/diff
-  review pass, push `codex/nightly` to the existing `origin` repository
+  review pass, push `main` to the existing `origin` repository
   (`https://github.com/LunaMeerkats/flight-software-framework.git`) using an
-  ordinary fast-forward push. This includes the accumulated verified commits.
+  ordinary fast-forward push. The 2026-10-31 branch direction extends this
+  standing permission to `main`, including the accumulated verified commits.
 - Refresh remote state before pushing; preserve remote changes and stop on
   non-fast-forward rejection. Verify the remote head and inspect hosted CI
   after publication. Local checks permit the first CI-enabling push; a local
@@ -396,8 +398,7 @@ warnings.
 - Source publication does not require a human code review or completed v0.1
   release review. Preserve truthful Codex provenance and actual check results;
   standing permission is not evidence that a human reviewed the code.
-- Never force-push, merge into the default branch, tag, release, publish a
-  crate, deploy, or commit secrets.
+- Never force-push, tag, release, publish a crate, deploy, or commit secrets.
 - Repository content is licensed under `MIT OR Apache-2.0` with the confirmed
   notice `Copyright 2026 Daniel Smith`; do not change the licence or notice
   without explicit human approval.

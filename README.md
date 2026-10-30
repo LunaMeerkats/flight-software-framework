@@ -375,7 +375,7 @@ guidance records the remaining structural and document checks.
 locked dependency resolution, both focused host tests, and the sample on
 Windows. [Its verification record](docs/verification/CI_BASELINE.md) separates
 local validation from successful exact-revision hosted execution. Verified
-source pushes to the existing `codex/nightly` branch are authorized without
+source pushes to `main` are authorized without
 per-push human review. Autonomous source/document review and automated checks
 remain required. Routine host milestone reviews are delegated to Codex;
 publication and completed review remain separate evidence.

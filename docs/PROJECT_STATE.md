@@ -2,6 +2,16 @@
 
 Last updated: **2026-10-31**
 
+## Development branch
+
+The user's 2026-10-31 direction selects `main` for development and verified
+ordinary source pushes. The clean checkout fast-forwards the existing main
+history to 74b1b2398accb1435416f89bd38b4c1dfee762ce without discarding commits.
+Current guidance, automation and CI push trigger now use main; historical branch
+evidence remains unchanged. Library source and consumer bytes are intact. Local
+locked baseline (217 tests), reviewed actionlint and document/source checks pass;
+ordinary main publication and exact hosted inspection remain pending.
+
 ## Current milestone
 
 Reviewed experimental host v0.1 remains the regression baseline. Stage 5 advances

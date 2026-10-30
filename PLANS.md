@@ -1,54 +1,46 @@
-# Subscription-respecting selective publication
+# Continue verified development on main
 
-Status: Complete implementation checkpoint — 2026-10-31
+Status: Local verification passed; publication pending — 2026-10-31
 
-## Objective and context
+## Objective and authority
 
-Complete RFF-LIB-REQ-009/ADR-0034: enable a host to retry one rejected subscriber
-without duplicating an earlier fan-out acceptance. Clean input
-986ffd82a7a909d10bc2e6cbd50875c98410e2e4 matches refreshed origin. Initial locked
-format/check/Clippy/test/warnings-denied rustdoc and both whitespace checks pass
-with 208 workspace tests. Exact input hosted raw logs/connector steps pass all
-20 steps, 208 workspace/14 adapter/five sample tests and unchanged sample output.
+The user directed: "Please don't use the nightly/codex branch anymore. Use main".
+Use main for development, local commits and ordinary verified source pushes.
+This supersedes earlier branch-specific instructions while retaining all other
+verification/review, preservation and consequential authorization gates.
 
-## Acceptance and components
+## Bounded change and acceptance
 
-- Add MessageBus/MessagingRuntime publish_to and export typed PublishToError.
-  Reject unknown/unsubscribed destinations before lifecycle/capacity checks;
-  reuse bounded enqueue with no report allocation or peer mutation.
-- Add public-only tests and a fixed two-subscriber retry consumer. Cover
-  lifecycle, FIFO/saturation, nonmutating errors, no duplicate accepted copies
-  and acceptance-versus-processing. Keep broadcast/context contracts unchanged.
-- Document use/errors/resources and independent identical-source verification.
-  Update requirements, ADR, traceability, roadmap, current state and entry points.
+- Fetch origin and confirm clean checkout/ancestry. Fast-forward main to the
+  latest verified 74b1b2398accb1435416f89bd38b4c1dfee762ce without losing history.
+- Update active AGENTS/README guidance and add dated ADR-0023/0024 amendments;
+  preserve historical branch/revision evidence. Change only the CI push filter.
+- Update the existing automation through its tool, retaining its schedule,
+  model, effort, notification policy, project, working directory and status.
+- Run reviewed actionlint 1.7.12, inspect unchanged PowerShell run bodies and
+  failure propagation, run the locked baseline, source/doc/link/diff checks.
+- Commit on main after review; refresh origin and publish by ordinary
+  fast-forward push. Inspect exact main-head CI and confirm clean remote match.
 
-## Verification and stopping point
+No library behavior, dependency, example or consumer-guidance change is selected.
+Keep both existing branch histories; do not force-push or delete branches.
+Stop after the requested branch-policy transition is verified.
 
-Run the locked AGENTS.md baseline plus focused selective-publication tests.
-Check/lint/test an independent path-dependent package with the identical tests;
-inspect metadata and source hashes. Inspect widths/waivers, relative links,
-changed rendered documents and complete diff with independent Codex review.
-Publish coherent verified commits by ordinary fast-forward push and inspect
-exact hosted checkout/results. Logs/aids stay in ignored
-target/review-2026-10-30-selective-retry (run's UTC date).
+## Actual local evidence
 
-Retry ledgers represent enqueue acceptance only. No automatic deduplication,
-drain, fairness, authentication or timing guarantee. Stop after this checkpoint;
-if implementation cannot pass, remove only current-run changes where safe and
-retain useful evidence without discarding unrelated state or weakening gates.
+Clean main and origin/main were both 81ca906e97c28db53ca601d34c1b2d1b2e7926fb.
+Fetched origin/main is an ancestor of the verified input; main fast-forwards
+40 commits to 74b1b2398accb1435416f89bd38b4c1dfee762ce. No history is rewritten.
+GitHub's default branch was already main; no repository setting changes.
 
-## Actual evidence
-
-Final locked baseline passes 217 workspace tests; focused nine tests pass.
-Identical external package check/Clippy/nine tests, bytes/SHA256 and normalized
-metadata pass. Whole-tree source-width/waiver audit, links and traceability
-inspection pass; generated API docs and changed rendered documents are reviewed
-for content/structure. Root and independent source review find no source issues;
-one guide capacity mismatch is corrected. Complete root/independent evidence/diff
-review passes with no findings. Ordinary publication of
-f57819985c3f0320f992c9b237324edc83874733 passes exact hosted run 41061628585/
-job 124082536243: all 20 steps, 217 workspace/14 adapter/five sample tests and
-unchanged 222-line sample. Raw logs and connector steps agree; tools/image
-match input. This evidence-only completion receives complete review, ordinary
-publication and exact hosted inspection, then the run stops. No source changes
-or further capability remain in this checkpoint.
+The automation tool update changes only prompt/updated_at in the saved record;
+all other fields are identical. Main direction supersedes the earlier branch
+restriction. Locked format/check/Clippy/test/warnings-denied rustdoc pass with
+217 workspace tests. Reviewed actionlint 1.7.12 passes with the retained archive
+checksum verified. All 16 nonempty PowerShell run bodies parse and remain one
+unchanged native command each; existing failure propagation is preserved.
+Whole-tree width/waiver audit, links/traceability and changed rendered documents
+pass; source and consumers are unchanged. Root and independent main_branch_audit
+Codex review accept the complete eight-file diff with no findings. Exact hosted
+main-head publication verification remains before completion. Raw aids/logs:
+target/review-2026-10-31-main-branch. No new product behavior is selected.

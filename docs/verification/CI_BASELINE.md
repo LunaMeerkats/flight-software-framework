@@ -3,6 +3,20 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Development branch direction — 2026-10-31
+
+The user selected `main` for continued development and verified ordinary source
+publication. The workflow push filter changes from codex/nightly to main;
+pull-request/manual triggers, permissions, actions and all command bodies remain
+unchanged. Existing exact-revision records below retain their original scope.
+Reviewed actionlint 1.7.12 passes; the retained archive matches the recorded
+SHA256. All 16 nonempty PowerShell bodies parse as unchanged single native
+commands, preserving existing wrapper failure propagation. The locked local
+baseline passes 217 workspace tests, including warnings-denied Clippy/rustdoc.
+Whole-tree source and changed rendered documents pass review; exact hosted
+main-head acceptance remains pending publication. See [the plan](../../PLANS.md)
+for ancestry and automation-setting preservation evidence.
+
 ## Selective-publication checkpoint — 2026-10-31
 
 Implementation f57819985c3f0320f992c9b237324edc83874733 passes exact
