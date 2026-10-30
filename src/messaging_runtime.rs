@@ -16,8 +16,8 @@ use crate::clock::Clock;
 use crate::events::EventQueue;
 use crate::lifecycle::{ApplicationId, ApplicationState, LifecycleError};
 use crate::messaging::{
-    InboxAccessError, Message, MessageBus, MessageBusCreateError, PublishError, PublishReport,
-    RuntimeInboxConfig,
+    DeliveryStatus, InboxAccessError, Message, MessageBus, MessageBusCreateError, PublishError,
+    PublishReport, PublishToError, RuntimeInboxConfig,
 };
 use crate::runtime::{
     Application, RunningCallbackError, Runtime, RuntimeConfigurationError, RuntimeRestartError,
@@ -347,6 +347,37 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize, E, const MAX_CONFIGURA
         let runtime = &self.runtime;
         self.message_bus
             .publish_with_availability(message, |application_id| {
+                runtime.state(application_id) == Ok(ApplicationState::Running)
+            })
+    }
+
+    /// Attempts publication to one subscribed endpoint using current state.
+    ///
+    /// Only a `Running` subscriber may enqueue. A `Registered`, `Stopped` or
+    /// `Failed` subscriber returns [`DeliveryStatus::Unavailable`], before
+    /// capacity inspection. A running full inbox returns
+    /// [`DeliveryStatus::InboxFull`] and retains its older entries. No peer
+    /// inbox changes, and no publication report or retry history is allocated.
+    ///
+    /// The borrowed message remains caller-owned. The caller owns retry policy;
+    /// repeated accepted attempts can enqueue repeated copies. Acceptance does
+    /// not establish processing, and later stop or failure may clear the copy.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PublishToError::UnknownApplication`] for an unknown endpoint,
+    /// then [`PublishToError::NotSubscribed`] for a known endpoint without the
+    /// topic, before reading lifecycle availability or inspecting capacity.
+    /// Both errors leave all inboxes unchanged. IDs remain runtime-local and
+    /// cannot detect a same-position identity from another issuer.
+    pub fn publish_to(
+        &mut self,
+        application_id: ApplicationId,
+        message: &Message<Topic, MAX_PAYLOAD_BYTES>,
+    ) -> Result<DeliveryStatus, PublishToError> {
+        let runtime = &self.runtime;
+        self.message_bus
+            .publish_to_with_availability(application_id, message, |application_id| {
                 runtime.state(application_id) == Ok(ApplicationState::Running)
             })
     }

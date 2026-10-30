@@ -45,6 +45,10 @@ also composes recurring work with deferred host consumption. Bounded host turns
 pause production while older output is pending, then resume without a catch-up
 burst when capacity becomes available.
 
+[Retry one rejected subscriber](docs/SELECTIVE_PUBLICATION.md) after partial
+fan-out with subscription-respecting host publication and a bounded acceptance
+ledger. Successful inbox acceptance remains distinct from later processing.
+
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.

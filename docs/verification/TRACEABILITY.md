@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 selective subscriber publication — 2026-10-31
+
+RFF-LIB-REQ-009 revision 1 and
+[ADR-0034](../adr/0034-subscription-respecting-selective-publication.md) add
+one host-selected subscribed destination through the existing message owners.
+The [guide](../SELECTIVE_PUBLICATION.md) and
+[focused review](SELECTIVE_PUBLICATION_REVIEW.md) retain evidence and limits.
+Original broadcast, callback, lifecycle and single-subscriber contracts remain.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-009 | Checked single-subscriber publish_to; existing bounded enqueue; public-only fixed retry ledger | `selected_publication_preserves_peer_inboxes_and_full_fifo`; `standalone_rejects_unknown_and_unsubscribed_before_full_inbox_checks`; `runtime_selective_publication_tracks_lifecycle_and_selected_clearing`; `failed_selected_subscriber_rejects_retry_and_preserves_healthy_peer`; `runtime_validates_subscription_before_registered_running_or_stopped_availability`; `partial_retry_retains_one_record_and_never_repeats_an_accepted_copy`; `retry_after_unavailable_retains_acceptance_and_requires_explicit_restart`; `an_acceptance_ledger_does_not_prove_processing_after_lifecycle_clearing`; `repeated_selected_publication_remains_a_new_enqueue_attempt`; identical independent consumer check/Clippy/test/metadata/hash | Locked baseline passes 217 workspace/nine focused/nine identical independent tests, check/Clippy and metadata/hash; complete review and exact hosted publication pending; limits in focused record |
+
 ## Stage 5 recurring host coordination — 2026-10-29
 
 RFF-LIB-REQ-008 revision 1 and

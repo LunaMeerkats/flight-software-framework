@@ -349,3 +349,26 @@ their concrete source and disable the selected timer. Verify the identical
 source in an independent Cargo package. Existing direct-work/full-output failure
 contracts remain unchanged. This mission policy adds no framework runner,
 automatic drain/retry, fairness, timing or physical-delivery guarantee.
+
+### RFF-LIB-REQ-009 — Subscription-respecting selective publication
+
+Revision 1 (2026-10-31). MessageBus and the host-facing MessagingRuntime shall
+offer publish_to for one caller-selected destination and a borrowed message.
+Unknown destinations and known destinations not subscribed to the message topic
+shall return distinct typed errors before availability or capacity is inspected,
+without changing any inbox. A subscribed destination shall reuse existing
+Delivered/InboxFull/Unavailable behavior and touch no peer inbox. The standalone
+bus treats configured endpoints as available; the runtime shall use current
+lifecycle state. The operation shall allocate no publication report or retry
+history. Ordinary publication and callback contexts shall retain their contracts.
+
+Acceptance: public-API tests shall cover selected delivery, peer exclusion,
+unknown and unsubscribed rejection, full-inbox retention/FIFO, current lifecycle
+availability, selected stop clearing and restart. A public-only two-subscriber
+consumer shall retain one message and a fixed acceptance ledger, retry only
+rejected destinations after partial fan-out and preserve older FIFO without
+duplicating an accepted copy. Repeated rejection shall retain pending ownership;
+new records shall wait for completion. Verify identical tests in an independent
+Cargo package. Guidance shall distinguish inbox acceptance from processing,
+later lifecycle clearing, physical delivery, authentication and exactly-once
+guarantees. Retry order, storage limits and termination remain caller policy.

@@ -348,6 +348,38 @@ impl fmt::Display for PublishError {
 
 impl Error for PublishError {}
 
+/// Failure before a selected publication modifies any inbox.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PublishToError {
+    /// The identity does not name a configured endpoint.
+    UnknownApplication {
+        /// Identity supplied by the caller.
+        application_id: ApplicationId,
+    },
+    /// The known endpoint does not subscribe to the message topic.
+    NotSubscribed {
+        /// Identity whose immutable topic set rejected the selection.
+        application_id: ApplicationId,
+    },
+}
+
+impl fmt::Display for PublishToError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::UnknownApplication { application_id } => write!(
+                formatter,
+                "application {application_id:?} has no message inbox"
+            ),
+            Self::NotSubscribed { application_id } => write!(
+                formatter,
+                "application {application_id:?} does not subscribe to the message topic"
+            ),
+        }
+    }
+}
+
+impl Error for PublishToError {}
+
 /// Failure to inspect or consume an inbox outside the configured topology.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum InboxAccessError {
@@ -378,8 +410,8 @@ impl Error for InboxAccessError {}
 /// Each configuration position must match the same registration position in
 /// one [`crate::Runtime`] or [`crate::LifecycleRegistry`]. The existing opaque
 /// identity representation cannot detect a same-position key from another
-/// issuer. Direct construction and [`MessageBus::publish`] treat all configured
-/// endpoints as available.
+/// issuer. Direct construction, [`MessageBus::publish`] and
+/// [`MessageBus::publish_to`] treat all configured endpoints as available.
 ///
 /// Construction also cannot prove that the identity issuer has no additional
 /// application records. [`crate::MessagingRuntime`] instead constructs and owns
@@ -440,6 +472,29 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
         message: &Message<Topic, MAX_PAYLOAD_BYTES>,
     ) -> Result<PublishReport, PublishError> {
         self.publish_with_availability(message, |_| true)
+    }
+
+    /// Attempts publication to one configured subscriber without waiting.
+    ///
+    /// Only the selected inbox may change. A full inbox retains its older
+    /// entries and returns [`DeliveryStatus::InboxFull`]. The message remains
+    /// caller-owned; a successful attempt copies it into the selected inbox.
+    /// No publication report or retry history is allocated. Repeated calls can
+    /// enqueue repeated copies; the caller owns any selective-retry ledger.
+    /// Inbox acceptance does not establish processing or physical delivery.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PublishToError::UnknownApplication`] for an unknown endpoint,
+    /// then [`PublishToError::NotSubscribed`] for a known endpoint without the
+    /// topic. Both errors leave all inboxes unchanged. Application identities
+    /// remain caller-scoped; same-position foreign issuers are not detected.
+    pub fn publish_to(
+        &mut self,
+        application_id: ApplicationId,
+        message: &Message<Topic, MAX_PAYLOAD_BYTES>,
+    ) -> Result<DeliveryStatus, PublishToError> {
+        self.publish_to_with_availability(application_id, message, |_| true)
     }
 
     /// Returns the configured logical slot limit for one inbox.
@@ -528,6 +583,23 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
             }
         }
         Ok(PublishReport { outcomes })
+    }
+
+    pub(crate) fn publish_to_with_availability(
+        &mut self,
+        application_id: ApplicationId,
+        message: &Message<Topic, MAX_PAYLOAD_BYTES>,
+        is_available: impl FnOnce(ApplicationId) -> bool,
+    ) -> Result<DeliveryStatus, PublishToError> {
+        let endpoint = self
+            .endpoints
+            .get_mut(application_id.index())
+            .ok_or(PublishToError::UnknownApplication { application_id })?;
+        if !endpoint.subscribes_to(message.topic()) {
+            return Err(PublishToError::NotSubscribed { application_id });
+        }
+
+        Ok(endpoint.enqueue(*message, is_available(application_id)))
     }
 
     pub(crate) fn clear_runtime_inbox(&mut self, application_id: ApplicationId) -> usize {

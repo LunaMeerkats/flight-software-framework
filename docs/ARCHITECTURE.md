@@ -3,6 +3,18 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Host-selected subscriber publication — 2026-10-31
+
+RFF-LIB-REQ-009 and
+[ADR-0034](adr/0034-subscription-respecting-selective-publication.md) extend the
+existing message owners with one selected subscribed destination. The host can
+retain a partial fan-out acceptance ledger and retry only rejected destinations.
+Membership and subscription validation precede current lifecycle/capacity checks;
+the same bounded enqueue preserves FIFO and peers. No report allocation, retry
+owner, callback-context expansion or direct-address subscription bypass is added.
+The [consumer guide](SELECTIVE_PUBLICATION.md) separates inbox acceptance from
+processing and later lifecycle clearing. APIs remain provisional.
+
 ## Observed responsibility boundaries
 
 The following observations use the official NASA cFS v7.0.1 public release:

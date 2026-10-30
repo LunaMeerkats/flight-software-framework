@@ -118,6 +118,10 @@ translate NASA C source.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
+- `tests/selective_publication.rs`: public-only targeted publication and fixed
+  two-subscriber retry consumer. Its guide verifies identical tests in an
+  independent Cargo package. The acceptance ledger records inbox enqueue only;
+  later stop/failure may clear accepted copies without proving processing.
 - `tests/event_filter.rs`: public-only optional-diagnostic consumer and explicit
   severity-filter evidence. Its guide verifies identical tests in an independent
   Cargo package; unfiltered emission and failure-event wrappers retain their
@@ -216,6 +220,14 @@ recipe in [the periodic-work guide](docs/PERIODIC_WORK.md). Check, lint and test
 the identical test source, inspect metadata and compare SHA256 hashes. Record
 the actual package path/results in the focused periodic-work review. A released
 item is not evidence that the host invoked or completed its callback.
+
+When changing selective publication or its consumer guidance, run
+`cargo test --locked --test selective_publication`, then follow the independent
+package recipe in [the selective-publication guide](docs/SELECTIVE_PUBLICATION.md).
+Check, lint and test identical test source; inspect metadata and SHA256 hashes.
+Record the actual package path and results in the focused review. Targeted
+publication respects subscriptions; acceptance does not guarantee processing,
+retention after stop/failure or duplicate suppression on repeated calls.
 
 When changing event filtering or its consumer guidance, run
 `cargo test --locked --test event_filter`, then follow the independent-package

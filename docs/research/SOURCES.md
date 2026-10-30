@@ -13,6 +13,25 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-SELECTIVE-PUBLICATION — Checked selection and existing FIFO enqueue
+
+- Titles: slice::get_mut and VecDeque, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/primitive.slice.html#method.get_mut>
+  and <https://doc.rust-lang.org/std/collections/struct.VecDeque.html>
+- Version: official std 1.99.1 documentation, commit 58cf8f9c3 (2026-10-13),
+  accessed 2026-10-31 Australia/Sydney; local execution remains on 1.98.0.
+  Version-prefixed page fetches were unavailable; live official pages succeeded.
+- Informed: checked mutable access returns None outside the slice; ordinary
+  queue use appends at the back and removes at the front. VecDeque is growable,
+  so the existing constructor reservation and logical capacity guard remain
+  responsible for the framework bound.
+- Local treatment: reuse checked endpoint lookup, subscription validation and
+  existing enqueue. ADR-0034 selects one subscribed destination over whole-topic
+  retry, separate destination topics and subset APIs. Caller-owned retry flags
+  record enqueue acceptance only. These are local semantics, not upstream or
+  agency requirements; no source code or dependency is reused.
+
 ## SRC-RUST-HOST-COORDINATION — Serial slots and explicit recurrence ownership
 
 - Titles: Cell, std::cell; Option, std::option

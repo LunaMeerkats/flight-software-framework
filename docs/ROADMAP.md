@@ -5,7 +5,16 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; recurring host coordination checkpoint verified**
+Status: **Active; selective subscriber publication in progress**
+
+The next bounded checkpoint adds subscription-respecting host publish_to under
+RFF-LIB-REQ-009 and
+[ADR-0034](adr/0034-subscription-respecting-selective-publication.md). A
+[two-subscriber consumer](SELECTIVE_PUBLICATION.md) retains one message and
+acceptance flags so a rejected destination can be retried without resending to
+an accepted peer. Existing broadcast, callback and single-subscriber examples
+retain their contracts. The [focused review](verification/SELECTIVE_PUBLICATION_REVIEW.md)
+will record actual verification, controlled consumer limits and publication.
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4

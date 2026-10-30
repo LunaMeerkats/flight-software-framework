@@ -1,53 +1,49 @@
-# Backpressure-aware recurring host coordination
+# Subscription-respecting selective publication
 
-Status: Complete implementation checkpoint — 2026-10-29
+Status: Local verification and Codex review passed — 2026-10-31
 
 ## Objective and context
 
-Complete RFF-LIB-REQ-008/ADR-0033 in the existing public-only work_output example.
-Clean input c899aef39a8df854d14b48484bd044ee14bba120 matches refreshed origin.
-Initial locked format/check/Clippy/test/rustdoc and whitespace checks pass,
-including 201 workspace tests. Exact input hosted run 40511047519 passes all
-20 steps; raw logs and connector steps agree. No toolchain/configuration change.
+Complete RFF-LIB-REQ-009/ADR-0034: enable a host to retry one rejected subscriber
+without duplicating an earlier fan-out acceptance. Clean input
+986ffd82a7a909d10bc2e6cbd50875c98410e2e4 matches refreshed origin. Initial locked
+format/check/Clippy/test/warnings-denied rustdoc and both whitespace checks pass
+with 208 workspace tests. Exact input hosted raw logs/connector steps pass all
+20 steps, 208 workspace/14 adapter/five sample tests and unchanged sample output.
 
 ## Acceptance and components
 
-- One host turn gates dispatch on empty output/Running sink, attempts existing
-  sole-subscriber transfer once, and polls/invokes recurrence only with empty
-  pending storage. New output waits for a later turn; caller drains separately.
-- Tests fill the three-stage pipeline, retain FIFO/configuration/timer while
-  blocked, resume one overdue release, handle unavailable sinks and disable
-  recurrence on work failure. Existing strict direct-call tests remain.
-- Update the work-output guide/entry points, requirements, ADR, source register,
-  traceability, focused verification, roadmap and current state. Verify identical
-  source in an independent Cargo package; no library API/dependency changes.
+- Add MessageBus/MessagingRuntime publish_to and export typed PublishToError.
+  Reject unknown/unsubscribed destinations before lifecycle/capacity checks;
+  reuse bounded enqueue with no report allocation or peer mutation.
+- Add public-only tests and a fixed two-subscriber retry consumer. Cover
+  lifecycle, FIFO/saturation, nonmutating errors, no duplicate accepted copies
+  and acceptance-versus-processing. Keep broadcast/context contracts unchanged.
+- Document use/errors/resources and independent identical-source verification.
+  Update requirements, ADR, traceability, roadmap, current state and entry points.
 
-## Verification and risks
+## Verification and stopping point
 
-Run the locked AGENTS.md baseline, focused work_output test/run and the guide's
-independent-package check/Clippy/test/run/metadata/hash recipe. Inspect source
-widths/waivers, relative links, changed rendered docs and complete diff with root
-and independent Codex review. Raw aids/logs stay in ignored
-target/review-2026-10-29-host-coordination. Refresh origin, publish by ordinary
-fast-forward push and inspect exact hosted checkout/results.
+Run the locked AGENTS.md baseline plus focused selective-publication tests.
+Check/lint/test an independent path-dependent package with the identical tests;
+inspect metadata and source hashes. Inspect widths/waivers, relative links,
+changed rendered documents and complete diff with independent Codex review.
+Publish coherent verified commits by ordinary fast-forward push and inspect
+exact hosted checkout/results. Logs/aids stay in ignored
+target/review-2026-10-30-selective-retry (run's UTC date).
 
-Single-subscriber retry, serial caller pairing and nontransactional effects stay
-explicit. A bounded operation count does not bound callback time. Stop after this
-coherent checkpoint. If implementation fails, preserve evidence and remove only
-current-run changes where safe; never discard unrelated work or weaken gates.
+Retry ledgers represent enqueue acceptance only. No automatic deduplication,
+drain, fairness, authentication or timing guarantee. Stop after this checkpoint;
+if implementation cannot pass, remove only current-run changes where safe and
+retain useful evidence without discarding unrelated state or weakening gates.
 
-## Actual local evidence
+## Actual evidence
 
-Final locked baseline passes 208 workspace tests, 17 focused tests and both
-runnable scenarios. The identical independent package passes check/Clippy/17
-tests/run and normalized metadata/hash/byte inspection. Whole-tree source audit
-finds zero width issues and three unchanged fulfilled expectations. Links,
-traceability and changed rendered documents pass content/structure inspection.
-Root and independent coordination_review accept the complete 13-file source,
-document and diff with actual raw evidence and no remaining findings.
-Ordinary publication of beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
-hosted run 40694345405/job 122837012923: all 20 steps, 208 workspace/14 adapter/
-five sample tests and the unchanged 222-line sample. Raw logs and connector steps
-agree; hosted tools/image match input. Evidence-only completion receives its
-own document/diff review, ordinary publication and exact hosted inspection.
-Stop after this checkpoint without another capability.
+Final locked baseline passes 217 workspace tests; focused nine tests pass.
+Identical external package check/Clippy/nine tests, bytes/SHA256 and normalized
+metadata pass. Whole-tree source-width/waiver audit, links and traceability
+inspection pass; generated API docs and changed rendered documents are reviewed
+for content/structure. Root and independent source review find no source issues;
+one guide capacity mismatch is corrected. Complete root/independent evidence/diff
+review passes with no findings. Ordinary publication and exact hosted inspection
+remain before this checkpoint is complete.

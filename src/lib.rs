@@ -18,6 +18,11 @@ mission-owned enum delegation, typed errors and bounded peer publication.
 show configured ordinary work staging a bounded output for explicit host
 publication and retry to one subscriber, including finite scheduled work.
 
+`docs/SELECTIVE_PUBLICATION.md` shows host-selected publication to one subscribed
+destination and a bounded acceptance ledger for retries after partial fan-out.
+The caller retries only rejected destinations; enqueue acceptance does not
+establish processing or retention after a later stop or failure.
+
 `docs/PERIODIC_WORK.md` shows a host-owned recurring release cursor composed
 with the existing direct and messaging work boundaries. Polling releases at
 most one item; the host explicitly invokes work and chooses error policy.
@@ -59,7 +64,7 @@ pub use lifecycle::{
 pub use messaging::{
     ApplicationInboxConfig, DeliveryStatus, DestinationOutcome, InboxAccessError, Message,
     MessageBus, MessageBusCreateError, MessageCreateError, PublishClassification, PublishError,
-    PublishReport, RuntimeInboxConfig,
+    PublishReport, PublishToError, RuntimeInboxConfig,
 };
 pub use messaging_runtime::{
     MessagingOperationError, MessagingRuntime, MessagingRuntimeCreateError,

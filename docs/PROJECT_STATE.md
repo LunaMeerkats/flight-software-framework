@@ -1,33 +1,30 @@
 # Project state
 
-Last updated: **2026-10-29**
+Last updated: **2026-10-31**
 
 ## Current milestone
 
 Reviewed experimental host v0.1 remains the regression baseline. Stage 5 advances
-practical library use under ADR-0025. RFF-LIB-REQ-008 composes recurring work,
-bounded transfer and deferred host observation in the existing public-only
-work_output consumer. Package 0.0.0 remains unpublished and APIs provisional.
+practical library use under ADR-0025. RFF-LIB-REQ-009/ADR-0034 add one selected
+subscribed host publication so a consumer can retry rejected destinations after
+partial fan-out. Package 0.0.0 remains unpublished and APIs provisional.
 
 ## Verified baseline
 
-- Clean input c899aef39a8df854d14b48484bd044ee14bba120 matches refreshed origin.
-  Live exact run 40511047519/job 122212738703 passes all 20 steps, 201 workspace
+- Clean input 986ffd82a7a909d10bc2e6cbd50875c98410e2e4 matches refreshed origin.
+  Live exact run 40694990149/job 122839265392 passes all 20 steps, 208 workspace
   tests, separate 14 adapter/five sample tests and the unchanged 222-line sample.
   Root raw logs and connector step inspection agree.
-- Fresh initial/final locked format/check/Clippy/test/warnings-denied rustdoc and
-  both whitespace checks pass, with 201/208 workspace tests. All 17 work_output
-  tests and its runnable ordinary/recurring scenarios pass. Identical independent
-  consumer check/Clippy/17 tests/run and metadata/byte/hash inspection pass.
-- Published implementation beb1d1294aebac190956b6d9ba7bdc2080c123d3 passes exact
-  hosted run 40694345405/job 122837012923, all 20 steps, 208 workspace/14 adapter/
-  five sample tests and the unchanged 222-line sample. Root raw logs and connector
-  steps agree; tools/image match input.
+- Fresh initial/final locked format/check/Clippy/test/warnings-denied rustdoc
+  and both whitespace checks pass, with 208/217 workspace tests. Nine focused
+  tests and identical independent consumer check/Clippy/nine tests pass, with
+  matching bytes/hash and sole path-dependency metadata. Complete root and
+  independent Codex source/document/evidence/diff review passes with no findings.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
   2.338.0/windows-2025-vs2026 image 20261021.278.1. Local checks do not claim
-  execution on those hosted tools. Actual current evidence is retained in
-  [the focused review](verification/HOST_COORDINATION_REVIEW.md).
+  execution on hosted tools. Current evidence is retained in
+  [the focused review](verification/SELECTIVE_PUBLICATION_REVIEW.md).
 
 ## Current architecture
 
@@ -36,26 +33,23 @@ routing/dispatch, manual time, finite one-shot scheduling, bounded events and
 optional configuration with immutable work visibility/one-use rollback. All work
 shares selected identity/context construction. PeriodicWork supplies one
 observed-time release for host delegation. EventFilter applies optional severity
-admission; failure reports remain unfiltered. The separate event presenter owns
-one writer and retained line/cursor. The work-output host turn guards dispatch,
-transfers pending output and polls recurrence only when production has space.
-It holds no hidden worker and changes no library contract or dependency.
+admission; failure reports remain unfiltered. Host-owned examples coordinate
+bounded work output and partial event writes. Selective publication adds one
+subscription-checked attempt through the existing standalone/runtime message
+owners, with no report allocation, retry history or callback-context expansion.
 
 ## Work in progress
 
-RFF-LIB-REQ-008/ADR-0033 precede source changes. Implementation, final baseline,
-identical independent consumer and complete root/independent Codex review pass
-with no remaining findings. Ordinary publication and exact implementation hosted
-inspection pass. This documentation-only completion receives its own review,
-publication and exact hosted inspection. No unfinished implementation or further
-capability remains in this work item.
+RFF-LIB-REQ-009/ADR-0034 precede source changes. Implementation, public-only
+consumer and identical independent-package verification pass. Complete root and
+independent Codex source/document/evidence/diff review passes. Ordinary source
+publication and exact hosted inspection remain before checkpoint completion.
 
 ## Highest risks and uncertainties
 
 - Controlled consumers do not establish external adoption or broad usability.
-  The new host policy is serial, nontransactional and limited to one subscriber.
-  Paused polling provides no fairness or drain deadline. Earlier effects survive
-  a later error. Physical/durable output requires separate evidence and policy.
+  Retry flags represent enqueue acceptance only; later stop/failure can discard
+  accepted copies. Repeated calls can duplicate. No fairness or drain deadline.
 - Application/clock origin and slot pairing remain caller duties. Logical bounds
   do not bound process memory, allocation, blocking or callback time. Panics,
   hangs, allocator exhaustion and process failure remain uncontained.
@@ -71,15 +65,13 @@ and no_std remain undecided. Codex review is not human acceptance or qualificati
 
 ## Most likely next task
 
-Assess a concrete multi-producer or selective fan-out consumer before choosing
-further host policy or library changes. Compare existing per-destination reports
-with retry ownership needs; do not add a generic runner or more models by default.
+Complete and verify this selective-publication checkpoint before another
+capability. After acceptance, assess concrete multi-producer coordination or
+callback-side feedback needs before selecting another API or host policy.
 
 ## Latest run
 
-2026-10-29: implemented bounded host coordination to prevent ordinary downstream
-backpressure from invoking full producer/sink callbacks. Seven new regressions
-and the runnable four-value recurring scenario pass. Identical independent
-consumer and complete root/independent review pass. Ordinary publication and
-exact implementation hosted verification pass; the evidence-only completion
-receives its own exact hosted check, then the run stops.
+2026-10-31: selected one subscribed-destination publication over blind whole-topic
+retry, separate destination topics and subset APIs. Input local/hosted baseline
+passes. Final local baseline and identical retry-consumer verification pass;
+complete review passes. Source publication and exact hosted inspection remain.
