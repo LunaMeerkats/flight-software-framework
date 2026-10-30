@@ -1,6 +1,6 @@
 # Subscription-respecting selective publication
 
-Status: Local verification and Codex review passed — 2026-10-31
+Status: Complete implementation checkpoint — 2026-10-31
 
 ## Objective and context
 
@@ -45,5 +45,10 @@ metadata pass. Whole-tree source-width/waiver audit, links and traceability
 inspection pass; generated API docs and changed rendered documents are reviewed
 for content/structure. Root and independent source review find no source issues;
 one guide capacity mismatch is corrected. Complete root/independent evidence/diff
-review passes with no findings. Ordinary publication and exact hosted inspection
-remain before this checkpoint is complete.
+review passes with no findings. Ordinary publication of
+f57819985c3f0320f992c9b237324edc83874733 passes exact hosted run 41061628585/
+job 124082536243: all 20 steps, 217 workspace/14 adapter/five sample tests and
+unchanged 222-line sample. Raw logs and connector steps agree; tools/image
+match input. This evidence-only completion receives complete review, ordinary
+publication and exact hosted inspection, then the run stops. No source changes
+or further capability remain in this checkpoint.

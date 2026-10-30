@@ -20,6 +20,10 @@ partial fan-out. Package 0.0.0 remains unpublished and APIs provisional.
   tests and identical independent consumer check/Clippy/nine tests pass, with
   matching bytes/hash and sole path-dependency metadata. Complete root and
   independent Codex source/document/evidence/diff review passes with no findings.
+- Published implementation f57819985c3f0320f992c9b237324edc83874733 passes exact
+  hosted run 41061628585/job 124082536243: all 20 steps, 217 workspace/14 adapter/
+  five sample tests and unchanged 222-line sample. Raw logs and connector steps
+  agree; hosted tools/image match input.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted tools are 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
   2.338.0/windows-2025-vs2026 image 20261021.278.1. Local checks do not claim
@@ -43,7 +47,9 @@ owners, with no report allocation, retry history or callback-context expansion.
 RFF-LIB-REQ-009/ADR-0034 precede source changes. Implementation, public-only
 consumer and identical independent-package verification pass. Complete root and
 independent Codex source/document/evidence/diff review passes. Ordinary source
-publication and exact hosted inspection remain before checkpoint completion.
+publication and exact implementation hosted inspection pass. This evidence-only
+completion receives its own complete review, publication and exact hosted check.
+No unfinished implementation or further capability remains in this work item.
 
 ## Highest risks and uncertainties
 
@@ -65,13 +71,15 @@ and no_std remain undecided. Codex review is not human acceptance or qualificati
 
 ## Most likely next task
 
-Complete and verify this selective-publication checkpoint before another
-capability. After acceptance, assess concrete multi-producer coordination or
-callback-side feedback needs before selecting another API or host policy.
+Assess concrete multi-producer coordination or callback-side feedback needs
+before selecting another API or host policy. Do not add a generic retry service
+or further model machinery without a demonstrated consumer need.
 
 ## Latest run
 
 2026-10-31: selected one subscribed-destination publication over blind whole-topic
 retry, separate destination topics and subset APIs. Input local/hosted baseline
 passes. Final local baseline and identical retry-consumer verification pass;
-complete review passes. Source publication and exact hosted inspection remain.
+complete review passes. Ordinary source publication and exact implementation
+hosted verification pass; evidence-only completion receives its own hosted
+inspection, then the run stops.

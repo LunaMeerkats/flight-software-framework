@@ -1,6 +1,6 @@
 # ADR-0034: Subscription-respecting selective publication
 
-- Status: Implemented; local verification passed, publication review pending
+- Status: Implemented; autonomous review and exact hosted verification passed
 - Date: 2026-10-31
 - Scope: One host-selected subscriber through the existing message owners
 
@@ -47,7 +47,7 @@ Official Rust slice get_mut and VecDeque queue documentation supports checked
 endpoint access and reuse of FIFO enqueue. The selective-routing and retry
 semantics are local design choices; SRC-RUST-SELECTIVE-PUBLICATION records
 provenance. No upstream source code or dependencies are reused.
-The [focused review](../verification/SELECTIVE_PUBLICATION_REVIEW.md) will retain
+The [focused review](../verification/SELECTIVE_PUBLICATION_REVIEW.md) retains
 actual local, independent-consumer, source/diff and exact hosted evidence.
 
 IDs remain caller-scoped and cannot detect same-position foreign issuers.

@@ -3,6 +3,22 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Selective-publication checkpoint — 2026-10-31
+
+Implementation f57819985c3f0320f992c9b237324edc83874733 passes exact
+[run 41061628585](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41061628585),
+job 124082536243. All 20 steps pass: 217 workspace tests including nine new
+selective-publication tests, separate 14 adapter/five sample tests, warnings-denied
+rustdoc, both whitespace checks and unchanged 222-line combined sample. Root
+actual raw checkout/result/tool/image logs and connector steps agree.
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.0 and
+windows-2025-vs2026 image 20261021.278.1 match input. Local Rust/Cargo 1.98.0
+checks remain separate. Source-quality configuration/whole-tree review retains
+policy without waiver changes. No workflow or dependency changes. The
+[focused review](SELECTIVE_PUBLICATION_REVIEW.md) records source identity,
+independent consumer, complete Codex review and limits. Evidence-only completion
+receives its own exact hosted inspection; it changes no implementation.
+
 ## Execution contract
 
 [ADR-0023](../adr/0023-host-ci-baseline.md) selects one

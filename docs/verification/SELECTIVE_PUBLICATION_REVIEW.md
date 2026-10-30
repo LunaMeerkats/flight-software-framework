@@ -1,6 +1,6 @@
 # Selective publication review
 
-Status: Local verification and Codex review passed — 2026-10-31 Australia/Sydney
+Status: Implementation and exact hosted checkpoint verified — 2026-10-31
 
 ## Selected consumer and decision
 
@@ -35,8 +35,8 @@ runner 2.338.0, windows-2025-vs2026 image 20261021.278.1 remain distinct evidenc
 
 ## Local commands and actual results
 
-Initial/final locked baseline passes with 208/217 workspace tests. No source
-publication or new hosted acceptance is claimed yet. All commands below pass:
+Initial/final locked baseline passes with 208/217 workspace tests. All commands
+below pass. Source publication and exact hosted evidence are recorded below:
 
 ```text
 cargo fmt --all -- --check
@@ -93,8 +93,8 @@ src/lib.rs
 6d88c161888735f016676d40efd3b8979419b2a5dc928c3983933527cf58a912
 ```
 
-These are current working-file hashes; publication revision and Git blob identity
-will be recorded separately. No second maintained crate or new example target.
+These are working-file hashes, distinct from the normalized Git blobs below.
+No second maintained crate or new example target.
 
 ## Source, document and review boundary
 
@@ -102,8 +102,8 @@ Whole-tree audit currently inspects 52 Rust files, 22,398 physical lines and
 1,333 comment-only lines: zero width findings and three unchanged fulfilled
 item expectations. Function-size acceptance is supplied by warnings-denied
 Clippy, not the lexical inventory. Relative links and exact traceability test
-references resolve: 99 Markdown files, 562 relative links and 181 exact test
-references. All 12 changed documents are rendered and checked for matching
+references resolve: 99 Markdown files, 563 relative links and 181 exact test
+references. All 13 run-changed documents are rendered and checked for matching
 text, headings, code, tables, links and malformed markup; this is content and
 structure inspection, not pixel or human acceptance. Generated MessageBus and
 MessagingRuntime method/error documentation and PublishToError variant content
@@ -114,12 +114,42 @@ findings. Review is by Codex under ADR-0024/0025, not human acceptance.
 Root and independent consumer_assessment reviewed the implementation and all
 nine tests. One guide capacity description was corrected to match the actual
 one/two-slot scenarios before acceptance. Independent consumer logs, metadata,
-bytes and hashes agree. Final local/evidence/diff acceptance passes; source
-publication and exact hosted acceptance remain the next separate checks.
+bytes and hashes agree. Final local/evidence/diff acceptance passes. The committed
+implementation patch exactly equals the accepted staged diff.
 Raw commands/logs and temporary review aids remain in ignored
 target/review-2026-10-30-selective-retry (UTC run date); they are not adopted
 repository gates. No workflow, dependency, licence or source-quality policy
 change is made.
+
+## Exact source publication and hosted acceptance
+
+Ordinary fast-forward publication produced implementation revision
+f57819985c3f0320f992c9b237324edc83874733. Refreshed origin and live remote match;
+the tree was clean after publication. Root and independent consumer_assessment
+accept that exact implementation and evidence under ADR-0024/0025 with Codex
+provenance and no remaining findings. Normalized source Git blobs:
+
+```text
+src/messaging.rs 785b4e1a1ec4b7c76d0e8f0ca2dd14df77b78761
+src/messaging_runtime.rs 70a36a16c65d16ec25da0e5fcac432bd5c0d3753
+src/lib.rs f546f6a3703b387b100f71de6964c96d5e15831c
+tests/selective_publication.rs af815bb08cc5528057ceb467e00b2ed579121f00
+```
+
+Exact [hosted run 41061628585](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41061628585),
+job 124082536243 passes all 20 steps. Root inspected the logged checkout, all
+217 workspace tests including the nine new tests, separate 14 adapter/five sample
+tests, warnings-denied rustdoc, both whitespace checks and unchanged 222-line
+sample output. Connector step summaries agree. Hosted tools, runner and image
+match input exactly; no toolchain policy change or local 1.99.1 execution is
+claimed. No workflow change requires actionlint in this checkpoint.
+
+This documentation-only completion records actual evidence and receives its
+own complete document/diff review, ordinary publication and exact hosted
+inspection. Source and consumer bytes remain unchanged. Final completion-head
+inspection is recorded in automation memory and the end-of-run report, avoiding
+an endless chain of commits recording their own hashes. No further capability
+is included in this run.
 
 ## Limits and next assessment
 
