@@ -5,9 +5,21 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; selective subscriber publication checkpoint verified**
+Status: **Active; callback-owned selective reply retry locally verified**
 
-The current bounded checkpoint adds subscription-respecting host publish_to under
+The next bounded checkpoint, RFF-LIB-REQ-010 and
+[ADR-0035](adr/0035-callback-owned-selective-publication.md), extends the
+publish-only message context with one selected subscribed attempt. A
+[message-driven consumer](CALLBACK_PUBLICATION.md) retains reply/acceptance state
+inside its application across explicit retry commands. This closes the observed
+callback ownership gap without a new runner or retry service. The
+[focused review](verification/CALLBACK_PUBLICATION_REVIEW.md) records actual
+verification as it completes. Seven focused/identical independent consumer tests
+and the 224-test locked baseline pass; root and independent Codex source review
+accept the increment. Publication/hosted inspection remains separate. Existing
+host selective publication remains.
+
+The preceding checkpoint adds subscription-respecting host publish_to under
 RFF-LIB-REQ-009 and
 [ADR-0034](adr/0034-subscription-respecting-selective-publication.md). A
 [two-subscriber consumer](SELECTIVE_PUBLICATION.md) retains one message and
@@ -18,8 +30,8 @@ records actual verification, controlled consumer limits and publication.
 Implementation f57819985c3f0320f992c9b237324edc83874733 passes exact hosted
 run 41061628585, all 20 steps and 217 workspace tests. Nine identical independent
 consumer tests, metadata/hash and complete root/independent Codex review pass.
-Next assess concrete multi-producer coordination or callback feedback needs;
-do not infer a general retry service from this fixed consumer.
+Its callback feedback follow-up is the bounded checkpoint above; do not infer
+a general retry service from either fixed consumer.
 
 [ADR-0025](adr/0025-practical-library-development.md) records the user's direction
 to build a practical library and progress beyond v0.1 autonomously. Stages 0–4

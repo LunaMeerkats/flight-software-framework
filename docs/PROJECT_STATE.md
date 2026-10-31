@@ -1,76 +1,57 @@
 # Project state
 
-Last updated: **2026-10-31**
-
-## Development branch
-
-The user's 2026-10-31 direction selects `main` for development and verified
-ordinary source pushes. The clean checkout fast-forwards the existing main
-history to 74b1b2398accb1435416f89bd38b4c1dfee762ce without discarding commits.
-Current guidance, automation and CI push trigger now use main; historical branch
-evidence remains unchanged. Library source and consumer bytes are intact. Local
-locked baseline (217 tests), reviewed actionlint and document/source checks pass;
-ordinary main publication of 0de96233f8a3dec98b347ba93e942ff4f0160387 passes
-exact main run 41136002509/job 124338483258, all 20 steps. Raw logs and connector
-steps agree. Tools/image match prior evidence; runner is now 2.338.2.
+Last updated: **2026-11-01**
 
 ## Current milestone
 
-Reviewed experimental host v0.1 remains the regression baseline. Stage 5 advances
-practical library use under ADR-0025. RFF-LIB-REQ-009/ADR-0034 add one selected
-subscribed host publication so a consumer can retry rejected destinations after
-partial fan-out. Package 0.0.0 remains unpublished and APIs provisional.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-010/ADR-0035 extend
+selective publication into the publish-only message callback context, enabling
+an application-owned reply ledger across explicit retry commands. Implementation
+and local verification are complete; publication/hosted inspection remains.
+Reviewed experimental host v0.1 remains the regression baseline; package 0.0.0
+is unpublished and APIs provisional.
 
 ## Verified baseline
 
-- Clean input 986ffd82a7a909d10bc2e6cbd50875c98410e2e4 matches refreshed origin.
-  Live exact run 40694990149/job 122839265392 passes all 20 steps, 208 workspace
-  tests, separate 14 adapter/five sample tests and the unchanged 222-line sample.
-  Root raw logs and connector step inspection agree.
-- Fresh initial/final locked format/check/Clippy/test/warnings-denied rustdoc
-  and both whitespace checks pass, with 208/217 workspace tests. Nine focused
-  tests and identical independent consumer check/Clippy/nine tests pass, with
-  matching bytes/hash and sole path-dependency metadata. Complete root and
-  independent Codex source/document/evidence/diff review passes with no findings.
-- Published implementation f57819985c3f0320f992c9b237324edc83874733 passes exact
-  hosted run 41061628585/job 124082536243: all 20 steps, 217 workspace/14 adapter/
-  five sample tests and unchanged 222-line sample. Raw logs and connector steps
-  agree; hosted tools/image match input.
-- Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-  Input hosted tools are 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
-  2.338.0/windows-2025-vs2026 image 20261021.278.1. Local checks do not claim
-  execution on hosted tools. Current evidence is retained in
-  [the focused review](verification/SELECTIVE_PUBLICATION_REVIEW.md).
+- Clean main input 3d547b75cdae424b123927fde09a915299b940a8 matches fetched
+  origin/main. The 2026-10-31 branch transition is complete; work stays on main.
+- Fresh initial/final locked format/check/Clippy/test/warnings-denied rustdoc and both
+  whitespace checks pass, with 217/224 workspace tests. The source audit finds 53
+  Rust files, 23,070 physical/1,355 comment lines, no width findings and three
+  existing expectations. All relative links and 188 exact test references resolve.
+- Exact input hosted run 41136402063/job 124339823419 passes all 20 steps,
+  217 workspace/14 adapter/five sample tests and the unchanged 222-line sample.
+  Root raw logs and connector step summaries agree. Local Rust/Cargo 1.98.0,
+  rustfmt 1.9.0-stable/Clippy 0.1.98 remain separate from hosted 1.99.1,
+  rustfmt 1.10.0-stable/Clippy 0.1.99. Runner 2.338.2 uses image
+  windows-2025-vs2026 20261030.294.1.
 
 ## Current architecture
 
 One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
 routing/dispatch, manual time, finite one-shot scheduling, bounded events and
-optional configuration with immutable work visibility/one-use rollback. All work
-shares selected identity/context construction. PeriodicWork supplies one
-observed-time release for host delegation. EventFilter applies optional severity
-admission; failure reports remain unfiltered. Host-owned examples coordinate
-bounded work output and partial event writes. Selective publication adds one
-subscription-checked attempt through the existing standalone/runtime message
-owners, with no report allocation, retry history or callback-context expansion.
+optional configuration with immutable work visibility/one-use rollback. Periodic
+releases remain host-owned. Event filtering and host output examples preserve
+existing bounds. Selective publication reuses checked membership/subscription and
+bounded enqueue; callbacks use an immutable pre-dispatch lifecycle snapshot.
+There is no automatic retry, nested dispatch or lifecycle mutation in callbacks.
 
 ## Work in progress
 
-RFF-LIB-REQ-009/ADR-0034 implementation, public-only consumer and independent
-verification are complete. The requested main-branch transition passes local
-checks, complete root/independent Codex review and exact configuration hosted
-inspection. Its record-only completion receives its own review, publication and
-exact hosted check. No unfinished implementation or further capability remains.
+The additive callback method, seven public-only consumer tests and identical
+independent-package check/Clippy/test/metadata/hash verification pass. Source and
+consumer review passes; complete document/diff and hosted inspection follow.
+See [the focused record](verification/CALLBACK_PUBLICATION_REVIEW.md).
 
 ## Highest risks and uncertainties
 
-- Controlled consumers do not establish external adoption or broad usability.
-  Retry flags represent enqueue acceptance only; later stop/failure can discard
-  accepted copies. Repeated calls can duplicate. No fairness or drain deadline.
+- Controlled consumers do not establish external adoption. Retry flags record
+  enqueue, not processing; later stop/failure may discard accepted copies.
+  Repeated attempts can duplicate; callback effects are nontransactional.
 - Application/clock origin and slot pairing remain caller duties. Logical bounds
   do not bound process memory, allocation, blocking or callback time. Panics,
   hangs, allocator exhaustion and process failure remain uncontained.
-- Finite models prove frozen domains. Hosted tools/images float; source/doc
+- Finite models cover frozen domains. Hosted tools/images float; source/document
   review and conditional probes remain outside the CI job.
 
 ## Important unresolved decisions
@@ -82,13 +63,12 @@ and no_std remain undecided. Codex review is not human acceptance or qualificati
 
 ## Most likely next task
 
-Assess concrete multi-producer coordination or callback-side feedback needs
-before selecting another API or host policy. Do not add a generic retry service
-or further model machinery without a demonstrated consumer need.
+Reassess a concrete consumer friction after this reply-owned retry checkpoint;
+consider bounded retry cancellation/lifecycle retention needs before adding a
+coordinator or another service. Do not infer a generic retry system.
 
 ## Latest run
 
-2026-10-31: user directed continued work on main. Preserved 40 verified commits,
-updated active guidance/automation/CI filter, passed the local baseline and
-complete Codex review, and published main with exact hosted acceptance. This
-record-only completion receives its own hosted inspection, then the run stops.
+2026-11-01: baseline and live input hosted inspection pass. Recorded requirement,
+ADR and plan before implementation; callback selective-publication increment
+passes local and independent consumer checks on main. Publication follows review.

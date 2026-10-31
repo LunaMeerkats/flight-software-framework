@@ -49,6 +49,10 @@ burst when capacity becomes available.
 fan-out with subscription-respecting host publication and a bounded acceptance
 ledger. Successful inbox acceptance remains distinct from later processing.
 
+[Keep reply retry inside a message handler](docs/CALLBACK_PUBLICATION.md) with
+application-owned pending state and explicit retry commands. Callback publish_to
+uses the same subscription checks and lifecycle snapshot as ordinary publication.
+
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.

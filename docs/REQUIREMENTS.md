@@ -372,3 +372,24 @@ new records shall wait for completion. Verify identical tests in an independent
 Cargo package. Guidance shall distinguish inbox acceptance from processing,
 later lifecycle clearing, physical delivery, authentication and exactly-once
 guarantees. Retry order, storage limits and termination remain caller policy.
+
+### RFF-LIB-REQ-010 — Callback-owned selective reply retry
+
+Revision 1 (2026-11-01). ApplicationMessageContext shall offer publish_to for
+one selected destination and borrowed message, returning the existing
+DeliveryStatus or PublishToError. It shall reuse membership/subscription checks
+and bounded enqueue, with the same pre-callback lifecycle snapshot as publish.
+It shall allocate no report or retry history and expose no lifecycle mutation,
+dequeue or nested dispatch. Existing host publication and failure cleanup retain
+their contracts; accepted peer copies are not rolled back on callback failure.
+
+Acceptance: a public-only message-driven consumer shall retain one reply and
+two acceptance flags inside its application. Explicit later commands shall retry
+only rejected subscribers, retain pending ownership on repeated full/unavailable
+outcomes and gate new replies until completion. Tests shall observe exact FIFO,
+peer exclusion, refreshed lifecycle availability between callbacks, unknown and
+unsubscribed errors, capacity-one self-publication and selected clearing after
+a returned callback error while accepted peer copies survive. Verify identical
+tests in an independent Cargo package. Guidance shall distinguish acceptance
+from processing, host-triggered retry from automatic retry, and committed effects
+from transactions. Existing origin, resource and qualification limits remain.

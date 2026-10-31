@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 callback-owned selective reply retry — 2026-11-01
+
+RFF-LIB-REQ-010 revision 1 and
+[ADR-0035](../adr/0035-callback-owned-selective-publication.md) extend the
+publish-only callback context using the existing selective primitive and
+pre-callback lifecycle snapshot. The [guide](../CALLBACK_PUBLICATION.md) and
+[focused review](CALLBACK_PUBLICATION_REVIEW.md) distinguish application-owned
+enqueue flags, explicit host retry commands and nontransactional failure effects.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-010 | ApplicationMessageContext::publish_to; unchanged checked routing/enqueue; application-owned one-reply/two-flag consumer | `callback_retry_preserves_fifo_and_never_repeats_accepted_peer`; `callback_retry_retains_reply_while_stopped_and_refreshes_after_restart`; `callback_selection_refreshes_registered_running_stopped_and_failed_states`; `callback_routing_errors_precede_availability_and_preserve_every_inbox`; `returned_routing_error_retains_its_concrete_source_chain`; `capacity_one_callback_can_self_publish_after_input_is_removed`; `returned_callback_error_clears_self_copies_and_retains_accepted_peer_copy`; identical independent consumer check/Clippy/test/metadata/hash | Seven focused and seven identical independent tests and 224-test locked baseline pass; publication/hosted inspection pending |
+
 ## Stage 5 selective subscriber publication — 2026-10-31
 
 RFF-LIB-REQ-009 revision 1 and

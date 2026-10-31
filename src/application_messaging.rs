@@ -9,7 +9,9 @@ use std::error::Error;
 use std::fmt;
 
 use crate::lifecycle::{ApplicationId, ApplicationState, LifecycleError};
-use crate::messaging::{Message, MessageBus, PublishError, PublishReport};
+use crate::messaging::{
+    DeliveryStatus, Message, MessageBus, PublishError, PublishReport, PublishToError,
+};
 use crate::runtime::Application;
 
 /// Application behavior for one caller-selected queued message.
@@ -93,6 +95,36 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize>
         let dispatch_states = self.dispatch_states;
         self.message_bus
             .publish_with_availability(message, |application_id| {
+                dispatch_states.get(application_id.index()) == Some(&ApplicationState::Running)
+            })
+    }
+
+    /// Attempts publication to one subscriber without touching peer inboxes.
+    ///
+    /// Membership and subscription checks precede availability and capacity.
+    /// Availability uses the same pre-callback lifecycle snapshot as
+    /// [`Self::publish`]. This method allocates no report or retry history;
+    /// the caller retains the borrowed message after every outcome.
+    ///
+    /// [`DeliveryStatus::Delivered`] means enqueued, not processed. A later
+    /// returned callback error clears the callback owner's inbox,
+    /// including accepted self-publications, while retaining accepted peer
+    /// copies. Repeated calls can enqueue duplicates.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`PublishToError::UnknownApplication`] for an identity outside
+    /// this bus or [`PublishToError::NotSubscribed`] for a known destination
+    /// without the topic. Both errors leave every inbox unchanged. Identities
+    /// remain caller-scoped; same-position foreign identities can alias.
+    pub fn publish_to(
+        &mut self,
+        application_id: ApplicationId,
+        message: &Message<Topic, MAX_PAYLOAD_BYTES>,
+    ) -> Result<DeliveryStatus, PublishToError> {
+        let dispatch_states = self.dispatch_states;
+        self.message_bus
+            .publish_to_with_availability(application_id, message, |application_id| {
                 dispatch_states.get(application_id.index()) == Some(&ApplicationState::Running)
             })
     }

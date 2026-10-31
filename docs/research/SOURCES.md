@@ -13,6 +13,24 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-CALLBACK-PUBLICATION — Reuse disjoint service borrows
+
+- Titles: Splitting Borrows, The Rustonomicon; VecDeque, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/nomicon/borrow-splitting.html> and
+  <https://doc.rust-lang.org/std/collections/struct.VecDeque.html>
+- Version: official live book and std 1.99.1 (58cf8f9c3, 2026-10-13), accessed
+  2026-11-01 Australia/Sydney. Local execution remains on Rust 1.98.0.
+- Informed: Rust supports simultaneous borrows of disjoint struct fields;
+  ordinary VecDeque queue use appends at the back and removes at the front.
+  The growable collection alone does not impose the framework's logical bound.
+- Local treatment: reuse the callback's existing exclusive bus borrow,
+  immutable dispatch-state slice and bounded selective enqueue under ADR-0035.
+  Adopt only the safe field-borrow principle from the book; no unsafe examples
+  or source implementation are reused. Reject parallel routing storage and
+  defer automatic retry/coordinator policy. Reply ledger and command policy are
+  local consumer choices, not Rust or agency requirements. No new dependency.
+
 ## SRC-RUST-SELECTIVE-PUBLICATION — Checked selection and existing FIFO enqueue
 
 - Titles: slice::get_mut and VecDeque, Rust standard library

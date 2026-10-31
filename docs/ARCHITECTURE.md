@@ -3,6 +3,18 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Callback-selected subscriber publication — 2026-11-01
+
+RFF-LIB-REQ-010 and
+[ADR-0035](adr/0035-callback-owned-selective-publication.md) extend the
+publish-only message context with one selected subscribed attempt. It delegates
+the existing bounded routing primitive using the same immutable pre-callback
+lifecycle snapshot as broadcast. The application can retain its own reply and
+acceptance ledger across explicit retry commands, without exporting pending
+state to the host. No new queue owner, lifecycle authority or retry service.
+The [consumer guide](CALLBACK_PUBLICATION.md) explains immediate peer effects,
+selected failure cleanup and enqueue-versus-processing limits.
+
 ## Host-selected subscriber publication — 2026-10-31
 
 RFF-LIB-REQ-009 and

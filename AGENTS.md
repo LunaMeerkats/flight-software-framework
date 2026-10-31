@@ -126,6 +126,10 @@ translate NASA C source.
   severity-filter evidence. Its guide verifies identical tests in an independent
   Cargo package; unfiltered emission and failure-event wrappers retain their
   existing contracts.
+- `tests/callback_publication.rs`: public-only application-owned reply/retry
+  consumer and message-context selective publication evidence. Its guide uses
+  identical tests in an independent Cargo package; host retry commands remain
+  explicit, and enqueue flags do not establish processing or transactionality.
 - `examples/event_output.rs`: a public-only host event presenter that owns one
   writer, pending event, fixed rendered line and accepted-byte cursor. Its
   test-enabled target and independent-package recipe verify partial writes,
@@ -235,6 +239,13 @@ recipe in [the filtering guide](docs/EVENT_FILTERING.md). Check, lint and test t
 identical test source; inspect metadata and compare SHA256 hashes. Record the
 actual package path and results in the focused filtering review. Filtering is
 optional admission policy, not reserved capacity or guaranteed event delivery.
+
+When changing callback selective publication or its guidance, run
+`cargo test --locked --test callback_publication`, then follow the independent
+package recipe in [its guide](docs/CALLBACK_PUBLICATION.md). Check, lint and test
+identical source, inspect metadata and compare SHA256 hashes. Record the actual
+package path/results in the focused review. Acceptance is enqueue only; callback
+failure clears selected queued copies while accepted peer effects remain.
 
 When changing the event-output example or its guidance, run
 `cargo test --locked --example event_output` and
