@@ -7,7 +7,7 @@ Last updated: **2026-11-01**
 Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-010/ADR-0035 extend
 selective publication into the publish-only message callback context, enabling
 an application-owned reply ledger across explicit retry commands. Implementation
-and local verification are complete; publication/hosted inspection remains.
+and verification are complete, including exact hosted acceptance of the source.
 Reviewed experimental host v0.1 remains the regression baseline; package 0.0.0
 is unpublished and APIs provisional.
 
@@ -25,6 +25,12 @@ is unpublished and APIs provisional.
   rustfmt 1.9.0-stable/Clippy 0.1.98 remain separate from hosted 1.99.1,
   rustfmt 1.10.0-stable/Clippy 0.1.99. Runner 2.338.2 uses image
   windows-2025-vs2026 20261030.294.1.
+- Published implementation e2ad3484530091e9b51e5f61ead43318187e802e passes
+  exact main run 41204737701/job 124547413239: all 20 steps, 224 workspace/14
+  adapter/five sample tests and unchanged 222-line sample. Root raw logs and
+  connector summaries agree. Hosted tools/runner match input; this job's image
+  is 20261021.278.1. Seven identical independent consumer tests, sole dependency
+  metadata/hash, source/document/full-diff and Codex review pass.
 
 ## Current architecture
 
@@ -40,7 +46,10 @@ There is no automatic retry, nested dispatch or lifecycle mutation in callbacks.
 
 The additive callback method, seven public-only consumer tests and identical
 independent-package check/Clippy/test/metadata/hash verification pass. Source and
-consumer review passes; complete document/diff and hosted inspection follow.
+consumer review passes, as do complete document/diff and implementation hosted
+inspection. No unfinished implementation or further behavior is selected. This
+record-only completion retains the verified source and receives its own hosted
+inspection in automation memory/report.
 See [the focused record](verification/CALLBACK_PUBLICATION_REVIEW.md).
 
 ## Highest risks and uncertainties
@@ -71,4 +80,6 @@ coordinator or another service. Do not infer a generic retry system.
 
 2026-11-01: baseline and live input hosted inspection pass. Recorded requirement,
 ADR and plan before implementation; callback selective-publication increment
-passes local and independent consumer checks on main. Publication follows review.
+passes local/independent checks, root and independent Codex review and exact
+implementation hosted CI after ordinary main publication. Final documentation
+records the accepted checkpoint; stop after its separate publication/CI check.

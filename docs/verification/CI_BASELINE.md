@@ -3,6 +3,23 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Callback-publication checkpoint — 2026-11-01
+
+Implementation e2ad3484530091e9b51e5f61ead43318187e802e passes exact main push
+[run 41204737701](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41204737701),
+job 124547413239. All 20 steps pass: 224 workspace tests including seven new
+callback-publication regressions, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and unchanged 222-line sample.
+Root raw checkout/result/tool/image logs and connector summaries agree.
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.2 match
+the input run at 3d547b75cdae424b123927fde09a915299b940a8. This job's
+windows-2025-vs2026 image is 20261021.278.1; input used 20261030.294.1. Local
+Rust 1.98.0 remains separate. No workflow/dependency/waiver change. Full source
+and rendered-document review retains the source policy. The
+[focused record](CALLBACK_PUBLICATION_REVIEW.md) gives source identities,
+independent consumer verification and actual Codex review. Record-only completion
+receives its own hosted inspection, with implementation source unchanged.
+
 ## Development branch direction — 2026-10-31
 
 The user selected `main` for continued development and verified ordinary source

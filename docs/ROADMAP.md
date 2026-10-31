@@ -5,9 +5,9 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; callback-owned selective reply retry locally verified**
+Status: **Active; callback-owned selective reply retry checkpoint verified**
 
-The next bounded checkpoint, RFF-LIB-REQ-010 and
+The current bounded checkpoint, RFF-LIB-REQ-010 and
 [ADR-0035](adr/0035-callback-owned-selective-publication.md), extends the
 publish-only message context with one selected subscribed attempt. A
 [message-driven consumer](CALLBACK_PUBLICATION.md) retains reply/acceptance state
@@ -16,8 +16,10 @@ callback ownership gap without a new runner or retry service. The
 [focused review](verification/CALLBACK_PUBLICATION_REVIEW.md) records actual
 verification as it completes. Seven focused/identical independent consumer tests
 and the 224-test locked baseline pass; root and independent Codex source review
-accept the increment. Publication/hosted inspection remains separate. Existing
-host selective publication remains.
+accept the increment. Implementation e2ad3484530091e9b51e5f61ead43318187e802e
+passes exact hosted run 41204737701, all 20 steps and the configured host/sample
+checks. Existing host selective publication remains. Reassess concrete consumer
+friction before selecting retry cancellation, lifecycle retention or coordination.
 
 The preceding checkpoint adds subscription-respecting host publish_to under
 RFF-LIB-REQ-009 and

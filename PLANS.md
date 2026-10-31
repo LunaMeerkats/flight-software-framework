@@ -1,6 +1,6 @@
 # Callback-owned selective reply retry
 
-Status: Locally verified; publication pending — 2026-11-01
+Status: Complete implementation checkpoint — 2026-11-01
 
 ## Objective and selection
 
@@ -51,4 +51,13 @@ and the independent package passes check/Clippy/seven identical tests plus its
 separate generated smoke test. Metadata/bytes/SHA256 match the focused record.
 Root and independent callback_review accept source and consumer with no findings.
 Whole-tree widths/waivers, relative links and 188 exact test references pass.
-Rendered document/full diff review and publication/hosted inspection follow.
+All 12 implementation-changed Markdown documents pass rendered content/structure
+review; generated API docs and complete root/independent Codex diff review pass.
+Implementation e2ad3484530091e9b51e5f61ead43318187e802e equals the accepted
+staged patch and is published by ordinary fast-forward to origin/main. Exact
+run 41204737701/job 124547413239 passes all 20 steps, 224 workspace/14 adapter/
+five sample tests and unchanged 222-line sample. Root raw logs and connector
+summaries agree; hosted tools/runner match input and image is 20261021.278.1.
+The record-only completion retains source bytes and receives separate review,
+ordinary main publication and exact hosted inspection in automation memory/report.
+No further implementation or behavior is selected.

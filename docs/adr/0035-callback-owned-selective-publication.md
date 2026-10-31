@@ -1,6 +1,6 @@
 # ADR-0035: Callback-owned selective publication
 
-- Status: Implemented; local verification passed, hosted inspection pending
+- Status: Implemented; autonomous source review and exact hosted checks passed
 - Date: 2026-11-01
 - Scope: One selected subscribed publication from a message callback
 
@@ -57,6 +57,8 @@ The [consumer guide](../CALLBACK_PUBLICATION.md) and
 actual public/independent consumer and source/diff/hosted evidence. Seven focused
 and identical independent consumer tests pass; the locked baseline passes 224
 workspace tests. Root and independent callback_review accept source and consumer.
+Implementation e2ad3484530091e9b51e5f61ead43318187e802e passes exact hosted
+run 41204737701 and all 20 steps; later document revisions receive separate checks.
 
 ## Risks and revisit conditions
 

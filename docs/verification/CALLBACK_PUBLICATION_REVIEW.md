@@ -77,8 +77,8 @@ were corrected before these passing checks, without policy waivers.
 ## Full baseline and review
 
 The final locked baseline passes all commands below, with 224 workspace tests.
-Publication/hosted results remain pending. RUSTDOCFLAGS=-D warnings is set for
-the documentation command; local tool versions remain the input versions.
+RUSTDOCFLAGS=-D warnings is set for the documentation command; local tool
+versions remain the input versions. Source is unchanged after these checks.
 
 ```text
 cargo fmt --all -- --check
@@ -102,6 +102,29 @@ complete source/document/diff review accepts the bounded change with no findings
 independent callback_review also accepts the complete evidence/document diff
 after clarifying busy-command consumption and the pending hosted status.
 Temporary raw aids are under target/review-2026-11-01-callback-publication.
+
+## Publication and exact hosted acceptance
+
+Implementation e2ad3484530091e9b51e5f61ead43318187e802e exactly matches the
+accepted staged patch. An ordinary fast-forward push publishes it to origin/main;
+the clean local and live remote heads agree. Exact main push
+[run 41204737701](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41204737701),
+job 124547413239 passes all 20 steps: 224 workspace tests including all seven
+new regressions, separate 14 adapter/five sample tests, warnings-denied rustdoc,
+both whitespace checks and unchanged 222-line combined sample. Root actual raw
+checkout/result/tool/image logs and connector step summaries agree.
+
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.2 match
+input. This job uses windows-2025-vs2026 image 20261021.278.1, differing from
+input 20261030.294.1; the exact image is recorded rather than assumed unchanged.
+Local Rust 1.98.0 execution remains separate. Independent callback_review also
+accepts the raw exact-checkout/result/tool/image logs with no findings. The
+record-only completion passes the same source/link audit (583 relative links)
+and rendered content/structure inspection of all 13 run-changed documents; root
+complete-diff review accepts it. Independent callback_review accepts the complete
+seven-document completion with no findings. Completion changes no source or
+consumer bytes; its own exact hosted result is recorded in automation memory
+and the end-of-run report. No further behavior is selected in this run.
 
 ## Limits and disposition
 
