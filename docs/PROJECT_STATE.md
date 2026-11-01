@@ -7,8 +7,8 @@ Last updated: **2026-11-02**
 Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-011/ADR-0036 add an
 explicit cancellation command to the public callback consumer so a permanently
 Failed subscriber need not occupy its reply slot indefinitely. Local and
-independent consumer verification and complete Codex review pass; hosted checks
-follow.
+independent consumer verification, complete Codex review and exact implementation
+hosted checks pass. No further behavior is selected.
 Reviewed experimental host v0.1 remains the regression baseline. Package 0.0.0
 is unpublished and APIs provisional.
 
@@ -26,6 +26,10 @@ is unpublished and APIs provisional.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
   Input hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99 and runner
   2.338.2/image windows-2025-vs2026 20261021.278.1 remain separate evidence.
+- Published implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes
+  exact run 41309924576/job 124857958410: all 20 steps, 229 workspace/14 adapter/
+  five sample tests and unchanged 222-line sample. Raw metadata/log inspection
+  confirms the actual checkout; hosted tools/runner/image match input.
 
 ## Current architecture
 
@@ -43,8 +47,10 @@ Five new tests cover cancellation, peer retention, failed destinations, command
 backpressure and producer restart. Existing seven callback test bodies remain
 unchanged. Root and independent cancellation_review accept the complete 13-file
 source/document diff with no findings. Width/waiver/link/test-reference audits and
-all 12 rendered documents pass content/structure inspection. Publication and
-exact hosted checks follow.
+all 12 implementation-changed rendered documents pass content/structure inspection.
+Implementation is published and exact hosted checks pass. No unfinished source
+work remains. This record-only completion receives its own publication/hosted
+inspection in automation memory/report.
 See [the focused record](verification/CALLBACK_CANCELLATION_REVIEW.md).
 
 ## Highest risks and uncertainties
@@ -76,5 +82,6 @@ cancellation scope; do not infer general reliable command delivery.
 ## Latest run
 
 2026-11-02: initial/final baseline, 12 focused/identical independent consumer
-checks and complete root/independent Codex review pass. Exact hosted results are
-recorded as they finish; no later behavior selected.
+checks, complete root/independent Codex review and exact implementation hosted
+inspection pass after ordinary main publication. Final documentation records the
+accepted checkpoint and receives separate review/publication/CI; stop here.

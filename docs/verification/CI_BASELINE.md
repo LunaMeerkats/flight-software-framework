@@ -3,6 +3,21 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Callback-cancellation checkpoint — 2026-11-02
+
+Implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes exact main push
+[run 41309924576](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41309924576),
+job 124857958410. All 20 steps pass: 229 workspace tests including five new
+cancellation regressions and seven retained callback tests, 14 adapter/five
+sample tests, warnings-denied rustdoc, both whitespace checks and unchanged
+222-line sample. Root raw metadata/log inspection confirms checkout and results.
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.2
+and windows-2025-vs2026 image 20261021.278.1 match input run 41204977193.
+Local tools remain 1.98.0/rustfmt 1.9.0-stable/Clippy 0.1.98. Source/waiver/link/
+rendered-document and complete root/independent Codex diff review remain outside
+this CI job; see [the focused record](CALLBACK_CANCELLATION_REVIEW.md).
+Record-only completion receives exact hosted inspection in automation memory.
+
 ## Callback-publication checkpoint — 2026-11-01
 
 Implementation e2ad3484530091e9b51e5f61ead43318187e802e passes exact main push

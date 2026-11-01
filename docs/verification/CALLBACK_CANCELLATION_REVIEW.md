@@ -108,9 +108,28 @@ acceptance.
 
 ## Publication and limits
 
-Publication and exact hosted inspection are pending; local results do not imply
-a hosted pass. This record will be updated with the actual implementation SHA,
-run/job and completed results after ordinary main publication.
+Implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b is published by ordinary
+fast-forward main push. The actual committed patch exactly equals the accepted
+staged diff (SHA256 516a3fbded3171d7e69b4447885152dbaea4f5c225e96c787e4eb5064170e039).
+Its consumer blob is 8a27af36a9c46083f628493f96c1b4287515df55; raw working-source
+SHA256 and independent bytes remain as recorded above. The complete committed
+identities are retained in the local review folder.
+
+Exact main push [run 41309924576](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41309924576),
+job 124857958410 passes all 20 steps: 229 workspace tests, 14 adapter tests,
+five sample tests, warnings-denied rustdoc and both whitespace checks. Raw logs
+confirm every callback consumer test and the unchanged 222-line sample. Hosted
+Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner 2.338.2 and
+windows-2025-vs2026 image 20261021.278.1 match input. Root and independent
+cancellation_review raw metadata/log inspection pass with no findings. No local 1.99.1
+execution or cross-image equivalence is claimed.
+
+This record-only completion retains the exact verified source and receives its
+own full diff/rendered review, ordinary main publication and exact hosted
+inspection in automation memory/report. No further capability is selected.
+The complete run now changes 13 rendered Markdown documents; their content and
+structure pass inspection, and all 596 relative links/193 exact test references
+resolve. Source and existing expectations remain unchanged by this completion.
 
 Cancellation ends future attempts; it cannot retract queued/processed effects.
 Command saturation, unavailable/Failed producers, FIFO order and lifecycle inbox

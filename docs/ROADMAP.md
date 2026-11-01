@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; explicit callback reply cancellation locally verified**
+Status: **Active; explicit callback reply cancellation checkpoint verified**
 
 RFF-LIB-REQ-011 and
 [ADR-0036](adr/0036-explicit-callback-reply-cancellation.md) extend the existing
@@ -15,7 +15,11 @@ the host chooses to cancel. Accepted destination copies remain intact; ordinary
 command admission, FIFO and lifecycle clearing apply. Five new regressions,
 12 identical independent consumer tests and the 229-test locked baseline pass.
 The [focused record](verification/CALLBACK_CANCELLATION_REVIEW.md) separates
-actual review and hosted evidence. No new framework service or API is needed.
+actual review and hosted evidence. Root and independent Codex review accept the
+complete diff; implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes
+exact hosted run 41309924576, all 20 steps and configured host/sample checks.
+No new framework service or API is needed. Reassess concrete command feedback or
+correlation needs before adding another protocol.
 
 The preceding bounded checkpoint, RFF-LIB-REQ-010 and
 [ADR-0035](adr/0035-callback-owned-selective-publication.md), extends the

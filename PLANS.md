@@ -1,6 +1,6 @@
 # Explicit cancellation of callback-owned replies
 
-Status: Local implementation and review complete; hosted checks pending — 2026-11-02
+Status: Complete implementation checkpoint — 2026-11-02
 
 ## Objective and selection
 
@@ -59,5 +59,10 @@ zero width findings and three unchanged expectations. All 595 relative links and
 193 exact test references resolve across 104 Markdown files. All 12 changed
 documents pass rendered content/structure review, without a pixel-QA claim.
 Root and independent cancellation_review accept the complete 13-file diff with
-no findings. Source is unchanged after verification. Publication and exact hosted
-inspection follow, with no further behavior selected.
+no findings. Source is unchanged after verification. Implementation
+38e1d9ab8c5548ce5cabf2356b5af161ec2e044b exactly matches the accepted staged
+patch and is published by ordinary fast-forward to origin/main. Exact run
+41309924576/job 124857958410 passes all 20 steps, 229 workspace/14 adapter/five
+sample tests and unchanged 222-line sample. Hosted tools/runner/image match input.
+This record-only completion receives separate review, main publication and exact
+hosted inspection in automation memory/report. No further behavior is selected.

@@ -1,6 +1,6 @@
 # ADR-0036: Explicit callback reply cancellation
 
-- Status: Implemented; local checks and Codex review pass, hosted checks pending
+- Status: Implemented; local checks, Codex review and exact hosted checks pass
 - Date: 2026-11-02
 - Scope: Cancellation policy in the public-only callback reply consumer
 
@@ -61,7 +61,9 @@ the policy and limits. The
 [focused review](../verification/CALLBACK_CANCELLATION_REVIEW.md) records
 12 focused and identical independent-package tests and the 229-test locked
 baseline passing. Root and independent cancellation_review accept the complete
-source/document diff with no findings; exact hosted checks follow.
+source/document diff with no findings. Implementation
+38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes exact hosted run 41309924576
+and all 20 steps; later document revisions receive separate checks.
 Existing selective publication and lifecycle regression evidence is retained.
 
 ## Risks and revisit conditions
