@@ -129,7 +129,8 @@ translate NASA C source.
 - `tests/callback_publication.rs`: public-only application-owned reply/retry
   consumer and message-context selective publication evidence. Its guide uses
   identical tests in an independent Cargo package; host retry commands remain
-  explicit, and enqueue flags do not establish processing or transactionality.
+  explicit. Its Cancel command clears only application-owned pending state;
+  enqueue flags do not establish processing or transactionality.
 - `examples/event_output.rs`: a public-only host event presenter that owns one
   writer, pending event, fixed rendered line and accepted-byte cursor. Its
   test-enabled target and independent-package recipe verify partial writes,
@@ -246,6 +247,9 @@ package recipe in [its guide](docs/CALLBACK_PUBLICATION.md). Check, lint and tes
 identical source, inspect metadata and compare SHA256 hashes. Record the actual
 package path/results in the focused review. Acceptance is enqueue only; callback
 failure clears selected queued copies while accepted peer effects remain.
+For consumer cancellation changes, also record results in the
+[cancellation review](docs/verification/CALLBACK_CANCELLATION_REVIEW.md).
+Cancel uses ordinary command admission/dispatch and cannot retract accepted copies.
 
 When changing the event-output example or its guidance, run
 `cargo test --locked --example event_output` and

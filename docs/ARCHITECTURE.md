@@ -3,6 +3,21 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Explicit callback reply cancellation — 2026-11-02
+
+RFF-LIB-REQ-011 and
+[ADR-0036](adr/0036-explicit-callback-reply-cancellation.md) add an explicit Cancel
+command to the existing public-only reply consumer. Dispatch clears only the
+application-owned pending reply and flags; accepted destination copies and
+older FIFO values remain intact. Idle cancellation and retry with no pending
+reply do nothing. The same bounded inbox controls admission and ordering, with
+no priority or processing acknowledgement. Producer stop/restart retains reply
+state while stop clears queued commands. Cancel targets the reply current at
+dispatch, without an operation ID. This is mission policy using existing public
+APIs, with no library service or lifecycle change. The
+[consumer guide](CALLBACK_PUBLICATION.md#cancel-future-attempts) explains host
+resubmission duties and why cancellation cannot retract accepted effects.
+
 ## Callback-selected subscriber publication — 2026-11-01
 
 RFF-LIB-REQ-010 and

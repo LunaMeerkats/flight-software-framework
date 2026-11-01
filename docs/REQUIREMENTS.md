@@ -393,3 +393,25 @@ a returned callback error while accepted peer copies survive. Verify identical
 tests in an independent Cargo package. Guidance shall distinguish acceptance
 from processing, host-triggered retry from automatic retry, and committed effects
 from transactions. Existing origin, resource and qualification limits remain.
+
+### RFF-LIB-REQ-011 — Explicit callback reply cancellation
+
+Revision 1 (2026-11-02). The public-only callback consumer shall accept an
+explicit Cancel command through its ordinary bounded inbox. When dispatched,
+it shall clear the current application-owned pending reply and acceptance flags,
+if any, without publishing or changing destination queues. Repeated or idle
+cancellation shall succeed. A later retry with no pending reply shall do nothing;
+a new reply may then be admitted. Accepted copies remain accepted and cannot be
+retracted by cancellation. Existing selective publication and lifecycle contracts
+retain their meanings; stop/restart alone shall retain this consumer's reply.
+
+Acceptance: public-only tests shall verify cancellation after partial acceptance,
+unchanged accepted copies and rejected destination FIFO, retry after cancellation,
+new-reply progress, repeated/idle cancellation, a permanently Failed subscriber,
+ordinary command inbox saturation/FIFO and producer stop/restart retention.
+Verify identical tests in an independent path-dependent Cargo package. Guidance
+shall explain dispatch-time targeting, absence of operation IDs, host command
+ordering, command rejection/clearing and the distinction between cancelling
+future attempts and retracting accepted effects. No automatic cancellation,
+priority command lane, acknowledgement, authentication or library retry service
+is introduced. RFF-LIB-REQ-010 revision 1 evidence retains its original domain.

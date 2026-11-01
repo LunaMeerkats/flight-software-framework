@@ -17,6 +17,7 @@ use rust_flight_framework::{
 enum Topic {
     NewReply,
     Retry,
+    Cancel,
     Probe,
     Reply,
     Other,
@@ -118,6 +119,8 @@ impl ReplyProducer {
                     }
                 }
             }
+            // Accepted inbox copies belong to their destinations already.
+            Topic::Cancel => self.pending = None,
             _ => return Err(CallbackError::InvalidInput),
         }
         self.observation.set(ReplyObservation {
@@ -308,7 +311,7 @@ fn reply_mission() -> ReplyMission {
         [producer, first, second],
         [1, 2, 2],
         [
-            &[Topic::NewReply, Topic::Retry],
+            &[Topic::NewReply, Topic::Retry, Topic::Cancel],
             &[Topic::Reply],
             &[Topic::Reply],
         ],
@@ -395,6 +398,172 @@ fn callback_retry_retains_reply_while_stopped_and_refreshes_after_restart() {
     invoke(&mut mission.owner, producer, Topic::Retry, 0);
     assert_reply(&mission, 42, [true; 2]);
     assert_eq!(mission.owner.pending(first), Ok(0));
+    assert_eq!(drain(&mut mission.owner, second, &mission.outputs[1]), 42);
+}
+
+#[test]
+fn cancellation_preserves_accepted_copy_and_rejected_fifo_then_admits_new_reply() {
+    let mut mission = reply_mission();
+    let [producer, first, second] = mission.ids;
+    for value in [3, 4] {
+        mission
+            .owner
+            .publish_to(second, &message(Topic::Reply, value))
+            .unwrap();
+    }
+    invoke(&mut mission.owner, producer, Topic::NewReply, 42);
+    assert_reply(&mission, 42, [true, false]);
+    invoke(&mut mission.owner, producer, Topic::Cancel, 0);
+    assert_eq!(mission.observation.get().pending, None);
+    for _ in 0..2 {
+        invoke(&mut mission.owner, producer, Topic::Retry, 0);
+        assert_eq!(mission.observation.get().pending, None);
+        assert_eq!(mission.owner.pending(first), Ok(1));
+        assert_eq!(mission.owner.pending(second), Ok(2));
+    }
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 42);
+    for value in [3, 4] {
+        assert_eq!(
+            drain(&mut mission.owner, second, &mission.outputs[1]),
+            value
+        );
+    }
+    invoke(&mut mission.owner, producer, Topic::NewReply, 43);
+    assert_reply(&mission, 43, [true; 2]);
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 43);
+    assert_eq!(drain(&mut mission.owner, second, &mission.outputs[1]), 43);
+}
+
+#[test]
+fn cancellation_unblocks_new_replies_after_permanent_subscriber_failure() {
+    let mut mission = reply_mission();
+    let [producer, first, second] = mission.ids;
+    mission.outputs[1].set(Some(7));
+    mission
+        .owner
+        .publish_to(second, &message(Topic::Reply, 8))
+        .unwrap();
+    let error = mission.owner.dispatch_one(second).unwrap_err();
+    assert_eq!(
+        error.operation_error(),
+        &MessageDispatchError::Application {
+            application_id: second,
+            source: CallbackError::OutputOccupied,
+        }
+    );
+    assert_eq!(mission.owner.state(second), Ok(ApplicationState::Failed));
+    invoke(&mut mission.owner, producer, Topic::NewReply, 42);
+    assert_reply(&mission, 42, [true, false]);
+    invoke(&mut mission.owner, producer, Topic::NewReply, 43);
+    assert_eq!(mission.observation.get().deferred, Some(43));
+    for _ in 0..2 {
+        invoke(&mut mission.owner, producer, Topic::Cancel, 0);
+        assert_eq!(mission.observation.get().pending, None);
+    }
+    invoke(&mut mission.owner, producer, Topic::Retry, 0);
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 42);
+    invoke(&mut mission.owner, producer, Topic::NewReply, 43);
+    assert_reply(&mission, 43, [true, false]);
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 43);
+    assert_eq!(mission.owner.state(second), Ok(ApplicationState::Failed));
+    assert_eq!(mission.owner.pending(second), Ok(0));
+    assert_eq!(mission.outputs[1].get(), Some(7));
+    assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Running));
+}
+
+#[test]
+fn cancellation_obeys_command_inbox_backpressure_and_dispatch_order() {
+    let mut mission = reply_mission();
+    let [producer, first, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    invoke(&mut mission.owner, producer, Topic::NewReply, 42);
+    assert_reply(&mission, 42, [true, false]);
+    assert_eq!(
+        mission
+            .owner
+            .publish_to(producer, &message(Topic::Retry, 0)),
+        Ok(DeliveryStatus::Delivered)
+    );
+    assert_eq!(
+        mission
+            .owner
+            .publish_to(producer, &message(Topic::Cancel, 0)),
+        Ok(DeliveryStatus::InboxFull)
+    );
+    assert_eq!(
+        mission.owner.dispatch_one(producer),
+        Ok(MessageDispatchOutcome::Dispatched)
+    );
+    assert_reply(&mission, 42, [true, false]);
+    assert_eq!(
+        mission
+            .owner
+            .publish_to(producer, &message(Topic::Cancel, 0)),
+        Ok(DeliveryStatus::Delivered)
+    );
+    // Enqueue acceptance is not execution of the cancellation command.
+    assert_reply(&mission, 42, [true, false]);
+    assert_eq!(mission.owner.pending(first), Ok(1));
+    assert_eq!(
+        mission.owner.dispatch_one(producer),
+        Ok(MessageDispatchOutcome::Dispatched)
+    );
+    assert_eq!(mission.observation.get().pending, None);
+    mission.owner.restart(second).unwrap();
+    invoke(&mut mission.owner, producer, Topic::Retry, 0);
+    assert_eq!(mission.owner.pending(second), Ok(0));
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 42);
+}
+
+#[test]
+fn producer_restart_retains_reply_but_discards_queued_cancellation() {
+    let mut mission = reply_mission();
+    let [producer, first, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    invoke(&mut mission.owner, producer, Topic::NewReply, 42);
+    assert_reply(&mission, 42, [true, false]);
+    assert_eq!(
+        mission
+            .owner
+            .publish_to(producer, &message(Topic::Cancel, 0)),
+        Ok(DeliveryStatus::Delivered)
+    );
+    assert_eq!(
+        mission.owner.stop(producer).unwrap().discarded_deliveries(),
+        1
+    );
+    mission.owner.restart(producer).unwrap();
+    invoke(&mut mission.owner, producer, Topic::Retry, 0);
+    assert_reply(&mission, 42, [true, false]);
+    invoke(&mut mission.owner, producer, Topic::Cancel, 0);
+    assert_eq!(mission.observation.get().pending, None);
+    mission.owner.stop(producer).unwrap();
+    mission.owner.restart(producer).unwrap();
+    mission.owner.restart(second).unwrap();
+    invoke(&mut mission.owner, producer, Topic::Retry, 0);
+    assert_eq!(mission.observation.get().pending, None);
+    assert_eq!(mission.owner.pending(second), Ok(0));
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 42);
+}
+
+#[test]
+fn idle_repeated_and_completed_cancellation_leave_accepted_copies_intact() {
+    let mut mission = reply_mission();
+    let [producer, first, second] = mission.ids;
+    for _ in 0..2 {
+        invoke(&mut mission.owner, producer, Topic::Cancel, 0);
+        assert_eq!(mission.observation.get().pending, None);
+    }
+    invoke(&mut mission.owner, producer, Topic::NewReply, 42);
+    assert_reply(&mission, 42, [true; 2]);
+    for _ in 0..2 {
+        invoke(&mut mission.owner, producer, Topic::Cancel, 0);
+        invoke(&mut mission.owner, producer, Topic::Retry, 0);
+        assert_eq!(mission.observation.get().pending, None);
+        assert_eq!(mission.owner.pending(first), Ok(1));
+        assert_eq!(mission.owner.pending(second), Ok(1));
+    }
+    assert_eq!(drain(&mut mission.owner, first, &mission.outputs[0]), 42);
     assert_eq!(drain(&mut mission.owner, second, &mission.outputs[1]), 42);
 }
 

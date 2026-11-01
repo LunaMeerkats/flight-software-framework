@@ -1,5 +1,17 @@
 # Verification traceability
 
+## Stage 5 explicit callback reply cancellation — 2026-11-02
+
+RFF-LIB-REQ-011 revision 1 and
+[ADR-0036](../adr/0036-explicit-callback-reply-cancellation.md) define a consumer
+command, with no library API change. The [guide](../CALLBACK_PUBLICATION.md) and
+[focused review](CALLBACK_CANCELLATION_REVIEW.md) distinguish dispatched
+cancellation from enqueue acceptance and retained destination effects.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-011 | Existing public-only producer's Cancel topic clears its current pending reply; ordinary inbox and lifecycle policy | `cancellation_preserves_accepted_copy_and_rejected_fifo_then_admits_new_reply`; `cancellation_unblocks_new_replies_after_permanent_subscriber_failure`; `cancellation_obeys_command_inbox_backpressure_and_dispatch_order`; `producer_restart_retains_reply_but_discards_queued_cancellation`; `idle_repeated_and_completed_cancellation_leave_accepted_copies_intact`; identical independent consumer check/Clippy/test/metadata/hash | Five new tests, all 12 focused/identical independent tests and 229-test locked baseline pass; complete root/independent Codex review passes; exact hosted inspection pending in focused record |
+
 ## Stage 5 callback-owned selective reply retry — 2026-11-01
 
 RFF-LIB-REQ-010 revision 1 and

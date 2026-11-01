@@ -5,9 +5,19 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; callback-owned selective reply retry checkpoint verified**
+Status: **Active; explicit callback reply cancellation locally verified**
 
-The current bounded checkpoint, RFF-LIB-REQ-010 and
+RFF-LIB-REQ-011 and
+[ADR-0036](adr/0036-explicit-callback-reply-cancellation.md) extend the existing
+public consumer with explicit cancellation of its current reply. A permanently
+Failed subscriber no longer requires an indefinitely occupied reply slot when
+the host chooses to cancel. Accepted destination copies remain intact; ordinary
+command admission, FIFO and lifecycle clearing apply. Five new regressions,
+12 identical independent consumer tests and the 229-test locked baseline pass.
+The [focused record](verification/CALLBACK_CANCELLATION_REVIEW.md) separates
+actual review and hosted evidence. No new framework service or API is needed.
+
+The preceding bounded checkpoint, RFF-LIB-REQ-010 and
 [ADR-0035](adr/0035-callback-owned-selective-publication.md), extends the
 publish-only message context with one selected subscribed attempt. A
 [message-driven consumer](CALLBACK_PUBLICATION.md) retains reply/acceptance state

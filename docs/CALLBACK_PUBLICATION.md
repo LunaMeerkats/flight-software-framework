@@ -3,7 +3,7 @@
 A message-driven application can own its pending reply and acceptance ledger.
 Use ApplicationMessageContext::publish for initial fan-out, then publish_to for
 one rejected subscriber during a later callback. The host explicitly queues and
-dispatches a retry command; the framework does not schedule retries.
+dispatches retry or cancellation commands; the framework does not schedule them.
 
 The [public-only consumer](../tests/callback_publication.rs) demonstrates this
 through the ordinary MessagingApplication callback, without private sample
@@ -41,10 +41,43 @@ The consumer retains one inline reply, two destination IDs and two acceptance
 flags inside its application. Initial broadcast seeds those flags. Later retry
 commands attempt only rejected destinations; full/unavailable results retain the
 reply. A busy new-reply command is consumed without replacing or buffering its
-requested value; the host must resubmit it after completion. The copied deferred
-value is test instrumentation, not another pending request. After both inboxes
-accept, the application clears its slot and permits another reply. Host policy
-must choose when to send retries, when to stop, and how to cancel pending work.
+requested value; the host must resubmit it after completion or cancellation.
+The copied deferred value is test instrumentation, not another pending request.
+After both inboxes accept, the application clears its slot and permits another
+reply. Host policy must choose when to send retries, cancel the current reply,
+or stop.
+
+## Cancel future attempts
+
+A permanently Failed subscriber can leave a reply pending indefinitely. The
+consumer's explicit Cancel command clears that reply and its acceptance flags
+when dispatched. Idle or repeated cancellation succeeds, later Retry commands
+with no pending reply do nothing, and a new reply may then be admitted. Cancel
+does not publish, change destination queues, or retract a copy already accepted
+or processed by a subscriber. Older destination FIFO values remain intact.
+
+Cancel uses the same capacity-one producer inbox as NewReply and Retry. There
+is no priority lane: publication can return InboxFull or Unavailable, and
+accepted commands still await explicit dispatch in FIFO order. The host must
+handle rejection, retain/resubmit commands and choose their order. Acceptance
+only means the command was queued; it does not acknowledge cancellation.
+
+The command targets whichever single reply exists when its callback runs. It
+has no operation ID, so a delayed Cancel may cancel a newer reply. Keep command
+ordering explicit; this consumer provides no correlation or authentication.
+Successful producer stop discards queued commands, including Cancel. Its no-op
+stop/restart callbacks retain the pending reply and flags in the same application
+value. Resubmit a discarded cancellation after restart if the mission still
+wants it. A terminal Failed producer cannot dispatch another command.
+
+[ADR-0036](adr/0036-explicit-callback-reply-cancellation.md) compares explicit
+commands with automatic lifecycle cancellation, host mutation and an
+acknowledgement/operation-ID protocol. RFF-LIB-REQ-011 defines this additional
+consumer policy; the original RFF-LIB-REQ-010 revision 1 evidence is unchanged.
+The [cancellation review](verification/CALLBACK_CANCELLATION_REVIEW.md) records
+actual verification separately from the original selective-publication review.
+
+## Acceptance and failure limits
 
 These flags record enqueue history. Stopping or failing an accepted destination
 can later discard its copy without changing a flag. Repeating publish_to remains
@@ -88,7 +121,9 @@ Inspect metadata: one independent workspace member, the consumer plus its sole
 framework path dependency, and no library dependencies. Compare SHA256 and exact
 source bytes. The generated cargo-new smoke test is separate from the copied
 consumer tests. Record the actual package path and results in the
-[focused review](verification/CALLBACK_PUBLICATION_REVIEW.md).
-[ADR-0035](adr/0035-callback-owned-selective-publication.md) compares alternatives.
+[focused publication review](verification/CALLBACK_PUBLICATION_REVIEW.md) for
+the original checkpoint or the cancellation review above for RFF-LIB-REQ-011.
+[ADR-0035](adr/0035-callback-owned-selective-publication.md) compares selective
+publication alternatives; ADR-0036 above records cancellation policy.
 This controlled consumer demonstrates this composition only; publication and
 the separate consequential authorization gates remain unchanged.

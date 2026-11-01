@@ -13,6 +13,25 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-CALLBACK-CANCELLATION — Optional state and command FIFO
+
+- Titles: Option and VecDeque::pop_front, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/option/enum.Option.html> and
+  <https://doc.rust-lang.org/std/collections/struct.VecDeque.html#method.pop_front>
+- Version: official live std 1.99.1 (58cf8f9c3, 2026-10-13), accessed
+  2026-11-02 Australia/Sydney. Local execution remains on Rust 1.98.0.
+- Informed: Option represents a value with Some or absence with None;
+  VecDeque::pop_front removes the first element, or returns None when empty.
+- Local treatment: adopt an explicit consumer command that replaces the current
+  optional reply with None under ADR-0036, using existing bounded FIFO dispatch.
+  Cancellation targets dispatch-time application state and leaves accepted
+  destination copies intact. Reject implicit lifecycle cancellation and direct
+  host mutation; defer acknowledgements and operation IDs until demonstrated
+  need. These cancellation and ordering policies are local choices, not Rust or
+  agency requirements. No upstream implementation, dependency or library API
+  is introduced.
+
 ## SRC-RUST-CALLBACK-PUBLICATION — Reuse disjoint service borrows
 
 - Titles: Splitting Borrows, The Rustonomicon; VecDeque, Rust standard library
