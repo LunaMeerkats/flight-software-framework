@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; correlated operation cancellation locally verified**
+Status: **Active; correlated operation cancellation checkpoint verified**
 
 RFF-LIB-REQ-012 and
 [ADR-0037](adr/0037-correlated-operation-cancellation.md) define a separate
@@ -14,7 +14,9 @@ from clearing newer pending work. Matching control IDs and a finite nonwrapping
 host issuer use existing APIs. Original callback behavior remains unchanged.
 The [focused record](verification/CORRELATED_COMMANDS_REVIEW.md) records seven
 focused/identical independent consumer tests and the 236-test locked baseline
-passing; complete root/independent Codex review passes. Publication is pending. Acknowledgements, persistent
+passing; complete root/independent Codex review passes. Implementation
+34514bd98bb671fadb2863f5d12492b54297e37c passes exact hosted run 41450862997,
+all 20 steps and configured host/sample checks. Acknowledgements, persistent
 identity and multiple issuers remain outside this bounded increment.
 
 RFF-LIB-REQ-011 and

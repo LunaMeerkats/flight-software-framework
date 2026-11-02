@@ -128,8 +128,27 @@ REQ-012 wording explicitly limits no-effect controls to stale/idle commands and
 repeated cancellation after clearing; matching Retry may still make progress.
 The reviewed source identity is the exact Git blob above; the accepted staged
 patch is retained locally for comparison with the resulting commit. Review is
-Codex provenance, not human review. Ordinary main publication and exact hosted
-inspection remain pending; no hosted pass is claimed for uncommitted work.
+Codex provenance, not human review. Committed implementation
+34514bd98bb671fadb2863f5d12492b54297e37c has tree
+49d0b18cea2277dce71084e33db0e5130057f23b and exactly matches the accepted
+staged patch. It is published by ordinary fast-forward to origin/main.
+
+## Exact implementation hosted evidence
+
+[Run 41450862997](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41450862997),
+job 125295426494, passes all 20 steps at logged checkout
+34514bd98bb671fadb2863f5d12492b54297e37c: 236 workspace tests, all seven new
+regressions and 12 retained callback tests, separate 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and unchanged 222-line sample.
+Root and independent verification_support raw metadata/log inspection confirms
+the actual checkout/results. The connector returned only an acknowledgement;
+GitHub CLI supplied inspectable
+metadata and raw job logs. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable,
+Clippy 0.1.99, runner 2.338.2 and image windows-2025-vs2026 20261021.278.1 match
+input. Local 1.98.0 checks remain separate. Source/configuration are unchanged
+by this record-only completion, which receives separate review/publication and
+exact hosted inspection in automation memory/report. No further behavior is
+selected.
 
 ## Limits
 
@@ -137,6 +156,6 @@ One session issuer, one pending operation and two destinations only. Correlation
 does not acknowledge processing, authenticate commands, suppress duplicate New
 commands or preserve identity across issuer reset. Ordinary admission/FIFO and
 lifecycle clearing apply; cancellation cannot retract accepted copies. No
-framework API, service, dependency or workflow change is intended. Controlled
+framework API, service, dependency or workflow changes were made. Controlled
 host evidence does not establish adoption, stability, operational suitability or
 qualification. Release and other consequential gates remain separate.

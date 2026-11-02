@@ -1,6 +1,6 @@
 # Correlated cancellation of a callback-owned operation
 
-Status: Locally verified and independently reviewed; publication pending — 2026-11-03 Australia/Sydney
+Status: Complete implementation checkpoint — 2026-11-03 Australia/Sydney
 
 ## Objective and selection
 
@@ -46,6 +46,13 @@ tests plus generated smoke test pass; metadata, bytes and SHA256 match the
 focused record. Whole-tree audit finds 54 Rust files, 23,848 physical/1,361
 comment-only lines, zero width findings and three unchanged expectations.
 Relative links and all 200 exact test references resolve. Changed documents pass
-rendered content/structure inspection, without a pixel-QA claim. Root and independent verification_support accept the complete 13-file diff with
-no findings. All 12 changed documents pass rendered content/structure review.
-Source is frozen; ordinary main publication and exact hosted inspection remain.
+rendered content/structure inspection, without a pixel-QA claim. Root and
+independent verification_support accept the complete 13-file diff with no
+findings. All 12 changed documents pass rendered content/structure review.
+Implementation 34514bd98bb671fadb2863f5d12492b54297e37c exactly matches the
+accepted staged patch and is published by ordinary fast-forward to origin/main.
+Exact run 41450862997/job 125295426494 passes all 20 steps, 236 workspace/14
+adapter/five sample tests and unchanged 222-line sample. Hosted tools/runner/image
+match input. This record-only completion receives separate review/publication
+and exact hosted inspection in automation memory/report. No further behavior is
+selected.

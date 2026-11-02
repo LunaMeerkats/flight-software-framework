@@ -1,6 +1,6 @@
 # ADR-0037: Correlated operation cancellation
 
-- Status: Implemented; local checks and Codex review pass; publication pending
+- Status: Implemented; local checks, Codex review and exact hosted checks pass
 - Date: 2026-11-03
 - Scope: One session-local public-only callback consumer
 
@@ -50,7 +50,9 @@ or dependency is reused. The [guide](../CORRELATED_COMMANDS.md) and
 [focused review](../verification/CORRELATED_COMMANDS_REVIEW.md) record seven
 focused/identical independent tests and the 236-test locked baseline passing.
 Root and independent verification_support accept the complete diff with no
-findings. Publication and exact hosted inspection remain pending.
+findings. Implementation 34514bd98bb671fadb2863f5d12492b54297e37c is published;
+exact hosted run 41450862997 passes all 20 steps. Later record revisions receive
+separate checks.
 
 ## Risks and revisit conditions
 
