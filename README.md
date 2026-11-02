@@ -55,6 +55,10 @@ uses the same subscription checks and lifecycle snapshot as ordinary publication
 An explicit cancellation command can end future attempts for the current reply;
 already accepted subscriber copies remain intact.
 
+[Correlate control commands with an operation](docs/CORRELATED_COMMANDS.md) when
+delayed cancellation must preserve a newer reply. A separate public-only consumer
+uses finite session IDs and matching Cancel/Retry commands with existing APIs.
+
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.

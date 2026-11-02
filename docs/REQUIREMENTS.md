@@ -415,3 +415,26 @@ ordering, command rejection/clearing and the distinction between cancelling
 future attempts and retracting accepted effects. No automatic cancellation,
 priority command lane, acknowledgement, authentication or library retry service
 is introduced. RFF-LIB-REQ-010 revision 1 evidence retains its original domain.
+
+### RFF-LIB-REQ-012 — Correlated cancellation of one pending operation
+
+Revision 1 (2026-11-03). A separate public-only consumer shall retain one reply
+with a mission-owned operation ID and two destination acceptance flags. Cancel
+and Retry commands shall carry that ID and affect only a matching pending
+operation. Stale or idle controls, including repeated cancellation after clearing,
+shall leave pending state and destination queues unchanged. New while busy shall be
+consumed without replacing the retained operation and require host resubmission.
+The host shall issue nonreused IDs within one session using a finite checked
+allocator that explicitly rejects exhaustion without wrapping. Retransmissions
+of the same operation shall retain its ID; creating another issuer while old
+commands or replies survive is outside this consumer's session contract.
+
+Acceptance: public-only tests shall observe delayed cancellation queued after a
+newer operation, matching/idle/repeated cancellation, unchanged accepted copies
+and older rejected FIFO, correlated rejected-only retry, busy-command retention,
+ordinary command saturation and producer stop/restart retaining pending state
+while clearing queued commands. Exercise the entire finite ID domain and repeated
+exhaustion. Verify identical source in an independent path-dependent Cargo
+package. Guidance shall distinguish correlation from acknowledgement,
+authentication, duplicate suppression and durable identity across sessions.
+Existing RFF-LIB-REQ-010/011 consumers and requirement meanings remain unchanged.

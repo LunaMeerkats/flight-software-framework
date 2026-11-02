@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-CORRELATED-COMMANDS — Checked finite identity allocation
+
+- Titles: u8::checked_add and Option, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/primitive.u8.html#method.checked_add>
+  and <https://doc.rust-lang.org/std/option/enum.Option.html>
+- Version: official live std 1.99.1 (58cf8f9c3, 2026-10-13), accessed
+  2026-11-03 Australia/Sydney. Local execution remains on Rust 1.98.0.
+- Informed: checked addition returns None on overflow; Option can represent
+  absent state and test a predicate on its present value.
+- Local treatment: adopt checked finite session-ID issuance with explicit
+  exhaustion and match optional pending identity before control effects under
+  ADR-0037. Reject wrapping IDs; defer acknowledgements, persistence and multiple
+  issuers. These correlation/session rules are local policy, not Rust or agency
+  requirements. No upstream code, dependency or framework API is reused/added.
+
 ## SRC-RUST-CALLBACK-CANCELLATION — Optional state and command FIFO
 
 - Titles: Option and VecDeque::pop_front, Rust standard library

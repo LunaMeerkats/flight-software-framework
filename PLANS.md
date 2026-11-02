@@ -1,68 +1,51 @@
-# Explicit cancellation of callback-owned replies
+# Correlated cancellation of a callback-owned operation
 
-Status: Complete implementation checkpoint — 2026-11-02
+Status: Locally verified and independently reviewed; publication pending — 2026-11-03 Australia/Sydney
 
 ## Objective and selection
 
-An unavailable, permanently Failed subscriber can keep the callback consumer's
-single reply pending indefinitely and block every later new reply. Root Codex
-and independent consumer_assessment select explicit mission cancellation over
-automatic lifecycle cancellation, admission acknowledgements or a retry service.
-Existing public APIs suffice. RFF-LIB-REQ-011 precedes implementation; existing
-RFF-LIB-REQ-010 revision 1 contracts and seven regressions remain unchanged.
+Prevent a delayed cancellation from erasing a newer pending reply. Root Codex
+and independent consumer_assessment select a separate public-only consumer using
+existing APIs over a larger acknowledgement protocol or automatic lifecycle
+abandonment. RFF-LIB-REQ-012 revision 1 precedes implementation. Preserve the
+original callback consumer and its 12 regressions unchanged.
 
 ## Acceptance and components
 
-- Add a Cancel topic to tests/callback_publication.rs. On dispatch it clears
-  only the current application-owned reply, with no publication or peer cleanup.
-- Verify partial acceptance, rejected peer FIFO, idle/repeated cancellation,
-  retry after cancellation, new-reply admission, permanently Failed subscribers,
-  command inbox saturation/FIFO and deliberate producer stop/restart retention.
-- Record the local policy and alternatives in ADR-0036; update the existing
-  consumer guide, requirements, traceability, roadmap, architecture and state.
-- Run focused tests, locked baseline, identical independent package checks,
-  source hashes/metadata, width/waiver/link audits and rendered document review.
-  Obtain independent Codex source and full-diff review before committing main.
-- Refresh origin; ordinary fast-forward source push and inspect exact hosted CI.
-  Stop after this one verified increment, retaining separate release gates.
+- Add tests/correlated_commands.rs, independently composed with public APIs.
+  One pending operation and two acceptance flags; matching Cancel/Retry only.
+- Issue finite session-local IDs with checked exhaustion; demonstrate stale
+  commands, exact FIFO/peer retention, busy admission, saturation and restart.
+- Record policy/alternatives in ADR-0037, guide, source register, traceability,
+  focused review, roadmap and current state. Keep docs proportionate.
+- Run focused checks and locked baseline, identical independent Cargo consumer,
+  metadata/byte/SHA256 comparison, width/waiver/link/test-reference audits and
+  rendered-document content/structure inspection. Obtain independent Codex
+  source/full-diff review before committing main.
+- Refresh origin, ordinary fast-forward push main, inspect exact hosted CI.
 
-## Baseline and risks
+## Baseline, risks and safe stopping point
 
-Clean main input 1972d66f20d08ab3590e84035073bc4d015b35b9 matches fetched
-origin/main. Initial locked format/check/Clippy/224 workspace tests and
-warnings-denied rustdoc pass, as do working/committed whitespace checks.
-Input run 41204977193/job 124548108020 passes all 20 steps at that exact head;
-raw logs are retained locally. Source audit: 53 Rust files, 23,070 physical and
-1,355 comment-only lines, no width findings, three existing expectations;
-102 Markdown files, 583 relative links and 188 exact test references resolve.
-Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
+Clean main input d56441235dc8670a14c8a54fadd4df4abeb6c9f3 matches fetched
+origin/main. Initial locked baseline passes 229 workspace tests and all checks.
+Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
 
-Cancel targets whatever reply exists when dispatched, without an operation ID.
-It cannot retract accepted copies or promise cancellation while its command is
-full, unavailable or awaiting dispatch. Lifecycle operations do not implicitly
-clear the application's pending reply. No acknowledgement or authentication is
-added. Command ordering remains a host responsibility.
-
-## Safe stopping point
-
-One verified consumer policy with no library, dependency or workflow change.
-If checks fail, remove only current-run implementation where safe and retain
-decision/failure evidence. No unrelated work, release, tag or deployment.
+IDs correlate equality within one host session only. No acknowledgement,
+authentication, deduplication, persistent epoch, new library service, dependency
+or workflow is introduced. Command acceptance remains enqueue only; accepted
+copies cannot be retracted. Stop/restart retains application state and must not
+reset the host issuer. If verification fails, remove only current-run source
+changes where safe and retain useful decision/failure evidence. Stop after this
+one coherent verified consumer increment.
 
 ## Actual local results
 
-Focused tests/Clippy pass all 12 tests. Final locked baseline passes 229 workspace
-tests. An independent package passes check/Clippy/12 identical tests plus its
-generated smoke test; source bytes, SHA256 and metadata match the focused record.
-Whole-tree audit finds 53 Rust files, 23,239 physical/1,357 comment-only lines,
-zero width findings and three unchanged expectations. All 595 relative links and
-193 exact test references resolve across 104 Markdown files. All 12 changed
-documents pass rendered content/structure review, without a pixel-QA claim.
-Root and independent cancellation_review accept the complete 13-file diff with
-no findings. Source is unchanged after verification. Implementation
-38e1d9ab8c5548ce5cabf2356b5af161ec2e044b exactly matches the accepted staged
-patch and is published by ordinary fast-forward to origin/main. Exact run
-41309924576/job 124857958410 passes all 20 steps, 229 workspace/14 adapter/five
-sample tests and unchanged 222-line sample. Hosted tools/runner/image match input.
-This record-only completion receives separate review, main publication and exact
-hosted inspection in automation memory/report. No further behavior is selected.
+Seven focused tests/Clippy pass. Final locked baseline passes 236 workspace tests
+and warnings-denied rustdoc. Identical independent consumer check/Clippy/seven
+tests plus generated smoke test pass; metadata, bytes and SHA256 match the
+focused record. Whole-tree audit finds 54 Rust files, 23,848 physical/1,361
+comment-only lines, zero width findings and three unchanged expectations.
+Relative links and all 200 exact test references resolve. Changed documents pass
+rendered content/structure inspection, without a pixel-QA claim. Root and independent verification_support accept the complete 13-file diff with
+no findings. All 12 changed documents pass rendered content/structure review.
+Source is frozen; ordinary main publication and exact hosted inspection remain.

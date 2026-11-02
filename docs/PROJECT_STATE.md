@@ -1,87 +1,76 @@
 # Project state
 
-Last updated: **2026-11-02**
+Last updated: **2026-11-03**
 
 ## Current milestone
 
-Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-011/ADR-0036 add an
-explicit cancellation command to the public callback consumer so a permanently
-Failed subscriber need not occupy its reply slot indefinitely. Local and
-independent consumer verification, complete Codex review and exact implementation
-hosted checks pass. No further behavior is selected.
-Reviewed experimental host v0.1 remains the regression baseline. Package 0.0.0
-is unpublished and APIs provisional.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-012/ADR-0037 add a
+separate correlated-command consumer: delayed Cancel/Retry affect only matching
+pending operations. Local and identical independent consumer checks pass;
+root/independent complete review passes; publication remains pending. The original
+callback consumer and its 12 tests are unchanged. Reviewed experimental host
+v0.1 remains the regression baseline; package 0.0.0 is unpublished/provisional.
 
 ## Verified baseline
 
-- Clean main input 1972d66f20d08ab3590e84035073bc4d015b35b9 matches fetched
-  origin/main. Exact input run 41204977193/job 124548108020 passes all 20 steps,
-  224 workspace/14 adapter/five sample tests and the 222-line host sample.
+- Clean main input d56441235dc8670a14c8a54fadd4df4abeb6c9f3 matches fetched
+  origin/main. Exact input run 41310258543/job 124858954952 passes all 20 steps:
+  229 workspace/14 adapter/five sample tests and unchanged 222-line sample.
 - Initial/final locked format/check/Clippy/test/warnings-denied rustdoc and both
-  whitespace checks pass, with 224/229 workspace tests. The focused consumer
-  passes all 12 tests, including five new cancellation regressions.
-- Identical independent Cargo consumer check/Clippy/test pass; metadata confirms
-  one workspace member and sole framework path dependency, with matching bytes
-  and SHA256. The library still has no dependencies. See the focused record.
+  whitespace checks pass, with 229/236 workspace tests. Seven focused tests pass.
+- Identical independent Cargo consumer check/Clippy/seven tests plus generated
+  smoke test pass. Source bytes/SHA256 match; metadata confirms one independent
+  workspace member and sole framework path dependency, with no library deps.
 - Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
-  Input hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99 and runner
-  2.338.2/image windows-2025-vs2026 20261021.278.1 remain separate evidence.
-- Published implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes
-  exact run 41309924576/job 124857958410: all 20 steps, 229 workspace/14 adapter/
-  five sample tests and unchanged 222-line sample. Raw metadata/log inspection
-  confirms the actual checkout; hosted tools/runner/image match input.
+  Input hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable/Clippy 0.1.99, runner
+  2.338.2 and windows-2025-vs2026 image 20261021.278.1 remain separate evidence.
 
 ## Current architecture
 
-One unpublished package owns synchronous LC1 lifecycle/work, bounded inbox
-routing/dispatch, manual time, finite one-shot scheduling, bounded events and
-optional configuration with immutable work visibility/one-use rollback. Periodic
-releases remain host-owned. Selective callback publication uses checked routing
-and the pre-callback lifecycle snapshot. Consumer Cancel clears only its current
-pending reply; already accepted copies remain owned by their destinations.
-No library service, public API, dependency or workflow changes in this increment.
+One unpublished package owns synchronous LC1 lifecycle/work, bounded routing,
+manual time, finite schedules, events and optional validated configuration.
+Host-owned recurring releases delegate to existing work owners. Callback selective
+publication uses checked routing and a pre-callback lifecycle snapshot. The new
+consumer owns one operation/two acceptance flags and compares session IDs before
+control effects; one host issuer rejects exhaustion after IDs 1..=255. No
+framework API, service, dependency, workflow or policy configuration changes.
 
 ## Work in progress
 
-Five new tests cover cancellation, peer retention, failed destinations, command
-backpressure and producer restart. Existing seven callback test bodies remain
-unchanged. Root and independent cancellation_review accept the complete 13-file
-source/document diff with no findings. Width/waiver/link/test-reference audits and
-all 12 implementation-changed rendered documents pass content/structure inspection.
-Implementation is published and exact hosted checks pass. No unfinished source
-work remains. This record-only completion receives its own publication/hosted
-inspection in automation memory/report.
-See [the focused record](verification/CALLBACK_CANCELLATION_REVIEW.md).
+Seven regressions cover stale controls with spare capacity, exact cancellation/
+FIFO retention, busy resubmission, restart, all finite IDs and malformed commands.
+Whole-tree width/waiver/link/test-reference and rendered content/structure checks
+pass. Root and independent verification_support accept the complete 13-file diff
+with no findings. Main publication/hosted inspection remain pending. See
+[the focused record](verification/CORRELATED_COMMANDS_REVIEW.md).
 
 ## Highest risks and uncertainties
 
-- Cancel has no operation ID or acknowledgement; stale commands can cancel a
-  newer reply. Enqueue does not prove dispatch. Stop may discard queued Cancel
-  while retaining application-owned reply state; terminal Failed owners cannot
-  process commands. Host command ordering and resubmission remain explicit.
-- Retry flags record enqueue, not processing. Cancellation cannot retract
-  copies, and later lifecycle clearing may discard them. Effects are
-  nontransactional. Controlled consumers do not establish external adoption.
-- IDs/clocks remain caller-paired. Logical bounds do not bound process memory,
-  blocking or callback time. Panics, hangs and allocator/process failures remain
-  uncontained. Floating hosted tools/images require exact-revision evidence.
+- One issuer must survive producer restart and all saved session requests;
+  bypass/reset can alias IDs. No durable epoch, authentication, acknowledgement
+  or duplicate-New suppression. Exhaustion requires stopping new issuance.
+- Acceptance means enqueue, not processing; cancellation cannot retract copies.
+  Ordinary command saturation/FIFO/clearing still apply. Controlled consumers
+  do not establish external adoption, stability or reliable command delivery.
+- Framework IDs/clocks remain caller-paired. Logical bounds do not bound process
+  memory or callback time; panics/hangs/process failures remain uncontained.
+  Floating hosted tools/images require exact-revision evidence.
 
 ## Important unresolved decisions
 
 Major API freeze, unsafe/runtime/code-generation/dependency/security decisions,
 platform commitments, identity/licences, tags/releases/crate publication and
-deployment retain separate gates. MSRV, external I/O protocols, hardware, RTOS
-and no_std remain undecided. Codex review is not human acceptance or qualification.
+deployment retain separate gates. MSRV and external I/O protocols remain undecided.
+Codex review is not human acceptance or qualification.
 
 ## Most likely next task
 
-Assess a concrete consumer need for command-result feedback or correlation
-before adding another protocol/service. Preserve this fixed consumer's explicit
-cancellation scope; do not infer general reliable command delivery.
+Assess a concrete need for host command-result feedback before adding a bounded
+acknowledgement path. Session persistence or multiple issuers need a separate
+consumer contract; do not extend IDs or add a service without demonstrated need.
 
 ## Latest run
 
-2026-11-02: initial/final baseline, 12 focused/identical independent consumer
-checks, complete root/independent Codex review and exact implementation hosted
-inspection pass after ordinary main publication. Final documentation records the
-accepted checkpoint and receives separate review/publication/CI; stop here.
+2026-11-03: seven focused/identical independent consumer tests and the final
+236-test locked baseline pass. Complete root/independent review accepts the frozen
+source for authorized main publication; no unrelated work is selected.

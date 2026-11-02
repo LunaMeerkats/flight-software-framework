@@ -1,5 +1,17 @@
 # Verification traceability
 
+## Stage 5 correlated operation cancellation — 2026-11-03
+
+RFF-LIB-REQ-012 revision 1 and
+[ADR-0037](../adr/0037-correlated-operation-cancellation.md) define a separate
+public-only consumer. The [guide](../CORRELATED_COMMANDS.md) and
+[focused review](CORRELATED_COMMANDS_REVIEW.md) distinguish session correlation
+from acknowledgement, deduplication and persistent identity.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-012 | One callback-owned pending operation/two acceptance flags; matching Cancel/Retry; host issuer 1..=255 with checked exhaustion | `delayed_cancel_cannot_erase_newer_operation_and_retry_skips_accepted_peer`; `matching_cancellation_preserves_accepted_copy_and_rejected_fifo`; `busy_new_command_requires_same_id_resubmission_after_pending_completion`; `producer_restart_retains_operation_and_host_issuer_but_clears_commands`; `session_issuer_uses_entire_nonzero_domain_then_repeatedly_rejects_exhaustion`; `idle_repeated_and_completed_control_commands_leave_copies_intact`; `malformed_commands_are_rejected_before_reply_or_cancellation_effects`; identical independent consumer check/Clippy/test/metadata/hash | Seven focused and identical independent tests and the 236-test locked baseline pass; complete root/independent Codex review passes; publication pending |
+
 ## Stage 5 explicit callback reply cancellation — 2026-11-02
 
 RFF-LIB-REQ-011 revision 1 and

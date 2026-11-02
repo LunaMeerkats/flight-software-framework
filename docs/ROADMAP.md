@@ -5,7 +5,17 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; explicit callback reply cancellation checkpoint verified**
+Status: **Active; correlated operation cancellation locally verified**
+
+RFF-LIB-REQ-012 and
+[ADR-0037](adr/0037-correlated-operation-cancellation.md) define a separate
+[public-only consumer](CORRELATED_COMMANDS.md) to prevent a stale cancellation
+from clearing newer pending work. Matching control IDs and a finite nonwrapping
+host issuer use existing APIs. Original callback behavior remains unchanged.
+The [focused record](verification/CORRELATED_COMMANDS_REVIEW.md) records seven
+focused/identical independent consumer tests and the 236-test locked baseline
+passing; complete root/independent Codex review passes. Publication is pending. Acknowledgements, persistent
+identity and multiple issuers remain outside this bounded increment.
 
 RFF-LIB-REQ-011 and
 [ADR-0036](adr/0036-explicit-callback-reply-cancellation.md) extend the existing
@@ -18,8 +28,8 @@ The [focused record](verification/CALLBACK_CANCELLATION_REVIEW.md) separates
 actual review and hosted evidence. Root and independent Codex review accept the
 complete diff; implementation 38e1d9ab8c5548ce5cabf2356b5af161ec2e044b passes
 exact hosted run 41309924576, all 20 steps and configured host/sample checks.
-No new framework service or API is needed. Reassess concrete command feedback or
-correlation needs before adding another protocol.
+No new framework service or API is needed. The correlated consumer above addresses
+the subsequent stale-command risk without changing this original policy.
 
 The preceding bounded checkpoint, RFF-LIB-REQ-010 and
 [ADR-0035](adr/0035-callback-owned-selective-publication.md), extends the

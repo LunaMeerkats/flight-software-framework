@@ -135,6 +135,10 @@ translate NASA C source.
   writer, pending event, fixed rendered line and accepted-byte cursor. Its
   test-enabled target and independent-package recipe verify partial writes,
   explicit errors and host flush without adding a library sink service.
+- `tests/correlated_commands.rs`: a separate public-only single-operation
+  consumer with matching Cancel/Retry IDs, finite session issuance and explicit
+  exhaustion. Its guide verifies identical source in an independent package;
+  the original callback consumer retains its dispatch-time cancellation policy.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -250,6 +254,15 @@ failure clears selected queued copies while accepted peer effects remain.
 For consumer cancellation changes, also record results in the
 [cancellation review](docs/verification/CALLBACK_CANCELLATION_REVIEW.md).
 Cancel uses ordinary command admission/dispatch and cannot retract accepted copies.
+
+When changing correlated operation control or its consumer guidance, run
+`cargo test --locked --test correlated_commands`, then follow the independent
+package recipe in [the correlation guide](docs/CORRELATED_COMMANDS.md). Check,
+lint and test identical source; inspect metadata and compare SHA256 and bytes.
+Record the actual package path and results in the focused correlation review.
+Keep the one host issuer across producer restart and reject exhaustion without
+wrapping; IDs supply session correlation, not authentication, acknowledgement,
+duplicate suppression or identity after issuer reset.
 
 When changing the event-output example or its guidance, run
 `cargo test --locked --example event_output` and

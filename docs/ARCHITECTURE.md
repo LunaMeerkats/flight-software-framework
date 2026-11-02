@@ -3,6 +3,18 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Correlated operation cancellation — 2026-11-03
+
+RFF-LIB-REQ-012 and
+[ADR-0037](adr/0037-correlated-operation-cancellation.md) select a separate
+public-only consumer using session-local operation IDs. Matching Cancel/Retry
+commands affect only the retained operation, preserving newer work from stale
+controls. A single host issuer rejects finite exhaustion rather than wrapping;
+it must survive producer restart. One reply/two flags and existing selective
+publication suffice. The [guide](CORRELATED_COMMANDS.md) explains ID reuse,
+busy admission and enqueue-versus-processing limits. Original consumer semantics,
+framework APIs, lifecycle policy and routing remain unchanged.
+
 ## Explicit callback reply cancellation — 2026-11-02
 
 RFF-LIB-REQ-011 and
