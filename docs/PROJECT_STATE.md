@@ -7,6 +7,8 @@ Last updated: **2026-11-04**
 Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-013/ADR-0038 add
 bounded host command-result feedback to the correlated consumer. The serial host
 distinguishes local command effects with one result slot and gated dispatch.
+Local/independent consumer checks, complete Codex review and exact implementation
+hosted verification pass after ordinary main publication.
 Reviewed host v0.1 remains the regression baseline; package 0.0.0 stays unpublished
 and provisional. The original callback consumer remains unchanged.
 
@@ -25,6 +27,11 @@ and provisional. The original callback consumer remains unchanged.
   14 focused tests/Clippy pass. All seven original correlation test bodies remain.
 - Identical independent consumer check/Clippy/14 tests plus generated smoke pass;
   independent workspace metadata, exact bytes and SHA256 are verified.
+- Published implementation 4ee3c5091ff49e85b9c9595958e040c051f8bec5 passes
+  exact run 41641979417/job 125937510804: all 20 steps, 243 workspace/14 adapter/
+  five sample tests and unchanged 222-line sample. Hosted tools/runner match
+  input; windows-2025-vs2026 image advances to 20261030.294.1. Root and
+  independent verification_review accept raw checkout/log/source evidence.
 
 ## Current architecture
 
@@ -42,8 +49,9 @@ dependency, workflow or policy-configuration change is selected.
 Consumer implementation and local/independent package verification pass. Root
 and independent verification_review accept the complete source/document diff
 without findings. Whole-tree width/waiver/link/exact-test-reference and changed
-rendered content/structure checks pass. Main publication/exact hosted evidence
-remain pending; no unfinished source work remains.
+rendered content/structure checks pass. Main implementation is published and exact
+hosted evidence passes; no unfinished source work remains. Record-only completion
+receives separate publication/hosted inspection in automation memory/report.
 See [the focused record](verification/COMMAND_RESULTS_REVIEW.md).
 
 ## Highest risks and uncertainties
@@ -74,4 +82,6 @@ requires a concrete need; retain one bounded increment and the host baseline.
 
 2026-11-04: initial/final 236/243-test locked baselines, 14 focused and identical
 independent consumer tests pass. Original histories remain. Complete root and
-independent review passes; publication/hosted inspection remains for this increment.
+independent review and exact implementation hosted verification pass after main
+publication. Final documentation records the accepted checkpoint and receives
+separate review/publication/CI; stop after this increment.

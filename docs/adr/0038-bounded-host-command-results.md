@@ -1,6 +1,6 @@
 # ADR-0038: Bounded host command results
 
-- Status: Implemented; local checks/complete Codex review pass, publication pending
+- Status: Implemented; local checks, complete Codex review and exact hosted pass
 - Date: 2026-11-04
 - Scope: Serial correlated-command consumer under RFF-LIB-REQ-013
 
@@ -58,7 +58,9 @@ The [guide](../CORRELATED_COMMANDS.md) and
 [focused review](../verification/COMMAND_RESULTS_REVIEW.md) record 14 focused
 and identical independent tests, the 243-test locked baseline, matching
 bytes/hashes/metadata and root/independent complete source/document acceptance.
-Publication and exact hosted verification remain pending.
+Implementation 4ee3c5091ff49e85b9c9595958e040c051f8bec5 is published; exact
+hosted run 41641979417 passes all 20 steps with root/independent raw-log review.
+Later record revisions receive separate checks.
 
 ## Risks and revisit conditions
 

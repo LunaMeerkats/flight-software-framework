@@ -110,14 +110,16 @@ git diff --check
 git show --format= --check --diff-merges=first-parent HEAD
 ```
 
-The committed-tip check covers the input until a new commit exists. No conditional
-host-adapter/sample or ADR-0018/0019 probes are required by unchanged components.
+The committed-tip check passes for input and published implementation. No
+conditional host-adapter/sample or ADR-0018/0019 probes are required by unchanged
+components.
 Their unchanged behavior remains covered by workspace tests and hosted commands.
 The workflow is unchanged; actionlint is not rerun.
 
 Independent verification_review accepts the exact source blob above and unchanged
 old test bodies with no findings. Root complete source/diff review agrees.
-Whole-tree review finds 54 Rust files, 24,240 physical/1,362 comment-only lines,
+Implementation whole-tree review finds 54 Rust files, 24,240 physical/1,362
+comment-only lines,
 zero width findings and three unchanged fulfilled expectations. All 624 relative
 links across 109 Markdown files and 207 exact test references resolve. All 12
 changed rendered documents pass text/headings/code/links/tables/HTML structure
@@ -126,7 +128,32 @@ aid is corrected to distinguish wrapped numeric prose from ordered-list starts.
 Independent verification_review accepts the complete 13-file increment without
 remaining findings, after correcting a guide method name to actual result.take().
 Root Codex accepts the complete diff on the same evidence. This is autonomous
-Codex review, not human review. Publication/exact hosted evidence remain pending.
+Codex review, not human review.
+
+## Publication and hosted acceptance
+
+Implementation 4ee3c5091ff49e85b9c9595958e040c051f8bec5 exactly matches the
+independently accepted staged patch. Committed-tip whitespace passes; refreshed
+origin is preserved and ordinary fast-forward main publication succeeds. Live
+remote matches. Exact
+[run 41641979417](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41641979417),
+job 125937510804, passes all 20 steps at that logged checkout: 243 workspace
+tests including all 14 consumer cases, 14 adapters/five sample tests,
+warnings-denied rustdoc, both whitespace checks and unchanged 222-line sample.
+Root Codex and independent verification_review inspect raw metadata/logs, source
+identity, all test results and the sample; no implementation findings remain.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.2
+match input. The windows-2025-vs2026 image advances from 20261021.278.1 to
+20261030.294.1. An additional image-equality probe fails on this real runner drift;
+the required hosted baseline passes. Record the new image rather than asserting
+environment equality. No Rust toolchain/configuration change or new waiver is
+needed; the current whole-tree audit remains separate evidence. Record-only
+completion passes root/independent seven-document diff review, 625 relative links
+and content/structure inspection of all 13 whole-run changed Markdown documents.
+Rust inventory and 207 exact test references remain unchanged. This completion
+receives separate publication/exact hosted inspection in
+automation memory/report. Stop after this one verified checkpoint.
 
 ## Boundaries
 

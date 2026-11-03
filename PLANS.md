@@ -1,6 +1,6 @@
 # Bounded host command-result feedback
 
-Status: Complete local verification/review; publication pending — 2026-11-04
+Status: Complete verified implementation checkpoint — 2026-11-04 Australia/Sydney
 
 ## Objective and selection
 
@@ -52,4 +52,11 @@ test pass; metadata confirms an independent workspace and sole framework path
 dependency. Exact source bytes/SHA256 match the focused record. Root and
 independent verification_review accept the complete source/document diff without
 findings. Whole-tree width/waiver/link/exact-test-reference and 12 changed rendered
-document content/structure checks pass. Publication/exact hosted evidence remain.
+document content/structure checks pass. Implementation
+4ee3c5091ff49e85b9c9595958e040c051f8bec5 equals the accepted staged patch and
+is published by ordinary fast-forward to origin/main. Exact run 41641979417/job
+125937510804 passes all 20 steps, 243 workspace/14 adapter/five sample tests and
+unchanged 222-line sample. Hosted tools/runner match input; image advances to
+20261030.294.1. Root/independent raw-log review accepts this evidence. Record-only
+completion receives separate review/publication/exact hosted inspection in
+automation memory/report. No further behavior is selected.

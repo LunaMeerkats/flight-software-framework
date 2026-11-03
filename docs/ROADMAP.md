@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; bounded host command-result local verification passed**
+Status: **Active; bounded host command-result checkpoint verified**
 
 RFF-LIB-REQ-013 and [ADR-0038](adr/0038-bounded-host-command-results.md)
 extend the correlated consumer with one typed result slot and explicit host
@@ -14,8 +14,10 @@ matching cancellation and reply acceptance progress without reading test-only
 pending state. Bus acknowledgements and a library result service are deferred;
 the [focused result record](verification/COMMAND_RESULTS_REVIEW.md) records
 14 focused/identical independent tests and the 243-test locked baseline passing.
-Complete root/independent review passes; publication/exact hosted checks remain
-pending. Existing correlation histories and library APIs remain.
+Complete root/independent review passes. Published implementation
+4ee3c5091ff49e85b9c9595958e040c051f8bec5 passes exact hosted run 41641979417,
+all 20 steps and configured host/sample checks. Existing correlation histories
+and library APIs remain. Later documentation receives separate exact checks.
 
 RFF-LIB-REQ-012 and
 [ADR-0037](adr/0037-correlated-operation-cancellation.md) define a separate

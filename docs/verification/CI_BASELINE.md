@@ -3,6 +3,24 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Bounded command-result checkpoint — 2026-11-04
+
+Implementation 4ee3c5091ff49e85b9c9595958e040c051f8bec5 passes exact main push
+[run 41641979417](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41641979417),
+job 125937510804. All 20 steps pass: 243 workspace tests including 14 correlated
+consumer cases and 12 unchanged callback tests, 14 adapters/five sample tests,
+warnings-denied rustdoc, both whitespace checks and unchanged 222-line sample.
+Root and independent verification_review inspect raw checkout/log/source evidence.
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner 2.338.2
+match input run 41451380499. The windows-2025-vs2026 image advances from
+20261021.278.1 to 20261030.294.1; an additional image-equality probe fails on
+that drift while the baseline passes. Local tools remain 1.98.0/rustfmt
+1.9.0-stable/Clippy 0.1.98. The whole-tree source/waiver/link/test-reference,
+rendered-document and complete root/independent review remain outside CI; see
+[the focused result record](COMMAND_RESULTS_REVIEW.md). No workflow, library API
+or dependency changes. Record-only completion receives its own exact hosted
+inspection in automation memory/report.
+
 ## Correlated-command checkpoint — 2026-11-03
 
 Implementation 34514bd98bb671fadb2863f5d12492b54297e37c passes exact main push
