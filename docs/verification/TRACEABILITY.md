@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 bounded host command results — 2026-11-04
+
+RFF-LIB-REQ-013 revision 1 and
+[ADR-0038](../adr/0038-bounded-host-command-results.md) extend the correlated
+consumer with capacity-one local feedback and serial host dispatch gating.
+The [guide](../CORRELATED_COMMANDS.md) and
+[focused review](COMMAND_RESULTS_REVIEW.md) preserve enqueue/processing and
+historical snapshot boundaries. Earlier RFF-LIB-REQ-012 evidence remains dated.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-013 | One typed command result slot; host drains before next producer dispatch; defensive occupied-slot failure | `typed_results_report_busy_cancellation_and_same_id_resubmission`; `retry_results_snapshot_partial_and_completed_acceptance_after_peer_clearing`; `blocked_result_turns_preserve_command_fifo_saturation_and_peer_queues`; `malformed_command_has_no_result_and_clears_only_queued_producer_commands`; `occupied_result_bypass_fails_before_command_effects_and_preserves_old_result`; `stop_restart_retains_result_and_operation_but_unhandled_commands_have_no_result`; `routing_failure_has_no_result_while_previously_accepted_peer_effect_survives`; identical independent consumer check/Clippy/test/metadata/bytes/hash | 14 focused and identical independent tests and 243-test locked baseline pass; complete root/independent Codex review passes; publication/exact hosted verification pending |
+
 ## Stage 5 correlated operation cancellation — 2026-11-03
 
 RFF-LIB-REQ-012 revision 1 and

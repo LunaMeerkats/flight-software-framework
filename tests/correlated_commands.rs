@@ -1,4 +1,4 @@
-//! Public-only session correlation for one application-owned reply.
+//! Public-only session correlation and bounded host command results.
 
 use std::cell::{Cell, OnceCell};
 use std::convert::Infallible;
@@ -10,7 +10,8 @@ use std::rc::Rc;
 use rust_flight_framework::{
     Application, ApplicationId, ApplicationMessageContext, ApplicationState,
     ApplicationWorkContext, DeliveryStatus, Message, MessageDispatchError, MessageDispatchOutcome,
-    MessagingApplication, MessagingRuntime, PublishToError, Runtime, RuntimeInboxConfig,
+    MessagingApplication, MessagingOperationError, MessagingRuntime, PublishToError, Runtime,
+    RuntimeInboxConfig,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -60,6 +61,7 @@ enum ConsumerError {
     MissingDestinations,
     Routing(PublishToError),
     OutputOccupied,
+    ResultOccupied,
 }
 
 impl fmt::Display for ConsumerError {
@@ -69,6 +71,7 @@ impl fmt::Display for ConsumerError {
             Self::MissingDestinations => formatter.write_str("mission destinations are missing"),
             Self::Routing(error) => error.fmt(formatter),
             Self::OutputOccupied => formatter.write_str("host must drain the output first"),
+            Self::ResultOccupied => formatter.write_str("host must take the command result first"),
         }
     }
 }
@@ -117,6 +120,26 @@ impl Command {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum CommandOutcome {
+    Reply { accepted: [bool; 2] },
+    Busy { pending: OperationId },
+    Cancelled,
+    NoMatchingOperation,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct CommandResult {
+    command: Command,
+    outcome: CommandOutcome,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ProducerTurn {
+    ResultPending,
+    Dispatch(MessageDispatchOutcome),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct PendingOperation {
     id: OperationId,
     reply: Message<Topic, 2>,
@@ -125,10 +148,12 @@ struct PendingOperation {
 
 type Observation = Rc<Cell<Option<PendingOperation>>>;
 type Output = Rc<Cell<Option<(OperationId, u8)>>>;
+type ResultSlot = Rc<Cell<Option<CommandResult>>>;
 
 struct Producer {
     destinations: Rc<OnceCell<[ApplicationId; 2]>>,
     pending: Option<PendingOperation>,
+    result: ResultSlot,
     // This copied test observation never drives command or retry decisions.
     observation: Observation,
 }
@@ -139,21 +164,35 @@ impl Producer {
         input: &Message<Topic, 2>,
         context: &mut ApplicationMessageContext<'_, Topic, 2>,
     ) -> Result<(), ConsumerError> {
-        // Validate even busy and idle commands before any state or bus effect.
-        match Command::parse(input)? {
-            Command::New { id, value } if self.pending.is_none() => {
-                self.pending = Some(PendingOperation {
-                    id,
-                    reply: message(Topic::Reply, &[id.0.get(), value]),
-                    accepted: [false; 2],
-                });
-                self.attempt(context)?;
-            }
-            Command::Retry(id) if self.matches(id) => self.attempt(context)?,
-            Command::Cancel(id) if self.matches(id) => self.pending = None,
-            _ => {}
+        // The serial host gates dispatch; reject bypass before any effects.
+        if self.result.get().is_some() {
+            return Err(ConsumerError::ResultOccupied);
         }
+        // Validate even busy and idle commands before any state or bus effect.
+        let command = Command::parse(input)?;
+        let outcome = match command {
+            Command::New { id, value } => match self.pending {
+                Some(operation) => CommandOutcome::Busy {
+                    pending: operation.id,
+                },
+                None => {
+                    self.pending = Some(PendingOperation {
+                        id,
+                        reply: message(Topic::Reply, &[id.0.get(), value]),
+                        accepted: [false; 2],
+                    });
+                    self.attempt(context)?
+                }
+            },
+            Command::Retry(id) if self.matches(id) => self.attempt(context)?,
+            Command::Cancel(id) if self.matches(id) => {
+                self.pending = None;
+                CommandOutcome::Cancelled
+            }
+            _ => CommandOutcome::NoMatchingOperation,
+        };
         self.observation.set(self.pending);
+        self.result.set(Some(CommandResult { command, outcome }));
         Ok(())
     }
 
@@ -164,13 +203,13 @@ impl Producer {
     fn attempt(
         &mut self,
         context: &mut ApplicationMessageContext<'_, Topic, 2>,
-    ) -> Result<(), ConsumerError> {
+    ) -> Result<CommandOutcome, ConsumerError> {
         let destinations = self
             .destinations
             .get()
             .ok_or(ConsumerError::MissingDestinations)?;
         let Some(operation) = &mut self.pending else {
-            return Ok(());
+            return Ok(CommandOutcome::NoMatchingOperation);
         };
         for (index, destination) in destinations.iter().enumerate() {
             if !operation.accepted[index] {
@@ -180,10 +219,11 @@ impl Producer {
                 operation.accepted[index] = status == DeliveryStatus::Delivered;
             }
         }
-        if operation.accepted == [true; 2] {
+        let accepted = operation.accepted;
+        if accepted == [true; 2] {
             self.pending = None;
         }
-        Ok(())
+        Ok(CommandOutcome::Reply { accepted })
     }
 }
 
@@ -248,17 +288,24 @@ struct Mission {
     issuer: OperationIssuer,
     observation: Observation,
     outputs: [Output; 2],
+    result: ResultSlot,
 }
 
 impl Mission {
     fn new() -> Self {
+        Self::with_routes(|ids| [ids[1], ids[2]])
+    }
+
+    fn with_routes(routes: fn([ApplicationId; 3]) -> [ApplicationId; 2]) -> Self {
         let destinations = Rc::new(OnceCell::new());
         let observation = Rc::new(Cell::new(None));
+        let result = Rc::new(Cell::new(None));
         let outputs = std::array::from_fn(|_| Rc::new(Cell::new(None)));
         let actors = [
             Actor::Producer(Producer {
                 destinations: Rc::clone(&destinations),
                 pending: None,
+                result: Rc::clone(&result),
                 observation: Rc::clone(&observation),
             }),
             Actor::Subscriber(Rc::clone(&outputs[0])),
@@ -266,7 +313,7 @@ impl Mission {
         ];
         let mut runtime = Runtime::new(3).expect("three application slots fit");
         let ids = actors.map(|actor| runtime.register(actor).expect("application slot exists"));
-        destinations.set([ids[1], ids[2]]).unwrap();
+        destinations.set(routes(ids)).unwrap();
         let configurations = [
             RuntimeInboxConfig::new(2, &[Topic::New, Topic::Retry, Topic::Cancel]),
             RuntimeInboxConfig::new(2, &[Topic::Reply]),
@@ -282,6 +329,7 @@ impl Mission {
             issuer: OperationIssuer::new(),
             observation,
             outputs,
+            result,
         }
     }
 
@@ -297,9 +345,32 @@ impl Mission {
 
     fn dispatch(&mut self) {
         assert_eq!(
-            self.owner.dispatch_one(self.ids[0]),
-            Ok(MessageDispatchOutcome::Dispatched)
+            self.producer_turn(),
+            Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
         );
+        self.result.take().expect("host takes the command result");
+    }
+
+    fn producer_turn(
+        &mut self,
+    ) -> Result<ProducerTurn, MessagingOperationError<MessageDispatchError<ConsumerError>>> {
+        if self.result.get().is_some() {
+            return Ok(ProducerTurn::ResultPending);
+        }
+        self.owner
+            .dispatch_one(self.ids[0])
+            .map(ProducerTurn::Dispatch)
+    }
+
+    fn command_result(&mut self, command: Command) -> CommandOutcome {
+        assert_eq!(self.enqueue(command), DeliveryStatus::Delivered);
+        assert_eq!(
+            self.producer_turn(),
+            Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+        );
+        let result = self.result.take().expect("command recorded one result");
+        assert_eq!(result.command, command);
+        result.outcome
     }
 
     fn invoke(&mut self, command: Command) {
@@ -606,4 +677,325 @@ fn malformed_commands_are_rejected_before_reply_or_cancellation_effects() {
         assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Failed));
         assert_eq!(mission.issue().0.get(), 2);
     }
+}
+
+#[test]
+fn typed_results_report_busy_cancellation_and_same_id_resubmission() {
+    let mut mission = Mission::new();
+    let older = mission.seed_second_inbox();
+    let current = mission.issue();
+    let next = mission.issue();
+    let retained = Command::New {
+        id: next,
+        value: 51,
+    };
+    assert_eq!(
+        mission.command_result(Command::New {
+            id: current,
+            value: 50,
+        }),
+        CommandOutcome::Reply {
+            accepted: [true, false]
+        }
+    );
+    assert_eq!(
+        mission.command_result(retained),
+        CommandOutcome::Busy { pending: current }
+    );
+    assert_eq!(
+        mission.command_result(Command::Cancel(next)),
+        CommandOutcome::NoMatchingOperation
+    );
+    mission.assert_pending(current, 50, [true, false]);
+    assert_eq!(
+        mission.command_result(Command::Cancel(current)),
+        CommandOutcome::Cancelled
+    );
+    assert_eq!(mission.observation.get(), None);
+    assert_eq!(
+        mission.command_result(retained),
+        CommandOutcome::Reply {
+            accepted: [true, false]
+        }
+    );
+    mission.assert_pending(next, 51, [true, false]);
+    assert_eq!(mission.drain(0), (current, 50));
+    assert_eq!(mission.drain(0), (next, 51));
+    for record in older {
+        assert_eq!(mission.drain(1), record);
+    }
+}
+
+#[test]
+fn retry_results_snapshot_partial_and_completed_acceptance_after_peer_clearing() {
+    let mut mission = Mission::new();
+    let [producer, _, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    let id = mission.issue();
+    let partial = CommandOutcome::Reply {
+        accepted: [true, false],
+    };
+    assert_eq!(
+        mission.command_result(Command::New { id, value: 52 }),
+        partial
+    );
+    assert_eq!(mission.command_result(Command::Retry(id)), partial);
+    mission.assert_inboxes([1, 0]);
+    mission.owner.restart(second).unwrap();
+    let retry = Command::Retry(id);
+    assert_eq!(mission.enqueue(retry), DeliveryStatus::Delivered);
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+    );
+    let completed = CommandResult {
+        command: retry,
+        outcome: CommandOutcome::Reply {
+            accepted: [true; 2],
+        },
+    };
+    assert_eq!(mission.result.get(), Some(completed));
+    assert_eq!(mission.observation.get(), None);
+    mission.assert_inboxes([1, 1]);
+    assert_eq!(
+        mission.owner.stop(second).unwrap().discarded_deliveries(),
+        1
+    );
+    assert_eq!(mission.result.take(), Some(completed));
+    mission.assert_inboxes([1, 0]);
+    assert_eq!(mission.drain(0), (id, 52));
+    for command in [Command::Retry(id), Command::Cancel(id), Command::Cancel(id)] {
+        assert_eq!(
+            mission.command_result(command),
+            CommandOutcome::NoMatchingOperation
+        );
+    }
+    assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Running));
+    mission.assert_inboxes([0, 0]);
+}
+
+#[test]
+fn blocked_result_turns_preserve_command_fifo_saturation_and_peer_queues() {
+    let mut mission = Mission::new();
+    let older = mission.seed_second_inbox();
+    let current = mission.issue();
+    let next = mission.issue();
+    let command = Command::New {
+        id: current,
+        value: 53,
+    };
+    assert_eq!(mission.enqueue(command), DeliveryStatus::Delivered);
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+    );
+    let recorded = mission
+        .result
+        .get()
+        .expect("first command recorded its result");
+    let busy = Command::New {
+        id: next,
+        value: 54,
+    };
+    assert_eq!(mission.enqueue(busy), DeliveryStatus::Delivered);
+    assert_eq!(
+        mission.enqueue(Command::Cancel(current)),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.enqueue(Command::Retry(current)),
+        DeliveryStatus::InboxFull
+    );
+    for _ in 0..3 {
+        assert_eq!(mission.producer_turn(), Ok(ProducerTurn::ResultPending));
+        assert_eq!(mission.result.get(), Some(recorded));
+        assert_eq!(mission.owner.pending(mission.ids[0]), Ok(2));
+        mission.assert_pending(current, 53, [true, false]);
+        mission.assert_inboxes([1, 2]);
+    }
+    assert_eq!(mission.result.take(), Some(recorded));
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+    );
+    assert_eq!(
+        mission.result.take(),
+        Some(CommandResult {
+            command: busy,
+            outcome: CommandOutcome::Busy { pending: current },
+        })
+    );
+    mission.dispatch();
+    assert_eq!(mission.observation.get(), None);
+    assert_eq!(mission.owner.pending(mission.ids[0]), Ok(0));
+    assert_eq!(mission.drain(0), (current, 53));
+    for record in older {
+        assert_eq!(mission.drain(1), record);
+    }
+}
+
+#[test]
+fn malformed_command_has_no_result_and_clears_only_queued_producer_commands() {
+    let mut mission = Mission::new();
+    let [producer, _, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    let id = mission.issue();
+    mission.invoke(Command::New { id, value: 55 });
+    let before = mission.observation.get();
+    assert_eq!(
+        mission
+            .owner
+            .publish_to(producer, &message(Topic::Retry, &[])),
+        Ok(DeliveryStatus::Delivered)
+    );
+    assert_eq!(
+        mission.enqueue(Command::Cancel(id)),
+        DeliveryStatus::Delivered
+    );
+    let error = mission.producer_turn().unwrap_err();
+    assert_eq!(
+        error.operation_error(),
+        &MessageDispatchError::Application {
+            application_id: producer,
+            source: ConsumerError::InvalidCommand,
+        }
+    );
+    assert_eq!(error.discarded_deliveries(), 1);
+    assert_eq!(mission.result.get(), None);
+    assert_eq!(mission.observation.get(), before);
+    assert_eq!(mission.owner.pending(producer), Ok(0));
+    assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Failed));
+    assert_eq!(mission.drain(0), (id, 55));
+}
+
+#[test]
+fn occupied_result_bypass_fails_before_command_effects_and_preserves_old_result() {
+    let mut mission = Mission::new();
+    let [producer, _, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    let id = mission.issue();
+    assert_eq!(
+        mission.enqueue(Command::New { id, value: 56 }),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+    );
+    let recorded = mission.result.get().expect("New recorded its result");
+    assert_eq!(
+        mission.enqueue(Command::Cancel(id)),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.enqueue(Command::Retry(id)),
+        DeliveryStatus::Delivered
+    );
+    let error = mission.owner.dispatch_one(producer).unwrap_err();
+    assert_eq!(
+        error.operation_error(),
+        &MessageDispatchError::Application {
+            application_id: producer,
+            source: ConsumerError::ResultOccupied,
+        }
+    );
+    assert_eq!(error.discarded_deliveries(), 1);
+    assert_eq!(mission.result.get(), Some(recorded));
+    mission.assert_pending(id, 56, [true, false]);
+    mission.assert_inboxes([1, 0]);
+    assert_eq!(mission.owner.pending(producer), Ok(0));
+    assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Failed));
+    assert_eq!(mission.drain(0), (id, 56));
+    assert_eq!(mission.result.take(), Some(recorded));
+}
+
+#[test]
+fn stop_restart_retains_result_and_operation_but_unhandled_commands_have_no_result() {
+    let mut mission = Mission::new();
+    let [producer, _, second] = mission.ids;
+    mission.owner.stop(second).unwrap();
+    let id = mission.issue();
+    assert_eq!(
+        mission.enqueue(Command::New { id, value: 57 }),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+    );
+    let recorded = mission.result.get().expect("New recorded its result");
+    assert_eq!(
+        mission.enqueue(Command::Cancel(id)),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.enqueue(Command::Retry(id)),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.owner.stop(producer).unwrap().discarded_deliveries(),
+        2
+    );
+    assert_eq!(mission.producer_turn(), Ok(ProducerTurn::ResultPending));
+    mission.owner.restart(producer).unwrap();
+    assert_eq!(mission.producer_turn(), Ok(ProducerTurn::ResultPending));
+    mission.assert_pending(id, 57, [true, false]);
+    assert_eq!(mission.owner.pending(producer), Ok(0));
+    assert_eq!(mission.issue().0.get(), id.0.get() + 1);
+    assert_eq!(mission.result.take(), Some(recorded));
+    assert_eq!(
+        mission.producer_turn(),
+        Ok(ProducerTurn::Dispatch(MessageDispatchOutcome::InboxEmpty))
+    );
+    assert_eq!(mission.result.get(), None);
+    assert_eq!(
+        mission.command_result(Command::Cancel(id)),
+        CommandOutcome::Cancelled
+    );
+    assert_eq!(mission.drain(0), (id, 57));
+    assert_eq!(mission.observation.get(), None);
+}
+
+#[test]
+fn routing_failure_has_no_result_while_previously_accepted_peer_effect_survives() {
+    let mut mission = Mission::with_routes(|ids| [ids[1], ids[0]]);
+    let producer = mission.ids[0];
+    let id = mission.issue();
+    assert_eq!(
+        mission.enqueue(Command::New { id, value: 58 }),
+        DeliveryStatus::Delivered
+    );
+    assert_eq!(
+        mission.enqueue(Command::Cancel(id)),
+        DeliveryStatus::Delivered
+    );
+    let error = mission.producer_turn().unwrap_err();
+    let source = PublishToError::NotSubscribed {
+        application_id: producer,
+    };
+    assert_eq!(
+        error.operation_error(),
+        &MessageDispatchError::Application {
+            application_id: producer,
+            source: ConsumerError::Routing(source),
+        }
+    );
+    assert_eq!(error.discarded_deliveries(), 1);
+    let callback_error = error.operation_error().source().unwrap();
+    assert_eq!(
+        callback_error.downcast_ref::<ConsumerError>(),
+        Some(&ConsumerError::Routing(source))
+    );
+    assert_eq!(
+        callback_error
+            .source()
+            .unwrap()
+            .downcast_ref::<PublishToError>(),
+        Some(&source)
+    );
+    assert_eq!(mission.result.get(), None);
+    assert_eq!(mission.owner.pending(producer), Ok(0));
+    assert_eq!(mission.owner.state(producer), Ok(ApplicationState::Failed));
+    mission.assert_inboxes([1, 0]);
+    assert_eq!(mission.drain(0), (id, 58));
 }

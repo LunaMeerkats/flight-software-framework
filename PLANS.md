@@ -1,58 +1,55 @@
-# Correlated cancellation of a callback-owned operation
+# Bounded host command-result feedback
 
-Status: Complete implementation checkpoint — 2026-11-03 Australia/Sydney
+Status: Complete local verification/review; publication pending — 2026-11-04
 
 ## Objective and selection
 
-Prevent a delayed cancellation from erasing a newer pending reply. Root Codex
-and independent consumer_assessment select a separate public-only consumer using
-existing APIs over a larger acknowledgement protocol or automatic lifecycle
-abandonment. RFF-LIB-REQ-012 revision 1 precedes implementation. Preserve the
-original callback consumer and its 12 regressions unchanged.
+Let a serial host distinguish a busy New command, matching cancellation and
+stale controls after dispatch. Existing enqueue outcomes and copied test-only
+pending observations cannot provide this consumer contract. Root Codex and
+independent consumer_assessment select a capacity-one typed result mailbox over
+bus-routed acknowledgements or persistent identities. RFF-LIB-REQ-013 revision 1
+and ADR-0038 precede implementation; retain all seven correlated histories and
+the original callback consumer unchanged.
 
 ## Acceptance and components
 
-- Add tests/correlated_commands.rs, independently composed with public APIs.
-  One pending operation and two acceptance flags; matching Cancel/Retry only.
-- Issue finite session-local IDs with checked exhaustion; demonstrate stale
-  commands, exact FIFO/peer retention, busy admission, saturation and restart.
-- Record policy/alternatives in ADR-0037, guide, source register, traceability,
-  focused review, roadmap and current state. Keep docs proportionate.
-- Run focused checks and locked baseline, identical independent Cargo consumer,
-  metadata/byte/SHA256 comparison, width/waiver/link/test-reference audits and
-  rendered-document content/structure inspection. Obtain independent Codex
-  source/full-diff review before committing main.
-- Refresh origin, ordinary fast-forward push main, inspect exact hosted CI.
+- Extend tests/correlated_commands.rs with one shared typed result slot and an
+  explicit host turn that skips producer dispatch while the slot is occupied.
+- Report exact command, reply acceptance flags, busy pending ID, cancellation
+  or unmatched control; test full-slot bypass, FIFO/backpressure, malformed and
+  routing errors, explicit draining and restart retention without false results.
+- Update its guide, requirements, ADR, source register, focused review,
+  traceability, roadmap, project state, README and contributor commands.
+- Run focused tests/Clippy, locked baseline and independent-package recipe;
+  compare bytes/hashes/metadata and preserve old test bodies. Review complete
+  diff, source form, links and rendered documentation with independent Codex.
+- Commit on main after applicable checks; refresh origin, push ordinarily and
+  inspect hosted CI at the exact published revision.
 
-## Baseline, risks and safe stopping point
+## Baseline, risks and stopping point
 
-Clean main input d56441235dc8670a14c8a54fadd4df4abeb6c9f3 matches fetched
-origin/main. Initial locked baseline passes 229 workspace tests and all checks.
-Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 are unchanged.
+Clean main input 4f64a4e70037609c6f382b20ff6c13967a54e05e matches fetched
+origin/main. Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98
+are unchanged. Initial locked baseline passes 236 workspace tests. Exact input
+hosted run 41451380499 passes all 20 steps with independent raw-log inspection.
 
-IDs correlate equality within one host session only. No acknowledgement,
-authentication, deduplication, persistent epoch, new library service, dependency
-or workflow is introduced. Command acceptance remains enqueue only; accepted
-copies cannot be retracted. Stop/restart retains application state and must not
-reset the host issuer. If verification fails, remove only current-run source
-changes where safe and retain useful decision/failure evidence. Stop after this
-one coherent verified consumer increment.
+The gate is a serial mission policy and precedes lifecycle validation. Bypassing
+it returns a callback error and uses ordinary terminal failure/queue cleanup;
+it cannot recover the consumed command. Results are local snapshots and cannot
+prove destination processing or survival after lifecycle clearing. Retain session
+issuer/correlation limits. No library API, dependency, workflow, licence or
+consequential gate changes. If checks fail, remove only this run's source changes
+where safe and preserve useful decision/failure evidence. Stop after this one
+verified increment.
 
 ## Actual local results
 
-Seven focused tests/Clippy pass. Final locked baseline passes 236 workspace tests
-and warnings-denied rustdoc. Identical independent consumer check/Clippy/seven
-tests plus generated smoke test pass; metadata, bytes and SHA256 match the
-focused record. Whole-tree audit finds 54 Rust files, 23,848 physical/1,361
-comment-only lines, zero width findings and three unchanged expectations.
-Relative links and all 200 exact test references resolve. Changed documents pass
-rendered content/structure inspection, without a pixel-QA claim. Root and
-independent verification_support accept the complete 13-file diff with no
-findings. All 12 changed documents pass rendered content/structure review.
-Implementation 34514bd98bb671fadb2863f5d12492b54297e37c exactly matches the
-accepted staged patch and is published by ordinary fast-forward to origin/main.
-Exact run 41450862997/job 125295426494 passes all 20 steps, 236 workspace/14
-adapter/five sample tests and unchanged 222-line sample. Hosted tools/runner/image
-match input. This record-only completion receives separate review/publication
-and exact hosted inspection in automation memory/report. No further behavior is
-selected.
+14 focused tests and Clippy pass. All seven original test bodies are unchanged.
+Final locked baseline passes 243 workspace tests and warnings-denied rustdoc.
+Identical independent Cargo consumer check/Clippy/14 tests plus generated smoke
+test pass; metadata confirms an independent workspace and sole framework path
+dependency. Exact source bytes/SHA256 match the focused record. Root and
+independent verification_review accept the complete source/document diff without
+findings. Whole-tree width/waiver/link/exact-test-reference and 12 changed rendered
+document content/structure checks pass. Publication/exact hosted evidence remain.

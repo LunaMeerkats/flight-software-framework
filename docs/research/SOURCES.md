@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-COMMAND-RESULTS — Serial shared result storage
+
+- Titles: Cell and Rc, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/cell/struct.Cell.html> and
+  <https://doc.rust-lang.org/std/rc/struct.Rc.html>
+- Version: official live std 1.99.1 (58cf8f9c3, 2026-10-13), accessed
+  2026-11-04 Australia/Sydney; local execution remains Rust 1.98.0.
+- Informed: Cell supports copied reads, replacement and taking a value with
+  Default left behind; Rc supplies single-thread reference-counted ownership.
+- Local treatment: compose one shared optional Copy result with explicit serial
+  host dispatch gating under ADR-0038. Capacity, outcomes, failure and lifecycle
+  policy are locally chosen. Defer bus acknowledgements and a library result
+  service; reject normal overwriting/dropping of full result storage. No upstream
+  implementation, dependency or concurrency system is reused or introduced.
+
 ## SRC-RUST-CORRELATED-COMMANDS — Checked finite identity allocation
 
 - Titles: u8::checked_add and Option, Rust standard library

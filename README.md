@@ -58,6 +58,9 @@ already accepted subscriber copies remain intact.
 [Correlate control commands with an operation](docs/CORRELATED_COMMANDS.md) when
 delayed cancellation must preserve a newer reply. A separate public-only consumer
 uses finite session IDs and matching Cancel/Retry commands with existing APIs.
+Its capacity-one typed result slot lets the serial host distinguish busy requests,
+matching cancellation and reply enqueue progress, with explicit drain before the
+next producer dispatch. Results describe local handling and acceptance snapshots.
 
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API

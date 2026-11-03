@@ -438,3 +438,30 @@ exhaustion. Verify identical source in an independent path-dependent Cargo
 package. Guidance shall distinguish correlation from acknowledgement,
 authentication, duplicate suppression and durable identity across sessions.
 Existing RFF-LIB-REQ-010/011 consumers and requirement meanings remain unchanged.
+
+### RFF-LIB-REQ-013 — Bounded host command-result feedback
+
+Revision 1 (2026-11-04). The correlated-command consumer shall expose one
+capacity-one typed result slot shared by the serial host and producer. Each
+successfully handled command shall record the exact command and distinguish
+reply acceptance flags, busy rejection with the retained operation ID, matching
+cancellation and no matching pending operation. Reply flags shall describe inbox
+acceptance after this command, including completion; they shall not acknowledge
+destination processing. The host shall explicitly take each result before
+dispatching another producer command. An occupied slot shall cause a host turn to
+skip dispatch without changing the slot, producer state or queued commands.
+
+Acceptance: preserve the seven RFF-LIB-REQ-012 test histories. Public-only tests
+shall observe busy feedback followed by same-ID resubmission, matching/stale/idle
+controls, partial and completed reply flags, blocked host turns with exact FIFO
+and inbox saturation, and explicit result draining. A direct dispatch bypass
+shall return a typed occupied-slot callback error before command or publication
+effects, preserving the old result and ordinary selected-inbox failure cleanup.
+Malformed or routing failures shall return the existing runtime error without a
+new result; previously accepted peer effects shall survive. Stop/restart shall
+retain a recorded result and pending operation while queued undispatched commands
+are cleared without results. Verify identical source in an independent
+path-dependent Cargo package. Guidance shall state that results are local
+callback observations, remain snapshots after later lifecycle clearing, and
+provide neither reliable transport nor duplicate-command suppression. This adds
+no library result service, concurrency, persistence or wire-format promise.

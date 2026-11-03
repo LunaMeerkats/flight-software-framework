@@ -3,6 +3,11 @@
 Date: 2026-11-03 Australia/Sydney
 Scope: RFF-LIB-REQ-012 revision 1 and ADR-0037; separate public-only consumer
 
+The later [bounded host-result extension](COMMAND_RESULTS_REVIEW.md), dated
+2026-11-04, retains the seven test bodies below and adds explicit result draining
+to their host helper. Source hashes and hosted results in this record describe
+the original checkpoint; use the extension record for the current source.
+
 ## Selection and baseline
 
 Root Codex and independent consumer_assessment selected correlation because

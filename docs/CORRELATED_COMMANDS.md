@@ -62,20 +62,67 @@ restart when still wanted. Terminal Failed producers cannot dispatch commands.
 Equality supplies correlation within this host session only. Bypassing the issuer
 or resetting it can reuse an ID. A repeated New after completion can create
 another reply; this consumer does not suppress duplicates or authenticate callers.
-No acknowledgement queue, persistence, multiple-issuer coordination or atomic
+No bus acknowledgement queue, persistence, multiple-issuer coordination or atomic
 transaction is introduced. Accepted peer effects survive later callback failure.
 
+## Read bounded command results
+
+The RFF-LIB-REQ-013 extension adds one typed host result slot. This is the
+operational feedback path; the copied pending observation remains test-only.
+The producer and sole serial host share an `Rc<Cell<Option<CommandResult>>>`.
+After a command callback succeeds, the record contains its exact Command and:
+
+| Outcome | What the host can conclude |
+| --- | --- |
+| Reply with two acceptance flags | These destinations have accepted this operation's reply by the end of this command, including earlier attempts. Both true means the producer cleared its pending slot. |
+| Busy with pending ID | New was consumed without staging its requested operation. Retain the request and resubmit the same ID after the current operation ends. |
+| Cancelled | The matching pending operation was cleared during this callback. Already accepted destination copies remain independent. |
+| NoMatchingOperation | This control had no matching pending operation at dispatch. It does not distinguish completed, cancelled, idle or different-ID state. |
+
+Use `producer_turn()` for producer dispatch. It returns ResultPending while the
+slot is occupied, without removing another queued command. Otherwise it calls
+dispatch_one at most once and preserves its full operation/error/discard-count
+wrapper. Empty inboxes produce no result. The host explicitly calls
+`result.take()` to free the slot, decides what that result means for its mission,
+then chooses the next turn. Reading a result does not automatically resubmit,
+retry or cancel anything. One slot bounds feedback; neglecting it stops producer
+dispatch and can fill the ordinary command inbox. Rejected ingress remains a
+host-owned request. The gate precedes lifecycle validation, so ResultPending
+does not assert that the producer is Running; inspect lifecycle separately.
+
+The callback defensively rejects direct dispatch while the slot is occupied
+with ResultOccupied before parsing or command/publication effects. The old result
+survives. Ordinary returned-error behavior still consumes the in-flight command,
+makes that producer Failed and clears its remaining command inbox. This is a
+composition error path, not the normal response to a full result slot.
+Malformed commands and routing errors return their existing typed runtime errors
+without a fresh result. A later routing error can follow an earlier accepted peer
+publication; result absence does not roll back that effect.
+
+Stop/restart retains both a recorded result and the pending operation. Stop may
+clear queued commands that never ran, and they have no result. A saved Reply
+result remains an enqueue snapshot even if a destination later stops and clears
+its accepted copy. These results observe local callback handling, not subscriber
+processing, persistent acknowledgements or reliable command transport. Repeated
+New commands can repeat effects; no request-result history suppresses duplicates.
+Host/app access to the cell is trusted; writing it externally can violate policy.
+This consumer supplies no synchronization or concurrent host support.
+
 Operational state is one pending two-byte reply, two flags, two destination IDs,
-the host issuer and finite inboxes. Each New or matching Retry makes at most two
-selective attempts; control commands add no pending-command history. Fixed copied
+the host issuer, one typed result slot and finite inboxes. One shared result
+allocation is constructed once; commands add no growing history. Each New or
+matching Retry makes at most two selective attempts. Fixed copied
 observations are test instrumentation. Logical bounds do not establish process
 memory or callback timing bounds, fairness, eventual progress, external adoption,
 API stability, flight suitability or release readiness.
 
-[ADR-0037](adr/0037-correlated-operation-cancellation.md) compares alternatives;
-RFF-LIB-REQ-012 defines this consumer. The
+[ADR-0037](adr/0037-correlated-operation-cancellation.md) compares correlation
+alternatives; [ADR-0038](adr/0038-bounded-host-command-results.md) compares host
+feedback with bus acknowledgements and a framework API change.
+RFF-LIB-REQ-012/013 define this consumer. The
 [focused review](verification/CORRELATED_COMMANDS_REVIEW.md) records actual
-verification and Codex provenance.
+correlation verification; the [result review](verification/COMMAND_RESULTS_REVIEW.md)
+records the feedback extension's verification and Codex provenance.
 
 ## Verify the independent package
 

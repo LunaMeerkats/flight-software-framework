@@ -137,7 +137,8 @@ translate NASA C source.
   explicit errors and host flush without adding a library sink service.
 - `tests/correlated_commands.rs`: a separate public-only single-operation
   consumer with matching Cancel/Retry IDs, finite session issuance and explicit
-  exhaustion. Its guide verifies identical source in an independent package;
+  exhaustion, plus capacity-one typed host command results and gated dispatch.
+  Its guide verifies identical source in an independent package;
   the original callback consumer retains its dispatch-time cancellation policy.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
@@ -260,6 +261,10 @@ When changing correlated operation control or its consumer guidance, run
 package recipe in [the correlation guide](docs/CORRELATED_COMMANDS.md). Check,
 lint and test identical source; inspect metadata and compare SHA256 and bytes.
 Record the actual package path and results in the focused correlation review.
+For host command-result changes, also record results in
+[the result review](docs/verification/COMMAND_RESULTS_REVIEW.md). Preserve the
+original seven histories, gate producer dispatch until the host drains its one
+result slot and keep enqueue snapshots distinct from subscriber processing.
 Keep the one host issuer across producer restart and reject exhaustion without
 wrapping; IDs supply session correlation, not authentication, acknowledgement,
 duplicate suppression or identity after issuer reset.
