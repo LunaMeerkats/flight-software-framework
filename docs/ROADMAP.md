@@ -5,7 +5,7 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; runnable command session locally verified**
+Status: **Active; runnable command-session checkpoint verified**
 
 RFF-LIB-REQ-014 and [ADR-0039](adr/0039-runnable-command-session.md) join
 validated ingress, correlated reply state, local command feedback and two
@@ -15,9 +15,10 @@ The [guide](COMMAND_SESSION.md) explains explicit host turns/drains; the
 [focused review](verification/COMMAND_SESSION_REVIEW.md) records ten focused
 and identical independent binary tests, exact source/output/metadata and the
 253-test locked baseline passing. Complete root/independent source/document/diff
-review passes; publication remains pending. Historical callback/correlated
-consumers remain unchanged;
-no framework runner or result transport is introduced.
+review passes. Published implementation
+3d171dc22d9c2661baf4d077871ebc60cad83003 passes exact hosted run 41855764215, all 20 steps and configured host/sample checks.
+Later record revisions receive separate checks. Historical callback/correlated
+consumers remain unchanged; no framework runner or result transport is introduced.
 
 RFF-LIB-REQ-013 and [ADR-0038](adr/0038-bounded-host-command-results.md)
 extend the correlated consumer with one typed result slot and explicit host

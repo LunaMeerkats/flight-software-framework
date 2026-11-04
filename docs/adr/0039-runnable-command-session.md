@@ -1,6 +1,6 @@
 # ADR-0039: Runnable bounded command session
 
-- Status: Implemented; local/independent checks and source review pass; publication pending
+- Status: Implemented; local/independent checks, complete Codex review and exact hosted pass
 - Date: 2026-11-05
 - Scope: Public-only executable consumer under RFF-LIB-REQ-014
 
@@ -54,8 +54,10 @@ The [guide](../COMMAND_SESSION.md) and
 and identical independent binary tests, matching source/output/metadata and the
 253-test locked baseline. Root and independent consumer_assessment accept the
 complete source without findings. Root and independent verification_support
-also accept the complete document/diff evidence. Publication and exact hosted
-acceptance remain pending until observed.
+also accept the complete document/diff evidence. Implementation
+3d171dc22d9c2661baf4d077871ebc60cad83003 is published; exact hosted run
+41855764215 passes all 20 steps with root/independent raw-log review. Later
+record revisions receive separate checks.
 
 ## Risks and revisit conditions
 

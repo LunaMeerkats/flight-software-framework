@@ -7,9 +7,9 @@ Last updated: **2026-11-05**
 Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-014/ADR-0039 join
 validated ingress, correlated replies, local command feedback and subscriber
 output in a standalone runnable public-only example. Local and independent
-binary verification and complete source/document/diff review pass; publication
-is in progress. Reviewed host v0.1 remains the regression
-baseline. Package 0.0.0 stays unpublished; APIs remain provisional.
+binary verification, complete source/document/diff review and exact implementation
+hosted verification pass after ordinary main publication. Reviewed host v0.1
+remains the regression baseline. Package 0.0.0 stays unpublished; APIs remain provisional.
 
 ## Verified baseline
 
@@ -29,6 +29,10 @@ baseline. Package 0.0.0 stays unpublished; APIs remain provisional.
 - Root and independent consumer_assessment accept the complete new source and
   tests without findings. Both historical callback/correlated test sources
   remain unchanged. See [the focused record](verification/COMMAND_SESSION_REVIEW.md).
+- Published implementation 3d171dc22d9c2661baf4d077871ebc60cad83003 passes exact
+  run 41855764215/job 126663830711: all 20 steps, 253 workspace/14 adapter/five
+  sample tests, rustdoc/whitespace and unchanged 222-line sample. Hosted tools,
+  runner and image match input; root/independent raw-log review accepts it.
 
 ## Current architecture
 
@@ -46,8 +50,9 @@ or source-quality policy change is selected.
 Implementation and local/independent package checks pass. Root and independent
 verification_support accept the complete source/document diff without findings.
 Whole-tree source-form/link/test-reference and all 12 changed rendered-document
-content/structure reviews pass. Main commit and authorized ordinary push follow. Exact hosted results are pending until
-observed; no later revision inherits an earlier pass.
+content/structure reviews pass. Implementation is published and exact hosted
+acceptance passes; no unfinished source work remains. Record-only completion
+receives separate review/publication/hosted inspection in automation memory/report.
 
 ## Highest risks and uncertainties
 
@@ -79,5 +84,6 @@ increment and the reviewed host regression baseline.
 
 2026-11-05: initial/final 243/253-test locked baselines, ten focused and identical
 independent binary tests/run pass. Source/output/metadata identities and complete
-root/independent source/document/diff review pass. Exact published hosted
-verification is pending until observed; stop after completing this one increment.
+root/independent source/document/diff review and exact implementation hosted
+verification pass. Record-only completion receives separate review/publication/CI;
+stop after this one increment.

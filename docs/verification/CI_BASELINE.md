@@ -3,6 +3,30 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Runnable command-session checkpoint — 2026-11-05
+
+Implementation 3d171dc22d9c2661baf4d077871ebc60cad83003 is published by ordinary
+fast-forward to origin/main; the committed patch equals the accepted staged
+patch exactly. Exact [push run 41855764215](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41855764215),
+job 126663830711, passes all 20 steps: 253 workspace tests including ten new session
+cases and unchanged earlier consumers, 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and the unchanged 222-line sample.
+Root and independent verification_support accept actual checkout/log/source
+metadata and the hosted result. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable,
+Clippy 0.1.99, runner 2.338.2 and windows-2025-vs2026 image 20261030.294.1
+match the input run. Local tools remain separate on 1.98.0. This record-only
+completion changes no source or configuration and receives separate complete
+review, publication and exact hosted inspection in automation memory/report.
+
+Whole-tree source/configuration review retains the existing policy: 55 Rust
+files, 25,153 physical/1,371 comment-only lines, zero width findings and three
+unchanged fulfilled expectations. Source/waiver/link/test-reference and the
+implementation's 12 rendered-document content/structure reviews remain outside
+CI; see
+[the focused record](COMMAND_SESSION_REVIEW.md). The example is test-enabled,
+so the existing workspace command executes its ten tests without workflow
+changes. No library API, dependency or lint-policy change is introduced.
+
 ## Bounded command-result checkpoint — 2026-11-04
 
 Implementation 4ee3c5091ff49e85b9c9595958e040c051f8bec5 passes exact main push

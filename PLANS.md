@@ -1,6 +1,6 @@
 # Runnable bounded command session
 
-Status: Local implementation and independent consumer verified; publication pending — 2026-11-05 Australia/Sydney
+Status: Complete verified implementation checkpoint — 2026-11-05 Australia/Sydney
 
 ## Objective and selection
 
@@ -55,4 +55,18 @@ correcting driver admission handling. Existing callback/correlated sources are
 unchanged. Root and independent verification_support accept the complete
 14-file source/document/evidence diff without findings. Whole-tree source/waiver/
 link/test-reference and all 12 changed rendered-document content/structure checks
-pass. Publication and exact hosted acceptance remain pending until observed. No second capability is selected.
+pass.
+
+Implementation 3d171dc22d9c2661baf4d077871ebc60cad83003 is published by ordinary
+fast-forward to origin/main; the committed patch equals the accepted staged
+patch exactly. Exact [push run 41855764215](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41855764215),
+job 126663830711, passes all 20 steps: 253 workspace tests including ten new session
+cases and unchanged earlier consumers, 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and the unchanged 222-line sample.
+Root and independent verification_support accept actual checkout/log/source
+metadata and the hosted result. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable,
+Clippy 0.1.99, runner 2.338.2 and windows-2025-vs2026 image 20261030.294.1
+match the input run. Local tools remain separate on 1.98.0. This record-only
+completion changes no source or configuration and receives separate complete
+review, publication and exact hosted inspection in automation memory/report.
+No second capability is selected.

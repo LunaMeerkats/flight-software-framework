@@ -2,7 +2,7 @@
 
 Date: 2026-11-05 Australia/Sydney
 Scope: RFF-LIB-REQ-014 revision 1 and ADR-0039
-Status: Local and independent consumer verification/review pass; publication pending
+Status: Verified implementation checkpoint; complete Codex review and exact hosted pass
 
 ## Selection and input evidence
 
@@ -142,8 +142,33 @@ All 12 changed documents render and pass content/structure inspection: headings,
 code blocks, links, tables, prose, nesting and encoding match source. This is
 rendered-content review, not pixel or human review. Source configuration retains
 the reviewed local policy; no toolchain change or new waiver is introduced.
-Minor prose wrapping is corrected before staging. Accepted staged patch identity
-and exact hosted publication evidence are recorded after those actions occur.
+Minor prose wrapping is corrected before staging. Independent final staged
+review accepts patch SHA256
+5f5a4c66f572c429acd1db5e83a65337368a3c82212117128f614b4e945c167b.
+The actual committed implementation patch compares byte-for-byte equal.
+
+## Publication and hosted acceptance
+
+Implementation 3d171dc22d9c2661baf4d077871ebc60cad83003 is published by ordinary
+fast-forward to origin/main; the committed patch equals the accepted staged
+patch exactly. Exact [push run 41855764215](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41855764215),
+job 126663830711, passes all 20 steps: 253 workspace tests including ten new session
+cases and unchanged earlier consumers, 14 adapter/five sample tests,
+warnings-denied rustdoc, both whitespace checks and the unchanged 222-line sample.
+Root and independent verification_support accept actual checkout/log/source
+metadata and the hosted result. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable,
+Clippy 0.1.99, runner 2.338.2 and windows-2025-vs2026 image 20261030.294.1
+match the input run. Local tools remain separate on 1.98.0. This record-only
+completion changes no source or configuration and receives separate complete
+review, publication and exact hosted inspection in automation memory/report.
+
+Completion rechecks preserve the source/hash/metadata boundary, with the same
+55 Rust files and three fulfilled expectations; 112 Markdown files, 644 relative
+links and 217 exact test references resolve. All 13 run-changed documents pass
+rendered content/structure inspection. Only seven evidence documents change;
+Cargo is not rerun locally for this record-only patch because its authenticated
+source/configuration inputs are unchanged. Exact final hosted CI executes the
+full baseline again; final revision/result remain in automation memory/report.
 
 ## Limits
 
