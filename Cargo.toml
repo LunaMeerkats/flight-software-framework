@@ -33,3 +33,7 @@ test = true
 [[example]]
 name = "event_output"
 test = true
+
+[[example]]
+name = "command_session"
+test = true

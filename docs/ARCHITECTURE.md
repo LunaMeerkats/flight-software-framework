@@ -3,6 +3,16 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Runnable command session — 2026-11-05
+
+RFF-LIB-REQ-014 and [ADR-0039](adr/0039-runnable-command-session.md) compose
+validated ingress, correlated pending replies, local command feedback and two
+subscriber output slots in a standalone public-only executable. Explicit host
+turns gate each selected dispatch on its corresponding output capacity; host
+draining remains separate. The [guide](COMMAND_SESSION.md) explains the finite
+scenario, resource/error policy and independent Cargo recipe. This consumer
+adds no framework service or API; existing test consumers retain their evidence.
+
 ## Correlated operation cancellation — 2026-11-03
 
 RFF-LIB-REQ-012 and

@@ -465,3 +465,25 @@ path-dependent Cargo package. Guidance shall state that results are local
 callback observations, remain snapshots after later lifecycle clearing, and
 provide neither reliable transport nor duplicate-command suppression. This adds
 no library result service, concurrency, persistence or wire-format promise.
+
+### RFF-LIB-REQ-014 — Runnable bounded command session
+
+Revision 1 (2026-11-05). A standalone public-only executable consumer shall join
+validated command ingress, a finite nonwrapping session issuer, one producer's
+correlated pending reply/two acceptance flags, typed local command feedback and
+two subscriber output slots. One explicit producer turn shall dispatch at most
+one command and pause while its capacity-one result is occupied. One selected
+subscriber turn shall dispatch at most one reply and pause while its output is
+occupied. The serial host shall drain each slot explicitly and retain rejected
+ingress for its own resubmission policy. Printing shall occur outside callbacks.
+
+Acceptance: the identical source shall run and pass behavioral tests as a Cargo
+example and independent path-dependent binary. Observe a finite session with
+partial acceptance, busy feedback, gated results, rejected-only retry and same-ID
+resubmission. Verify ingress and output saturation/FIFO, malformed input without
+false success results, matching/stale controls, stop/restart retention and checked
+issuer exhaustion. Preserve existing callback/correlated consumers unchanged.
+Document setup, errors, finite storage, local-result versus subscriber-processing
+boundaries, explicit host policy and independent verification. This demonstrates
+one controlled composition, not a new library service, protocol, acknowledgement
+transport, persistence or delivery guarantee.

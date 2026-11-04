@@ -13,6 +13,31 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-COMMAND-SESSION — Executable public-API composition
+
+- Titles: Cargo Targets, The Cargo Book; Cell, Rc and u8::checked_add,
+  Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/cargo/reference/cargo-targets.html>,
+  <https://doc.rust-lang.org/std/cell/struct.Cell.html>,
+  <https://doc.rust-lang.org/std/rc/struct.Rc.html> and
+  <https://doc.rust-lang.org/std/primitive.u8.html#method.checked_add>
+- Version: official live Cargo reference and std 1.99.1
+  (58cf8f9c3, 2026-10-13), accessed 2026-11-05 Australia/Sydney.
+  Local execution remains Rust/Cargo 1.98.0.
+- Informed: examples are executable Cargo targets; test=true includes their
+  test functions in cargo test. Cell supports copied optional storage and
+  explicit taking; Rc shares single-thread ownership; checked addition exposes
+  overflow without wrapping.
+- Local treatment: adopt standard tested-example placement and compose bounded
+  local borrowed Cell slots with explicit serial host turns under ADR-0039.
+  Rc was considered but scoped borrowing suffices without shared-slot heap
+  ownership. Independently author mission policy rather than import the
+  existing asserting test fixture.
+  Reject a new library runner/result service absent a demonstrated API gap.
+  Payload grammar, host order, capacities and ID policy are local decisions;
+  no upstream implementation, dependency or concurrency system is reused.
+
 ## SRC-RUST-COMMAND-RESULTS — Serial shared result storage
 
 - Titles: Cell and Rc, Rust standard library

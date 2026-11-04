@@ -1,0 +1,121 @@
+# Run a bounded command session
+
+The [standalone example](../examples/command_session.rs) connects validated
+command ingress, a correlated producer, local command feedback and two reply
+subscribers through public framework APIs and std. It imports no private sample
+modules or integration-test fixtures. The framework remains experimental host
+software, with provisional APIs and no flight qualification.
+
+```text
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+```
+
+## Follow the ownership
+
+One serial host owns the session issuer and selects every callback. Allocate one
+ID for a logical New operation and keep that ID when resubmitting a busy or
+rejected request. IDs are finite and never wrap within this session; retain the
+issuer across producer stop/restart and never reset it while old work survives.
+Frames use New=[1, nonzero ID, value], Retry=[2, nonzero ID] and
+Cancel=[3, nonzero ID]; reply payloads are [ID, value]. Unknown opcodes, zero IDs
+and all other lengths are rejected before enqueue. The three-byte command and
+two-byte reply grammar is local to this recipe; it is not an external protocol
+or a compatibility claim.
+
+The producer owns one pending reply and two acceptance flags. New while busy
+returns Busy without replacing the older operation. Matching Retry attempts only
+rejected subscribers. Matching Cancel clears only future attempts; stale controls
+leave newer work intact. Accepted subscriber copies remain independent and can
+later be cleared by lifecycle operations.
+
+The producer records the exact handled command in one capacity-one result slot.
+A producer turn checks that slot before dispatching at most one command. The host
+explicitly takes each result, decides its policy and chooses another turn. An
+occupied result preserves both the older record and queued command FIFO. Ingress
+full/unavailable outcomes do not transfer responsibility for resubmitting a
+rejected host request. Enqueue acceptance alone does not establish execution.
+
+Each subscriber has its own capacity-one output slot. A selected subscriber turn
+checks that slot before dispatching at most one reply. The host takes output
+separately, then may print it outside callbacks. A Reply result records inbox
+acceptance; taking subscriber output separately observes that subscriber's
+callback. Printing supplies another fallible host effect and establishes no
+physical or durable delivery.
+
+## Follow the fixed scenario
+
+The driver first sends operation 1/value 3 to both subscribers, then drains only
+the first subscriber. Operation 2/value 40 reaches the first inbox while the
+second still holds the older reply, yielding ReplyAccepted([true, false]).
+New operation 3/value 7 is queued while the result slot is occupied; another
+producer turn reports SlotOccupied. After taking the older result, the next
+turn reports Busy(operation 2) for that saved request.
+
+The host drains operation 2 from the first subscriber and the older operation 1
+from the second. Retry(2) then completes acceptance without duplicating the first
+subscriber's reply. After draining the second, the host resubmits its same saved
+New operation 3 and observes both outputs. The script is finite; every callback
+selection and result/output take appears in host code. Tests separately cover
+correlated cancellation, saturation and restart behavior.
+
+## Resource and failure policy
+
+Storage is finite: three applications, one command inbox of capacity two, two
+reply inboxes of capacity one, a three-byte maximum message payload, one pending
+reply with two acceptance flags, one local result, two local outputs and one
+issuer for IDs 1..=255. Setup uses the framework's finite-capacity constructors.
+The host owns HostSlots; applications borrow its Cell slots, with no shared-slot
+heap allocation or reference counting needed for this scoped session. No
+background runner, growing command history or automatic retry is present. Logical storage limits do not establish
+process-memory limits, callback timing, fairness or eventual progress.
+
+Malformed ingress is rejected before queue mutation. A malformed message inserted
+through a lower-level bypass can still fail its callback: the selected producer
+becomes terminal Failed, remaining queued commands are cleared, no fresh success
+result is invented and peer effects remain independent. Bypassing an occupied
+slot gate is a composition error and returns an explicit callback failure.
+Ordinary dispatch error wrappers retain selected-inbox discard counts.
+The host takes a result/output before writing its diagnostic. A writer error
+returns from the finite driver; it does not restore that taken slot or retain
+partially written bytes. Use a separately verified retained-writer policy when
+that continuity is required; this example makes no output-retry promise. Stop and
+restart retain the same producer value, pending operation, local result and host
+issuer, while successful stop clears undispatched selected commands.
+
+Setup propagates failures rather than asserting success. Its one-shot driver
+reports an error and tears down; reducing ownership-preserving construction or
+registration wrappers to their typed cause does not demonstrate recovery.
+Panics, hangs and process/allocator failure remain outside this recipe.
+
+No result history suppresses duplicate New commands. Session correlation is not
+authentication, persistent identity, reliable acknowledgement or a transaction.
+This controlled composition establishes neither external adoption nor API
+stability, operational suitability or release readiness.
+
+## Verify the identical independent binary
+
+From the framework checkout in PowerShell, stop after every command failure:
+
+```powershell
+$framework = (Get-Location).Path
+$consumer = Join-Path $env:TEMP ('rff-command-session-' + [guid]::NewGuid().ToString('N'))
+cargo new --bin --edition 2024 --vcs none $consumer
+cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
+Copy-Item -LiteralPath "$framework/examples/command_session.rs" -Destination "$consumer/src/main.rs"
+cargo check --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets
+cargo clippy --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets -- -D warnings
+cargo test --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo run --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo metadata --manifest-path "$consumer/Cargo.toml" --locked --offline --format-version 1
+Get-FileHash -Algorithm SHA256 "$framework/examples/command_session.rs", "$consumer/src/main.rs"
+```
+
+Inspect one independent workspace member, the binary and its sole framework path
+dependency, with no library dependencies. Compare exact source bytes and SHA256
+and compare the runnable output. Record the actual path/results in the
+[focused review](verification/COMMAND_SESSION_REVIEW.md).
+[RFF-LIB-REQ-014](REQUIREMENTS.md) and
+[ADR-0039](adr/0039-runnable-command-session.md) define the scope. The original
+[correlated-command consumer](CORRELATED_COMMANDS.md) retains its separate exact
+histories and evidence.

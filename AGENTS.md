@@ -140,6 +140,10 @@ translate NASA C source.
   exhaustion, plus capacity-one typed host command results and gated dispatch.
   Its guide verifies identical source in an independent package;
   the original callback consumer retains its dispatch-time cancellation policy.
+- `examples/command_session.rs`: a standalone public-only command session
+  joining validated ingress, correlated replies, explicit local-result draining
+  and two gated subscriber output slots. Its test-enabled target and independent
+  binary recipe verify the same source without importing historical test fixtures.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and
@@ -268,6 +272,16 @@ result slot and keep enqueue snapshots distinct from subscriber processing.
 Keep the one host issuer across producer restart and reject exhaustion without
 wrapping; IDs supply session correlation, not authentication, acknowledgement,
 duplicate suppression or identity after issuer reset.
+
+When changing the command-session example or its guidance, run
+`cargo test --locked --example command_session` and
+`cargo run --locked --example command_session`, then execute the independent
+binary recipe in [its guide](docs/COMMAND_SESSION.md). Check, lint, test and run
+identical source; inspect metadata and compare exact bytes/SHA256. Record the
+actual package path/results in [the focused review](docs/verification/COMMAND_SESSION_REVIEW.md).
+Keep existing callback/correlated consumer sources unchanged. Serial host turns
+gate on occupied local slots; command results, subscriber processing and host
+printing remain separate evidence, with no reliable transport or durability claim.
 
 When changing the event-output example or its guidance, run
 `cargo test --locked --example event_output` and

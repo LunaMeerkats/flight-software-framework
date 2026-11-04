@@ -1,62 +1,58 @@
-# Bounded host command-result feedback
+# Runnable bounded command session
 
-Status: Complete verified implementation checkpoint — 2026-11-04 Australia/Sydney
+Status: Local implementation and independent consumer verified; publication pending — 2026-11-05 Australia/Sydney
 
 ## Objective and selection
 
-Let a serial host distinguish a busy New command, matching cancellation and
-stale controls after dispatch. Existing enqueue outcomes and copied test-only
-pending observations cannot provide this consumer contract. Root Codex and
-independent consumer_assessment select a capacity-one typed result mailbox over
-bus-routed acknowledgements or persistent identities. RFF-LIB-REQ-013 revision 1
-and ADR-0038 precede implementation; retain all seven correlated histories and
-the original callback consumer unchanged.
+Make command ingress, local feedback and subscriber output runnable through
+public APIs. The previous consumer exists only as an asserting test fixture.
+Root Codex and independent consumer_assessment select a standalone tested example
+rather than extracting that fixture or adding a framework service. Preserve
+existing callback and correlated test sources byte-for-byte. Define
+RFF-LIB-REQ-014 and ADR-0039 before implementation.
 
 ## Acceptance and components
 
-- Extend tests/correlated_commands.rs with one shared typed result slot and an
-  explicit host turn that skips producer dispatch while the slot is occupied.
-- Report exact command, reply acceptance flags, busy pending ID, cancellation
-  or unmatched control; test full-slot bypass, FIFO/backpressure, malformed and
-  routing errors, explicit draining and restart retention without false results.
-- Update its guide, requirements, ADR, source register, focused review,
-  traceability, roadmap, project state, README and contributor commands.
-- Run focused tests/Clippy, locked baseline and independent-package recipe;
-  compare bytes/hashes/metadata and preserve old test bodies. Review complete
-  diff, source form, links and rendered documentation with independent Codex.
-- Commit on main after applicable checks; refresh origin, push ordinarily and
-  inspect hosted CI at the exact published revision.
+- One serial host issuer, producer, two subscribers, finite inboxes, one pending
+  operation with two acceptance flags, one result and one output per subscriber.
+- Explicit bounded producer/subscriber turns gate dispatch on occupied host
+  slots. Host draining remains separate. Validate ingress; rejected requests
+  remain caller-owned. No callback printing or test-only observations drive policy.
+- Run a finite scenario exposing partial acceptance, busy feedback, gated turns,
+  rejected-only retry and same-ID resubmission. Test malformed input, FIFO,
+  output/ingress saturation, correlated controls, restart retention and issuer
+  exhaustion for this independently authored policy.
+- Add a tested Cargo example and guide/independent binary recipe. Update
+  requirements, decision/source register, traceability, current state and entry
+  points; record actual results in a focused review.
+- Focused test/run, independent package check/Clippy/test/run/metadata/bytes/hash,
+  locked baseline, source-form/link/rendered-document and complete diff review.
+  Commit on main; refresh origin, push ordinarily, inspect exact hosted revision.
 
 ## Baseline, risks and stopping point
 
-Clean main input 4f64a4e70037609c6f382b20ff6c13967a54e05e matches fetched
-origin/main. Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98
-are unchanged. Initial locked baseline passes 236 workspace tests. Exact input
-hosted run 41451380499 passes all 20 steps with independent raw-log inspection.
+Clean main faab18be2fb06a4bec43f0889338409c5b71b26a matches fetched origin.
+Independent verification_support accepts exact input hosted run 41642653583,
+all 20 steps, 243 workspace/14 adapter/five sample tests and unchanged 222-line sample.
+Initial locked format/check/Clippy/243-test baseline, warnings-denied rustdoc
+and both whitespace checks pass before implementation.
+Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0, Clippy 0.1.98.
 
-The gate is a serial mission policy and precedes lifecycle validation. Bypassing
-it returns a callback error and uses ordinary terminal failure/queue cleanup;
-it cannot recover the consumed command. Results are local snapshots and cannot
-prove destination processing or survival after lifecycle clearing. Retain session
-issuer/correlation limits. No library API, dependency, workflow, licence or
-consequential gate changes. If checks fail, remove only this run's source changes
-where safe and preserve useful decision/failure evidence. Stop after this one
-verified increment.
+This is serial trusted host policy, not a framework runner or wire protocol.
+Results describe local handling and enqueue snapshots; printing establishes no
+physical/durable delivery. No library API, dependency, concurrency, release or
+platform commitment. Revert only own unfinished changes if necessary, preserving
+useful evidence. Stop after one tested, documented and reviewed increment.
 
 ## Actual local results
 
-14 focused tests and Clippy pass. All seven original test bodies are unchanged.
-Final locked baseline passes 243 workspace tests and warnings-denied rustdoc.
-Identical independent Cargo consumer check/Clippy/14 tests plus generated smoke
-test pass; metadata confirms an independent workspace and sole framework path
-dependency. Exact source bytes/SHA256 match the focused record. Root and
-independent verification_review accept the complete source/document diff without
-findings. Whole-tree width/waiver/link/exact-test-reference and 12 changed rendered
-document content/structure checks pass. Implementation
-4ee3c5091ff49e85b9c9595958e040c051f8bec5 equals the accepted staged patch and
-is published by ordinary fast-forward to origin/main. Exact run 41641979417/job
-125937510804 passes all 20 steps, 243 workspace/14 adapter/five sample tests and
-unchanged 222-line sample. Hosted tools/runner match input; image advances to
-20261030.294.1. Root/independent raw-log review accepts this evidence. Record-only
-completion receives separate review/publication/exact hosted inspection in
-automation memory/report. No further behavior is selected.
+Ten focused tests and the 24-line executable pass. The final locked baseline
+passes 253 workspace tests and warnings-denied rustdoc. Identical independent
+binary check/Clippy/ten tests/run/metadata/bytes/SHA256 and exact output equality
+pass; actual package/source identity is recorded in the focused review. Root and
+independent consumer_assessment accept all source/tests without findings after
+correcting driver admission handling. Existing callback/correlated sources are
+unchanged. Root and independent verification_support accept the complete
+14-file source/document/evidence diff without findings. Whole-tree source/waiver/
+link/test-reference and all 12 changed rendered-document content/structure checks
+pass. Publication and exact hosted acceptance remain pending until observed. No second capability is selected.

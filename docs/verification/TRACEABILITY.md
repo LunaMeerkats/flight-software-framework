@@ -1,5 +1,18 @@
 # Verification traceability
 
+## Stage 5 runnable bounded command session — 2026-11-05
+
+RFF-LIB-REQ-014 revision 1 and
+[ADR-0039](../adr/0039-runnable-command-session.md) define a separate
+standalone executable using public APIs. The [guide](../COMMAND_SESSION.md)
+and [focused review](COMMAND_SESSION_REVIEW.md) distinguish command admission,
+local callback result, subscriber output and host printing. Historical consumers
+and requirement meanings remain unchanged.
+
+| Requirement | Implementation | Verification evidence | Status |
+| --- | --- | --- | --- |
+| RFF-LIB-REQ-014 | Tested command_session example; validated ingress, finite issuer, correlated reply, result/output gates and explicit host drains | `finite_session_prints_exact_results_and_separate_subscriber_observations`; `occupied_result_preserves_command_fifo_and_rejected_host_request`; `occupied_output_preserves_older_reply_and_gates_next_subscriber_dispatch`; `malformed_ingress_is_rejected_before_queue_or_result_effects`; `malformed_callback_bypass_retains_peer_effect_and_reports_exact_cleanup`; `direct_producer_bypass_preserves_result_before_terminal_cleanup`; `direct_subscriber_bypass_preserves_old_output_and_peer_reply`; `matching_cancel_preserves_accepted_copy_and_stale_control_preserves_new_operation`; `restart_retains_result_operation_and_issuer_while_clearing_queued_command`; `session_issuer_uses_all_nonzero_ids_and_rejects_repeated_exhaustion`; exact independent binary check/Clippy/test/run/metadata/bytes/SHA256 | Ten focused/identical independent tests, 253-test locked baseline and complete root/independent Codex review pass; publication pending; see focused record |
+
 ## Stage 5 bounded host command results — 2026-11-04
 
 RFF-LIB-REQ-013 revision 1 and

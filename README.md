@@ -62,6 +62,17 @@ Its capacity-one typed result slot lets the serial host distinguish busy request
 matching cancellation and reply enqueue progress, with explicit drain before the
 next producer dispatch. Results describe local handling and acceptance snapshots.
 
+[Run a complete bounded command session](docs/COMMAND_SESSION.md) to connect
+validated ingress, local command results and two subscriber outputs through
+explicit host turns:
+
+```text
+cargo run --locked --example command_session
+```
+
+The host drains results and outputs separately; inbox acceptance, callback
+processing and printed diagnostics remain distinct observations.
+
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API
 consumer tests demonstrate immediate feedback from a caller-owned event queue.
