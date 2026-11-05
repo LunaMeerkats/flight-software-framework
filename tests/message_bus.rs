@@ -32,6 +32,36 @@ fn two_command_subscriber_bus<const MAX_PAYLOAD_BYTES: usize>(
 }
 
 #[test]
+fn subscription_inspection_uses_copied_topics_and_preserves_the_queue() {
+    let [subscriber, silent, unknown] = configured_application_ids::<3>();
+    let mut topics = COMMAND_ONLY;
+    let mut bus = MessageBus::<MissionTopic, 1>::new(&[
+        ApplicationInboxConfig::new(subscriber, 1, &topics),
+        ApplicationInboxConfig::new(silent, 1, &[]),
+    ])
+    .unwrap();
+    topics[0] = MissionTopic::Telemetry;
+    let command = Message::try_new(MissionTopic::Command, &[7]).unwrap();
+    assert_eq!(
+        bus.publish_to(subscriber, &command),
+        Ok(DeliveryStatus::Delivered)
+    );
+
+    assert_eq!(bus.subscribes_to(subscriber, command.topic()), Ok(true));
+    assert_eq!(bus.subscribes_to(subscriber, &topics[0]), Ok(false));
+    assert_eq!(bus.subscribes_to(silent, command.topic()), Ok(false));
+    assert_eq!(
+        bus.subscribes_to(unknown, command.topic()),
+        Err(InboxAccessError::UnknownApplication {
+            application_id: unknown,
+        })
+    );
+    assert_eq!(bus.dequeue(subscriber), Ok(Some(command)));
+    assert_eq!(bus.dequeue(subscriber), Ok(None));
+    assert_eq!(bus.dequeue(silent), Ok(None));
+}
+
+#[test]
 fn inline_payload_accepts_its_exact_limit_and_rejects_one_more_byte() {
     let at_limit = Message::<MissionTopic, 4>::try_new(MissionTopic::Command, &[1, 2, 3, 4])
         .expect("payload at the limit fits");

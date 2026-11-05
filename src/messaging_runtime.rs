@@ -382,6 +382,26 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize, E, const MAX_CONFIGURA
             })
     }
 
+    /// Checks whether one application inbox subscribes to the borrowed topic.
+    ///
+    /// Scans the copied topic list using topic equality. The runtime allocates
+    /// no storage, changes no queue and invokes no application callback.
+    /// Lifecycle state and inbox fullness do not affect membership.
+    /// A known inbox without the topic returns `Ok(false)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`InboxAccessError::UnknownApplication`] when the identity does
+    /// not name an integrated inbox. Use an identity from this runtime.
+    /// Same-position foreign identities cannot be distinguished.
+    pub fn subscribes_to(
+        &self,
+        application_id: ApplicationId,
+        topic: &Topic,
+    ) -> Result<bool, InboxAccessError> {
+        self.message_bus.subscribes_to(application_id, topic)
+    }
+
     /// Returns the number of queued deliveries for one application.
     ///
     /// # Errors

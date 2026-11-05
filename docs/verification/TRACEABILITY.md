@@ -1,5 +1,16 @@
 # Verification traceability
 
+## Stage 5 subscription inspection — 2026-11-06
+
+[ADR-0040](../adr/0040-read-only-subscription-inspection.md) defines read-only
+membership and the command-session startup check. The
+[focused review](COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
+records evidence separately from the original command-session checkpoint.
+
+| Requirement | Implementation | Verification evidence |
+| --- | --- | --- |
+| RFF-LIB-REQ-015 | Membership query on both messaging owners and explicit command-session route checks before startup | `subscription_inspection_uses_copied_topics_and_preserves_the_queue`; `subscription_inspection_is_independent_of_runtime_availability`; `misbound_inboxes_are_reported_before_any_application_starts`; `finite_session_prints_exact_results_and_separate_subscriber_observations`; independent binary checks and exact source/output comparison |
+
 ## Stage 5 runnable bounded command session — 2026-11-05
 
 RFF-LIB-REQ-014 revision 1 and

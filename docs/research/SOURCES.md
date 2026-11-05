@@ -13,6 +13,21 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-SUBSCRIPTION-INSPECTION — Typed membership query
+
+- Titles: Slice membership, Rust standard library; Result, Rust standard library
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/primitive.slice.html#method.contains>
+  and <https://doc.rust-lang.org/std/result/enum.Result.html>
+- Version: std 1.99.1 (58cf8f9c3, 2026-10-13), accessed 2026-11-06
+  Australia/Sydney. Local execution uses 1.98.0.
+- Informed: slice membership checks equality against stored values. A Result
+  carries a successful membership value or a typed lookup error.
+- Local treatment: reuse the routing comparison and inbox lookup for ADR-0040.
+  The public query returns a boolean for a known inbox and the existing typed
+  error for an unknown endpoint. The mission host checks its required routes.
+  No external implementation or dependency is reused.
+
 ## SRC-RUST-COMMAND-SESSION — Executable public-API composition
 
 - Titles: Cargo Targets, The Cargo Book; Cell, Rc and u8::checked_add,

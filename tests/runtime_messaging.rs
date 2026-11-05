@@ -5,9 +5,10 @@ use std::fmt;
 
 use rust_flight_framework::{
     Application, ApplicationId, ApplicationState, ApplicationWorkContext, DeliveryStatus,
-    LifecycleError, LifecycleOperation, Message, MessageBusCreateError, MessagingRuntime,
-    MessagingRuntimeCreateErrorKind, PublishClassification, PublishReport, Runtime,
-    RuntimeInboxConfig, RuntimeRestartError, RuntimeStartError, RuntimeStopError, RuntimeWorkError,
+    InboxAccessError, LifecycleError, LifecycleOperation, Message, MessageBusCreateError,
+    MessagingRuntime, MessagingRuntimeCreateErrorKind, PublishClassification, PublishReport,
+    Runtime, RuntimeInboxConfig, RuntimeRestartError, RuntimeStartError, RuntimeStopError,
+    RuntimeWorkError,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -145,6 +146,51 @@ fn assert_inbox_capacity_source_chain(
             requested: usize::MAX,
         })
     );
+}
+
+#[test]
+fn subscription_inspection_is_independent_of_runtime_availability() {
+    let (mut owner, [healthy, failing]) =
+        configured_runtime([None, Some(FailurePoint::Work)], [1, 1]);
+    let (_, [_, _, unknown]) = configured_runtime([None; 3], [1; 3]);
+    let command = command(7);
+    assert_eq!(owner.state(healthy), Ok(ApplicationState::Registered));
+    assert_eq!(owner.subscribes_to(healthy, command.topic()), Ok(true));
+    assert_eq!(
+        owner.subscribes_to(healthy, &MissionTopic::Unrouted),
+        Ok(false)
+    );
+    assert_eq!(
+        owner.subscribes_to(unknown, command.topic()),
+        Err(InboxAccessError::UnknownApplication {
+            application_id: unknown,
+        })
+    );
+    assert_eq!(owner.pending(healthy), Ok(0));
+    assert_eq!(owner.start(healthy), Ok(ApplicationState::Running));
+    assert_eq!(owner.start(failing), Ok(ApplicationState::Running));
+    assert_eq!(
+        owner.publish_to(healthy, &command),
+        Ok(DeliveryStatus::Delivered)
+    );
+    assert_eq!(
+        owner.publish_to(failing, &command),
+        Ok(DeliveryStatus::Delivered)
+    );
+    assert_eq!(owner.subscribes_to(healthy, command.topic()), Ok(true));
+    assert_eq!(owner.pending(healthy), Ok(1));
+    assert_eq!(
+        owner.stop(healthy).unwrap().state(),
+        ApplicationState::Stopped
+    );
+    assert_eq!(owner.subscribes_to(healthy, command.topic()), Ok(true));
+    assert_eq!(owner.pending(healthy), Ok(0));
+    assert_eq!(owner.restart(healthy), Ok(ApplicationState::Running));
+    assert_eq!(owner.subscribes_to(healthy, command.topic()), Ok(true));
+    assert_eq!(owner.work(failing).unwrap_err().discarded_deliveries(), 1);
+    assert_eq!(owner.state(failing), Ok(ApplicationState::Failed));
+    assert_eq!(owner.subscribes_to(failing, command.topic()), Ok(true));
+    assert_eq!(owner.pending(failing), Ok(0));
 }
 
 #[test]

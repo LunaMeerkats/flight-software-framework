@@ -5,7 +5,15 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; runnable command-session checkpoint verified**
+Status: **Active; subscription inspection and command-session preflight**
+
+RFF-LIB-REQ-015 and [ADR-0040](adr/0040-read-only-subscription-inspection.md)
+add read-only membership queries so a host can check required routes without
+publishing a message. The command session uses this check before startup.
+The [focused review](verification/COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
+records checks for misbound inboxes, lifecycle and queue independence, and the
+identical independent binary. Revisit paired setup only if consumer evidence
+shows additional assembly errors.
 
 RFF-LIB-REQ-014 and [ADR-0039](adr/0039-runnable-command-session.md) join
 validated ingress, correlated reply state, local command feedback and two

@@ -179,3 +179,60 @@ authentication, concurrency, timing or process-memory guarantee. The example is
 controlled integration evidence rather than external adoption, API stability,
 qualification, operational suitability or release readiness. Separate
 consequential authorization gates remain unchanged.
+
+## Subscription inspection follow-up
+
+RFF-LIB-REQ-015 and [ADR-0040](../adr/0040-read-only-subscription-inspection.md)
+add a startup check for required routes. The input is clean main
+`ee1a8ed6cd6dacefc43835caf14d9d013dd5111b`. The initial locked local
+baseline passes. Independent Codex rechecked [input hosted run 41856418810](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/41856418810)
+against the actual checkout and raw job log. All 20 steps, 253 workspace tests,
+14 adapter tests, five sample tests and the unchanged 222-line host sample pass.
+
+The new public API inspects the copied topics of one inbox. The detached test
+checks membership, absence, an unknown ID and preservation of a queued message
+after the caller changes its topic array. The runtime test observes membership
+before start, with a full running inbox, after stop/restart and after terminal
+work failure. The command session rejects both a producer/subscriber swap and
+a missing route on the second subscriber before any application starts. All
+three inboxes remain empty. The original successful transcript and historical
+callback/correlated consumers are preserved.
+
+The check relies on the host's required-route list and its pairing of IDs
+with the issuing runtime. A match describes configuration only. Availability,
+capacity and eventual subscriber processing remain separate observations.
+
+### Local and independent verification
+
+On local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98, all of
+the following pass. The focused command runs 13 detached bus, 13 runtime
+messaging and 11 command-session tests. The workspace runs 256 tests.
+
+```powershell
+cargo fmt --all -- --check
+cargo test --locked --test message_bus --test runtime_messaging --example command_session
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+$env:RUSTDOCFLAGS = "-D warnings"
+cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+```
+
+The independent binary is at
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-1f095dcc645040e3ac10d574a220f29c`.
+The guide's locked offline check, Clippy, test, run and metadata commands pass.
+Metadata reports one independent binary workspace member and its sole framework
+path dependency. The framework has no dependencies. Exact source bytes match
+with SHA256 `090008b9ece268d7123d7ceb4121531aa8d9d8fa2fb0a41da43a066cb13a9215`.
+The independent package passes all 11 tests. Both executables emit byte-identical
+24-line stdout, with the same transcript as the earlier example.
+
+Root Codex and an independent Codex reviewer accept the Rust source and tests.
+The audit finds no width violations in 55 Rust files and retains the three
+fulfilled lint expectations. All 653 relative Markdown paths and 220 exact
+traceability test references resolve. All nine changed Markdown documents pass
+rendered content and structure checks. This review examines rendered HTML
+structure and text.

@@ -49,7 +49,13 @@ enum SessionError {
     IdsExhausted,
     ResultOccupied,
     OutputOccupied,
-    RegistrationFull { capacity: usize },
+    RegistrationFull {
+        capacity: usize,
+    },
+    MissingSubscription {
+        application_id: ApplicationId,
+        topic: Topic,
+    },
     Message(MessageCreateError),
     Routing(PublishToError),
 }
@@ -66,6 +72,13 @@ impl fmt::Display for SessionError {
             Self::RegistrationFull { capacity } => {
                 write!(formatter, "runtime capacity {capacity} full")
             }
+            Self::MissingSubscription {
+                application_id,
+                topic,
+            } => write!(
+                formatter,
+                "application {application_id:?} must subscribe to {topic:?}"
+            ),
             Self::Message(error) => error.fmt(formatter),
             Self::Routing(error) => error.fmt(formatter),
         }
@@ -334,9 +347,7 @@ impl<'a> Session<'a> {
             RuntimeInboxConfig::new(2, &[Topic::Command]),
         ];
         let mut owner = MessagingRuntime::new(runtime, &inboxes).map_err(|error| error.kind())?;
-        for id in [subscribers[0], subscribers[1], producer] {
-            owner.start(id)?;
-        }
+        start_session(&mut owner, producer, subscribers)?;
         Ok(Self {
             owner,
             producer,
@@ -383,6 +394,31 @@ impl<'a> Session<'a> {
             .dispatch_one(self.subscribers[index])
             .map(HostTurn::Dispatch)
     }
+}
+
+fn start_session(
+    owner: &mut Owner<'_>,
+    producer: ApplicationId,
+    [first, second]: [ApplicationId; 2],
+) -> Result<(), Box<dyn Error>> {
+    // A structurally valid positional topology can still bind the wrong role.
+    for (application_id, topic) in [
+        (producer, Topic::Command),
+        (first, Topic::Reply),
+        (second, Topic::Reply),
+    ] {
+        if !owner.subscribes_to(application_id, &topic)? {
+            return Err(SessionError::MissingSubscription {
+                application_id,
+                topic,
+            }
+            .into());
+        }
+    }
+    for application_id in [first, second, producer] {
+        owner.start(application_id)?;
+    }
+    Ok(())
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -509,6 +545,54 @@ mod tests {
         run_session(&mut output).unwrap();
         let actual = String::from_utf8(output).unwrap();
         assert_eq!(actual.lines().collect::<Vec<_>>(), expected_transcript());
+    }
+
+    #[test]
+    fn misbound_inboxes_are_reported_before_any_application_starts() {
+        let command = RuntimeInboxConfig::new(2, &[Topic::Command]);
+        let reply = RuntimeInboxConfig::new(1, &[Topic::Reply]);
+        assert_setup_rejects_inboxes([command, reply, reply], Topic::Command);
+        assert_setup_rejects_inboxes([reply, command, command], Topic::Reply);
+    }
+
+    fn assert_setup_rejects_inboxes(inboxes: [RuntimeInboxConfig<'_, Topic>; 3], missing: Topic) {
+        let slots = HostSlots::default();
+        let mut runtime = Runtime::new(3).unwrap();
+        let subscribers = [
+            runtime
+                .register(Actor::Subscriber(&slots.outputs[0]))
+                .unwrap(),
+            runtime
+                .register(Actor::Subscriber(&slots.outputs[1]))
+                .unwrap(),
+        ];
+        let producer = runtime
+            .register(Actor::Producer(Producer {
+                destinations: subscribers,
+                pending: None,
+                result: &slots.result,
+            }))
+            .unwrap();
+        let mut owner = Owner::new(runtime, &inboxes).unwrap();
+        let error = start_session(&mut owner, producer, subscribers).unwrap_err();
+        let application_id = match missing {
+            Topic::Command => producer,
+            Topic::Reply => subscribers[1],
+        };
+        assert_eq!(
+            error.downcast_ref::<SessionError>(),
+            Some(&SessionError::MissingSubscription {
+                application_id,
+                topic: missing,
+            })
+        );
+        for application_id in [subscribers[0], subscribers[1], producer] {
+            assert_eq!(
+                owner.state(application_id),
+                Ok(ApplicationState::Registered)
+            );
+            assert_eq!(owner.pending(application_id), Ok(0));
+        }
     }
 
     fn expected_transcript() -> [&'static str; 24] {

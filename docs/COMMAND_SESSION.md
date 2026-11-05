@@ -88,6 +88,14 @@ reports an error and tears down; reducing ownership-preserving construction or
 registration wrappers to their typed cause does not demonstrate recovery.
 Panics, hangs and process/allocator failure remain outside this recipe.
 
+After attaching the inboxes, setup uses `MessagingRuntime::subscribes_to` to
+check the producer's Command and both subscribers' Reply routes before starting
+any application. A valid topology can still have its inbox entries in the
+wrong order. The example reports the first missing required route with the
+application ID and topic. Use IDs returned by the same runtime. The query
+inspects configured membership independently of availability and capacity,
+without publishing a probe message. The host supplies the expected routes.
+
 No result history suppresses duplicate New commands. Session correlation is not
 authentication, persistent identity, reliable acknowledgement or a transaction.
 This controlled composition establishes neither external adoption nor API
@@ -115,7 +123,8 @@ Inspect one independent workspace member, the binary and its sole framework path
 dependency, with no library dependencies. Compare exact source bytes and SHA256
 and compare the runnable output. Record the actual path/results in the
 [focused review](verification/COMMAND_SESSION_REVIEW.md).
-[RFF-LIB-REQ-014](REQUIREMENTS.md) and
-[ADR-0039](adr/0039-runnable-command-session.md) define the scope. The original
-[correlated-command consumer](CORRELATED_COMMANDS.md) retains its separate exact
-histories and evidence.
+[RFF-LIB-REQ-014 and RFF-LIB-REQ-015](REQUIREMENTS.md),
+[ADR-0039](adr/0039-runnable-command-session.md) and
+[ADR-0040](adr/0040-read-only-subscription-inspection.md) define the scope. The
+original [correlated-command consumer](CORRELATED_COMMANDS.md) retains its
+separate exact histories and evidence.

@@ -487,3 +487,20 @@ Document setup, errors, finite storage, local-result versus subscriber-processin
 boundaries, explicit host policy and independent verification. This demonstrates
 one controlled composition, not a new library service, protocol, acknowledgement
 transport, persistence or delivery guarantee.
+
+### RFF-LIB-REQ-015 — Read-only subscription inspection
+
+Revision 1 (2026-11-06). A host shall be able to query whether a configured
+inbox subscribes to a borrowed topic through either messaging owner. A known
+endpoint shall return its configured membership independently of lifecycle
+state, queued deliveries and available capacity. An unknown endpoint shall
+return the existing typed inbox-access error. The owner shall query the copied
+topology without allocating storage, enqueueing or invoking application callbacks.
+
+Acceptance: verify membership, absence and unknown identities through public
+APIs, including an occupied inbox and lifecycle changes. The command-session
+consumer shall check all required routes before starting any application. A
+structurally valid swap of producer and subscriber inboxes shall report the
+missing required subscription while all applications remain registered. The
+identical independent binary shall preserve the existing successful transcript
+and behavioral cases. Application IDs remain scoped to their issuing runtime.

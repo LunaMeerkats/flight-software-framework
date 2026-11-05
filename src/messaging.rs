@@ -497,6 +497,25 @@ impl<Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize> MessageBus<Topic, MAX_PAY
         self.publish_to_with_availability(application_id, message, |_| true)
     }
 
+    /// Checks whether one configured inbox subscribes to the borrowed topic.
+    ///
+    /// Scans that inbox's copied topic list using topic equality. The bus
+    /// allocates no storage and changes no queue. A known inbox without the
+    /// topic returns `Ok(false)`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`InboxAccessError::UnknownApplication`] when the identity does
+    /// not name a configured endpoint. Use an identity from the topology's
+    /// issuer. Same-position foreign identities cannot be distinguished.
+    pub fn subscribes_to(
+        &self,
+        application_id: ApplicationId,
+        topic: &Topic,
+    ) -> Result<bool, InboxAccessError> {
+        Ok(self.endpoint(application_id)?.subscribes_to(topic))
+    }
+
     /// Returns the configured logical slot limit for one inbox.
     ///
     /// # Errors
