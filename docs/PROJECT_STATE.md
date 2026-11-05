@@ -21,6 +21,9 @@ Package 0.0.0 remains unpublished with provisional APIs.
 - The updated local locked baseline passes 256 tests. The workspace example
   and the identical independent binary pass all 11 command-session tests
   and emit the same 24-line transcript.
+- Published implementation `97296afda530bd721c4421bd2aa97d35f6be7ce3`
+  passes exact hosted run 42032781940, including all 20 steps and the same
+  222-line host sample.
 - See the [focused review](verification/COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
   for this increment's exact commands and evidence.
 
@@ -34,9 +37,8 @@ reply, a local result slot and two output slots, with explicit host turns.
 
 ## Work in progress
 
-The subscription query and command-session startup check form the single
-selected increment. The prior callback and correlated consumers retain their
-original tests and ownership boundaries.
+The subscription query and startup check are complete. The prior callback and
+correlated consumers retain their original tests and ownership boundaries.
 
 ## Highest risks and uncertainties
 
@@ -63,6 +65,6 @@ before considering an API change.
 
 ## Latest run
 
-2026-11-06. Local and independent checks pass. Misbound required routes are
-reported before startup, with source and rendered-content review complete.
-The focused review records hosted results separately.
+2026-11-06. Local, independent and exact implementation hosted checks pass.
+Source and rendered-content review complete. The record revision receives
+separate hosted inspection.

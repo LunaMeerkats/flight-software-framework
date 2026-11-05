@@ -1,6 +1,6 @@
 # ADR-0040: Read-only subscription inspection
 
-- Status: Selected for RFF-LIB-REQ-015
+- Status: Implemented and verified for RFF-LIB-REQ-015
 - Date: 2026-11-06
 
 ## Context
@@ -44,3 +44,6 @@ running without queue effects. The host still supplies the correct issuing
 IDs and expectations. A valid membership result cannot establish callback
 behavior, available capacity or acceptance of a later publication. Revisit a
 paired builder when checking expectations leaves demonstrated assembly errors.
+
+The [focused review](../verification/COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
+records the local, independent binary and exact hosted evidence.

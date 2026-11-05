@@ -1,6 +1,6 @@
 # Read-only subscription inspection
 
-Status: Local and independent verification complete, 2026-11-06 Australia/Sydney.
+Status: Verified implementation checkpoint, 2026-11-06 Australia/Sydney.
 
 ## Objective and acceptance
 
@@ -34,3 +34,7 @@ binary passes 11 tests with the same source and output. Root and independent
 Codex accept source. The
 [focused record](docs/verification/COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
 contains exact local commands, independent evidence and the hosted checkpoint.
+
+Implementation `97296afda530bd721c4421bd2aa97d35f6be7ce3` passes exact
+hosted run 42032781940 with all 20 steps. The documentation revision receives
+its own hosted inspection. Stop at this verified increment.

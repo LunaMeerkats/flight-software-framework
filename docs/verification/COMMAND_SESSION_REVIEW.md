@@ -236,3 +236,20 @@ fulfilled lint expectations. All 653 relative Markdown paths and 220 exact
 traceability test references resolve. All nine changed Markdown documents pass
 rendered content and structure checks. This review examines rendered HTML
 structure and text.
+
+### Hosted verification and disposition
+
+Implementation `97296afda530bd721c4421bd2aa97d35f6be7ce3` was published
+by ordinary fast-forward to `origin/main`. Its committed diff matches the
+reviewed staged diff. Exact
+[push run 42032781940](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42032781940),
+job 127263132675, passed all 20 steps. The raw log confirms the exact checkout,
+256 workspace tests, 14 focused adapter tests, five focused sample tests,
+warnings-denied rustdoc, both whitespace checks and the same 222-line host
+sample. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99, runner
+2.338.2 and windows-2025-vs2026 image 20261030.294.1 match the input run.
+
+Root Codex and independent Codex review accept this bounded checkpoint. The
+implementation fixes pre-start detection of the demonstrated missing routes.
+The follow-up record changes only documentation. Its own exact hosted result
+is tracked separately in the automation run record.
