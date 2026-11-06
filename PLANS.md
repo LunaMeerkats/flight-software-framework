@@ -29,3 +29,12 @@ hosted CI for that revision.
 Stop after one corrected pre-start attachment. This experiment covers a known
 configuration error with an explicit correction. If verification fails,
 preserve the evidence and withdraw only this run's incomplete changes.
+
+## Result
+
+The locked local baseline passes 257 tests. The workspace and identical
+independent quickstart each pass four tests with matching stdout. Complete
+source and rendered-content review passes. Exact implementation
+`3a7c87a905fd33ee256c7d4f692c83d054153227` passes hosted run 42222349329, all
+20 steps. See the [focused review](docs/verification/QUICKSTART_REVIEW.md#borrowed-setup-recovery-follow-up).
+The record revision receives its own hosted inspection.

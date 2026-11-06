@@ -18,20 +18,22 @@ baseline. Package 0.0.0 remains unpublished with provisional APIs.
 - The updated locked local baseline passes 257 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace and identical
   independent quickstart each pass four tests and emit identical output.
+- Implementation `3a7c87a905fd33ee256c7d4f692c83d054153227` passes exact hosted
+  run 42222349329 with all 20 steps, 257 workspace tests and the unchanged
+  222-line host sample.
 
 ## Current architecture
 
 One unpublished package owns synchronous lifecycle/work, bounded messaging,
 manual time, finite schedules, structured events and optional validated
 configuration. Both messaging owners inspect the same membership that
-publication uses. A failed attachment returns the original still-owned
-runtime to its caller. The command session retains one finite issuer, one
-pending reply, a local result slot and two output slots, with explicit host turns.
+publication uses. A failed attachment returns the original runtime with its
+applications. The command session retains one finite issuer, one pending
+reply, a local result slot and two output slots, with explicit host turns.
 
 ## Work in progress
 
-The quickstart's pre-start retry path is verified locally and in the
-independent package. The normal one-shot driver still exits on setup failure.
+The quickstart's pre-start retry checkpoint is complete.
 
 ## Highest risks and uncertainties
 
@@ -56,6 +58,7 @@ one explicit short-write or error boundary before expanding the host driver.
 
 ## Latest run
 
-2026-11-07. A corrected inbox allows the same registered application to deliver
-to its original host slot. Local and independent verification pass. The
-focused record separates hosted evidence from local results.
+2026-11-07. After corrected attachment, the original application dispatches a
+command into its original host slot. Local and independent verification,
+source and document review, and exact implementation hosted CI pass. The
+record revision receives separate hosted inspection.

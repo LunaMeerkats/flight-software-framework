@@ -217,5 +217,25 @@ which has no dependencies. The source files match byte for byte:
   Stdout SHA256 `b7ed24538cb08493e26aaf9ad196adf0beec8702d53b29bb4ec9b0ed5d388f3d`.
 
 Raw logs and review aids are in the ignored
-`target/review-2026-11-07-setup-recovery` directory. Hosted CI evidence is
-recorded separately from local acceptance.
+`target/review-2026-11-07-setup-recovery` directory. Root and independent Codex
+review the complete diff and rendered content/structure of nine changed
+Markdown documents. The audit checks 55 Rust files, 25,398 physical lines and
+1,395 comment-only lines with zero width findings and three unchanged fulfilled
+expectations. All 660 relative paths, seven added internal fragments and 221
+exact test references resolve.
+
+### Published checkpoint evidence
+
+The ordinary fast-forward push publishes
+`3a7c87a905fd33ee256c7d4f692c83d054153227`. The staged and committed trees
+match, and the local committed-tip whitespace check passes. Exact
+[push run 42222349329](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42222349329),
+Windows job 127907224195, passes all 20 steps. Root inspects the recorded
+checkout and raw logs for all 257 workspace tests, including all four quickstart
+tests, 14 adapter tests, five sample tests, warnings-denied rustdoc, both
+whitespace steps and the unchanged 222-line host sample.
+
+Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable, Clippy 0.1.99 and runner
+2.338.2 match input. The Windows image advances from `20261030.294.1` to
+`20261103.298.1`. The record revision receives its own document and hosted
+checks. The Cargo inputs match the implementation revision.
