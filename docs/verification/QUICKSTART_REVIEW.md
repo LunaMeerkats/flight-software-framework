@@ -169,3 +169,53 @@ limits remain. No MSRV, API freeze, release or publication readiness is inferred
 Next, assess a consumer needing two independently defined applications or
 ordinary-work output. Select an API/capability improvement only from a concrete
 composition gap; preserve this simple recipe and all prior baseline evidence.
+
+## Borrowed setup recovery follow-up
+
+Date: **2026-11-07** Australia/Sydney.
+
+### Scope and decisions
+
+Input `e100be6e06439e394c665466808f758de96f6eb1` matches refreshed origin.
+Independent Codex inspection confirms the exact
+[input push run](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42033160214)
+passes all 20 steps, 256 workspace tests and the 222-line host sample.
+The locked local input baseline also passes 256 tests.
+
+The RFF-LIB-REQ-001 acceptance supplement and ADR-0026 use the existing ADR-0011
+attachment contract. `corrected_inbox_attachment_retains_the_original_borrowed_output`
+checks the zero-capacity diagnostic and still-registered original application.
+It consumes the typed error, attaches a corrected inbox, starts the original ID,
+and observes 25 in the original borrowed slot only after explicit dispatch.
+The inbox begins and ends empty. The test uses public APIs and the quickstart's
+own application and publication helper. Its change is confined to test code.
+
+Root and independent Codex consumer review accept the source and design,
+including the [guide](../GETTING_STARTED.md#correct-a-rejected-inbox-before-startup),
+the requirement supplement and the source treatment. The existing three
+histories and one-shot driver stay in place. The correction is caller-owned and
+applies to a known pre-start configuration error. It demonstrates neither
+registration recovery nor recovery from a returned callback failure or allocator
+exhaustion.
+
+### Local and independent execution
+
+The local locked commands listed above pass, including 257 workspace tests
+and four focused quickstart tests. Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable
+and Clippy 0.1.98 match input. Rustdoc runs with `RUSTDOCFLAGS=-D warnings`.
+
+Independent package:
+`C:/Users/drrsm/AppData/Local/Temp/rff-consumer-fbce7d89976a456d97bb5ce1a3579808`.
+The same commands under [Independent consumer execution](#independent-consumer-execution)
+pass with this path, including four tests. Metadata confirms one independent
+binary workspace member and a sole direct path dependency on this framework,
+which has no dependencies. The source files match byte for byte:
+
+- Source SHA256 `df308ccbfadf4458624df8ce88528b5abbfd7d7d8c252a2152d411480d74825a`.
+- Source Git blob `b1813f1726f5921b7d8de888baeeb7b50fadf77e`.
+- Both runs match byte for byte and reproduce the guide's seven-line transcript.
+  Stdout SHA256 `b7ed24538cb08493e26aaf9ad196adf0beec8702d53b29bb4ec9b0ed5d388f3d`.
+
+Raw logs and review aids are in the ignored
+`target/review-2026-11-07-setup-recovery` directory. Hosted CI evidence is
+recorded separately from local acceptance.

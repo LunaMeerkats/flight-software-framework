@@ -1,5 +1,15 @@
 # Verification traceability
 
+## Stage 5 borrowed setup recovery — 2026-11-07
+
+The RFF-LIB-REQ-001 acceptance supplement under
+[ADR-0026](../adr/0026-public-api-quickstart.md#borrowed-setup-follow-up)
+applies the existing ADR-0011 attachment contract to a borrowed application.
+
+| Requirement | Consumer evidence | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-001 supplement | `corrected_inbox_attachment_retains_the_original_borrowed_output` checks the typed rejection, preserved ID and lifecycle, explicit corrected attachment, dispatch and original slot observation | [Focused quickstart review](QUICKSTART_REVIEW.md#borrowed-setup-recovery-follow-up) |
+
 ## Stage 5 subscription inspection — 2026-11-06
 
 [ADR-0040](../adr/0040-read-only-subscription-inspection.md) defines read-only

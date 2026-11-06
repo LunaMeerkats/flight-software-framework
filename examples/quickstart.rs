@@ -213,7 +213,10 @@ fn publish(
 
 #[cfg(test)]
 mod tests {
-    use rust_flight_framework::{MessageDispatchError, MessageDispatchOutcome};
+    use rust_flight_framework::{
+        MessageBusCreateError, MessageDispatchError, MessageDispatchOutcome,
+        MessagingRuntimeCreateErrorKind,
+    };
 
     use super::*;
 
@@ -246,6 +249,49 @@ mod tests {
                 ApplicationState::Stopped,
             ]
         );
+    }
+
+    #[test]
+    fn corrected_inbox_attachment_retains_the_original_borrowed_output() {
+        let output = Cell::new(None);
+        let mut runtime = Runtime::new(1).unwrap();
+        let application_id = runtime
+            .register(PercentApplication { output: &output })
+            .unwrap();
+        let invalid = [RuntimeInboxConfig::new(0, &[CommandTopic::SetPercent])];
+        let Err(error) = PercentRuntime::new(runtime, &invalid) else {
+            panic!("zero-capacity inbox was accepted");
+        };
+        assert_eq!(
+            error.kind(),
+            MessagingRuntimeCreateErrorKind::MessageBus(MessageBusCreateError::ZeroInboxCapacity {
+                application_id
+            })
+        );
+        assert_eq!(
+            error.runtime().state(application_id),
+            Ok(ApplicationState::Registered)
+        );
+        assert_eq!(output.get(), None);
+
+        let corrected = [RuntimeInboxConfig::new(1, &[CommandTopic::SetPercent])];
+        let mut owner = PercentRuntime::new(error.into_runtime(), &corrected).unwrap();
+        assert_eq!(owner.pending(application_id), Ok(0));
+        assert_eq!(owner.start(application_id), Ok(ApplicationState::Running));
+        assert_eq!(
+            publish(&mut owner, application_id, 25).unwrap(),
+            Publication {
+                classification: PublishClassification::Complete,
+                status: DeliveryStatus::Delivered,
+            }
+        );
+        assert_eq!(output.get(), None);
+        assert_eq!(
+            owner.dispatch_one(application_id),
+            Ok(MessageDispatchOutcome::Dispatched)
+        );
+        assert_eq!(output.take(), Some(25));
+        assert_eq!(owner.pending(application_id), Ok(0));
     }
 
     #[test]

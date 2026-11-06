@@ -104,20 +104,38 @@ input and clears remaining selected inbox deliveries. Draining the output does
 not recover a failed application; restart is supported from `Stopped`, not
 `Failed`. Panics, hangs and allocator exhaustion are outside this boundary.
 
-The one-shot driver reports an error and tears down on failure. It deliberately
-reduces ownership-preserving registration/attachment errors to their typed cause
-when propagating diagnostics; it does not attempt recovery. A longer-lived host
-can inspect `RuntimeRegistrationError::into_application` or
-`MessagingRuntimeCreateError::into_runtime` to recover those owned values.
-Boxing a wrapper containing an application that borrows host state can impose an
-unwanted `'static` lifetime; preserve or consume the wrapper locally instead.
-
 Use the [development commands](../README.md#development),
 [requirements](REQUIREMENTS.md#stage-5-integration-requirements--revision-1-2026-10-20)
 and [quickstart verification](verification/QUICKSTART_REVIEW.md) for exact
 contracts and evidence. This demonstrates one independently packaged composition,
 not external adoption, general consumer readiness, API stability or release
 readiness. Publication and deployment retain their separate authorization gates.
+
+## Correct a rejected inbox before startup
+
+The one-shot driver maps setup errors to their diagnostic cause and exits.
+To recover during setup, keep the concrete `MessagingRuntimeCreateError` that
+owns the runtime. A return type of `Box<dyn Error>` defaults to a `'static`
+object bound, while this wrapper holds an application that borrows a local
+host slot.
+
+The `corrected_inbox_attachment_retains_the_original_borrowed_output` test in
+the [quickstart source](../examples/quickstart.rs) runs this sequence:
+
+1. Inspect `error.kind()` for `ZeroInboxCapacity` and its application ID.
+   Use `error.runtime()` to inspect the original application's registered state.
+2. Consume the wrapper with `error.into_runtime()` and call
+   `MessagingRuntime::new` once with the corrected configuration. Preserve
+   registration order and keep the original application ID. If the retry
+   fails, its new wrapper carries the runtime back to the caller.
+3. Start the application after attachment succeeds. Publish and check the
+   reported destination against the original ID. Dispatch using that ID, then
+   read the handled value from the original host slot.
+
+This correction applies before any application starts. A runtime that already
+contains a non-registered application is rejected separately. A registration
+error has a different owner boundary: `RuntimeRegistrationError::into_application`
+returns the rejected value, while the caller retains the runtime separately.
 
 For a second controlled recipe, see
 [composing independently implemented applications](COMPOSING_APPLICATIONS.md).

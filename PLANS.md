@@ -1,40 +1,31 @@
-# Read-only subscription inspection
-
-Status: Verified implementation checkpoint, 2026-11-06 Australia/Sydney.
+# Recover borrowed quickstart setup
 
 ## Objective and acceptance
 
-Detect valid but misordered inbox configurations before command-session startup.
-Add one read-only membership query to the existing messaging owners under
-RFF-LIB-REQ-015 and [ADR-0040](docs/adr/0040-read-only-subscription-inspection.md).
-Use the query at startup and verify a swapped configuration before any callback
-runs. Preserve the original transcript, callbacks, routing and ownership APIs.
+Verify the ownership-preserving attachment error in a downstream host whose
+application borrows a local output slot. A rejected zero-capacity inbox must
+report the original application ID and return its still-registered runtime.
+Attach a corrected inbox, start and dispatch using that same ID, and observe
+the handled command in the original slot. Preserve the executable transcript.
+
+The getting-started guide explains how to inspect the typed cause and consume
+the wrapper before retrying setup. Keep the policy local to the caller under
+[ADR-0011](docs/adr/0011-runtime-owned-message-availability.md) and
+[ADR-0026](docs/adr/0026-public-api-quickstart.md). The quickstart's normal
+one-shot driver continues to propagate its diagnostic and exit.
 
 ## Verification and stopping point
 
-Input `ee1a8ed6cd6dacefc43835caf14d9d013dd5111b` matches fetched `origin/main`.
-The local locked baseline passes on Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and
-Clippy 0.1.98. Exact input hosted run 41856418810 independently passes all
-20 steps, 253 workspace tests and the 222-line sample comparison.
+Input `e100be6e06439e394c665466808f758de96f6eb1` matches fetched origin.
+The locked local baseline passes 256 tests. Independent Codex inspection of
+input hosted run 42033160214 confirms all 20 steps and the 222-line sample.
 
-Run focused owner/session tests and the example. Verify the independent binary,
-including source bytes, metadata and output. Run the locked baseline, inspect
-source form and rendered Markdown, and review the complete diff. Commit on
-`main`, push by fast-forward and check hosted CI for the exact revision.
+Run the focused example and full locked baseline, and build, lint, test and
+run its exact source in an independent Cargo binary. Compare bytes and stdout,
+inspect Cargo metadata, and review source, Markdown and the complete diff.
+Record the results, publish the reviewed increment on `main`, and inspect
+hosted CI for that revision.
 
-Membership is a topology check. The host still pairs IDs with the owner that
-issued them and supplies the expected routes. Stop at this query and consumer
-check. If verification fails, preserve the useful evidence and withdraw only
-this run's unfinished changes.
-
-## Local result
-
-All 256 locked workspace tests and warnings-denied rustdoc pass. The independent
-binary passes 11 tests with the same source and output. Root and independent
-Codex accept source. The
-[focused record](docs/verification/COMMAND_SESSION_REVIEW.md#subscription-inspection-follow-up)
-contains exact local commands, independent evidence and the hosted checkpoint.
-
-Implementation `97296afda530bd721c4421bd2aa97d35f6be7ce3` passes exact
-hosted run 42032781940 with all 20 steps. The documentation revision receives
-its own hosted inspection. Stop at this verified increment.
+Stop after one corrected pre-start attachment. This experiment covers a known
+configuration error with an explicit correction. If verification fails,
+preserve the evidence and withdraw only this run's incomplete changes.

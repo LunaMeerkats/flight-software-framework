@@ -5,7 +5,13 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 ## Stage 5 — Practical library use and continued development
 
-Status: **Active; subscription inspection and command-session preflight**
+Status: **Active**
+
+The RFF-LIB-REQ-001 [borrowed setup follow-up](verification/QUICKSTART_REVIEW.md#borrowed-setup-recovery-follow-up)
+exercises a corrected attachment using the existing typed error. The
+[getting-started guide](GETTING_STARTED.md#correct-a-rejected-inbox-before-startup)
+shows how to retain the original runtime, application ID and borrowed host
+slot. This provides a consumer recovery path before startup under ADR-0011.
 
 RFF-LIB-REQ-015 and [ADR-0040](adr/0040-read-only-subscription-inspection.md)
 add read-only membership queries so a host can check required routes without

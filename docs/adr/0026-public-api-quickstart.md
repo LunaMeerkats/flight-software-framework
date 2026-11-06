@@ -37,6 +37,22 @@ registration/attachment errors remain available to integrating callers for
 explicit recovery. Explain this choice and the borrowing/lifetime implications
 without adding framework recovery policy.
 
+## Borrowed setup follow-up
+
+Keep the one-shot driver and verify a separate caller-controlled attachment
+retry in the same quickstart target. It retains the typed wrapper locally,
+consumes it to recover the still-registered runtime, and retries once with
+corrected input. The existing wrapper carries the borrow to the host's original
+output slot. See SRC-RUST-BORROWED-SETUP in the
+[source register](../research/SOURCES.md).
+
+Reconstructing the runtime would require re-registering the application and
+would bypass the ownership contract being demonstrated. Making retry automatic
+would move error classification and configuration repair into the example
+driver. A focused test and guide let the host choose a correction explicitly
+and preserve the existing driver contract. Registration recovery and recovery
+after a callback failure have separate ownership and lifecycle rules.
+
 ## Alternatives
 
 - A permanent consumer crate gives a separate Cargo boundary but adds manifest,

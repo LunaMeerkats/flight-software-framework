@@ -203,6 +203,13 @@ stop/restart. The workspace baseline shall execute its regression tests. Review
 shall distinguish this controlled composition from external adoption, API
 stability, flight suitability, and release or publication readiness.
 
+Borrowed setup acceptance supplement (2026-11-07). The quickstart shall document
+and test how a caller recovers a still-registered runtime from a rejected inbox
+attachment. The test shall check the typed rejection for the original ID, then
+attach a corrected inbox and observe a dispatched command in the same borrowed
+host slot using that ID. Run the same test in the independent package and retain
+the original runnable scenario and transcript.
+
 ### RFF-LIB-REQ-002 — Independently implemented application composition
 
 Revision 1 (2026-10-21). A documented public-API consumer shall compose two

@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-BORROWED-SETUP — Retain typed setup errors
+
+- Titles: Lifetime elision, The Rust Reference. Result::map_err, Rust standard
+  library.
+- Organisation: The Rust Project.
+- Sources: <https://doc.rust-lang.org/reference/lifetime-elision.html#default-trait-object-lifetimes>
+  and <https://doc.rust-lang.org/std/result/enum.Result.html#method.map_err>.
+- Version: std 1.99.1 (58cf8f9c3, 2026-10-13), accessed 2026-11-06
+  Australia/Sydney. Local execution uses 1.98.0.
+- Informed: a boxed trait object with no inferred bound defaults to `'static`
+  in a return type. Mapping an error transforms the owned error value.
+- Local treatment: preserve the concrete attachment error until the host has
+  chosen whether to recover the runtime. The one-shot quickstart maps it to a
+  diagnostic cause, and a separate test consumes the wrapper after inspecting
+  the cause. The framework's attachment behavior is defined by ADR-0011.
+
 ## SRC-RUST-SUBSCRIPTION-INSPECTION — Typed membership query
 
 - Titles: Slice membership, Rust standard library; Result, Rust standard library
