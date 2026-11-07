@@ -35,5 +35,8 @@ incomplete changes.
 Local verification passes 258 workspace tests. The workspace and identical
 independent binary each pass 12 focused tests and preserve the 24-line
 transcript. Root and independent Codex source and document reviews pass.
+Implementation `7918362f6a8da0701eaa1b0b0fcac431ee0f3a13` passes all 20
+steps of exact hosted run 42375736424. The record revision receives its own
+hosted inspection.
 See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#retained-command-result-follow-up)
 for exact checks and publication evidence.

@@ -18,6 +18,9 @@ baseline. Package 0.0.0 remains unpublished with provisional APIs.
 - The locked local baseline passes 258 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace and identical
   independent command session each pass 12 tests and emit the same 24 lines.
+- Implementation `7918362f6a8da0701eaa1b0b0fcac431ee0f3a13` passes all 20
+  steps of exact hosted run 42375736424, with 258 workspace tests and the
+  unchanged 222-line host sample.
 
 ## Current architecture
 
@@ -31,8 +34,9 @@ retry its suffix while the existing slot gates producer dispatch.
 
 ## Work in progress
 
-The retained command-result checkpoint has passed local and independent
-verification. Exact hosted results are recorded separately from local evidence.
+The retained command-result checkpoint is complete. The implementation has
+local, independent and exact hosted evidence. The record revision receives
+separate hosted inspection.
 
 ## Highest risks and uncertainties
 

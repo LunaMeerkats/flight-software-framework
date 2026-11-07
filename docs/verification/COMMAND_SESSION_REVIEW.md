@@ -327,3 +327,19 @@ comment-only lines, with zero width findings and three unchanged Clippy
 expectations. All 222 traceability test references and 668 relative Markdown
 links resolve. The nine changed documents pass rendered text and structure
 review.
+
+### Hosted implementation acceptance
+
+The reviewed implementation `7918362f6a8da0701eaa1b0b0fcac431ee0f3a13`
+was fast-forward pushed to `main`. The committed tree matches the reviewed
+stage and its example bytes match the independent binary source.
+[Exact hosted run 42375736424](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42375736424),
+job 128412806896, passes all 20 steps, with 258 workspace tests including all
+12 command-session tests, 14 focused adapter tests, five focused sample
+tests, warnings-denied rustdoc and both whitespace checks. The 222-line
+host sample matches the input run. Hosted Rust/Cargo 1.99.1, rustfmt
+1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2, image
+`windows-2025-vs2026` version `20261103.298.1`.
+
+Codex accepts this bounded host-consumer checkpoint. This record revision
+receives its own exact hosted inspection, tracked in the nightly run record.
