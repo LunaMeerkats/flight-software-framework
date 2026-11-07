@@ -253,3 +253,77 @@ Root Codex and independent Codex review accept this bounded checkpoint. The
 implementation fixes pre-start detection of the demonstrated missing routes.
 The follow-up record changes only documentation. Its own exact hosted result
 is tracked separately in the automation run record.
+
+## Retained command result follow-up
+
+2026-11-08. Codex reviewed RFF-LIB-REQ-014 revision 2 under
+[ADR-0039](../adr/0039-runnable-command-session.md#retained-command-result-follow-up).
+The original take-before-write could lose the only host record after a
+partially accepted diagnostic. The selected serial host policy keeps the typed
+record in its existing slot, with one fixed 128-byte line and one byte offset.
+Holding the scoped writer across explicit turns lets the host resume from the
+accepted prefix without resubmitting the command. The fixed driver exits on an
+error. Writer acceptance, flush and physical or durable delivery are separate.
+
+Input `fb2d728954980e042b7ca1d6af4278ed3b958767` matches local, fetched and live
+origin. Codex independently inspected [hosted run 42222654426](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42222654426),
+job 127908227152. All 20 steps passed, with 257 workspace, 14 adapter and five
+sample tests and the unchanged 222-line combined host sample. The locked local
+input baseline also passed.
+
+### Local and downstream evidence
+
+All commands passed on Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
+
+```text
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo doc --locked --workspace --all-features --no-deps
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+git diff --check
+```
+
+Rustdoc used `RUSTDOCFLAGS=-D warnings`. The workspace passes 258 tests and the
+example passes 12. The new history
+`result_write_retry_preserves_the_slot_and_resumes_at_the_accepted_prefix`
+checks positive short progress, WouldBlock, WriteZero, InvalidData and an exact
+suffix. The queued command stays behind the occupied slot, then dispatches
+once. A further turn on the completed presenter leaves the new result intact.
+
+The independent binary is at
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-05c2e129e6b84459abd63f589fa6afbb`.
+`$consumer` below denotes that path and `$framework` denotes the checkout path.
+
+```powershell
+cargo new --bin --edition 2024 --vcs none $consumer
+cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
+Copy-Item -LiteralPath "$framework/examples/command_session.rs" -Destination "$consumer/src/main.rs"
+cargo check --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets
+cargo clippy --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets -- -D warnings
+cargo test --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo run --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo metadata --manifest-path "$consumer/Cargo.toml" --locked --offline --format-version 1
+Get-FileHash -Algorithm SHA256 "$framework/examples/command_session.rs", "$consumer/src/main.rs"
+```
+
+The independent binary passes 12 tests. Metadata shows one independent
+workspace member, one binary, the sole local framework dependency and zero
+framework dependencies. Source files match byte for byte with SHA256
+`708aba56d8945633a0a53c51a704dcc1f6a09564bd948a501dea509beaaaeb47`
+and Git blob `92e9225c30db5ffc3cc42ea45810d68307b91ad5`.
+The input, workspace and independent stdout match byte for byte at 24 lines,
+1,469 bytes, SHA256
+`051de58c94bccc798114af77fc2c935c5f501d24edcef28a2ee580281cea2787`.
+Raw local evidence is in ignored `target/review-2026-11-08-command-result-output`.
+
+### Source and document acceptance
+
+Root and independent Codex accepted the full source and documentation diff.
+The whole-tree audit covered 55 Rust files, 25,526 physical lines and 1,398
+comment-only lines, with zero width findings and three unchanged Clippy
+expectations. All 222 traceability test references and 668 relative Markdown
+links resolve. The nine changed documents pass rendered text and structure
+review.

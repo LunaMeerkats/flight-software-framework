@@ -196,6 +196,14 @@ code. Any future source reuse must record provenance and licence obligations.
   labels and the line format. Fixed rendering may make multiple in-memory
   writes; it does not make extra sink calls. No source implementation is copied,
   dependency added or physical/durable delivery established.
+- Rechecked the official `Write` and `Cursor` documentation at std 1.99.1
+  (58cf8f9c3, 2026-10-13) on 2026-11-08 Australia/Sydney. The command session
+  adopts the same accepted-byte rule for a scoped writer over an existing
+  result slot. Keeping the slot occupied until full acceptance preserves
+  producer backpressure. A whole-line retry after `write_all` can repeat a
+  prefix accepted by earlier writes. The command-session policy uses only the
+  standard library and public framework APIs. See the
+  [command-session follow-up](../adr/0039-runnable-command-session.md#retained-command-result-follow-up).
 
 ## SRC-RUST-EVENT-FILTERING — Explicit admission and unchanged FIFO storage
 

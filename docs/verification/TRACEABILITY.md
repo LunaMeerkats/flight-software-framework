@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 retained command result — 2026-11-08
+
+[ADR-0039](../adr/0039-runnable-command-session.md#retained-command-result-follow-up)
+applies a bounded accepted-byte cursor at the command-session result boundary.
+
+| Requirement | Consumer evidence | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 2 | `result_write_retry_preserves_the_slot_and_resumes_at_the_accepted_prefix` verifies short writes, typed errors, exact suffix acceptance and producer dispatch gating. The existing transcript test and independent binary compare output. | [Focused command-session review](COMMAND_SESSION_REVIEW.md#retained-command-result-follow-up) |
+
 ## Stage 5 borrowed setup recovery — 2026-11-07
 
 The RFF-LIB-REQ-001 acceptance supplement under

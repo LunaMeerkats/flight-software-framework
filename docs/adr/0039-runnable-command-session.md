@@ -71,3 +71,37 @@ No persistence, duplicate suppression, concurrency or public API freeze follows.
 Revisit extraction for demonstrated shared production responsibility, or library
 APIs when an independently authored consumer cannot compose the required use.
 Separate release, platform, security and other consequential gates remain.
+
+## Retained command result follow-up
+
+Decision recorded on 2026-11-08.
+
+The original driver took its result before writing it. A short write followed
+by an error could leave an accepted prefix and no host result to resume. The
+typed record matters to the host because rerunning a command may repeat its
+effects. RFF-LIB-REQ-014 revision 2 adds a narrow output policy for command
+results.
+
+Use one scoped `ResultOutput` over the existing result slot and one writer.
+Render the complete line once into a 128-byte buffer. Each explicit turn attempts
+one write of its unwritten suffix. Keep the record and accepted-byte offset
+across short writes and errors, and clear the slot only after the entire line
+is accepted. The existing occupied-result gate keeps queued commands in place
+while output is pending. The finite script lends the writer to this output,
+advances after positive short writes and exits on error. A caller retaining the
+output can choose a later retry on the same writer.
+
+The original one-shot take and write is simpler for incidental diagnostics.
+Keeping the result and retrying a whole `write_all` could duplicate the bytes
+accepted before an error. Moving the result into a separate output slot would
+permit another producer result to accumulate and change the current gate. A
+shared sink service would add a library boundary for one host policy. The scoped
+line applies the accepted-byte approach demonstrated by [ADR-0032](0032-bounded-host-event-presentation.md)
+while leaving the typed result in its existing slot.
+
+The standard writer contract is recorded in `SRC-RUST-EVENT-OUTPUT` in the
+[source register](../research/SOURCES.md). Focused verification exercises short
+progress, a returned writer error, zero progress, an invalid count, suffix
+acceptance and queued producer dispatch. Writer acceptance, flush and physical
+or durable delivery are separate effects. Subscriber output and other
+diagnostics retain their one-shot policy.

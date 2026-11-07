@@ -495,6 +495,22 @@ boundaries, explicit host policy and independent verification. This demonstrates
 one controlled composition, not a new library service, protocol, acknowledgement
 transport, persistence or delivery guarantee.
 
+Revision 2 supplement (2026-11-08). The host shall retain the typed command
+result in its existing slot until a single writer accepts the complete bounded
+diagnostic line. One result write turn shall attempt at most one write. Short
+writes shall advance only the accepted prefix. An I/O error or invalid progress
+shall preserve the record and its retry position. The producer gate shall stay
+occupied until full acceptance, then permit the next queued command to dispatch.
+The host shall resume with the same presenter and writer without resubmitting
+the command. Subscriber output and other script diagnostics retain their
+one-shot policy.
+
+Acceptance: inject a short write, a writer error, zero progress and an
+overreported byte count before a successful suffix write. Verify exact
+accepted bytes, the retained result and queued command, and dispatch after
+acceptance. Preserve the existing successful transcript and verify the
+identical independent binary. Writer acceptance is a local observation.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured

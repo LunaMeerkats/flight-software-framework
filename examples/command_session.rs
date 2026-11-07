@@ -10,7 +10,7 @@ use std::cell::Cell;
 use std::convert::Infallible;
 use std::error::Error;
 use std::fmt;
-use std::io::{self, Write};
+use std::io::{self, Cursor, Write};
 use std::num::NonZeroU8;
 
 use rust_flight_framework::{
@@ -19,6 +19,8 @@ use rust_flight_framework::{
     MessagingApplication, MessagingOperationError, MessagingRuntime, PublishToError, Runtime,
     RuntimeInboxConfig,
 };
+
+const RESULT_LINE_CAPACITY: usize = 128;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct OperationId(NonZeroU8);
@@ -166,6 +168,21 @@ struct CommandResult {
 struct HostSlots {
     result: Cell<Option<CommandResult>>,
     outputs: [Cell<Option<Reply>>; 2],
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum ResultWrite {
+    Pending,
+    Accepted,
+}
+
+// The occupied result slot gates producer dispatch until this line completes.
+// A serial host keeps one presenter and its writer for the duration of a line.
+struct ResultOutput<'a, W> {
+    slot: &'a Cell<Option<CommandResult>>,
+    writer: W,
+    line: Cursor<[u8; RESULT_LINE_CAPACITY]>,
+    written: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -396,6 +413,44 @@ impl<'a> Session<'a> {
     }
 }
 
+impl<'a, W: Write> ResultOutput<'a, W> {
+    fn new(slot: &'a Cell<Option<CommandResult>>, writer: W) -> io::Result<Self> {
+        let result = slot
+            .get()
+            .ok_or_else(|| io::Error::other("missing command result"))?;
+        let mut line = Cursor::new([0; RESULT_LINE_CAPACITY]);
+        writeln!(line, "result: {result:?}")?;
+        Ok(Self {
+            slot,
+            writer,
+            line,
+            written: 0,
+        })
+    }
+
+    fn write_turn(&mut self) -> io::Result<ResultWrite> {
+        let length = self.line.position() as usize;
+        if self.written == length {
+            return Ok(ResultWrite::Accepted);
+        }
+        let remainder = &self.line.get_ref()[self.written..length];
+        let accepted = self.writer.write(remainder)?;
+        if accepted == 0 {
+            return Err(io::ErrorKind::WriteZero.into());
+        }
+        if accepted > remainder.len() {
+            return Err(io::ErrorKind::InvalidData.into());
+        }
+        self.written += accepted;
+        if self.written < length {
+            return Ok(ResultWrite::Pending);
+        }
+
+        self.slot.set(None);
+        Ok(ResultWrite::Accepted)
+    }
+}
+
 fn start_session(
     owner: &mut Owner<'_>,
     producer: ApplicationId,
@@ -486,11 +541,9 @@ fn admit(
 }
 
 fn observe_result(slots: &HostSlots, output: &mut impl Write) -> Result<(), Box<dyn Error>> {
-    let result = slots
-        .result
-        .take()
-        .ok_or_else(|| io::Error::other("missing command result"))?;
-    writeln!(output, "result: {result:?}")?;
+    let mut result = ResultOutput::new(&slots.result, output)?;
+    // Each pending turn accepts at least one byte of the fixed-size line.
+    while result.write_turn()? == ResultWrite::Pending {}
     Ok(())
 }
 
@@ -512,6 +565,36 @@ mod tests {
     use rust_flight_framework::ApplicationState;
 
     use super::*;
+
+    const FIRST_RESULT_LINE: &str = concat!(
+        "result: CommandResult { command: New { id: OperationId(1), value: 3 }, ",
+        "effect: ReplyAccepted([true, true]) }"
+    );
+
+    #[derive(Default)]
+    struct ScriptedResultWriter {
+        calls: usize,
+        accepted: Vec<u8>,
+    }
+
+    impl Write for ScriptedResultWriter {
+        fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+            self.calls += 1;
+            let count = match self.calls {
+                1 => 7,
+                2 => return Err(io::ErrorKind::WouldBlock.into()),
+                3 => return Ok(0),
+                4 => return Ok(bytes.len() + 1),
+                _ => bytes.len(),
+            };
+            self.accepted.extend_from_slice(&bytes[..count]);
+            Ok(count)
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
 
     fn id(command: Command) -> OperationId {
         let Command::New { id, .. } = command else {
@@ -545,6 +628,54 @@ mod tests {
         run_session(&mut output).unwrap();
         let actual = String::from_utf8(output).unwrap();
         assert_eq!(actual.lines().collect::<Vec<_>>(), expected_transcript());
+    }
+
+    #[test]
+    fn result_write_retry_preserves_the_slot_and_resumes_at_the_accepted_prefix() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let first = session.new_command(3).unwrap();
+        let queued = Command::Retry(id(first));
+        assert_eq!(session.enqueue(first), Ok(DeliveryStatus::Delivered));
+        let dispatched = HostTurn::Dispatch(MessageDispatchOutcome::Dispatched);
+        assert_eq!(session.producer_turn(), Ok(dispatched));
+        let first_result = CommandResult {
+            command: first,
+            effect: CommandEffect::ReplyAccepted([true, true]),
+        };
+        assert_eq!(slots.result.get(), Some(first_result));
+        assert_eq!(session.enqueue(queued), Ok(DeliveryStatus::Delivered));
+
+        let mut output = ResultOutput::new(&slots.result, ScriptedResultWriter::default()).unwrap();
+        assert_eq!(output.write_turn().unwrap(), ResultWrite::Pending);
+        assert_eq!(session.producer_turn(), Ok(HostTurn::SlotOccupied));
+        for kind in [
+            io::ErrorKind::WouldBlock,
+            io::ErrorKind::WriteZero,
+            io::ErrorKind::InvalidData,
+        ] {
+            assert_eq!(output.write_turn().unwrap_err().kind(), kind);
+            assert_eq!(output.writer.accepted, b"result:");
+            assert_eq!(slots.result.get(), Some(first_result));
+            assert_eq!(session.producer_turn(), Ok(HostTurn::SlotOccupied));
+            assert_eq!(session.owner.pending(session.producer), Ok(1));
+        }
+
+        assert_eq!(output.write_turn().unwrap(), ResultWrite::Accepted);
+        assert_eq!(
+            output.writer.accepted,
+            format!("{FIRST_RESULT_LINE}\n").as_bytes()
+        );
+        assert_eq!(slots.result.get(), None);
+        assert_eq!(session.producer_turn(), Ok(dispatched));
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
+        let queued_result = CommandResult {
+            command: queued,
+            effect: CommandEffect::NoMatch,
+        };
+        assert_eq!(output.write_turn().unwrap(), ResultWrite::Accepted);
+        assert_eq!(output.writer.calls, 5);
+        assert_eq!(slots.result.get(), Some(queued_result));
     }
 
     #[test]
@@ -601,10 +732,7 @@ mod tests {
             "No NASA affiliation, demonstrated TRL, operational suitability or compatibility.",
             "ingress New { id: OperationId(1), value: 3 }: Delivered",
             "producer turn: Dispatch(Dispatched)",
-            concat!(
-                "result: CommandResult { command: New { id: OperationId(1), value: 3 }, ",
-                "effect: ReplyAccepted([true, true]) }"
-            ),
+            FIRST_RESULT_LINE,
             "subscriber 0: Reply { id: OperationId(1), value: 3 }",
             "ingress New { id: OperationId(2), value: 40 }: Delivered",
             "producer turn: Dispatch(Dispatched)",

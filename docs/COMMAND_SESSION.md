@@ -31,10 +31,10 @@ later be cleared by lifecycle operations.
 
 The producer records the exact handled command in one capacity-one result slot.
 A producer turn checks that slot before dispatching at most one command. The host
-explicitly takes each result, decides its policy and chooses another turn. An
-occupied result preserves both the older record and queued command FIFO. Ingress
-full/unavailable outcomes do not transfer responsibility for resubmitting a
-rejected host request. Enqueue acceptance alone does not establish execution.
+explicitly drains each result and chooses another turn. An occupied result
+preserves both the older record and queued command FIFO, including while the
+host writes the result line. Ingress full/unavailable outcomes leave resubmission
+with the host. Enqueue acceptance alone does not establish execution.
 
 Each subscriber has its own capacity-one output slot. A selected subscriber turn
 checks that slot before dispatching at most one reply. The host takes output
@@ -55,31 +55,52 @@ turn reports Busy(operation 2) for that saved request.
 The host drains operation 2 from the first subscriber and the older operation 1
 from the second. Retry(2) then completes acceptance without duplicating the first
 subscriber's reply. After draining the second, the host resubmits its same saved
-New operation 3 and observes both outputs. The script is finite; every callback
-selection and result/output take appears in host code. Tests separately cover
+New operation 3 and observes both outputs. Every callback selection and drain
+appears in the finite host script. Tests separately cover
 correlated cancellation, saturation and restart behavior.
+
+## Write a command result
+
+The host opens a `ResultOutput` over the existing result slot and its writer.
+It renders one complete line into a fixed 128-byte buffer before the first
+write. If rendering fails, the original result stays in the slot and the
+writer receives no bytes. Each `write_turn` attempts one write of the remaining
+suffix. A positive short write advances the byte offset and reports `Pending`.
+A writer error returns its original `io::Error`. Zero progress returns
+`WriteZero`, and an impossible count beyond the supplied suffix returns
+`InvalidData`. Each write error leaves the record and byte offset available
+for another turn.
+
+Full acceptance clears the result slot and reports `Accepted`. Another turn on
+that completed output leaves any later result alone. The serial host uses one
+presenter per result slot and keeps its writer across turns. The script lends
+it the sole mutable writer borrow until the line completes. A recovering host
+keeps that same presenter alive and chooses when to retry. The fixed script
+advances on short writes and exits on a writer error. Its other diagnostics and
+subscriber lines use one-shot writes.
+Acceptance describes the bytes reported by the writer. Flush, physical delivery,
+durability and process recovery have separate boundaries.
 
 ## Resource and failure policy
 
-Storage is finite: three applications, one command inbox of capacity two, two
+The session has three applications, one command inbox of capacity two, two
 reply inboxes of capacity one, a three-byte maximum message payload, one pending
-reply with two acceptance flags, one local result, two local outputs and one
-issuer for IDs 1..=255. Setup uses the framework's finite-capacity constructors.
-The host owns HostSlots; applications borrow its Cell slots, with no shared-slot
-heap allocation or reference counting needed for this scoped session. No
-background runner, growing command history or automatic retry is present. Logical storage limits do not establish
-process-memory limits, callback timing, fairness or eventual progress.
+reply with two acceptance flags, one local result, two local outputs, one
+issuer for IDs 1..=255 and one fixed rendered result line with an accepted-byte
+offset. Setup uses the framework's finite-capacity constructors.
+The host owns `HostSlots` and applications borrow its `Cell` slots directly.
+The host selects every callback and retains only the current command result.
+Logical storage limits do not establish process-memory limits, callback timing,
+fairness or eventual progress.
 
 Malformed ingress is rejected before queue mutation. A malformed message inserted
 through a lower-level bypass can still fail its callback: the selected producer
 becomes terminal Failed, remaining queued commands are cleared, no fresh success
 result is invented and peer effects remain independent. Bypassing an occupied
 slot gate is a composition error and returns an explicit callback failure.
-Ordinary dispatch error wrappers retain selected-inbox discard counts.
-The host takes a result/output before writing its diagnostic. A writer error
-returns from the finite driver; it does not restore that taken slot or retain
-partially written bytes. Use a separately verified retained-writer policy when
-that continuity is required; this example makes no output-retry promise. Stop and
+Ordinary dispatch error wrappers retain selected-inbox discard counts. The host
+takes a subscriber output before writing its diagnostic. A writer error in that
+path exits the finite driver and leaves that subscriber slot drained. Stop and
 restart retain the same producer value, pending operation, local result and host
 issuer, while successful stop clears undispatched selected commands.
 
