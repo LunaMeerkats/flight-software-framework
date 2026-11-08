@@ -343,3 +343,79 @@ host sample matches the input run. Hosted Rust/Cargo 1.99.1, rustfmt
 
 Codex accepts this bounded host-consumer checkpoint. This record revision
 receives its own exact hosted inspection, tracked in the nightly run record.
+
+## Retained subscriber output follow-up
+
+2026-11-09. [ADR-0039](../adr/0039-runnable-command-session.md#retained-subscriber-output-follow-up)
+and RFF-LIB-REQ-014 revision 3 extend the existing result presenter to each
+subscriber's typed slot. One active 128-byte line holds the mutable writer
+borrow across turns. The peer can stage output independently. Finishing the
+active line clears only its slot and allows the next selected delivery to run.
+
+### Input and local verification
+
+Input `785c6610260c05c66b3c52207487084eb085a715` matches refreshed origin.
+The locked local baseline passes. Independent Codex inspected
+[hosted run 42375973171](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42375973171),
+job 128413499054, with 20 successful steps, 258 workspace tests, 14 adapter
+tests, five sample tests and the 222-line combined host sample.
+
+The following checks use Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
+0.1.98. Rustdoc uses `RUSTDOCFLAGS=-D warnings`.
+
+```text
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo doc --locked --workspace --all-features --no-deps
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+git diff --check
+```
+
+The new `subscriber_write_retry_preserves_independent_gates_and_line_order`
+history exercises short progress, WouldBlock, zero progress and an invalid
+count. It observes peer callback staging during the interrupted line, a
+second reply queued behind the selected gate, and exact suffix acceptance.
+It then verifies release of the selected gate, retention of the peer's older
+output, and two ordered lines on one writer. The earlier result retry and
+transcript tests still pass. The initial draft exceeded the 60-line Clippy
+limit. Removing redundant assertions restores the warnings-denied check
+without a new expectation.
+
+### Independent consumer
+
+The independent package is
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-6ab469a585a1467cbc25911996a1b058`.
+The following commands from the [guide](../COMMAND_SESSION.md#verify-the-identical-independent-binary)
+pass with `$consumer` set to that package and `$framework` to the checkout.
+
+```powershell
+cargo new --bin --edition 2024 --vcs none $consumer
+cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
+Copy-Item -LiteralPath "$framework/examples/command_session.rs" -Destination "$consumer/src/main.rs"
+cargo check --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets
+cargo clippy --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets -- -D warnings
+cargo test --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo run --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo metadata --manifest-path "$consumer/Cargo.toml" --locked --offline --format-version 1
+Get-FileHash -Algorithm SHA256 "$framework/examples/command_session.rs", "$consumer/src/main.rs"
+```
+
+Metadata shows one independent workspace member, one binary, the sole local
+framework dependency and zero framework dependencies. Both example test runs
+pass 13 tests. Source files match byte for byte with SHA256
+`38ac2009d8f98114e6b026f4ffb679ad251a2b65fc3c619995b1fffce70117e6`
+and Git blob `b72e045daddba8f401daad2ba89100236da98e08`.
+Input, workspace and independent stdout match byte for byte at 24 lines,
+1,469 bytes, SHA256
+`051de58c94bccc798114af77fc2c935c5f501d24edcef28a2ee580281cea2787`.
+Raw logs are under ignored `target/review-2026-11-09-subscriber-output`.
+
+### Scope
+
+The fixed script exits on writer error. Recovery requires keeping the same
+live presenter and writer. A pending line delays further writes through that
+writer object while peer staging remains bounded. Writer acceptance measures
+local progress, independently of flush and external delivery.

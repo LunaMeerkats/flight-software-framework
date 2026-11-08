@@ -7,12 +7,12 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
-The RFF-LIB-REQ-014 revision 2
-[command-result follow-up](verification/COMMAND_SESSION_REVIEW.md#retained-command-result-follow-up)
-uses a bounded writer turn to finish a result line across short writes and
-returned errors. The existing occupied slot keeps later commands queued until
-the writer accepts the complete line. The fixed script keeps its one-shot error
-policy. The guide separates writer acceptance from other delivery effects.
+RFF-LIB-REQ-014 revisions 2 and 3 keep command results and subscriber replies
+in their existing slots across short writes and returned writer errors.
+One active line borrows the writer until completion while peer callbacks can
+stage output. The [subscriber follow-up](verification/COMMAND_SESSION_REVIEW.md#retained-subscriber-output-follow-up)
+records independent gate release and exact line ordering. The fixed script
+exits on writer error. The guide separates acceptance from delivery effects.
 
 The RFF-LIB-REQ-001 [borrowed setup follow-up](verification/QUICKSTART_REVIEW.md#borrowed-setup-recovery-follow-up)
 exercises a corrected attachment using the existing typed error. The

@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 retained subscriber output — 2026-11-09
+
+[ADR-0039](../adr/0039-runnable-command-session.md#retained-subscriber-output-follow-up)
+extends the existing cursor to each subscriber slot on the same host writer.
+
+| Requirement | Consumer evidence | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 3 | `subscriber_write_retry_preserves_independent_gates_and_line_order` verifies short writes and errors, peer staging, queued selected delivery, exact suffix, isolated slot release and ordered bytes on the same writer. The existing result and transcript tests still pass in the identical independent binary. | [Focused command-session review](COMMAND_SESSION_REVIEW.md#retained-subscriber-output-follow-up) |
+
 ## Stage 5 retained command result — 2026-11-08
 
 [ADR-0039](../adr/0039-runnable-command-session.md#retained-command-result-follow-up)

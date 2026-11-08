@@ -20,7 +20,7 @@ use rust_flight_framework::{
     RuntimeInboxConfig,
 };
 
-const RESULT_LINE_CAPACITY: usize = 128;
+const OUTPUT_LINE_CAPACITY: usize = 128;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct OperationId(NonZeroU8);
@@ -171,17 +171,16 @@ struct HostSlots {
 }
 
 #[derive(Debug, Eq, PartialEq)]
-enum ResultWrite {
+enum LineWrite {
     Pending,
     Accepted,
 }
 
-// The occupied result slot gates producer dispatch until this line completes.
-// A serial host keeps one presenter and its writer for the duration of a line.
-struct ResultOutput<'a, W> {
-    slot: &'a Cell<Option<CommandResult>>,
-    writer: W,
-    line: Cursor<[u8; RESULT_LINE_CAPACITY]>,
+// Keep the selected slot occupied and the writer exclusive until completion.
+struct SlotOutput<'a, T, W> {
+    slot: &'a Cell<Option<T>>,
+    writer: &'a mut W,
+    line: Cursor<[u8; OUTPUT_LINE_CAPACITY]>,
     written: usize,
 }
 
@@ -413,13 +412,17 @@ impl<'a> Session<'a> {
     }
 }
 
-impl<'a, W: Write> ResultOutput<'a, W> {
-    fn new(slot: &'a Cell<Option<CommandResult>>, writer: W) -> io::Result<Self> {
-        let result = slot
+impl<'a, T: Copy + fmt::Debug, W: Write> SlotOutput<'a, T, W> {
+    fn new(
+        slot: &'a Cell<Option<T>>,
+        writer: &'a mut W,
+        label: impl fmt::Display,
+    ) -> io::Result<Self> {
+        let record = slot
             .get()
-            .ok_or_else(|| io::Error::other("missing command result"))?;
-        let mut line = Cursor::new([0; RESULT_LINE_CAPACITY]);
-        writeln!(line, "result: {result:?}")?;
+            .ok_or_else(|| io::Error::other(format!("missing {label} output")))?;
+        let mut line = Cursor::new([0; OUTPUT_LINE_CAPACITY]);
+        writeln!(line, "{label}: {record:?}")?;
         Ok(Self {
             slot,
             writer,
@@ -428,10 +431,10 @@ impl<'a, W: Write> ResultOutput<'a, W> {
         })
     }
 
-    fn write_turn(&mut self) -> io::Result<ResultWrite> {
+    fn write_turn(&mut self) -> io::Result<LineWrite> {
         let length = self.line.position() as usize;
         if self.written == length {
-            return Ok(ResultWrite::Accepted);
+            return Ok(LineWrite::Accepted);
         }
         let remainder = &self.line.get_ref()[self.written..length];
         let accepted = self.writer.write(remainder)?;
@@ -443,11 +446,17 @@ impl<'a, W: Write> ResultOutput<'a, W> {
         }
         self.written += accepted;
         if self.written < length {
-            return Ok(ResultWrite::Pending);
+            return Ok(LineWrite::Pending);
         }
 
         self.slot.set(None);
-        Ok(ResultWrite::Accepted)
+        Ok(LineWrite::Accepted)
+    }
+
+    fn finish(mut self) -> io::Result<()> {
+        // Each pending turn accepts at least one byte of the fixed-size line.
+        while self.write_turn()? == LineWrite::Pending {}
+        Ok(())
     }
 }
 
@@ -541,9 +550,7 @@ fn admit(
 }
 
 fn observe_result(slots: &HostSlots, output: &mut impl Write) -> Result<(), Box<dyn Error>> {
-    let mut result = ResultOutput::new(&slots.result, output)?;
-    // Each pending turn accepts at least one byte of the fixed-size line.
-    while result.write_turn()? == ResultWrite::Pending {}
+    SlotOutput::new(&slots.result, output, "result")?.finish()?;
     Ok(())
 }
 
@@ -553,10 +560,13 @@ fn observe_reply(
     output: &mut impl Write,
 ) -> Result<(), Box<dyn Error>> {
     session.subscriber_turn(subscriber)?;
-    let reply = session.slots.outputs[subscriber as usize]
-        .take()
-        .ok_or_else(|| io::Error::other("missing subscriber output"))?;
-    writeln!(output, "subscriber {}: {reply:?}", subscriber as usize)?;
+    let index = subscriber as usize;
+    SlotOutput::new(
+        &session.slots.outputs[index],
+        output,
+        format_args!("subscriber {index}"),
+    )?
+    .finish()?;
     Ok(())
 }
 
@@ -572,12 +582,12 @@ mod tests {
     );
 
     #[derive(Default)]
-    struct ScriptedResultWriter {
+    struct ScriptedWriter {
         calls: usize,
         accepted: Vec<u8>,
     }
 
-    impl Write for ScriptedResultWriter {
+    impl Write for ScriptedWriter {
         fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
             self.calls += 1;
             let count = match self.calls {
@@ -646,8 +656,9 @@ mod tests {
         assert_eq!(slots.result.get(), Some(first_result));
         assert_eq!(session.enqueue(queued), Ok(DeliveryStatus::Delivered));
 
-        let mut output = ResultOutput::new(&slots.result, ScriptedResultWriter::default()).unwrap();
-        assert_eq!(output.write_turn().unwrap(), ResultWrite::Pending);
+        let mut writer = ScriptedWriter::default();
+        let mut output = SlotOutput::new(&slots.result, &mut writer, "result").unwrap();
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Pending);
         assert_eq!(session.producer_turn(), Ok(HostTurn::SlotOccupied));
         for kind in [
             io::ErrorKind::WouldBlock,
@@ -661,7 +672,7 @@ mod tests {
             assert_eq!(session.owner.pending(session.producer), Ok(1));
         }
 
-        assert_eq!(output.write_turn().unwrap(), ResultWrite::Accepted);
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Accepted);
         assert_eq!(
             output.writer.accepted,
             format!("{FIRST_RESULT_LINE}\n").as_bytes()
@@ -673,9 +684,70 @@ mod tests {
             command: queued,
             effect: CommandEffect::NoMatch,
         };
-        assert_eq!(output.write_turn().unwrap(), ResultWrite::Accepted);
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Accepted);
         assert_eq!(output.writer.calls, 5);
         assert_eq!(slots.result.get(), Some(queued_result));
+    }
+
+    #[test]
+    fn subscriber_write_retry_preserves_independent_gates_and_line_order() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let [first, second] = [Subscriber::First, Subscriber::Second];
+        let dispatched = HostTurn::Dispatch(MessageDispatchOutcome::Dispatched);
+        let older = session.new_command(3).unwrap();
+        let newer = session.new_command(4).unwrap();
+        let older_reply = Reply {
+            id: id(older),
+            value: 3,
+        };
+        let accepted = CommandEffect::ReplyAccepted([true, true]);
+        assert_eq!(invoke(&mut session, older), accepted);
+        assert_eq!(session.subscriber_turn(first), Ok(dispatched));
+
+        let mut writer = ScriptedWriter::default();
+        let mut output = SlotOutput::new(&slots.outputs[0], &mut writer, "subscriber 0").unwrap();
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Pending);
+        assert_eq!(
+            output.write_turn().unwrap_err().kind(),
+            io::ErrorKind::WouldBlock
+        );
+        assert_eq!(session.subscriber_turn(second), Ok(dispatched));
+        assert_eq!(invoke(&mut session, newer), accepted);
+        assert_eq!(session.subscriber_turn(first), Ok(HostTurn::SlotOccupied));
+        assert_eq!(session.owner.pending(session.subscribers[0]), Ok(1));
+        assert_eq!(
+            slots.outputs.each_ref().map(Cell::get),
+            [Some(older_reply); 2]
+        );
+        assert_eq!(output.writer.accepted, b"subscri");
+        for kind in [io::ErrorKind::WriteZero, io::ErrorKind::InvalidData] {
+            assert_eq!(output.write_turn().unwrap_err().kind(), kind);
+        }
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Accepted);
+        assert_eq!(
+            slots.outputs.each_ref().map(Cell::get),
+            [None, Some(older_reply)]
+        );
+        assert_eq!(session.subscriber_turn(first), Ok(dispatched));
+        assert_eq!(session.subscriber_turn(second), Ok(HostTurn::SlotOccupied));
+
+        observe_reply(&mut session, second, &mut writer).unwrap();
+        assert_eq!(
+            writer.accepted,
+            b"subscriber 0: Reply { id: OperationId(1), value: 3 }\n\
+              subscriber 1: Reply { id: OperationId(1), value: 3 }\n"
+        );
+        assert_eq!(writer.calls, 6);
+        assert_eq!(
+            slots.outputs[0].get(),
+            Some(Reply {
+                id: id(newer),
+                value: 4
+            })
+        );
+        assert_eq!(slots.outputs[1].get(), None);
+        assert_eq!(session.owner.pending(session.subscribers[1]), Ok(1));
     }
 
     #[test]

@@ -70,8 +70,10 @@ explicit host turns:
 cargo run --locked --example command_session
 ```
 
-The host drains results and outputs separately; inbox acceptance, callback
-processing and printed diagnostics remain distinct observations.
+The host drains results and subscriber outputs separately through one writer.
+Each slot stays occupied through short writes and errors until its line is
+accepted. Inbox acceptance, callback processing and writer acceptance remain
+distinct observations.
 
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API

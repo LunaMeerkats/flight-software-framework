@@ -103,5 +103,27 @@ The standard writer contract is recorded in `SRC-RUST-EVENT-OUTPUT` in the
 [source register](../research/SOURCES.md). Focused verification exercises short
 progress, a returned writer error, zero progress, an invalid count, suffix
 acceptance and queued producer dispatch. Writer acceptance, flush and physical
-or durable delivery are separate effects. Subscriber output and other
-diagnostics retain their one-shot policy.
+or durable delivery are separate effects. This revision originally retained
+one-shot writes for subscriber output and other diagnostics.
+
+## Retained subscriber output follow-up
+
+Decision recorded on 2026-11-09 under RFF-LIB-REQ-014 revision 3. Taking a
+subscriber output before writing can lose its typed observation on error.
+Two separate byte cursors for one stream would require the host to arbitrate
+between incomplete lines. A central pending queue would add storage and a
+selection policy despite the existing independent slots.
+
+Reuse the same private slot presenter for command results and replies. One
+active line uses the existing 128-byte buffer and accepted-byte offset. The
+presenter borrows the same writer mutably throughout the line, which prevents
+other turns from writing through that object during its borrow. Peer dispatch
+can still fill its own slot. The host completes the active line before lending
+the writer to another presenter. Full acceptance clears only the selected
+slot, so a queued selected delivery can then dispatch. The serial host keeps
+one presenter for the active slot and does not drain it by another route.
+
+The Rust writer and borrowing rules are recorded in `SRC-RUST-EVENT-OUTPUT`.
+The fixed script exits on a writer error. A recovering caller can retain the
+same presenter and writer and choose another turn. Writer acceptance remains
+local progress. Other script diagnostics use one-shot writes.

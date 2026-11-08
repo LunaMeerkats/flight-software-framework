@@ -37,11 +37,10 @@ host writes the result line. Ingress full/unavailable outcomes leave resubmissio
 with the host. Enqueue acceptance alone does not establish execution.
 
 Each subscriber has its own capacity-one output slot. A selected subscriber turn
-checks that slot before dispatching at most one reply. The host takes output
-separately, then may print it outside callbacks. A Reply result records inbox
-acceptance; taking subscriber output separately observes that subscriber's
-callback. Printing supplies another fallible host effect and establishes no
-physical or durable delivery.
+checks that slot before dispatching at most one reply. The callback records the
+reply in that slot, and the host writes the line outside callbacks. A command
+result can record inbox acceptance. A populated reply slot records the selected
+subscriber's callback, and writing its line is a separate fallible host effect.
 
 ## Follow the fixed scenario
 
@@ -49,7 +48,7 @@ The driver first sends operation 1/value 3 to both subscribers, then drains only
 the first subscriber. Operation 2/value 40 reaches the first inbox while the
 second still holds the older reply, yielding ReplyAccepted([true, false]).
 New operation 3/value 7 is queued while the result slot is occupied; another
-producer turn reports SlotOccupied. After taking the older result, the next
+producer turn reports SlotOccupied. After writing the older result, the next
 turn reports Busy(operation 2) for that saved request.
 
 The host drains operation 2 from the first subscriber and the older operation 1
@@ -59,25 +58,29 @@ New operation 3 and observes both outputs. Every callback selection and drain
 appears in the finite host script. Tests separately cover
 correlated cancellation, saturation and restart behavior.
 
-## Write a command result
+## Write a result or reply
 
-The host opens a `ResultOutput` over the existing result slot and its writer.
-It renders one complete line into a fixed 128-byte buffer before the first
-write. If rendering fails, the original result stays in the slot and the
-writer receives no bytes. Each `write_turn` attempts one write of the remaining
+The host opens a `SlotOutput` over the selected result or reply slot and its
+writer. It renders one complete line into a fixed 128-byte buffer before the
+first write. If rendering fails, the record stays in the slot and the writer
+receives no bytes. Each `write_turn` attempts one write of the remaining
 suffix. A positive short write advances the byte offset and reports `Pending`.
 A writer error returns its original `io::Error`. Zero progress returns
 `WriteZero`, and an impossible count beyond the supplied suffix returns
 `InvalidData`. Each write error leaves the record and byte offset available
 for another turn.
 
-Full acceptance clears the result slot and reports `Accepted`. Another turn on
-that completed output leaves any later result alone. The serial host uses one
-presenter per result slot and keeps its writer across turns. The script lends
-it the sole mutable writer borrow until the line completes. A recovering host
-keeps that same presenter alive and chooses when to retry. The fixed script
-advances on short writes and exits on a writer error. Its other diagnostics and
-subscriber lines use one-shot writes.
+Full acceptance clears the selected slot and reports `Accepted`. Another turn
+on that completed output leaves any later record in the slot alone. While a
+line is pending, the occupied slot still gates its application. The peer
+subscriber can run and stage a reply if its own slot is free. Its line waits
+while the active presenter holds the shared writer's mutable borrow. The host
+finishes the current line before selecting another one for that writer.
+
+A recovering host keeps the same presenter and writer and drives `write_turn`
+directly. The script uses `finish`, which consumes the presenter and exits on
+a writer error. Restarting the script's observation would lose the byte offset.
+Incidental diagnostics use one-shot writes.
 Acceptance describes the bytes reported by the writer. Flush, physical delivery,
 durability and process recovery have separate boundaries.
 
@@ -86,10 +89,11 @@ durability and process recovery have separate boundaries.
 The session has three applications, one command inbox of capacity two, two
 reply inboxes of capacity one, a three-byte maximum message payload, one pending
 reply with two acceptance flags, one local result, two local outputs, one
-issuer for IDs 1..=255 and one fixed rendered result line with an accepted-byte
+issuer for IDs 1..=255 and one fixed rendered line with an accepted-byte
 offset. Setup uses the framework's finite-capacity constructors.
 The host owns `HostSlots` and applications borrow its `Cell` slots directly.
-The host selects every callback and retains only the current command result.
+The host selects every callback and keeps each occupied record until its line
+is accepted.
 Logical storage limits do not establish process-memory limits, callback timing,
 fairness or eventual progress.
 
@@ -98,11 +102,9 @@ through a lower-level bypass can still fail its callback: the selected producer
 becomes terminal Failed, remaining queued commands are cleared, no fresh success
 result is invented and peer effects remain independent. Bypassing an occupied
 slot gate is a composition error and returns an explicit callback failure.
-Ordinary dispatch error wrappers retain selected-inbox discard counts. The host
-takes a subscriber output before writing its diagnostic. A writer error in that
-path exits the finite driver and leaves that subscriber slot drained. Stop and
-restart retain the same producer value, pending operation, local result and host
-issuer, while successful stop clears undispatched selected commands.
+Ordinary dispatch error wrappers retain selected-inbox discard counts. Stop
+and restart retain the same producer value, pending operation, local result
+and host issuer, while successful stop clears undispatched selected commands.
 
 Setup propagates failures rather than asserting success. Its one-shot driver
 reports an error and tears down; reducing ownership-preserving construction or

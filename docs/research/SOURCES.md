@@ -205,6 +205,14 @@ code. Any future source reuse must record provenance and licence obligations.
   standard library and public framework APIs. See the
   [command-session follow-up](../adr/0039-runnable-command-session.md#retained-command-result-follow-up).
 
+- On 2026-11-09 Australia/Sydney, rechecked std 1.99.1 `Write` and consulted
+  [References and Borrowing](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html#mutable-references)
+  in The Rust Programming Language, published by the Rust project. Adopt the
+  exclusive mutable writer borrow for one active subscriber or result line.
+  The existing typed slots can still be filled independently by callbacks.
+  Defer a stream arbiter and additional staging storage for this serial recipe.
+  See the [subscriber decision](../adr/0039-runnable-command-session.md#retained-subscriber-output-follow-up).
+
 ## SRC-RUST-EVENT-FILTERING — Explicit admission and unchanged FIFO storage
 
 - Titles: Match expressions, The Rust Reference; VecDeque, Rust standard library

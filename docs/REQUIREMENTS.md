@@ -511,6 +511,20 @@ accepted bytes, the retained result and queued command, and dispatch after
 acceptance. Preserve the existing successful transcript and verify the
 identical independent binary. Writer acceptance is a local observation.
 
+Revision 3 supplement (2026-11-09). Apply the revision 2 write-turn and retry
+policy to each subscriber's diagnostic line. Keep the selected typed reply in
+its original slot until full acceptance, and release only its dispatch gate
+on completion. Use one active bounded line and the same exclusively borrowed
+writer across turns. The peer may dispatch into its own slot while the first
+line is pending. Its line may start after the active line completes. Other
+script diagnostics retain their one-shot policy.
+
+Acceptance: inject short progress and a returned writer error, observe peer
+dispatch and a queued selected reply during recovery, then resume the exact
+suffix. Verify that only the selected gate opens, the peer retains its record,
+and both lines appear in order on the same writer without interleaving.
+Preserve the result retry regression and successful independent transcript.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured
