@@ -419,3 +419,28 @@ The fixed script exits on writer error. Recovery requires keeping the same
 live presenter and writer. A pending line delays further writes through that
 writer object while peer staging remains bounded. Writer acceptance measures
 local progress, independently of flush and external delivery.
+
+### Source and document acceptance
+
+Root and independent Codex reviewed the complete implementation diff. The
+audit covered 55 Rust files, 25,598 physical lines and 1,397 comment-only lines,
+with zero width findings and three unchanged Clippy expectations. All 223
+traceability test references, 671 relative Markdown links and 27 fragments
+resolve. Ten changed Markdown documents pass rendered text and structure
+review. The staged tree equals the committed tree and its example blob matches
+the independent binary source byte for byte.
+
+### Hosted implementation acceptance
+
+Implementation `70180da0af12745b666962def0202f655a76ced4` was published to
+`origin/main` by ordinary fast-forward.
+[Exact hosted run 42483458584](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42483458584),
+job 128740148623, passes all 20 steps, including 259 workspace tests, 14 adapter
+tests, five sample tests, warnings-denied rustdoc and both whitespace checks.
+The 222-line host sample matches the input run. Hosted Rust/Cargo 1.99.1,
+rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 with
+`windows-2025-vs2026` image `20261103.298.1`, matching the input.
+
+Codex accepts the bounded host-consumer checkpoint. This record changes only
+documentation and receives its own exact hosted inspection. The nightly run
+record retains the result for that revision.

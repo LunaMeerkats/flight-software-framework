@@ -18,6 +18,9 @@ Package 0.0.0 remains unpublished with provisional APIs.
 - The locked local baseline passes 259 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace and identical
   independent command session each pass 13 tests and emit the same 24 lines.
+- Implementation `70180da0af12745b666962def0202f655a76ced4` passes all 20
+  steps of hosted run 42483458584, with 259 workspace tests and the unchanged
+  222-line host sample.
 
 ## Current architecture
 
@@ -32,8 +35,9 @@ stage output in their own slots during a pending subscriber line.
 
 ## Work in progress
 
-The retained subscriber implementation has local and independent evidence.
-Exact hosted inspection follows source publication.
+The retained subscriber checkpoint is complete. The implementation has local,
+independent and exact hosted evidence. The record revision receives separate
+hosted inspection.
 
 ## Highest risks and uncertainties
 

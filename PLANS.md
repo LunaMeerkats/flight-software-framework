@@ -29,3 +29,13 @@ exact hosted CI.
 Stop at bounded subscriber presentation. The script exits on error. A serial
 host retaining the presenter can choose another explicit turn. If verification
 fails, preserve the evidence and withdraw only this run's incomplete changes.
+
+## Result
+
+Local verification passes 259 workspace tests. The workspace example and
+identical independent binary each pass 13 tests and preserve the 24-line
+transcript. Root and independent Codex review accepted the complete source
+and document diff. Implementation `70180da0af12745b666962def0202f655a76ced4`
+passes all 20 steps of exact hosted run 42483458584. The record revision
+receives separate hosted inspection. See the
+[focused review](docs/verification/COMMAND_SESSION_REVIEW.md#retained-subscriber-output-follow-up).
