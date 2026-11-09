@@ -1,41 +1,24 @@
-# Retain subscriber output on a shared writer
+# Retain one command across ingress rejection
 
 ## Objective and acceptance
 
-Extend the command-session writer policy under
-[ADR-0039](docs/adr/0039-runnable-command-session.md) and RFF-LIB-REQ-014
-revision 3. A short write followed by a writer error currently drains the
-subscriber's typed output and loses its retry position. Reuse the result
-presenter for one subscriber line and keep the selected slot occupied until
-full acceptance. The peer can stage output in its own slot while the active
-presenter holds the only mutable borrow of the writer. No additional queue
-or arbitration is needed for one serial host.
+Use [ADR-0039](docs/adr/0039-runnable-command-session.md#retained-ingress-follow-up)
+and RFF-LIB-REQ-014 revision 4 to show explicit host recovery from a full
+command inbox. Retain one typed command and its original ID outside the
+inbox. An explicit admission turn uses the current routing path and clears
+that slot on acceptance before the host writes diagnostics.
 
 ## Verification and stopping point
 
-Input `785c6610260c05c66b3c52207487084eb085a715` matches refreshed origin.
-The locked local baseline passes. Independent Codex inspection confirms
-input hosted run 42375973171 passed all 20 steps, 258 workspace tests and
-the 222-line sample.
+Input `9dbab6ad0432902f319af304d64c35232bc2a2ea` matches refreshed origin.
+Hosted run 42483635231 passes 20 steps and 259 workspace tests. The local
+locked baseline passes on replay. Windows Application Control transiently
+blocked the existing message bus test executable on the first suite run.
 
-Exercise short progress, a returned error, exact suffix retry, peer staging,
-selected-gate release and ordered lines on the same writer. Preserve the
-result error regression and the 24-line successful transcript. Check, lint,
-test and run identical source in an independent Cargo binary. Compare source
-and transcript bytes, inspect metadata, and review source, rendered documents
-and the complete diff. Publish the reviewed increment on `main` and inspect
-exact hosted CI.
-
-Stop at bounded subscriber presentation. The script exits on error. A serial
-host retaining the presenter can choose another explicit turn. If verification
-fails, preserve the evidence and withdraw only this run's incomplete changes.
-
-## Result
-
-Local verification passes 259 workspace tests. The workspace example and
-identical independent binary each pass 13 tests and preserve the 24-line
-transcript. Root and independent Codex review accepted the complete source
-and document diff. Implementation `70180da0af12745b666962def0202f655a76ced4`
-passes all 20 steps of exact hosted run 42483458584. The record revision
-receives separate hosted inspection. See the
-[focused review](docs/verification/COMMAND_SESSION_REVIEW.md#retained-subscriber-output-follow-up).
+Keep the original transcript as a prefix. Run an appended saturation and
+FIFO recovery scenario and a stopped-owner retention regression. Check the
+locked baseline, exact independent Cargo recipe, source shape, rendered
+documents and complete diff. Publish the verified increment on main and
+inspect exact hosted CI. Stop at a single caller-owned slot. If the
+increment cannot pass review, preserve evidence and withdraw only this
+run's incomplete edits.

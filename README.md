@@ -72,8 +72,9 @@ cargo run --locked --example command_session
 
 The host drains results and subscriber outputs separately through one writer.
 Each slot stays occupied through short writes and errors until its line is
-accepted. Inbox acceptance, callback processing and writer acceptance remain
-distinct observations.
+accepted. If the command inbox fills, the host keeps one saved command and
+chooses when to try admitting it again. Inbox acceptance, callback processing
+and writer acceptance remain distinct observations.
 
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using
 the selected runtime-local identity from `ApplicationWorkContext`. The public-API

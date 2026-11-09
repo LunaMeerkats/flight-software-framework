@@ -525,6 +525,20 @@ suffix. Verify that only the selected gate opens, the peer retains its record,
 and both lines appear in order on the same writer without interleaving.
 Preserve the result retry regression and successful independent transcript.
 
+Revision 4 supplement (2026-11-10). A serial host may retain one validated
+command outside the inbox for explicit admission. Each turn shall attempt
+admission at most once and clear the host slot only after `Delivered`.
+`InboxFull`, `Unavailable` and typed errors shall retain the same command
+and ID. An empty turn shall leave the inbox alone. Admission shall neither
+dispatch nor issue an ID. The host chooses when to attempt another turn.
+
+Acceptance: extend the executable with a full command inbox while a result
+gates dispatch. After one older command dispatches, admit the retained command
+behind the remaining older entry. Observe both FIFO order and the exact
+retained command's separate callback result. Test retention when stopped and
+an empty turn after admission. Preserve the previous transcript as an exact
+prefix and verify the extended transcript in the identical independent binary.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured

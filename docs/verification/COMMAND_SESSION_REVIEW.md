@@ -444,3 +444,76 @@ rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 with
 Codex accepts the bounded host-consumer checkpoint. This record changes only
 documentation and receives its own exact hosted inspection. The nightly run
 record retains the result for that revision.
+
+## Retained ingress follow-up
+
+Root Codex and independent Codex reviewed RFF-LIB-REQ-014 revision 4 against
+[ADR-0039](../adr/0039-runnable-command-session.md#retained-ingress-follow-up).
+Input `9dbab6ad0432902f319af304d64c35232bc2a2ea` matched refreshed origin.
+[Exact input hosted run 42483635231](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42483635231)
+passed 20 steps, 259 workspace tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc, both whitespace checks and the 222-line sample.
+The local input baseline passed after rerunning the workspace tests.
+Windows Application Control returned OS error 4551 before the first run
+could execute the existing message bus test binary. The same binary passed
+on focused replay and the full replay completed without configuration changes.
+
+Root Codex ran the following against the implementation on Windows with
+Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98:
+
+```powershell
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+$env:RUSTDOCFLAGS = '-D warnings'
+cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+```
+
+All passed, with 260 workspace tests and 14 focused tests.
+`finite_session_prints_exact_results_and_separate_subscriber_observations`
+covers the appended `InboxFull`, occupied result gate, explicit retry and
+exact FIFO results before separate replies. The new test
+`pending_ingress_survives_stop_and_clears_only_after_admission` covers
+`Unavailable`, same-command admission after restart, an empty turn, and
+separate callback execution. The existing 13 test histories remain.
+Independent source review found that the typed error propagates before slot
+mutation. The normal configured session does not exercise that error branch.
+
+Root Codex ran the complete
+[independent binary recipe](../COMMAND_SESSION.md#verify-the-identical-independent-binary)
+with `$framework` set to `E:/Projects/flight software framework` and
+`$consumer` set to
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-8de3393b048644ba9df903b235a1abaa`:
+
+```powershell
+cargo new --bin --edition 2024 --vcs none $consumer
+cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
+Copy-Item -LiteralPath "$framework/examples/command_session.rs" -Destination "$consumer/src/main.rs"
+cargo check --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets
+cargo clippy --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets -- -D warnings
+cargo test --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo run --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo metadata --manifest-path "$consumer/Cargo.toml" --locked --offline --format-version 1
+Get-FileHash -Algorithm SHA256 "$framework/examples/command_session.rs", "$consumer/src/main.rs"
+```
+
+All succeeded. Metadata confirms one independent binary member and one
+framework path dependency. The framework has no dependencies. The source
+bytes match, with SHA256
+`80550edaa9d667a5f4d2a5b9020c65ea65f43c559a46d27448872cce254a0818`
+and Git blob `cfb9febe7be6baf038d074379d52461bf5ee4c4e`. The independent
+binary passed the same 14 tests. Both executable stdout captures match
+byte for byte at 40 lines and 2,333 bytes. Their first 24 lines and 1,469
+bytes match input stdout exactly. Raw local logs and captures are under
+`target/review-ingress-recovery`.
+
+The caller owns intake and may retry or abandon the saved command.
+Admission is an inbox enqueue. Later stop or failure can discard that
+copy. The scenario uses one trusted serial host and demonstrates local
+results and reply observations.
+
+Implementation hosted evidence is recorded after inspecting its exact CI run.

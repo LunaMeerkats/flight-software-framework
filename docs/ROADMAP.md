@@ -7,6 +7,11 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-014 revision 4 adds one host-owned retained ingress slot to the
+executable command session. The [ingress recovery recipe](COMMAND_SESSION.md#retain-a-command-when-the-inbox-is-full)
+shows explicit admission after capacity returns, ordered behind older
+queued work and separate from subsequent callback and output effects.
+
 RFF-LIB-REQ-014 revisions 2 and 3 keep command results and subscriber replies
 in their existing slots across short writes and returned writer errors.
 One active line borrows the writer until completion while peer callbacks can

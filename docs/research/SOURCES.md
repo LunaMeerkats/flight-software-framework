@@ -13,6 +13,18 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-RETAINED-INGRESS — A single caller-owned command slot
+
+- Source: [`Option<T>`](https://doc.rust-lang.org/std/option/enum.Option.html),
+  Rust standard library, 1.99.1, accessed 2026-11-10.
+- Observation: `Some` holds one value, `None` expresses the empty state and
+  `Option<T>` is `Copy` when `T` is `Copy`.
+- Local treatment: copy the saved typed command for one explicit attempt
+  through [the existing targeted publication API](../../src/messaging_runtime.rs).
+  Keep the original slot until that API reports enqueue acceptance. This
+  uses host-owned state without another queue or a returned-message API.
+  See [ADR-0039](../adr/0039-runnable-command-session.md#retained-ingress-follow-up).
+
 ## SRC-RUST-BORROWED-SETUP — Retain typed setup errors
 
 - Titles: Lifetime elision, The Rust Reference. Result::map_err, Rust standard

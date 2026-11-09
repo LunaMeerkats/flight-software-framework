@@ -58,6 +58,26 @@ New operation 3 and observes both outputs. Every callback selection and drain
 appears in the finite host script. Tests separately cover
 correlated cancellation, saturation and restart behavior.
 
+## Retain a command when the inbox is full
+
+The script then stages a stale control's result and fills the command inbox
+with two more stale controls. With dispatch gated, New operation 4/value 9
+gets `InboxFull` and stays in a caller-owned `Option<Command>`. The host
+finishes writing the staged result and dispatches one older command. It
+then admits the same operation 4 behind the other older command, while the
+first queued control's result still gates dispatch. The two controls
+produce `NoMatch` before operation 4 produces its result and replies.
+
+Call `admit_pending` once when the host chooses to try the saved command.
+`Delivered` clears the slot before the host prints the outcome. `InboxFull`,
+`Unavailable` and typed errors leave the command available for a later
+decision. An empty slot makes no enqueue attempt. Keep later offers upstream
+while the slot is occupied if they must follow this command. The host must
+decide how to handle persistent unavailability or a routing error.
+The turn uses the existing ID and does not invoke a callback. A `Busy`
+result belongs to a command that already dispatched and has its own
+resubmission policy.
+
 ## Write a result or reply
 
 The host opens a `SlotOutput` over the selected result or reply slot and its
@@ -89,8 +109,9 @@ durability and process recovery have separate boundaries.
 The session has three applications, one command inbox of capacity two, two
 reply inboxes of capacity one, a three-byte maximum message payload, one pending
 reply with two acceptance flags, one local result, two local outputs, one
-issuer for IDs 1..=255 and one fixed rendered line with an accepted-byte
-offset. Setup uses the framework's finite-capacity constructors.
+issuer for IDs 1..=255, one saved ingress command and one fixed rendered
+line with an accepted-byte offset. Setup uses the framework's
+finite-capacity constructors.
 The host owns `HostSlots` and applications borrow its `Cell` slots directly.
 The host selects every callback and keeps each occupied record until its line
 is accepted.

@@ -392,6 +392,20 @@ impl<'a> Session<'a> {
         self.ingress(command.message().map_err(SessionError::Message)?.payload())
     }
 
+    fn admit_pending(
+        &mut self,
+        pending: &mut Option<Command>,
+    ) -> Result<Option<DeliveryStatus>, SessionError> {
+        let Some(command) = *pending else {
+            return Ok(None);
+        };
+        let admission = self.enqueue(command)?;
+        if admission == DeliveryStatus::Delivered {
+            *pending = None;
+        }
+        Ok(Some(admission))
+    }
+
     fn producer_turn(&mut self) -> Result<HostTurn, DispatchError> {
         if self.slots.result.get().is_some() {
             return Ok(HostTurn::SlotOccupied);
@@ -523,6 +537,42 @@ fn run_session(output: &mut impl Write) -> Result<(), Box<dyn Error>> {
     send(&mut session, busy, output)?;
     observe_reply(&mut session, Subscriber::First, output)?;
     observe_reply(&mut session, Subscriber::Second, output)?;
+    recover_ingress(&mut session, id, output)
+}
+
+fn recover_ingress(
+    session: &mut Session<'_>,
+    stale: OperationId,
+    output: &mut impl Write,
+) -> Result<(), Box<dyn Error>> {
+    // Stale controls fill the FIFO without creating more subscriber replies.
+    admit(session, Command::Retry(stale), output)?;
+    writeln!(output, "producer turn: {:?}", session.producer_turn()?)?;
+    admit(session, Command::Cancel(stale), output)?;
+    admit(session, Command::Retry(stale), output)?;
+
+    let command = session.new_command(9)?;
+    let mut pending = Some(command);
+    let Some(status @ DeliveryStatus::InboxFull) = session.admit_pending(&mut pending)? else {
+        return Err(io::Error::other("expected full command inbox").into());
+    };
+    writeln!(output, "retained ingress {command:?}: {status:?}")?;
+    writeln!(output, "producer gate: {:?}", session.producer_turn()?)?;
+    observe_result(session.slots, output)?;
+    writeln!(output, "producer turn: {:?}", session.producer_turn()?)?;
+
+    let Some(status @ DeliveryStatus::Delivered) = session.admit_pending(&mut pending)? else {
+        return Err(io::Error::other("expected room for the retained command").into());
+    };
+    writeln!(output, "retained ingress {command:?}: {status:?}")?;
+    observe_result(session.slots, output)?;
+
+    for _ in 0..2 {
+        writeln!(output, "producer turn: {:?}", session.producer_turn()?)?;
+        observe_result(session.slots, output)?;
+    }
+    observe_reply(session, Subscriber::First, output)?;
+    observe_reply(session, Subscriber::Second, output)?;
     Ok(())
 }
 
@@ -637,7 +687,11 @@ mod tests {
         let mut output = Vec::new();
         run_session(&mut output).unwrap();
         let actual = String::from_utf8(output).unwrap();
-        assert_eq!(actual.lines().collect::<Vec<_>>(), expected_transcript());
+        let expected: Vec<_> = expected_transcript()
+            .into_iter()
+            .chain(expected_ingress_recovery())
+            .collect();
+        assert_eq!(actual.lines().collect::<Vec<_>>(), expected);
     }
 
     #[test]
@@ -837,6 +891,62 @@ mod tests {
             "subscriber 0: Reply { id: OperationId(3), value: 7 }",
             "subscriber 1: Reply { id: OperationId(3), value: 7 }",
         ]
+    }
+
+    fn expected_ingress_recovery() -> [&'static str; 16] {
+        [
+            "ingress Retry(OperationId(2)): Delivered",
+            "producer turn: Dispatch(Dispatched)",
+            "ingress Cancel(OperationId(2)): Delivered",
+            "ingress Retry(OperationId(2)): Delivered",
+            "retained ingress New { id: OperationId(4), value: 9 }: InboxFull",
+            "producer gate: SlotOccupied",
+            "result: CommandResult { command: Retry(OperationId(2)), effect: NoMatch }",
+            "producer turn: Dispatch(Dispatched)",
+            "retained ingress New { id: OperationId(4), value: 9 }: Delivered",
+            "result: CommandResult { command: Cancel(OperationId(2)), effect: NoMatch }",
+            "producer turn: Dispatch(Dispatched)",
+            "result: CommandResult { command: Retry(OperationId(2)), effect: NoMatch }",
+            "producer turn: Dispatch(Dispatched)",
+            concat!(
+                "result: CommandResult { command: New { id: OperationId(4), value: 9 }, ",
+                "effect: ReplyAccepted([true, true]) }"
+            ),
+            "subscriber 0: Reply { id: OperationId(4), value: 9 }",
+            "subscriber 1: Reply { id: OperationId(4), value: 9 }",
+        ]
+    }
+
+    #[test]
+    fn pending_ingress_survives_stop_and_clears_only_after_admission() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let command = session.new_command(9).unwrap();
+        let mut pending = Some(command);
+
+        session.owner.stop(session.producer).unwrap();
+        assert_eq!(
+            session.admit_pending(&mut pending),
+            Ok(Some(DeliveryStatus::Unavailable))
+        );
+        assert_eq!(pending, Some(command));
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
+
+        session.owner.restart(session.producer).unwrap();
+        assert_eq!(
+            session.admit_pending(&mut pending),
+            Ok(Some(DeliveryStatus::Delivered))
+        );
+        assert_eq!(pending, None);
+        assert_eq!(session.admit_pending(&mut pending), Ok(None));
+        assert_eq!(session.owner.pending(session.producer), Ok(1));
+        assert_eq!(slots.result.get(), None);
+        assert_eq!(
+            session.producer_turn(),
+            Ok(HostTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+        );
+        assert_eq!(slots.result.take().unwrap().command, command);
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
     }
 
     #[test]

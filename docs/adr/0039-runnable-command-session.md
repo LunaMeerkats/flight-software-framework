@@ -127,3 +127,26 @@ The Rust writer and borrowing rules are recorded in `SRC-RUST-EVENT-OUTPUT`.
 The fixed script exits on a writer error. A recovering caller can retain the
 same presenter and writer and choose another turn. Writer acceptance remains
 local progress. Other script diagnostics use one-shot writes.
+
+## Retained ingress follow-up
+
+Decision recorded on 2026-11-10 under RFF-LIB-REQ-014 revision 4. The
+existing saturation test saves a rejected command in a local variable.
+The executable's normal admission helper exits on rejection. Extend the
+script to show how a host admits one saved command while draining existing
+results and making space in the command inbox.
+
+Keep a caller-owned `Option<Command>`. One explicit admission turn copies the
+command into the existing validated enqueue path. Clear the slot on
+`Delivered` before any fallible logging. A rejected turn keeps the original
+value and ID. The caller controls intake, should keep later offers upstream
+while this slot is occupied, and can choose to abandon the saved command.
+
+Manual resubmission leaves the decision to clear the slot spread across
+callers. An ingress queue or an automatic retry loop would add intake and
+scheduling policy for this single saved command. The slot uses the existing
+targeted publication and serial host turns. Admission, callback effects
+(including `Busy`) and output remain separate. A later stop can clear an
+accepted command. A repeated explicit turn has no effect once the slot is
+empty. See `SRC-RUST-RETAINED-INGRESS` in the
+[source register](../research/SOURCES.md).

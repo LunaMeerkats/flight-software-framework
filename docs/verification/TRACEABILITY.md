@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 retained ingress — 2026-11-10
+
+[ADR-0039](../adr/0039-runnable-command-session.md#retained-ingress-follow-up)
+uses a caller-owned slot and the existing targeted admission path.
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 4 | `finite_session_prints_exact_results_and_separate_subscriber_observations` verifies gated dispatch, full rejection, same-ID admission behind older work, and distinct result and reply lines. `pending_ingress_survives_stop_and_clears_only_after_admission` verifies unavailable retention, explicit restart, acceptance and an empty turn without duplicate enqueue. | [Focused command-session review](COMMAND_SESSION_REVIEW.md#retained-ingress-follow-up) |
+
 ## Stage 5 retained subscriber output — 2026-11-09
 
 [ADR-0039](../adr/0039-runnable-command-session.md#retained-subscriber-output-follow-up)
