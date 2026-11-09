@@ -516,4 +516,24 @@ Admission is an inbox enqueue. Later stop or failure can discard that
 copy. The scenario uses one trusted serial host and demonstrates local
 results and reply observations.
 
-Implementation hosted evidence is recorded after inspecting its exact CI run.
+Root and independent Codex reviewed the complete diff, including rendered
+content and structure for ten changed documents. The implementation review
+covered 55 Rust files, 25,708 physical lines and 1,398 comment-only lines,
+with zero width findings and three unchanged fulfilled Clippy expectations.
+All 679 relative paths, 34 fragments and 224 exact test references resolved.
+The reviewed staged tree matches the published implementation. Its
+command-session blob matches the verified source.
+
+Implementation `b5e5ce0c0b48e23f4668fb512f3eab2094f4fc31` was pushed to
+`origin/main` by ordinary fast-forward.
+[Exact hosted run 42622185103](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42622185103)
+and job 129176860796 pass all 20 steps, including 260 workspace tests,
+14 focused adapter tests, five focused sample tests, warnings-denied
+rustdoc and both whitespace checks. The 222-line combined host sample
+matches the input run. Hosted Rust/Cargo 1.99.1, rustfmt 1.10.0-stable and
+Clippy 0.1.99 ran on runner 2.338.2 with Windows image 20261103.298.1,
+matching input.
+
+Codex accepts the bounded checkpoint. This record changes only documentation
+and receives its own exact hosted inspection. The nightly run record
+retains that result.

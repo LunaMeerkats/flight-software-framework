@@ -22,3 +22,13 @@ documents and complete diff. Publish the verified increment on main and
 inspect exact hosted CI. Stop at a single caller-owned slot. If the
 increment cannot pass review, preserve evidence and withdraw only this
 run's incomplete edits.
+
+## Result
+
+The locked local baseline passes 260 workspace tests. The workspace example
+and identical independent binary pass 14 focused tests. Their 40-line output
+keeps the original 24 lines byte for byte. Root and independent Codex review
+accepted the source and complete diff. Implementation
+`b5e5ce0c0b48e23f4668fb512f3eab2094f4fc31` passes all 20 steps of exact hosted
+run 42622185103. The record revision receives separate hosted inspection.
+See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#retained-ingress-follow-up).

@@ -20,6 +20,9 @@ APIs.
   1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace example and
   identical independent binary pass 14 tests and emit identical 40-line
   transcripts, preserving the exact 24-line input prefix.
+- Implementation `b5e5ce0c0b48e23f4668fb512f3eab2094f4fc31` passes all 20
+  steps of hosted run 42622185103 with 260 workspace tests and the unchanged
+  222-line combined host sample.
 
 ## Current architecture
 
@@ -34,8 +37,9 @@ offset. The host selects admission and dispatch independently.
 
 ## Work in progress
 
-The retained ingress implementation has local and independent binary evidence.
-Its exact hosted run will be inspected after publication.
+The retained ingress checkpoint is complete with local, independent and
+exact hosted implementation evidence. The record revision receives separate
+hosted inspection.
 
 ## Highest risks and uncertainties
 
