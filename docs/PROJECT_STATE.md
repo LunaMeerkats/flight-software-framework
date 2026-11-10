@@ -17,6 +17,9 @@ regression baseline. Package 0.0.0 is unpublished with provisional APIs.
 - The locked local baseline passes 264 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace example and identical
   independent binary pass 18 tests and preserve the 40-line transcript.
+- Implementation `12931b7e936b35bd0f4c9ffd15510213a6629efe` passes all 20
+  steps of hosted run 42822018637 with 264 workspace tests and the unchanged
+  222-line combined host sample.
 
 ## Current architecture
 
@@ -31,8 +34,9 @@ The serial host selects read, admission, dispatch and output separately.
 
 ## Work in progress
 
-The framed-input checkpoint has local and independent binary evidence.
-Exact hosted implementation inspection follows publication.
+The framed-input checkpoint is complete with local, independent binary
+and hosted implementation evidence. The record revision receives separate
+hosted inspection.
 
 ## Highest risks and uncertainties
 

@@ -25,5 +25,7 @@ preserve evidence and withdraw only this run's incomplete edits.
 
 The locked local baseline passes 264 tests. The example and independent
 binary pass 18 focused tests and match the input transcript byte for byte.
+Implementation `12931b7e936b35bd0f4c9ffd15510213a6629efe` passes all
+20 steps of exact hosted run 42822018637.
 See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#framed-input-follow-up)
-for local and downstream evidence.
+for local, downstream and hosted evidence.

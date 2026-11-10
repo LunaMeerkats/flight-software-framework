@@ -587,3 +587,27 @@ The same reader and session own frame progress and ID issuance through
 each turn. An admission result describes enqueue. This test domain uses
 finite in-memory input and injected errors. Blocking and transport policy
 depend on the caller's reader.
+
+### Source and hosted acceptance
+
+Root Codex reviewed the complete diff. Independent Codex reviewed the
+source, decisions, tests and all 12 changed Markdown documents. Rendered
+content and structure match their Markdown. All 688 relative paths, 42
+fragments and 228 exact test references resolve. The audit covers 55
+Rust files, 25,949 physical lines and 1,399 comment-only lines with zero
+width findings and three unchanged fulfilled Clippy expectations. The
+staged tree matches the committed tree and its example blob matches the
+verified consumer source.
+
+Implementation `12931b7e936b35bd0f4c9ffd15510213a6629efe` was pushed to
+`origin/main` by ordinary fast-forward.
+[Exact hosted run 42822018637](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42822018637),
+job 129849666161, passes all 20 steps, including 264 workspace tests, 14
+adapter tests, five sample tests, warnings-denied rustdoc and both
+whitespace checks. All 18 example tests appear in the workspace job.
+The 222-line combined sample matches input. Hosted Rust/Cargo 1.99.1,
+rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 with
+`windows-2025-vs2026` image `20261103.298.1`, matching input.
+
+Codex accepts the bounded host-consumer checkpoint. The documentation
+record revision receives a separate exact hosted inspection.
