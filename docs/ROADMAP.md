@@ -7,6 +7,11 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-014 revision 5 brings one finite framed reader into the same
+command session. The [input recipe](COMMAND_SESSION.md#read-a-new-request-from-finite-input)
+explains short-read recovery, local ID issuance and why the next record
+waits upstream while the saved command awaits admission.
+
 RFF-LIB-REQ-014 revision 4 adds one host-owned retained ingress slot to the
 executable command session. The [ingress recovery recipe](COMMAND_SESSION.md#retain-a-command-when-the-inbox-is-full)
 shows explicit admission after capacity returns, ordered behind older

@@ -10,7 +10,7 @@ use std::cell::Cell;
 use std::convert::Infallible;
 use std::error::Error;
 use std::fmt;
-use std::io::{self, Cursor, Write};
+use std::io::{self, Cursor, Read, Write};
 use std::num::NonZeroU8;
 
 use rust_flight_framework::{
@@ -130,6 +130,27 @@ impl Command {
             Self::Cancel(id) => Message::try_new(Topic::Command, &[3, id.0.get()]),
         }
     }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum ReadTurn {
+    SlotOccupied,
+    Partial,
+    Staged,
+    Rejected(SessionError),
+    End,
+}
+
+enum InputProgress {
+    Reading(usize),
+    End,
+}
+
+struct NewInput<R> {
+    reader: R,
+    frame: [u8; 2],
+    progress: InputProgress,
+    pending: Option<Command>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -426,6 +447,64 @@ impl<'a> Session<'a> {
     }
 }
 
+impl<R: Read> NewInput<R> {
+    fn new(reader: R) -> Self {
+        Self {
+            reader,
+            frame: [0; 2],
+            progress: InputProgress::Reading(0),
+            pending: None,
+        }
+    }
+
+    fn read_turn(&mut self, session: &mut Session<'_>) -> io::Result<ReadTurn> {
+        if self.pending.is_some() {
+            return Ok(ReadTurn::SlotOccupied);
+        }
+        let InputProgress::Reading(filled) = self.progress else {
+            return Ok(ReadTurn::End);
+        };
+        let suffix = &mut self.frame[filled..];
+        let count = self.reader.read(suffix)?;
+        if count == 0 {
+            self.progress = InputProgress::End;
+            return if filled == 0 {
+                Ok(ReadTurn::End)
+            } else {
+                Err(io::Error::new(
+                    io::ErrorKind::UnexpectedEof,
+                    "truncated New request",
+                ))
+            };
+        }
+        if count > suffix.len() {
+            // The reader's position is unknown, so stop intake.
+            self.progress = InputProgress::End;
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "reader overreported progress",
+            ));
+        }
+        let filled = filled + count;
+        if filled < self.frame.len() {
+            self.progress = InputProgress::Reading(filled);
+            return Ok(ReadTurn::Partial);
+        }
+
+        self.progress = InputProgress::Reading(0);
+        let [1, value] = self.frame else {
+            return Ok(ReadTurn::Rejected(SessionError::InvalidFrame));
+        };
+        match session.new_command(value) {
+            Ok(command) => {
+                self.pending = Some(command);
+                Ok(ReadTurn::Staged)
+            }
+            Err(error) => Ok(ReadTurn::Rejected(error)),
+        }
+    }
+}
+
 impl<'a, T: Copy + fmt::Debug, W: Write> SlotOutput<'a, T, W> {
     fn new(
         slot: &'a Cell<Option<T>>,
@@ -551,17 +630,24 @@ fn recover_ingress(
     admit(session, Command::Cancel(stale), output)?;
     admit(session, Command::Retry(stale), output)?;
 
-    let command = session.new_command(9)?;
-    let mut pending = Some(command);
-    let Some(status @ DeliveryStatus::InboxFull) = session.admit_pending(&mut pending)? else {
+    let mut input = NewInput::new(Cursor::new([1, 9]));
+    let (ReadTurn::Staged, Some(command)) = (input.read_turn(session)?, input.pending) else {
+        return Err(io::Error::other("expected one staged New request").into());
+    };
+    let Some(status @ DeliveryStatus::InboxFull) = session.admit_pending(&mut input.pending)?
+    else {
         return Err(io::Error::other("expected full command inbox").into());
     };
+    if input.read_turn(session)? != ReadTurn::SlotOccupied {
+        return Err(io::Error::other("expected intake to wait for admission").into());
+    }
     writeln!(output, "retained ingress {command:?}: {status:?}")?;
     writeln!(output, "producer gate: {:?}", session.producer_turn()?)?;
     observe_result(session.slots, output)?;
     writeln!(output, "producer turn: {:?}", session.producer_turn()?)?;
 
-    let Some(status @ DeliveryStatus::Delivered) = session.admit_pending(&mut pending)? else {
+    let Some(status @ DeliveryStatus::Delivered) = session.admit_pending(&mut input.pending)?
+    else {
         return Err(io::Error::other("expected room for the retained command").into());
     };
     writeln!(output, "retained ingress {command:?}: {status:?}")?;
@@ -630,6 +716,39 @@ mod tests {
         "result: CommandResult { command: New { id: OperationId(1), value: 3 }, ",
         "effect: ReplyAccepted([true, true]) }"
     );
+
+    #[derive(Default)]
+    struct ShortReader {
+        calls: usize,
+    }
+
+    impl Read for ShortReader {
+        fn read(&mut self, suffix: &mut [u8]) -> io::Result<usize> {
+            self.calls += 1;
+            match self.calls {
+                1 => {
+                    assert_eq!(suffix.len(), 2);
+                    suffix[0] = 1;
+                }
+                2 => return Err(io::ErrorKind::Interrupted.into()),
+                3 => return Err(io::ErrorKind::WouldBlock.into()),
+                4 => {
+                    assert_eq!(suffix.len(), 1);
+                    suffix[0] = 9;
+                }
+                _ => panic!("unexpected read"),
+            }
+            Ok(1)
+        }
+    }
+
+    struct OverreportingReader;
+
+    impl Read for OverreportingReader {
+        fn read(&mut self, suffix: &mut [u8]) -> io::Result<usize> {
+            Ok(suffix.len() + 1)
+        }
+    }
 
     #[derive(Default)]
     struct ScriptedWriter {
@@ -946,6 +1065,128 @@ mod tests {
             Ok(HostTurn::Dispatch(MessageDispatchOutcome::Dispatched))
         );
         assert_eq!(slots.result.take().unwrap().command, command);
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
+    }
+
+    #[test]
+    fn short_input_read_resumes_at_the_suffix_after_returned_errors() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let mut input = NewInput::new(ShortReader::default());
+
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::Partial);
+        assert_eq!(input.pending, None);
+        for kind in [io::ErrorKind::Interrupted, io::ErrorKind::WouldBlock] {
+            assert_eq!(input.read_turn(&mut session).unwrap_err().kind(), kind);
+            assert_eq!(input.pending, None);
+        }
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::Staged);
+        let command = input.pending.unwrap();
+        assert_eq!(id(command).0.get(), 1);
+        assert!(matches!(command, Command::New { value: 9, .. }));
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
+        assert_eq!(slots.result.get(), None);
+    }
+
+    #[test]
+    fn full_inbox_leaves_the_next_input_record_unread() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let stale = id(session.new_command(0).unwrap());
+        for command in [Command::Retry(stale), Command::Cancel(stale)] {
+            assert_eq!(session.enqueue(command), Ok(DeliveryStatus::Delivered));
+        }
+        let mut input = NewInput::new(Cursor::new([1, 9, 1, 10]));
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::Staged);
+        let saved = input.pending.unwrap();
+        assert_eq!(id(saved).0.get(), 2);
+        assert_eq!(
+            session.admit_pending(&mut input.pending),
+            Ok(Some(DeliveryStatus::InboxFull))
+        );
+        assert_eq!(
+            input.read_turn(&mut session).unwrap(),
+            ReadTurn::SlotOccupied
+        );
+        assert_eq!(input.reader.position(), 2);
+        assert_eq!(input.pending, Some(saved));
+
+        assert_eq!(
+            session.producer_turn(),
+            Ok(HostTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+        );
+        assert_eq!(slots.result.get().unwrap().command, Command::Retry(stale));
+        assert_eq!(
+            session.admit_pending(&mut input.pending),
+            Ok(Some(DeliveryStatus::Delivered))
+        );
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::Staged);
+        assert_eq!(id(input.pending.unwrap()).0.get(), 3);
+        assert!(matches!(
+            input.pending,
+            Some(Command::New { value: 10, .. })
+        ));
+
+        slots.result.take();
+        for expected in [Command::Cancel(stale), saved] {
+            assert_eq!(
+                session.producer_turn(),
+                Ok(HostTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+            );
+            assert_eq!(slots.result.take().unwrap().command, expected);
+        }
+    }
+
+    #[test]
+    fn framed_input_rejects_bad_tags_and_reports_issuer_exhaustion() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        session.issuer = Issuer(NonZeroU8::new(u8::MAX));
+        let mut input = NewInput::new(Cursor::new([9, 4, 1, 5, 1, 6]));
+        assert_eq!(
+            input.read_turn(&mut session).unwrap(),
+            ReadTurn::Rejected(SessionError::InvalidFrame)
+        );
+        assert_eq!(input.pending, None);
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::Staged);
+        assert_eq!(id(input.pending.unwrap()).0.get(), u8::MAX);
+        assert_eq!(
+            session.admit_pending(&mut input.pending),
+            Ok(Some(DeliveryStatus::Delivered))
+        );
+        assert_eq!(
+            input.read_turn(&mut session).unwrap(),
+            ReadTurn::Rejected(SessionError::IdsExhausted)
+        );
+        assert_eq!(input.pending, None);
+        assert_eq!(session.owner.pending(session.producer), Ok(1));
+        assert_eq!(input.read_turn(&mut session).unwrap(), ReadTurn::End);
+    }
+
+    #[test]
+    fn truncated_and_overreported_reads_end_intake_without_issuing_an_id() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let mut truncated = NewInput::new(Cursor::new([1]));
+        assert_eq!(
+            truncated.read_turn(&mut session).unwrap(),
+            ReadTurn::Partial
+        );
+        assert_eq!(
+            truncated.read_turn(&mut session).unwrap_err().kind(),
+            io::ErrorKind::UnexpectedEof
+        );
+        assert_eq!(truncated.read_turn(&mut session).unwrap(), ReadTurn::End);
+        assert_eq!(truncated.pending, None);
+
+        let mut overreported = NewInput::new(OverreportingReader);
+        assert_eq!(
+            overreported.read_turn(&mut session).unwrap_err().kind(),
+            io::ErrorKind::InvalidData
+        );
+        assert_eq!(overreported.read_turn(&mut session).unwrap(), ReadTurn::End);
+        assert_eq!(overreported.pending, None);
+        assert_eq!(id(session.new_command(0).unwrap()).0.get(), 1);
         assert_eq!(session.owner.pending(session.producer), Ok(0));
     }
 

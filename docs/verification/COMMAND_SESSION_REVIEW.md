@@ -537,3 +537,53 @@ matching input.
 Codex accepts the bounded checkpoint. This record changes only documentation
 and receives its own exact hosted inspection. The nightly run record
 retains that result.
+
+## Framed input follow-up
+
+Root Codex and independent Codex reviewed RFF-LIB-REQ-014 revision 5 and
+[ADR-0039](../adr/0039-runnable-command-session.md#framed-input-follow-up).
+Input `aaf4b92a15a7a53448e0a59169f87890931fee24` matched refreshed origin.
+[Exact input run 42622569988](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42622569988),
+job 129178163857, passed all 20 steps and 260 workspace tests. The input
+local baseline and focused example passed.
+
+Root Codex ran these checks on Windows with Rust/Cargo 1.98.0,
+rustfmt 1.9.0-stable and Clippy 0.1.98:
+
+```powershell
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+$env:RUSTDOCFLAGS = '-D warnings'
+cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+```
+
+All passed, with 264 workspace tests and 18 focused tests. The four added
+tests in [traceability](TRACEABILITY.md#stage-5-framed-input--2026-11-11)
+verify short reads and returned errors, the gated next record during
+inbox rejection, validation before issuing an ID, clean end of input,
+truncation and defensive handling of an impossible count. The fixed
+saturation scenario now stages the saved New from an in-memory cursor
+and preserves the previous 40-line, 2,333-byte stdout exactly.
+
+Root Codex ran every command in the
+[independent binary recipe](../COMMAND_SESSION.md#verify-the-identical-independent-binary)
+with framework `E:/Projects/flight software framework` and consumer
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-608e87afd5e940a6bf396dacfbaa51fe`.
+Creation, offline dependency setup, copy, locked offline check, warnings-denied
+Clippy, 18 tests, run, metadata and hashing all passed. Metadata shows one
+independent binary workspace member, one framework path dependency and
+no framework dependencies. The example and independent main match byte
+for byte with SHA256
+`66986420c0de2c005f623f6ef2da58f85edcd5ec7ce50916175b4b268e37e354`
+and Git blob `03e5221cc89a002f0eab52ea692e3e7bdc5b27f9`.
+The independent and workspace stdout captures match exactly.
+
+The same reader and session own frame progress and ID issuance through
+each turn. An admission result describes enqueue. This test domain uses
+finite in-memory input and injected errors. Blocking and transport policy
+depend on the caller's reader.

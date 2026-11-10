@@ -150,3 +150,32 @@ targeted publication and serial host turns. Admission, callback effects
 accepted command. A repeated explicit turn has no effect once the slot is
 empty. See `SRC-RUST-RETAINED-INGRESS` in the
 [source register](../research/SOURCES.md).
+
+## Framed input follow-up
+
+Decision recorded on 2026-11-11 under RFF-LIB-REQ-014 revision 5. The
+retained ingress turn assumes a typed command. A host reading bytes needs
+to assemble a complete request without reading ahead while admission is
+blocked or allocating an ID before validating the request.
+
+The example owns one finite reader, one two-byte buffer and a prefix
+length beside the existing command slot. A record `[1, value]` requests
+a New operation. The host issues its ID only after reading and validating
+the full record. Internal command payloads still carry that ID. Retry
+and Cancel remain explicit host decisions. The host controls read,
+admission and dispatch as separate turns.
+
+Leaving input entirely caller-owned would keep the runnable boundary at
+typed commands. A `read_exact` loop fits a blocking reader, but hides
+short progress and leaves the consumed count unspecified on error. A
+variable-length command stream would require a framing and recovery
+policy for every opcode. The fixed-width example keeps one explicit read
+per turn and continues at the next record after rejecting a complete
+unknown tag. Zero bytes ends the finite source. A truncated frame or an
+overreported count ends intake with an error. Other read errors return
+the original cause and retain the prefix for a host-selected retry.
+
+The existing saturation scenario reads its saved New from this input and
+keeps the previous output. Revisit framing only when another downstream
+consumer needs a different boundary. See `SRC-RUST-FRAMED-INPUT` in the
+[source register](../research/SOURCES.md).

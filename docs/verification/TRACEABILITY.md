@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 framed input — 2026-11-11
+
+[ADR-0039](../adr/0039-runnable-command-session.md#framed-input-follow-up)
+separates explicit reads from the existing admission turn.
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 5 | `short_input_read_resumes_at_the_suffix_after_returned_errors` checks the exact resumed suffix. `full_inbox_leaves_the_next_input_record_unread` checks same-ID admission, FIFO and the next staged record. `framed_input_rejects_bad_tags_and_reports_issuer_exhaustion` checks validation before issuance, finite IDs and clean EOF. `truncated_and_overreported_reads_end_intake_without_issuing_an_id` checks terminal errors. The existing exact transcript exercises the finite reader. | [Focused command-session review](COMMAND_SESSION_REVIEW.md#framed-input-follow-up) |
+
 ## Stage 5 retained ingress — 2026-11-10
 
 [ADR-0039](../adr/0039-runnable-command-session.md#retained-ingress-follow-up)

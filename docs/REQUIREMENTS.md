@@ -539,6 +539,23 @@ retained command's separate callback result. Test retention when stopped and
 an empty turn after admission. Preserve the previous transcript as an exact
 prefix and verify the extended transcript in the identical independent binary.
 
+Revision 5 supplement (2026-11-11). The example shall stage fixed two-byte
+New requests from one caller-owned reader. A read turn shall call
+that reader at most once, request only the unfilled suffix and retain a
+partial prefix across returned I/O errors. A valid record shall use the
+session issuer to fill the existing command slot or report exhaustion.
+A malformed record shall consume no ID. The occupied slot shall suppress
+all reads until admission clears it or the host abandons it. Admission
+and dispatch stay separate.
+Zero bytes shall end this finite input, reporting a truncation error if
+a prefix was pending. An overreported count shall end input with an error.
+
+Acceptance: use the reader in the full-inbox recovery scenario and keep its
+exact transcript. Test a short read and returned error, rejected framing
+and issuer exhaustion, clean and truncated end of input, invalid progress,
+and a later record that stays unread through inbox rejection. Verify the
+identical independent binary.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured

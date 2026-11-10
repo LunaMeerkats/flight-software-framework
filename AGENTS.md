@@ -144,6 +144,8 @@ translate NASA C source.
   joining validated ingress, correlated replies, explicit local-result draining
   and two gated subscriber output slots. Its test-enabled target and independent
   binary recipe verify the same source without importing historical test fixtures.
+  One finite reader stages New requests in the saved command slot and pauses
+  while it is occupied. Read, admission, dispatch and output use separate turns.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

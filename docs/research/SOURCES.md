@@ -13,6 +13,20 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-FRAMED-INPUT — Explicit read progress
+
+- Sources: [`Read::read`](https://doc.rust-lang.org/std/io/trait.Read.html#tymethod.read)
+  and [`Read::read_exact`](https://doc.rust-lang.org/std/io/trait.Read.html#method.read_exact).
+  Rust standard library, accessed 2026-11-11.
+- Observation: a read may report fewer bytes than requested. A returned
+  error consumes no bytes, and zero on a nonempty buffer can indicate end of
+  input. The reader controls whether a call blocks. `read_exact` loops and
+  leaves the consumed count unspecified on error.
+- Local treatment: retain the known prefix and issue one explicit read of
+  the suffix per turn. Treat zero as final for this finite input. Use an
+  example-local two-byte New request and the existing saved-command slot.
+  See [ADR-0039](../adr/0039-runnable-command-session.md#framed-input-follow-up).
+
 ## SRC-RUST-RETAINED-INGRESS — A single caller-owned command slot
 
 - Source: [`Option<T>`](https://doc.rust-lang.org/std/option/enum.Option.html),

@@ -72,8 +72,9 @@ cargo run --locked --example command_session
 
 The host drains results and subscriber outputs separately through one writer.
 Each slot stays occupied through short writes and errors until its line is
-accepted. If the command inbox fills, the host keeps one saved command and
-chooses when to try admitting it again. Inbox acceptance, callback processing
+accepted. A finite framed reader stages a New request in one saved command
+slot. If the inbox fills, the host pauses input and chooses when to try
+admitting the same command again. Inbox acceptance, callback processing
 and writer acceptance remain distinct observations.
 
 [Attribute ordinary-work diagnostics](docs/APPLICATION_WORK_IDENTITY.md) using

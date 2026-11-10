@@ -13,6 +13,12 @@ draining remains separate. The [guide](COMMAND_SESSION.md) explains the finite
 scenario, resource/error policy and independent Cargo recipe. This consumer
 adds no framework service or API; existing test consumers retain their evidence.
 
+Revision 5 composes the retained command slot with one private finite reader.
+The example keeps one two-byte frame and its progress alongside the reader.
+A complete valid request uses the existing issuer to stage one typed command.
+Input pauses while that slot is occupied. The host independently selects
+admission and dispatch.
+
 ## Correlated operation cancellation — 2026-11-03
 
 RFF-LIB-REQ-012 and

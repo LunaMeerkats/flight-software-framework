@@ -78,6 +78,33 @@ The turn uses the existing ID and does not invoke a callback. A `Busy`
 result belongs to a command that already dispatched and has its own
 resubmission policy.
 
+## Read a New request from finite input
+
+The saturation script uses a `Cursor` over `[1, 9]` to stage operation 4.
+The input record `[1, value]` requests New. The host issues the ID after
+validating the complete record, then stages the typed command in the same
+saved slot. The framed input grammar belongs to the example. The script
+supplies its own bytes, and Retry and Cancel remain typed host decisions.
+
+Keep the same `NewInput` and session across turns. `read_turn` calls its
+reader at most once, requesting only the suffix it still needs. A short
+read reports `Partial`. A reader error returns the original `io::Error`
+and preserves the prefix. The host chooses when to retry, including after
+`Interrupted` or `WouldBlock`. The reader controls whether a call blocks.
+
+`Staged` means the command is ready for an explicit admission turn. A
+read while the slot is occupied reports `SlotOccupied` without touching
+the reader. `Delivered` frees the slot for the next record. The host can
+also clear the slot to abandon the saved command. A bad tag consumes that
+two-byte record and returns `Rejected(InvalidFrame)` without issuing an
+ID. A valid record after issuer exhaustion returns `Rejected(IdsExhausted)`
+and leaves the slot empty.
+
+Zero at a record boundary reports `End`. Zero after a partial record
+returns `UnexpectedEof`, and a count beyond the supplied suffix returns
+`InvalidData`. Both errors end intake. Later turns report `End` without
+another read. The host treats this input as finite.
+
 ## Write a result or reply
 
 The host opens a `SlotOutput` over the selected result or reply slot and its
@@ -109,8 +136,9 @@ durability and process recovery have separate boundaries.
 The session has three applications, one command inbox of capacity two, two
 reply inboxes of capacity one, a three-byte maximum message payload, one pending
 reply with two acceptance flags, one local result, two local outputs, one
-issuer for IDs 1..=255, one saved ingress command and one fixed rendered
-line with an accepted-byte offset. Setup uses the framework's
+issuer for IDs 1..=255, one saved ingress command, one two-byte input buffer
+with its read position and one fixed rendered line with an accepted-byte
+offset. Setup uses the framework's
 finite-capacity constructors.
 The host owns `HostSlots` and applications borrow its `Cell` slots directly.
 The host selects every callback and keeps each occupied record until its line
