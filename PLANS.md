@@ -27,5 +27,8 @@ evidence and withdraw only this run's incomplete changes.
 ## Result
 
 The locked local baseline passes 265 tests, including 19 focused tests.
+The independent binary produces the identical 51-line transcript.
+Implementation `1b746222d535eb467236c85c69170f7888576f58` passes all 20
+steps of hosted run 43045074920.
 See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#command-clearing-follow-up)
 for the exact source, transcript and publication evidence.

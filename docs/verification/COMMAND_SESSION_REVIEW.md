@@ -669,3 +669,17 @@ comment-only lines with no width findings and three unchanged fulfilled
 Clippy expectations. All 699 relative paths, 48 fragments and 229 exact
 test references resolve. All nine changed Markdown documents passed
 rendered content and structure review.
+
+Implementation `1b746222d535eb467236c85c69170f7888576f58` matches the
+reviewed staged tree and was published by an ordinary fast-forward push.
+[Exact hosted run 43045074920](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43045074920),
+job 130606750782, passed all 20 steps. The job ran 265 workspace tests,
+including all 19 command-session tests, 14 adapters and five sample tests.
+Warnings-denied rustdoc and both whitespace checks passed. The 222-line
+combined sample matched the input run. Hosted Rust/Cargo 1.99.1, rustfmt
+1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 with
+`windows-2025-vs2026` image `20261103.298.1`.
+
+Codex accepts this bounded serial host checkpoint. The evidence covers
+successful stop with known admissions and a retained earlier callback
+result. The record revision receives a separate hosted check.

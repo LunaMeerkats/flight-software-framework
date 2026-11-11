@@ -16,6 +16,9 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
 - The locked local baseline passes 265 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace example passes 19
   tests, including the extended transcript and unexpected-backlog rejection.
+- Implementation `1b746222d535eb467236c85c69170f7888576f58` passes all
+  20 steps of hosted run 43045074920, with 265 workspace tests and the
+  same 222-line combined host sample.
 
 ## Current architecture
 
@@ -30,16 +33,16 @@ The serial host selects read, admission, dispatch and output separately.
 
 ## Work in progress
 
-The command-clearing checkpoint uses the existing public lifecycle and
-dispatch contracts. See the focused review for independent binary and
-exact-revision hosted verification.
+The command-clearing checkpoint is complete with local, independent binary
+and hosted implementation evidence. The record revision receives separate
+hosted inspection.
 
 ## Highest risks and uncertainties
 
 - The reader controls whether a call blocks. The example treats zero as
   finite end of input. The caller decides when to retry a read or abandon
   a saved command.
-- The stop count can identify cleared commands only when the host knows
+- Attributing the stop count to specific commands requires knowledge of
   every outstanding admission. Returned callback failures count the
   discarded tail separately from the attempted command.
 - A recovering writer needs the same live presenter and writer. A stalled
