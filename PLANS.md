@@ -1,31 +1,31 @@
-# Read one framed request into the command session
+# Account for known command admissions when stopping the producer
 
 ## Objective and acceptance
 
-Compose a fallible finite reader with the existing saved command slot under
-RFF-LIB-REQ-014 revision 5 and [ADR-0039](docs/adr/0039-runnable-command-session.md#framed-input-follow-up).
-Use one example-local two-byte New record and the session issuer. Keep
-the reader and prefix together across turns and read only when the slot
-is free. Keep read progress, admission, callback and output separate.
+Use the existing messaging lifecycle and typed command-result APIs to
+distinguish one handled command from two commands cleared at stop. Follow
+RFF-LIB-REQ-014 revision 6 and the
+[ADR-0039 decision](docs/adr/0039-runnable-command-session.md#command-clearing-follow-up).
+
+Start the fixed scenario with an empty command inbox and result slot.
+Dispatch one command, retain its result and admit two known commands while
+that result gates further dispatch. Check the exact stop count before
+attributing the clearing. Restart, drain the earlier result and verify
+that producer dispatch reports an empty inbox.
 
 ## Verification and stopping point
 
-Input `aaf4b92a15a7a53448e0a59169f87890931fee24` matches refreshed origin.
-The local locked baseline and exact hosted run 42622569988 pass. Retain
-the exact 40-line command-session transcript. Test short and fallible reads,
-framing rejection, finite input termination, ID exhaustion and the unread
-next record while admission is blocked. Run the locked baseline and
-independent binary recipe, audit source form and rendered docs, review
-the complete diff and inspect exact hosted CI after publication.
+Preserve the preceding 40 transcript lines byte for byte. Exercise the
+complete new transcript and reject unexpected starting backlog. Run the
+locked baseline and the identical independent binary recipe. Audit source
+form, rendered docs and the complete diff. Inspect exact hosted CI after
+publication.
 
-Stop at the private consumer boundary. If verification cannot pass,
-preserve evidence and withdraw only this run's incomplete edits.
+Stop at the private serial consumer. If verification fails, retain the
+evidence and withdraw only this run's incomplete changes.
 
 ## Result
 
-The locked local baseline passes 264 tests. The example and independent
-binary pass 18 focused tests and match the input transcript byte for byte.
-Implementation `12931b7e936b35bd0f4c9ffd15510213a6629efe` passes all
-20 steps of exact hosted run 42822018637.
-See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#framed-input-follow-up)
-for local, downstream and hosted evidence.
+The locked local baseline passes 265 tests, including 19 focused tests.
+See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#command-clearing-follow-up)
+for the exact source, transcript and publication evidence.

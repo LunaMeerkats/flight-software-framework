@@ -7,6 +7,11 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-014 revision 6 demonstrates attribution of two cleared commands
+at a successful producer stop using known serial admissions and the existing
+discard count. The [command-session recipe](COMMAND_SESSION.md#account-for-queued-commands-at-stop)
+distinguishes those commands from the earlier result retained through restart.
+
 RFF-LIB-REQ-014 revision 5 brings one finite framed reader into the same
 command session. The [input recipe](COMMAND_SESSION.md#read-a-new-request-from-finite-input)
 explains short-read recovery, local ID issuance and why the next record

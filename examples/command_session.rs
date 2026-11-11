@@ -616,7 +616,8 @@ fn run_session(output: &mut impl Write) -> Result<(), Box<dyn Error>> {
     send(&mut session, busy, output)?;
     observe_reply(&mut session, Subscriber::First, output)?;
     observe_reply(&mut session, Subscriber::Second, output)?;
-    recover_ingress(&mut session, id, output)
+    recover_ingress(&mut session, id, output)?;
+    observe_stop_cleanup(&mut session, id, output)
 }
 
 fn recover_ingress(
@@ -659,6 +660,62 @@ fn recover_ingress(
     }
     observe_reply(session, Subscriber::First, output)?;
     observe_reply(session, Subscriber::Second, output)?;
+    Ok(())
+}
+
+fn observe_stop_cleanup(
+    session: &mut Session<'_>,
+    stale: OperationId,
+    output: &mut impl Write,
+) -> Result<(), Box<dyn Error>> {
+    if session.owner.pending(session.producer)? != 0 || session.slots.result.get().is_some() {
+        return Err(
+            io::Error::other("stop scenario requires an empty command inbox and result").into(),
+        );
+    }
+
+    let handled = Command::Retry(stale);
+    admit(session, handled, output)?;
+    let turn = session.producer_turn()?;
+    if turn != HostTurn::Dispatch(MessageDispatchOutcome::Dispatched) {
+        return Err(io::Error::other("expected the first command to dispatch").into());
+    }
+    writeln!(output, "producer turn before stop: {turn:?}")?;
+
+    // The host is the only source of commands for this inbox.
+    let queued = [session.new_command(11)?, session.new_command(12)?];
+    for command in queued {
+        admit(session, command, output)?;
+    }
+    if session.producer_turn()? != HostTurn::SlotOccupied {
+        return Err(io::Error::other("expected the older result to gate dispatch").into());
+    }
+    writeln!(output, "producer gate before stop: SlotOccupied")?;
+    let stopped = session.owner.stop(session.producer)?;
+    let discarded = stopped.discarded_deliveries();
+    if discarded != queued.len() {
+        return Err(io::Error::other("stop count does not match known admissions").into());
+    }
+    writeln!(
+        output,
+        "producer stop: {:?}, cleared {discarded} queued deliveries",
+        stopped.state()
+    )?;
+    for command in queued {
+        writeln!(output, "cleared before dispatch: {command:?}")?;
+    }
+
+    let state = session.owner.restart(session.producer)?;
+    writeln!(output, "producer restart: {state:?}")?;
+    if session.slots.result.get().map(|result| result.command) != Some(handled) {
+        return Err(io::Error::other("expected the earlier result after restart").into());
+    }
+    observe_result(session.slots, output)?;
+    let turn = session.producer_turn()?;
+    if turn != HostTurn::Dispatch(MessageDispatchOutcome::InboxEmpty) {
+        return Err(io::Error::other("expected an empty command inbox after restart").into());
+    }
+    writeln!(output, "producer turn after restart: {turn:?}")?;
     Ok(())
 }
 
@@ -809,6 +866,7 @@ mod tests {
         let expected: Vec<_> = expected_transcript()
             .into_iter()
             .chain(expected_ingress_recovery())
+            .chain(expected_stop_cleanup())
             .collect();
         assert_eq!(actual.lines().collect::<Vec<_>>(), expected);
     }
@@ -1034,6 +1092,41 @@ mod tests {
             "subscriber 0: Reply { id: OperationId(4), value: 9 }",
             "subscriber 1: Reply { id: OperationId(4), value: 9 }",
         ]
+    }
+
+    fn expected_stop_cleanup() -> [&'static str; 11] {
+        [
+            "ingress Retry(OperationId(2)): Delivered",
+            "producer turn before stop: Dispatch(Dispatched)",
+            "ingress New { id: OperationId(5), value: 11 }: Delivered",
+            "ingress New { id: OperationId(6), value: 12 }: Delivered",
+            "producer gate before stop: SlotOccupied",
+            "producer stop: Stopped, cleared 2 queued deliveries",
+            "cleared before dispatch: New { id: OperationId(5), value: 11 }",
+            "cleared before dispatch: New { id: OperationId(6), value: 12 }",
+            "producer restart: Running",
+            "result: CommandResult { command: Retry(OperationId(2)), effect: NoMatch }",
+            "producer turn after restart: Dispatch(InboxEmpty)",
+        ]
+    }
+
+    #[test]
+    fn stop_scenario_rejects_unexpected_backlog_before_clearing() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let command = session.new_command(9).unwrap();
+        assert_eq!(session.enqueue(command), Ok(DeliveryStatus::Delivered));
+
+        let mut output = Vec::new();
+        assert!(observe_stop_cleanup(&mut session, id(command), &mut output).is_err());
+        assert!(output.is_empty());
+        assert_eq!(slots.result.get(), None);
+        assert_eq!(session.owner.pending(session.producer), Ok(1));
+        assert_eq!(
+            session.producer_turn(),
+            Ok(HostTurn::Dispatch(MessageDispatchOutcome::Dispatched))
+        );
+        assert_eq!(slots.result.take().unwrap().command, command);
     }
 
     #[test]

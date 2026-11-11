@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 command clearing — 2026-11-12
+
+[ADR-0039](../adr/0039-runnable-command-session.md#command-clearing-follow-up)
+uses the existing successful stop outcome with known admissions.
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 6 | `finite_session_prints_exact_results_and_separate_subscriber_observations` checks two named queued commands, the exact stop count, the earlier result retained through restart and an empty inbox. `stop_scenario_rejects_unexpected_backlog_before_clearing` checks refusal before stop and preservation of the earlier queued command. | [Focused command-session review](COMMAND_SESSION_REVIEW.md#command-clearing-follow-up) |
+
 ## Stage 5 framed input — 2026-11-11
 
 [ADR-0039](../adr/0039-runnable-command-session.md#framed-input-follow-up)

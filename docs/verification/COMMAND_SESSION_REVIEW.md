@@ -611,3 +611,61 @@ rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 with
 
 Codex accepts the bounded host-consumer checkpoint. The documentation
 record revision receives a separate exact hosted inspection.
+
+## Command clearing follow-up
+
+RFF-LIB-REQ-014 revision 6 and
+[ADR-0039](../adr/0039-runnable-command-session.md#command-clearing-follow-up)
+use the existing stop count and the host's complete knowledge of the
+producer's inbox admissions. Input `e3884ae1ec883178a01ef9c658dbddb439660e21`
+matched refreshed origin.
+[Exact input run 42822345190](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/42822345190),
+job 129850769992, passed all 20 steps. The locked input baseline passed
+264 workspace tests and the example ran successfully.
+
+The 2026-11-12 local checks ran on Windows with Rust/Cargo 1.98.0,
+rustfmt 1.9.0-stable and Clippy 0.1.98:
+
+```powershell
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+$env:RUSTDOCFLAGS = '-D warnings'
+cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+cargo test --locked --test host_adapters
+cargo test --locked --test host_sample
+cargo run --locked --example host-echo
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+```
+
+All passed, with 265 workspace tests, 14 adapter tests, five sample tests
+and 19 focused example tests. The new transcript segment records the Retry
+callback, two distinct New admissions cleared by successful stop, the
+Retry result retained through restart and the empty restarted inbox. The
+added backlog test verifies that the scenario leaves an unexpected earlier
+command available for normal dispatch. Attribution requires complete
+knowledge of admissions to the selected inbox.
+
+Independent Codex ran every command in the
+[independent binary recipe](../COMMAND_SESSION.md#verify-the-identical-independent-binary)
+using consumer
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-151dfca7b3fd4e9aa4abd2e5179679df`.
+Creation, dependency setup, source copy, locked offline check, Clippy with
+warnings denied, 19 tests, run, metadata and hashing all passed. Metadata
+shows one independent binary workspace member and one framework path
+dependency. The framework has no dependencies. The two source files match
+byte for byte with SHA256
+`e6fcb31b2e41b651b24fcbe258a655f9c5cfc2b6066327a51ea10b9b588d8be0`
+and normalized Git blob `52b083ee3636a0283f7e8163e54c805f86cf4797`.
+Both executables emitted the same 51 lines and 2,904 bytes, including the
+exact 40-line, 2,333-byte input prefix.
+
+Root and independent Codex reviewed the complete implementation diff.
+The audit covers 55 Rust files, 26,042 physical lines and 1,400
+comment-only lines with no width findings and three unchanged fulfilled
+Clippy expectations. All 699 relative paths, 48 fragments and 229 exact
+test references resolve. All nine changed Markdown documents passed
+rendered content and structure review.

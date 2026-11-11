@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-STOP-COUNT — Lifecycle discard evidence
+
+- Sources: Rust Flight Framework, input revision
+  `e3884ae1ec883178a01ef9c658dbddb439660e21`, inspected 2026-11-12.
+  [Messaging runtime source](../../src/messaging_runtime.rs),
+  [inbox ownership](../adr/0011-runtime-owned-message-availability.md)
+  and [message dispatch](../adr/0012-application-message-dispatch.md).
+- Observation: successful stop clears the selected inbox and returns its
+  exact queued delivery count. Dispatch consumes the oldest delivery. A
+  returned message callback error clears the selected tail and reports
+  its count separately from the attempted head.
+- Local treatment: combine known admissions and an earlier typed result
+  with the existing stop count. The runtime supplies the count, and
+  identity attribution is the serial consumer's responsibility.
+  See [ADR-0039](../adr/0039-runnable-command-session.md#command-clearing-follow-up).
+
 ## SRC-RUST-FRAMED-INPUT — Explicit read progress
 
 - Sources: [`Read::read`](https://doc.rust-lang.org/std/io/trait.Read.html#tymethod.read)

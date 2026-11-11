@@ -1,25 +1,21 @@
 # Project state
 
-Last updated: **2026-11-11**
+Last updated: **2026-11-12**
 
 ## Current milestone
 
-Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-014 revision 5
-[composes finite framed input](verification/COMMAND_SESSION_REVIEW.md#framed-input-follow-up)
-with the saved command slot. The reviewed host v0.1 milestone remains the
-regression baseline. Package 0.0.0 is unpublished with provisional APIs.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-014 revision 6
+[accounts for known command admissions cleared at stop](verification/COMMAND_SESSION_REVIEW.md#command-clearing-follow-up).
+The reviewed host v0.1 milestone remains the regression baseline. Package
+0.0.0 is unpublished with provisional APIs.
 
 ## Verified baseline
 
-- Input `aaf4b92a15a7a53448e0a59169f87890931fee24` matches refreshed origin.
-  Hosted run 42622569988 passes all 20 steps, 260 workspace tests and the
-  222-line combined host sample.
-- The locked local baseline passes 264 tests with Rust/Cargo 1.98.0,
-  rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace example and identical
-  independent binary pass 18 tests and preserve the 40-line transcript.
-- Implementation `12931b7e936b35bd0f4c9ffd15510213a6629efe` passes all 20
-  steps of hosted run 42822018637 with 264 workspace tests and the unchanged
-  222-line combined host sample.
+- Input `e3884ae1ec883178a01ef9c658dbddb439660e21` matches refreshed origin.
+  Hosted run 42822345190 passes all 20 steps with 264 workspace tests.
+- The locked local baseline passes 265 tests with Rust/Cargo 1.98.0,
+  rustfmt 1.9.0-stable and Clippy 0.1.98. The workspace example passes 19
+  tests, including the extended transcript and unexpected-backlog rejection.
 
 ## Current architecture
 
@@ -34,15 +30,18 @@ The serial host selects read, admission, dispatch and output separately.
 
 ## Work in progress
 
-The framed-input checkpoint is complete with local, independent binary
-and hosted implementation evidence. The record revision receives separate
-hosted inspection.
+The command-clearing checkpoint uses the existing public lifecycle and
+dispatch contracts. See the focused review for independent binary and
+exact-revision hosted verification.
 
 ## Highest risks and uncertainties
 
 - The reader controls whether a call blocks. The example treats zero as
   finite end of input. The caller decides when to retry a read or abandon
-  a saved command. Inbox acceptance can precede lifecycle cleanup.
+  a saved command.
+- The stop count can identify cleared commands only when the host knows
+  every outstanding admission. Returned callback failures count the
+  discarded tail separately from the attempted command.
 - A recovering writer needs the same live presenter and writer. A stalled
   line delays other presentation through that writer while slots and
   inboxes bound staged work.
@@ -57,12 +56,11 @@ separate gates.
 
 ## Most likely next task
 
-Inspect a downstream application that needs to distinguish a handled
-command from one cleared during lifecycle transition. Decide whether
-existing dispatch and stop evidence is sufficient for that host.
+Assess whether a downstream supervisor can distinguish missing application
+progress across completed host turns from a returned callback failure using
+the existing clock, event and lifecycle APIs.
 
 ## Latest run
 
-2026-11-11. The fixed scenario stages a New command from a finite reader.
-Tests verify short-read recovery, full-inbox backpressure without read-ahead,
-retained identity, malformed records, exhausted IDs and terminal input.
+2026-11-12. The fixed scenario matches a producer stop count to two known
+New admissions and observes the earlier Retry result after restart.

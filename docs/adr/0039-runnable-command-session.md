@@ -179,3 +179,31 @@ The existing saturation scenario reads its saved New from this input and
 keeps the previous output. Revisit framing only when another downstream
 consumer needs a different boundary. See `SRC-RUST-FRAMED-INPUT` in the
 [source register](../research/SOURCES.md).
+
+## Command clearing follow-up
+
+Decision recorded on 2026-11-12 under RFF-LIB-REQ-014 revision 6. The
+command host needs to distinguish a handled command from an accepted
+command that disappears from the inbox at stop. The result slot identifies
+the earlier callback. A successful stop reports the number of queued
+deliveries removed from the selected inbox.
+
+Demonstrate attribution using a known empty inbox, a serial host that
+controls every command admission and two exact commands retained in the
+fixed script. The older result gates dispatch while both admissions enter
+the inbox. Check the stop count before reporting the two cleared commands.
+Restart retains the earlier result and reconnects the empty inbox.
+
+A standing host ledger could track a longer stream with exclusive
+admission, at the cost of tracking each enqueue, dispatch and failure.
+A library API returning discarded payloads could serve hosts without
+exclusive admission, but would introduce an ownership and storage contract.
+The fixed scenario needs only the existing count and its two known offers.
+Revisit those alternatives for a consumer with an ongoing accounting need
+or commands entering outside its view.
+
+A stop count describes queued deliveries. On callback failure the attempted
+head is consumed separately from the counted tail. The script handles
+successful stop only and leaves any decision to resubmit to the host.
+See the [messaging ownership decision](0011-runtime-owned-message-availability.md)
+and the [dispatch decision](0012-application-message-dispatch.md).

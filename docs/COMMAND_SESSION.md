@@ -105,6 +105,28 @@ returns `UnexpectedEof`, and a count beyond the supplied suffix returns
 `InvalidData`. Both errors end intake. Later turns report `End` without
 another read. The host treats this input as finite.
 
+## Account for queued commands at stop
+
+The script begins this turn with an empty command inbox and result slot.
+It dispatches a stale Retry and keeps its typed `NoMatch` result in the
+slot. The host admits New operations 5 and 6 while that result gates
+another producer callback. It retains both exact commands in the script.
+
+Call `MessagingRuntime::stop` and compare
+`MessagingStopOutcome::discarded_deliveries` with those known admissions
+before reporting either command as cleared. The host controls every
+producer inbox admission and no command dispatch occurs between those
+offers and stop. The count corroborates that both queued commands were
+cleared. After restart, the host writes the earlier Retry result and a
+producer turn reports `InboxEmpty`.
+
+The stop outcome supplies a count. Payload attribution requires complete
+knowledge of the inbox's outstanding admissions. Keep the full command
+and its admission position if the same operation ID can appear in several
+requests. A returned message callback error consumes the attempted head
+separately from the counted discarded tail. The fixed script uses
+successful stop and leaves any resubmission decision with the host.
+
 ## Write a result or reply
 
 The host opens a `SlotOutput` over the selected result or reply slot and its

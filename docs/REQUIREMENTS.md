@@ -556,6 +556,20 @@ and issuer exhaustion, clean and truncated end of input, invalid progress,
 and a later record that stays unread through inbox rejection. Verify the
 identical independent binary.
 
+Revision 6 supplement (2026-11-12). The serial example shall distinguish a
+command with a recorded callback result from known admissions cleared by a
+successful producer stop. Start from an empty command inbox and result slot.
+After one successful dispatch, keep its result staged while the host admits
+exactly two commands and confirms that the producer turn is gated. Identify
+those commands as cleared only after the stop count matches both admissions.
+Restart the producer, observe the earlier result and confirm that dispatch
+reports an empty inbox.
+
+Acceptance: extend the exact transcript, preserve the previous output as a
+byte-identical prefix and verify the identical independent binary. Reject
+unexpected starting backlog before attributing any commands. Attribution
+depends on the host knowing every admission to the selected inbox.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured
