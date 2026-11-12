@@ -126,6 +126,9 @@ translate NASA C source.
   severity-filter evidence. Its guide verifies identical tests in an independent
   Cargo package; unfiltered emission and failure-event wrappers retain their
   existing contracts.
+- `tests/host_progress.rs`: a public-only serial host that observes fresh
+  samples after work, checks elapsed silence and reports queue outcomes.
+  Its guide verifies identical tests in an independent Cargo package.
 - `tests/callback_publication.rs`: public-only application-owned reply/retry
   consumer and message-context selective publication evidence. Its guide uses
   identical tests in an independent Cargo package; host retry commands remain
@@ -251,6 +254,13 @@ recipe in [the filtering guide](docs/EVENT_FILTERING.md). Check, lint and test t
 identical test source; inspect metadata and compare SHA256 hashes. Record the
 actual package path and results in the focused filtering review. Filtering is
 optional admission policy, not reserved capacity or guaranteed event delivery.
+
+When changing the host progress consumer or its guidance, run
+`cargo test --locked --test host_progress` and the independent-package recipe
+in [its guide](docs/HOST_PROGRESS.md). Check, lint and test identical source.
+Inspect metadata, SHA256 and bytes and record actual results in the
+[focused review](docs/verification/HOST_PROGRESS_REVIEW.md). The observation
+step requires the selected callback to return.
 
 When changing callback selective publication or its guidance, run
 `cargo test --locked --test callback_publication`, then follow the independent

@@ -1,5 +1,14 @@
 # Verification traceability
 
+## Stage 5 application progress — 2026-11-13
+
+[ADR-0041](../adr/0041-host-observed-application-progress.md) assigns the
+progress policy to the serial host and uses the existing work failure path.
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-016 revision 1 | `fresh_sample_at_threshold_resets_window_and_rearms_warning` checks startup timing, a sample at equality, the reset window, and warnings at equality and on a late turn. `full_queue_preserves_prior_warning_and_exposes_rejected_attempt` checks the exact rejected record and suppression after draining. `returned_failure_at_threshold_skips_overdue_observation` checks the typed callback error, Failed state, single error event and later lifecycle rejection. | [Focused host progress review](HOST_PROGRESS_REVIEW.md) |
+
 ## Stage 5 command clearing — 2026-11-12
 
 [ADR-0039](../adr/0039-runnable-command-session.md#command-clearing-follow-up)

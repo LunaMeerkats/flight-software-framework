@@ -1,34 +1,27 @@
-# Account for known command admissions when stopping the producer
+# Observe overdue application progress on completed host turns
 
 ## Objective and acceptance
 
-Use the existing messaging lifecycle and typed command-result APIs to
-distinguish one handled command from two commands cleared at stop. Follow
-RFF-LIB-REQ-014 revision 6 and the
-[ADR-0039 decision](docs/adr/0039-runnable-command-session.md#command-clearing-follow-up).
+Demonstrate that a serial host using public APIs can detect missing sample
+output while the application continues returning successfully. Follow
+RFF-LIB-REQ-016 and [ADR-0041](docs/adr/0041-host-observed-application-progress.md).
 
-Start the fixed scenario with an empty command inbox and result slot.
-Dispatch one command, retain its result and admit two known commands while
-that result gates further dispatch. Check the exact stop count before
-attributing the clearing. Restart, drain the earlier result and verify
-that producer dispatch reports an empty inbox.
+Use one application, a bounded sample slot, a ManualClock and a capacity-one
+event queue. Verify the inclusive threshold, fresh-sample precedence, a
+second overdue interval after fresh progress, and a rejected warning without
+automatic retry. Exercise the existing typed callback error and later
+lifecycle rejection at the same clock reading.
 
 ## Verification and stopping point
 
-Preserve the preceding 40 transcript lines byte for byte. Exercise the
-complete new transcript and reject unexpected starting backlog. Run the
-locked baseline and the identical independent binary recipe. Audit source
-form, rendered docs and the complete diff. Inspect exact hosted CI after
-publication.
-
-Stop at the private serial consumer. If verification fails, retain the
+Run the public integration test inside and outside the workspace with
+identical source. Run the locked baseline, review source form and the
+complete diff, render the changed guidance and inspect exact hosted CI.
+Stop at the serial consumer policy. If verification fails, keep the
 evidence and withdraw only this run's incomplete changes.
 
 ## Result
 
-The locked local baseline passes 265 tests, including 19 focused tests.
-The independent binary produces the identical 51-line transcript.
-Implementation `1b746222d535eb467236c85c69170f7888576f58` passes all 20
-steps of hosted run 43045074920.
-See the [focused review](docs/verification/COMMAND_SESSION_REVIEW.md#command-clearing-follow-up)
-for the exact source, transcript and publication evidence.
+The locked local baseline passes 268 tests. All three focused tests pass
+with byte-identical source in the workspace and an independent package.
+See the [focused review](docs/verification/HOST_PROGRESS_REVIEW.md).

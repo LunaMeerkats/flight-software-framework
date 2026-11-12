@@ -13,6 +13,26 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-HOST-PROGRESS — Completed-turn observation
+
+- Sources: Rust Flight Framework at input revision
+  `336ecfa17a22fabe93cd376e84f9194a1eaa8fbe`. The
+  [manual clock](../../src/clock.rs) advances explicitly and the
+  [work wrapper](../../src/runtime_events.rs) reports after lifecycle
+  commitment. A successful callback leaves the selected record Running.
+- [Health and Safety Application README](https://github.com/nasa/HS/blob/1500e1f9d608fd63171dd5cfd67dc5510891505a/README.md),
+  NASA Goddard, accessed 2026-11-13. Application monitoring, event monitoring,
+  optional execution-counter reporting and hardware watchdog servicing are
+  distinct upstream responsibilities. Adopt that distinction as context.
+  The local serial policy observes mission output through public Rust APIs.
+- [Cell::take](https://doc.rust-lang.org/std/cell/struct.Cell.html#method.take)
+  and [Duration subtraction](https://doc.rust-lang.org/std/time/struct.Duration.html),
+  Rust standard library 1.99.1, accessed 2026-11-13. Adopt a consume-once
+  optional sample slot and compare the elapsed difference from the same
+  nondecreasing clock. The latter invariant keeps subtraction in range.
+  [ADR-0041](../adr/0041-host-observed-application-progress.md) records the
+  alternatives and local observation boundary.
+
 ## SRC-RFF-STOP-COUNT — Lifecycle discard evidence
 
 - Sources: Rust Flight Framework, input revision

@@ -586,3 +586,26 @@ structurally valid swap of producer and subscriber inboxes shall report the
 missing required subscription while all applications remain registered. The
 identical independent binary shall preserve the existing successful transcript
 and behavioral cases. Application IDs remain scoped to their issuing runtime.
+
+### RFF-LIB-REQ-016 — Observe application progress on host turns
+
+Revision 1 (2026-11-13). A serial public-API consumer shall check for a fresh
+application sample after each successful selected work callback. The host
+shall start one elapsed-time window after successful startup and reset it
+when it receives a fresh sample. The host shall attempt one warning on the
+first completed callback without a sample observed at or after the threshold.
+A fresh sample at that instant shall reset the window. Each window permits
+one warning attempt, including a queue rejection. The host shall retain the
+attempted record and queue outcome in its turn result. The application shall
+remain Running after a warning.
+
+A returned callback error shall preserve the runtime's typed error, Failed
+state and failure-event attempt. That turn shall skip the progress check,
+including when the threshold is due. A lifecycle rejection shall produce
+neither diagnostic. The host shall use one injected clock and a finite
+event queue. This observes completed serial turns.
+
+Acceptance: verify the exact threshold, warning suppression and rearming,
+fresh progress at the threshold, queue saturation, typed callback failure
+at the threshold, and a later lifecycle rejection. Run the identical
+public-API test source in an independent package.

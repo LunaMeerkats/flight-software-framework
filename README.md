@@ -85,6 +85,11 @@ consumer tests demonstrate immediate feedback from a caller-owned event queue.
 host-owned cursor, positive interval and explicit late-poll/overflow policy.
 The host delegates each chosen release to the existing work owner.
 
+[Observe sample progress after ordinary work](docs/HOST_PROGRESS.md) with a
+bounded output slot and an elapsed-time warning. A successful turn without a
+sample leaves the application Running. Returned errors follow the runtime's
+failure path.
+
 [Filter optional events](docs/EVENT_FILTERING.md) before enqueue with an explicit
 severity threshold. Suppression, recording and saturation remain distinct;
 admitted events retain the queue's existing FIFO and reject-newest behavior.
