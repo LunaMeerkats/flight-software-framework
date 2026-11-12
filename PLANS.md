@@ -24,4 +24,6 @@ evidence and withdraw only this run's incomplete changes.
 
 The locked local baseline passes 268 tests. All three focused tests pass
 with byte-identical source in the workspace and an independent package.
+Implementation `d8b77724ea1b63a954c5becb64371c8e37de35ea` passes all 20
+steps of hosted run 43225151848.
 See the [focused review](docs/verification/HOST_PROGRESS_REVIEW.md).

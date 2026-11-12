@@ -16,6 +16,9 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
 - The locked local baseline passes 268 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. All three host progress tests pass
   in the workspace and an independent package with identical source.
+- Implementation `d8b77724ea1b63a954c5becb64371c8e37de35ea` passes all
+  20 steps in hosted run 43225151848 with 268 workspace tests and the
+  same 222-line combined host sample.
 
 ## Current architecture
 
@@ -28,8 +31,9 @@ manual clock and one event queue with the existing runtime work error path.
 
 ## Work in progress
 
-The host progress consumer is implemented and locally verified. See the
-[focused review](verification/HOST_PROGRESS_REVIEW.md) for exact results.
+The host progress checkpoint is complete with local, independent-package
+and hosted implementation evidence. The record revision receives separate
+hosted inspection. [Focused review](verification/HOST_PROGRESS_REVIEW.md)
 
 ## Highest risks and uncertainties
 

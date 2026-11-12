@@ -78,6 +78,24 @@ and normalized Git blob `2fe5df093fe4922d0d08b2a072eb59de307b54dd`.
 
 ## Source review and publication
 
-The implementation receives separate source review and hosted inspection.
-Ignored raw logs and review aids are under
-`target/review-2026-11-13-host-progress`.
+Codex and an independent Codex reviewer accepted the complete implementation
+diff. The audit covers 56 Rust files, 26,331 physical lines and 1,402
+comment-only lines, with no width findings and three unchanged fulfilled
+Clippy expectations. All 721 relative paths, 48 fragments and 232 exact test
+references resolve. All 11 changed Markdown files passed rendered content
+and structure review. The committed tree and test blob match the reviewed
+staged tree and verified consumer source.
+
+Implementation `d8b77724ea1b63a954c5becb64371c8e37de35ea` was published
+by an ordinary fast-forward push to `origin/main`.
+[Exact hosted run 43225151848](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43225151848),
+job 131206316119, passed all 20 steps, including 268 workspace tests
+with all three host progress tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined host
+sample reproduced the input's 222 lines. Hosted Rust/Cargo 1.99.1,
+rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 and
+`windows-2025-vs2026` image `20261103.298.1`, matching input.
+
+Codex accepts the completed-turn consumer checkpoint. The record revision
+receives separate hosted inspection. Ignored raw logs and review aids are
+under `target/review-2026-11-13-host-progress`.
