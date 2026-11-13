@@ -126,9 +126,10 @@ translate NASA C source.
   severity-filter evidence. Its guide verifies identical tests in an independent
   Cargo package; unfiltered emission and failure-event wrappers retain their
   existing contracts.
-- `tests/host_progress.rs`: a public-only serial host that observes fresh
-  samples after work, checks elapsed silence and reports queue outcomes.
-  Its guide verifies identical tests in an independent Cargo package.
+- `tests/host_progress.rs`: public-only serial hosts that observe fresh samples
+  after work and report queue outcomes. The periodic host excludes observed
+  downstream deferral from the sample window while retaining the next release.
+  The guide verifies identical tests in an independent Cargo package.
 - `tests/callback_publication.rs`: public-only application-owned reply/retry
   consumer and message-context selective publication evidence. Its guide uses
   identical tests in an independent Cargo package; host retry commands remain

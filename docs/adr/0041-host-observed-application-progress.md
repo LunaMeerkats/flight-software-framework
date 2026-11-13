@@ -2,7 +2,7 @@
 
 - Status: Accepted for the Stage 5 consumer
 - Date: 2026-11-13
-- Scope: RFF-LIB-REQ-016, revision 1
+- Scope: RFF-LIB-REQ-016, revisions 1 and 2
 
 ## Context
 
@@ -48,3 +48,34 @@ state and performs no scheduling or recovery. A full queue rejects the new
 warning and the turn result exposes that decision. Consider a reusable
 monitor API when another consumer demonstrates shared policy. Revisit execution
 isolation when observation must continue during a callback that never returns.
+
+## Periodic work under downstream backpressure
+
+Decision date: 2026-11-14.
+
+A periodic host can withhold a callback while a previously observed sample
+occupies its downstream slot. Following the gate in
+[ADR-0033](0033-backpressure-aware-host-coordination.md), defer before polling
+the release cursor and leave both pending items in place. Use the first
+deferred turn and first later turn with room as the clock boundaries. Exclude
+that interval from the sample window, carrying forward the elapsed time and
+warning-attempt state that preceded deferral. Draining the slot is an explicit
+host action. The next host turn observes resumption.
+
+Poll at most once after the gate opens. A late poll releases one item and
+re-arms from the observed time under [ADR-0030](0030-host-owned-periodic-releases.md).
+Only a released item reaches work and sample observation. A callback error
+keeps the existing failure-event path. Either a callback error or a lifecycle
+rejection disables the host's cursor and passes the typed error to the caller.
+
+An uninterrupted elapsed window would attribute time to missing output while
+the host deliberately withholds work. A new window on resumption would
+forgive elapsed time before the gate closed. Polling and discarding blocked
+releases would change which item is retained. The selected policy preserves
+both the pending release and the pre-deferral progress window.
+
+This is an observation policy for a serial consumer with one downstream
+slot. It uses host turn timestamps for the deferral boundaries. A mission
+that needs to report prolonged downstream congestion should track that
+condition separately. Revisit a shared policy if a second consumer needs
+the same window and gate semantics.

@@ -13,6 +13,22 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-PROGRESS-DEFERRAL — Periodic work and sample timing
+
+- Sources: Rust Flight Framework at input revision
+  `93118f295cc89c9374e3429f2775939d6213f22b`, inspected 2026-11-14.
+  The [periodic cursor](../../src/scheduling/periodic.rs) retains an unpolled
+  release and re-arms from the observed instant on a late poll.
+  [ADR-0033](../adr/0033-backpressure-aware-host-coordination.md) gates the
+  poll on downstream capacity. Reuse those decisions in the sample consumer.
+- [Duration subtraction](https://doc.rust-lang.org/std/time/struct.Duration.html#method.checked_sub),
+  Rust standard library 1.100.0, accessed 2026-11-14. Subtraction requires a
+  nonnegative difference. Rebase the sample window by subtracting the
+  pre-deferral elapsed duration from the resume time. The ordering of
+  window start, deferral and resume on one manual clock keeps both
+  subtractions in range. The choice of which time to count belongs to this
+  consumer. [ADR-0041](../adr/0041-host-observed-application-progress.md#periodic-work-under-downstream-backpressure)
+
 ## SRC-RFF-HOST-PROGRESS — Completed-turn observation
 
 - Sources: Rust Flight Framework at input revision

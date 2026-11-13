@@ -99,3 +99,36 @@ rustfmt 1.10.0-stable and Clippy 0.1.99 ran on runner 2.338.2 and
 Codex accepts the completed-turn consumer checkpoint. The record revision
 receives separate hosted inspection. Ignored raw logs and review aids are
 under `target/review-2026-11-13-host-progress`.
+
+## Periodic deferral follow-up
+
+Date: **2026-11-14**
+
+RFF-LIB-REQ-016 revision 2 and [ADR-0041](../adr/0041-host-observed-application-progress.md#periodic-work-under-downstream-backpressure)
+compose the existing observer with a periodic cursor and one downstream
+slot. The first observed blocked turn starts the pause. A later turn
+with space preserves the elapsed time accrued before the pause and
+polls the retained release. This demonstrates host observations and
+local queue outcomes. The host must still regain control to observe work.
+
+Input `93118f295cc89c9374e3429f2775939d6213f22b` matched refreshed origin.
+[Exact input run 43367462734](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43367462734),
+job 131695138725, passed all 20 steps and 268 workspace tests. The locked
+local input baseline also passed with 268 workspace tests.
+
+The local commands above passed with 270 workspace tests and five focused
+tests. The same local Rust, Cargo, rustfmt and Clippy versions applied.
+The two new histories check repeated deferral with retained input, sample
+and release, a single late release, a waiting poll, the warning at the
+adjusted threshold, and typed failure with cursor disablement at equality.
+All three revision 1 histories also pass.
+
+The independent-package commands above passed using
+`C:/Users/drrsm/AppData/Local/Temp/rff-host-progress-09b8b356e5fc407dab37a3be1d4400c8`.
+Offline locked check, Clippy, all five tests and metadata passed. Metadata
+confirmed one independent workspace member and the sole framework path
+dependency, with two graph packages. The 15,289 source bytes matched with
+SHA256 `e2748f7913551a101fc50993e637decd4f3f5d461732e13651ee48107d912dfe`
+and normalized Git blob `f1b516a18c9e1b16a22ad1dc9c53d47bd67aa2e1`.
+Ignored raw logs and review aids are under
+`target/review-2026-11-14-progress-deferral`.

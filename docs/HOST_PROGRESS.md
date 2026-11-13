@@ -4,6 +4,7 @@ A sampler can complete ordinary work successfully while its input is empty.
 When a mission expects fresh readings, the serial host can check for a sample
 after each successful work call and report when the absence reaches a threshold.
 The public-API consumer uses a one-byte sample and a two-second window.
+It covers directly selected work and periodic work with a downstream gate.
 [Consumer source](../tests/host_progress.rs)
 
 ```text
@@ -51,6 +52,39 @@ clock, whose readings are nondecreasing. A late turn reports at the observed
 instant. A callback that never returns prevents the host from reaching the
 check. Scheduling and any action after a warning remain host decisions.
 [Design decision](adr/0041-host-observed-application-progress.md)
+
+## Defer periodic work when the downstream slot is full
+
+The periodic consumer adds one `PeriodicWork` cursor for the same application
+and one downstream slot. A successful work turn stages a fresh sample in the
+slot. The caller takes it separately. While the slot is occupied, the host
+returns `Deferred` before polling the cursor. Both the sample and the pending
+release stay in place. The sampler's input remains untouched.
+
+The first deferred turn starts the pause even if the retained release is
+still in the future. The first later turn that sees room ends the pause, even
+if the caller drained the slot earlier. On that turn the host carries forward
+the elapsed time from before the pause and keeps the warning-attempt state.
+Both boundaries are observations on the same `ManualClock`. With room
+available, the host polls once. A late poll releases one pending item and
+re-arms from its observation time. A waiting or exhausted cursor yields
+`Idle`. Only a release leads to work.
+
+| Clock | Host turn | Sample window |
+| --- | --- | --- |
+| 0 s | Work produces a sample and fills the slot. | Fresh sample starts the window. |
+| 1 s | The host defers with the sample still pending. | One second has elapsed. |
+| 10 s | After the caller drains the slot, work runs for the retained 1 s release. | One second still counts. An empty callback returns `NoSample`. |
+| 11 s | The next release runs and returns empty. | Two seconds count. The host attempts a warning timestamped at 11 s. |
+
+A fresh sample still resets the window. A work call that returns a callback
+error or lifecycle rejection passes that error back to the caller and
+disables the cursor. Callback errors include the failure-event attempt.
+Later turns return `Disabled`. The cursor and two optional values for the
+staged sample and pause timestamp add fixed storage. The window describes
+the host's observed opportunity for work. Time spent congested can be
+measured separately if the caller needs that diagnostic.
+[Periodic policy decision](adr/0041-host-observed-application-progress.md#periodic-work-under-downstream-backpressure)
 
 ## Verify the consumer outside the workspace
 

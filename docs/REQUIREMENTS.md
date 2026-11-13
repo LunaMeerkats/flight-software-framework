@@ -609,3 +609,23 @@ Acceptance: verify the exact threshold, warning suppression and rearming,
 fresh progress at the threshold, queue saturation, typed callback failure
 at the threshold, and a later lifecycle rejection. Run the identical
 public-API test source in an independent package.
+
+Revision 2 (2026-11-14) retains revision 1 for directly selected work and adds
+a periodic consumer with one downstream sample slot. A turn with that slot
+occupied shall report deferral before polling or invoking work. It shall
+retain the staged sample and the next release. The progress window shall
+exclude the interval from the first turn that observes the occupied slot to
+the first later turn that observes space. Pre-deferral elapsed time and the
+warning-attempt state shall be preserved.
+
+On resumption the host shall poll once using the same clock and invoke only
+a released item. A waiting or exhausted cursor shall produce no progress
+observation. The first successful empty work turn at the adjusted threshold
+shall follow the revision 1 warning rule. A returned work error shall retain
+the typed failure path and disable this host's cursor.
+
+Acceptance: verify retained output, release and input across repeated deferred
+turns, one late release with observation-based re-arming, no warning on an
+early or waiting turn, a warning at the adjusted threshold, and returned
+failure at that threshold with no further release. Re-run revision 1 and
+the periodic cases in the same independent public-API package.

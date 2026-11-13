@@ -1,29 +1,28 @@
-# Observe overdue application progress on completed host turns
+# Account for downstream deferral in periodic progress observation
 
 ## Objective and acceptance
 
-Demonstrate that a serial host using public APIs can detect missing sample
-output while the application continues returning successfully. Follow
-RFF-LIB-REQ-016 and [ADR-0041](docs/adr/0041-host-observed-application-progress.md).
+Compose the existing host progress policy with a public periodic cursor
+and one downstream sample slot. Keep the three directly selected work
+histories. Follow RFF-LIB-REQ-016 revision 2 and
+[ADR-0041](docs/adr/0041-host-observed-application-progress.md).
 
-Use one application, a bounded sample slot, a ManualClock and a capacity-one
-event queue. Verify the inclusive threshold, fresh-sample precedence, a
-second overdue interval after fresh progress, and a rejected warning without
-automatic retry. Exercise the existing typed callback error and later
-lifecycle rejection at the same clock reading.
+Verify that an occupied slot preserves the sample, next release and
+application input through deferred turns. Exclude only the observed
+blocked interval, then show late re-arming and an overdue warning at the
+adjusted threshold. Preserve a returned error at equality and disable the
+periodic cursor. Keep observation and callback admission in the serial host.
 
 ## Verification and stopping point
 
-Run the public integration test inside and outside the workspace with
-identical source. Run the locked baseline, review source form and the
-complete diff, render the changed guidance and inspect exact hosted CI.
-Stop at the serial consumer policy. If verification fails, keep the
+Run the locked baseline, focused workspace tests and the independent package
+recipe with byte-identical source. Review source form, links, rendered
+guidance and the complete diff. Inspect exact hosted CI after the source push.
+Stop after one periodic consumer policy. If verification fails, retain the
 evidence and withdraw only this run's incomplete changes.
 
 ## Result
 
-The locked local baseline passes 268 tests. All three focused tests pass
-with byte-identical source in the workspace and an independent package.
-Implementation `d8b77724ea1b63a954c5becb64371c8e37de35ea` passes all 20
-steps of hosted run 43225151848.
-See the [focused review](docs/verification/HOST_PROGRESS_REVIEW.md).
+The locked local baseline passes 270 tests. All five host progress tests
+pass with identical source in the workspace and an independent package.
+See the [periodic deferral review](docs/verification/HOST_PROGRESS_REVIEW.md#periodic-deferral-follow-up).

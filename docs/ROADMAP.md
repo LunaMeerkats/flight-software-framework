@@ -9,10 +9,11 @@ Status: **Active**
 
 RFF-LIB-REQ-016 and [ADR-0041](adr/0041-host-observed-application-progress.md)
 show how a serial host can recognize overdue sample output across completed
-work turns while preserving the typed returned-error path.
-The [consumer guide](HOST_PROGRESS.md) describes the window, queue outcomes
-and lifecycle effects. The [focused review](verification/HOST_PROGRESS_REVIEW.md)
-records the independent consumer and verification.
+work turns while preserving the typed returned-error path. Revision 2
+composes that policy with a periodic cursor and a downstream slot. An
+observed deferral preserves the pending release and pauses the sample window.
+The [consumer guide](HOST_PROGRESS.md) describes both policies.
+The [focused review](verification/HOST_PROGRESS_REVIEW.md) records the evidence.
 
 RFF-LIB-REQ-014 revision 6 demonstrates attribution of two cleared commands
 at a successful producer stop using known serial admissions and the existing

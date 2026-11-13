@@ -1,4 +1,4 @@
-//! A serial public-API consumer that observes fresh samples after work.
+//! Serial public-API consumers that observe fresh samples after work.
 
 use std::cell::Cell;
 use std::convert::Infallible;
@@ -9,10 +9,12 @@ use std::time::Duration;
 use rust_flight_framework::{
     Application, ApplicationId, ApplicationState, ApplicationWorkContext, Clock, Event,
     EventEmitOutcome, EventQueue, EventSeverity, EventSource, EventTimestamp, FrameworkInstant,
-    LifecycleError, ManualClock, Runtime, RuntimeWorkError, RuntimeWorkEventError,
+    LifecycleError, ManualClock, PeriodicWork, PeriodicWorkOutcome, Runtime, RuntimeWorkError,
+    RuntimeWorkEventError, ScheduledWork,
 };
 
 const SAMPLE_WINDOW: Duration = Duration::from_secs(2);
+const WORK_INTERVAL: Duration = Duration::from_secs(1);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum SampleInput {
@@ -40,6 +42,17 @@ enum TurnProgress {
     },
 }
 
+#[derive(Debug, Eq, PartialEq)]
+enum PeriodicTurn {
+    Deferred,
+    Disabled,
+    Idle(PeriodicWorkOutcome),
+    Worked {
+        released: ScheduledWork,
+        progress: TurnProgress,
+    },
+}
+
 #[derive(Debug)]
 struct Sampler<'a> {
     input: &'a Cell<SampleInput>,
@@ -54,6 +67,13 @@ struct SampleHost<'a> {
     events: EventQueue<Diagnostic>,
     window_started_at: FrameworkInstant,
     warning_attempted: bool,
+}
+
+struct PeriodicSampleHost<'a> {
+    sampler: SampleHost<'a>,
+    cursor: Option<PeriodicWork>,
+    pending_sample: Option<u8>,
+    deferred_at: Option<FrameworkInstant>,
 }
 
 impl Application for Sampler<'_> {
@@ -146,6 +166,58 @@ impl<'a> SampleHost<'a> {
         );
         let outcome = self.events.emit(&event);
         Ok(TurnProgress::Overdue { event, outcome })
+    }
+}
+
+impl<'a> PeriodicSampleHost<'a> {
+    fn start(input: &'a Cell<SampleInput>, output: &'a Cell<Option<u8>>) -> Self {
+        let sampler = SampleHost::start(input, output);
+        let first = ScheduledWork::new(sampler.application_id, sampler.clock.now());
+        Self {
+            sampler,
+            cursor: Some(PeriodicWork::new(first, WORK_INTERVAL).unwrap()),
+            pending_sample: None,
+            deferred_at: None,
+        }
+    }
+
+    fn turn(&mut self) -> Result<PeriodicTurn, RuntimeWorkEventError<ReadFailed, Diagnostic>> {
+        let Some(cursor) = &mut self.cursor else {
+            return Ok(PeriodicTurn::Disabled);
+        };
+        if self.pending_sample.is_some() {
+            self.deferred_at
+                .get_or_insert_with(|| self.sampler.clock.now());
+            return Ok(PeriodicTurn::Deferred);
+        }
+        if let Some(deferred_at) = self.deferred_at.take() {
+            // These readings share one clock: window start <= deferral <= now.
+            let elapsed_before_deferral =
+                deferred_at.elapsed() - self.sampler.window_started_at.elapsed();
+            let now = self.sampler.clock.now();
+            self.sampler.window_started_at =
+                FrameworkInstant::from_elapsed(now.elapsed() - elapsed_before_deferral);
+        }
+
+        let release = cursor.poll(&self.sampler.clock);
+        let PeriodicWorkOutcome::Released { scheduled_work, .. } = release else {
+            return Ok(PeriodicTurn::Idle(release));
+        };
+        let progress = self
+            .sampler
+            .work_turn()
+            .inspect_err(|_| self.cursor = None)?;
+        if let TurnProgress::Sample(value) = progress {
+            self.pending_sample = Some(value);
+        }
+        Ok(PeriodicTurn::Worked {
+            released: scheduled_work,
+            progress,
+        })
+    }
+
+    fn take_pending_sample(&mut self) -> Option<u8> {
+        self.pending_sample.take()
     }
 }
 
@@ -286,4 +358,112 @@ fn returned_failure_at_threshold_skips_overdue_observation() {
     assert_eq!(input.get(), SampleInput::Ready(31));
     assert!(rejection.failure_event_attempt().is_none());
     assert!(host.events.is_empty());
+}
+
+#[test]
+fn periodic_deferral_preserves_release_and_pre_deferral_elapsed_time() {
+    let input = Cell::new(SampleInput::Ready(7));
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Worked {
+            released: ScheduledWork::new(id, FrameworkInstant::ZERO),
+            progress: TurnProgress::Sample(7),
+        })
+    );
+
+    let due = host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    let retained = ScheduledWork::new(id, due);
+    input.set(SampleInput::ReadFailed);
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    let resumed_at = host.sampler.clock.advance(Duration::from_secs(9)).unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    assert_eq!(input.replace(SampleInput::Empty), SampleInput::ReadFailed);
+    assert_eq!(
+        host.cursor.as_ref().unwrap().next_scheduled_work(),
+        Some(retained)
+    );
+    assert!(host.sampler.events.is_empty());
+    assert_eq!(host.take_pending_sample(), Some(7));
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Worked {
+            released: retained,
+            progress: TurnProgress::NoSample,
+        })
+    );
+    assert!(host.sampler.events.is_empty());
+
+    let next_at = FrameworkInstant::from_elapsed(Duration::from_secs(11));
+    let next = ScheduledWork::new(id, next_at);
+    input.set(SampleInput::ReadFailed);
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Idle(PeriodicWorkOutcome::Waiting {
+            next,
+            observed_at: resumed_at,
+        }))
+    );
+    assert_eq!(input.replace(SampleInput::Empty), SampleInput::ReadFailed);
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    let event = overdue_event(id, 11);
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Worked {
+            released: next,
+            progress: TurnProgress::Overdue {
+                event,
+                outcome: EventEmitOutcome::Recorded,
+            },
+        })
+    );
+    assert_eq!(host.sampler.events.dequeue(), Some(event));
+    assert_eq!(
+        host.sampler.runtime.state(id),
+        Ok(ApplicationState::Running)
+    );
+}
+
+#[test]
+fn periodic_failure_at_adjusted_threshold_disables_release() {
+    let input = Cell::new(SampleInput::Ready(7));
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    host.turn().unwrap();
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(Duration::from_secs(9)).unwrap();
+    assert_eq!(host.take_pending_sample(), Some(7));
+    host.turn().unwrap();
+
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    input.set(SampleInput::ReadFailed);
+    let error = host.turn().unwrap_err();
+    assert_eq!(
+        error.work_error(),
+        &RuntimeWorkError::Application {
+            application_id: id,
+            source: ReadFailed,
+        }
+    );
+    let expected = Event::new(
+        EventSource::Application(id),
+        EventSeverity::Error,
+        Diagnostic::WorkReturnedError,
+        EventTimestamp::from_elapsed(Duration::from_secs(11)),
+    );
+    let attempt = error.failure_event_attempt().unwrap();
+    assert_eq!(attempt.event(), &expected);
+    assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
+    assert_eq!(host.sampler.events.dequeue(), Some(expected));
+    assert_eq!(host.sampler.runtime.state(id), Ok(ApplicationState::Failed));
+
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    input.set(SampleInput::Ready(8));
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
+    assert_eq!(input.get(), SampleInput::Ready(8));
+    assert!(host.sampler.events.is_empty());
 }
