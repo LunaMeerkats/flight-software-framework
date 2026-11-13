@@ -25,4 +25,6 @@ evidence and withdraw only this run's incomplete changes.
 
 The locked local baseline passes 270 tests. All five host progress tests
 pass with identical source in the workspace and an independent package.
+Implementation `7a6150524c5bfdbf0bbfb8cee818e66a5dced280` passed all 20
+steps in hosted run 43431041267.
 See the [periodic deferral review](docs/verification/HOST_PROGRESS_REVIEW.md#periodic-deferral-follow-up).

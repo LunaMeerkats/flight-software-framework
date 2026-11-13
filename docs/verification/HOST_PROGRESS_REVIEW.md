@@ -132,3 +132,26 @@ SHA256 `e2748f7913551a101fc50993e637decd4f3f5d461732e13651ee48107d912dfe`
 and normalized Git blob `f1b516a18c9e1b16a22ad1dc9c53d47bd67aa2e1`.
 Ignored raw logs and review aids are under
 `target/review-2026-11-14-progress-deferral`.
+
+Codex and an independent Codex reviewer accepted the full implementation
+diff. The source audit covered 56 Rust files, 26,511 physical lines and
+1,403 comment-only lines with zero width findings and three fulfilled
+Clippy expectations. All 679 relative paths, 56 fragments and 234 exact
+test references resolved. All ten changed Markdown files passed rendered
+content and structure checks. The committed tree and test blob matched the
+reviewed staged tree and independent consumer source.
+
+Implementation `7a6150524c5bfdbf0bbfb8cee818e66a5dced280` reached
+`origin/main` by ordinary fast-forward push.
+[Exact hosted run 43431041267](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43431041267),
+job 131904305232, passed all 20 steps with 270 workspace tests including
+all five host progress tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined host
+sample matched the input's 222 lines. Hosted Rust/Cargo 1.100.0,
+rustfmt 1.11.0-stable and Clippy 0.1.100 ran on runner 2.338.2 and
+`windows-2025-vs2026` image `20261103.298.1`, matching input.
+
+Codex accepts the periodic consumer checkpoint. The focused periodic
+failure test covers a callback error. Cursor disablement after a lifecycle
+rejection follows the same error branch by source review. The periodic
+consumer depends on a returning callback and host turn timestamps.
