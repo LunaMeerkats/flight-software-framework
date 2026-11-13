@@ -776,3 +776,33 @@ dependency or workflow policy changes. Local tools remain 1.98.0; no local
 hosted-toolchain execution is claimed. This evidence-only completion preserves
 source/configuration and receives complete review and its own exact hosted
 inspection; final head/result remains in automation memory.
+
+## Developer onboarding and hosted toolchain re-audit — 2026-11-13
+
+Commit `3de84fe9a22aba3533f6ba9674ff8510ea9d1529` shortens the
+[README](../../README.md) from 505 to 38 lines and adds an
+[examples and guides index](../README.md) and
+[contribution guide](../../CONTRIBUTING.md). Codex ran the quickstart from
+a fresh clone, built local API documentation and verified the README's
+path dependency in a separate Cargo binary. Both binaries emitted the
+same seven lines. The four quickstart tests passed in both packages.
+The locked local baseline passed 268 workspace tests with Rust/Cargo
+1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98. GitHub rendered all three
+published documents and recognised the contribution guide.
+
+[Exact push run 43367203967](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43367203967),
+job 131694320547, passed all 20 steps at that checkout SHA. The run passed
+268 workspace tests, 14 adapter tests, five sample tests, warnings-denied
+rustdoc and both whitespace checks. The combined sample matched all 222
+lines from the preceding verified run. Runner 2.338.2 used image
+`windows-2025-vs2026` version `20261103.298.1`. Stable resolved to rustc
+1.100.0 (`0ef1bc386`), Cargo 1.100.0 (`3acc79c0c`), rustfmt
+1.11.0-stable and Clippy 0.1.100.
+
+The configuration review confirms `max_width = 100`, the 60-line
+Clippy threshold, warnings-denied CI and the workspace unsafe-code policy.
+The audit covers 56 Rust files, 26,331 physical lines and 1,402 comment-only
+lines with zero width findings. The hosted Clippy run accepts all three
+existing item-level expectations. The complete diff preserves the Rust
+source, Cargo files, lint settings and workflow. This toolchain result
+records one hosted execution. Local tooling remains on the version above.
