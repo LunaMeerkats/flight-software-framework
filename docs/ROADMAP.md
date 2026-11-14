@@ -12,7 +12,9 @@ show how a serial host can recognize overdue sample output across completed
 work turns while preserving the typed returned-error path. Revision 2
 composes that policy with a periodic cursor and a downstream slot. An
 observed deferral preserves the pending release and pauses the sample window.
-The [consumer guide](HOST_PROGRESS.md) describes both policies.
+Revision 3 demonstrates one congestion warning per observed deferral,
+including the queue outcome and rearming when the host sees space.
+The [consumer guide](HOST_PROGRESS.md) describes the host policies.
 The [focused review](verification/HOST_PROGRESS_REVIEW.md) records the evidence.
 
 RFF-LIB-REQ-014 revision 6 demonstrates attribution of two cleared commands

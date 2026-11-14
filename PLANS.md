@@ -1,30 +1,22 @@
-# Account for downstream deferral in periodic progress observation
+# Report sustained downstream congestion on periodic host turns
 
 ## Objective and acceptance
 
-Compose the existing host progress policy with a public periodic cursor
-and one downstream sample slot. Keep the three directly selected work
-histories. Follow RFF-LIB-REQ-016 revision 2 and
-[ADR-0041](docs/adr/0041-host-observed-application-progress.md).
+A host that intentionally pauses sample observation needs a distinct way to
+see a downstream slot that stays occupied. Extend the existing public-API
+periodic consumer under RFF-LIB-REQ-016 revision 3 and
+[ADR-0041](docs/adr/0041-host-observed-application-progress.md#sustained-downstream-congestion).
 
-Verify that an occupied slot preserves the sample, next release and
-application input through deferred turns. Exclude only the observed
-blocked interval, then show late re-arming and an overdue warning at the
-adjusted threshold. Preserve a returned error at equality and disable the
-periodic cursor. Keep observation and callback admission in the serial host.
+Use the first observed deferral and a single warning attempt at or after a
+ten-second host threshold. Return the exact event and queue outcome. Retain
+the pending sample, release and input, leave lifecycle handling with the
+runtime and re-arm when the host observes space. Verify equality, queue
+saturation and suppression, rearming and the existing sample-window histories.
 
 ## Verification and stopping point
 
-Run the locked baseline, focused workspace tests and the independent package
-recipe with byte-identical source. Review source form, links, rendered
-guidance and the complete diff. Inspect exact hosted CI after the source push.
-Stop after one periodic consumer policy. If verification fails, retain the
+Run the locked baseline, focused tests and independent package recipe with
+identical source. Review the complete diff, links, rendered guidance and Rust
+source form. Inspect exact hosted CI after the ordinary main push. Stop at
+the demonstrated serial host policy. If verification fails, preserve the
 evidence and withdraw only this run's incomplete changes.
-
-## Result
-
-The locked local baseline passes 270 tests. All five host progress tests
-pass with identical source in the workspace and an independent package.
-Implementation `7a6150524c5bfdbf0bbfb8cee818e66a5dced280` passed all 20
-steps in hosted run 43431041267.
-See the [periodic deferral review](docs/verification/HOST_PROGRESS_REVIEW.md#periodic-deferral-follow-up).

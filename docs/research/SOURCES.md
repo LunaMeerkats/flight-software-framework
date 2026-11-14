@@ -13,6 +13,21 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-DOWNSTREAM-CONGESTION — One warning per observed deferral
+
+- Rust Flight Framework input revision
+  `3acc1a9deb1ac0d113d96e6bd27908eaaa0878c2`, inspected 2026-11-15.
+  The [periodic sample consumer](../../tests/host_progress.rs) retains
+  the first occupied-turn timestamp and the next unpolled release.
+  The [manual clock](../../src/clock.rs) advances monotonically. The
+  [event queue](../../src/events.rs) preserves FIFO order and reports a full
+  queue without replacing an accepted record.
+- Use the existing deferral timestamp to measure how long the slot stays
+  occupied, independently of the sample window. Reuse the queue contract and
+  count either outcome toward one attempt per deferral. The threshold and
+  application attribution are consumer decisions.
+  [ADR-0041](../adr/0041-host-observed-application-progress.md#sustained-downstream-congestion)
+
 ## SRC-RFF-PROGRESS-DEFERRAL — Periodic work and sample timing
 
 - Sources: Rust Flight Framework at input revision

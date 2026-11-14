@@ -629,3 +629,18 @@ turns, one late release with observation-based re-arming, no warning on an
 early or waiting turn, a warning at the adjusted threshold, and returned
 failure at that threshold with no further release. Re-run revision 1 and
 the periodic cases in the same independent public-API package.
+
+Revision 3 (2026-11-15) adds a downstream congestion warning to the periodic
+host. While the downstream slot remains occupied, the first turn at or after
+the congestion threshold shall return the exact warning and its queue outcome.
+Measure elapsed time from the first observed deferral on the same clock.
+Attempt the warning once per observed deferral, including a queue rejection.
+The first turn observing room shall end the deferral and re-arm the warning.
+The warning shall preserve the staged sample, next release, input, sample
+window and application state.
+
+Acceptance: verify the turns immediately before and at the congestion
+threshold, suppression after a recorded or rejected warning, FIFO preservation
+on rejection, a late warning after re-arming, and draining at equality.
+Preserve both prior sample-window policies and the typed work failure path.
+Run the identical public-API tests in an independent package.

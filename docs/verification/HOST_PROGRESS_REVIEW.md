@@ -155,3 +155,48 @@ Codex accepts the periodic consumer checkpoint. The focused periodic
 failure test covers a callback error. Cursor disablement after a lifecycle
 rejection follows the same error branch by source review. The periodic
 consumer depends on a returning callback and host turn timestamps.
+
+## Downstream congestion follow-up
+
+Date: **2026-11-15**
+
+[RFF-LIB-REQ-016 revision 3](../REQUIREMENTS.md#rff-lib-req-016--observe-application-progress-on-host-turns)
+and [ADR-0041](../adr/0041-host-observed-application-progress.md#sustained-downstream-congestion)
+add one host warning attempt per observed deferral. A selected ten-second
+threshold serves this consumer. The pending sample, next release, input and
+sample-window state survive the warning branch. The warning uses the same
+FIFO as sample warnings and runtime failure events.
+
+Input `3acc1a9deb1ac0d113d96e6bd27908eaaa0878c2` matched refreshed origin.
+[Exact input run 43431354539](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43431354539),
+job 131905360022, passed all 20 steps with 270 workspace tests. The locked
+local input baseline also passed with 270 workspace tests.
+
+The local verification commands above passed with 272 workspace tests and
+all seven host progress tests. Local tool versions were unchanged. The
+focused histories check warning time and fields at equality and on a late
+turn, queue acceptance and rejection, suppression, rearming, retained
+state and draining at equality. The five prior histories also pass.
+Additional local commands passed:
+
+```powershell
+cargo test --locked --test host_adapters
+cargo test --locked --test host_sample
+cargo run --locked --example host-echo
+```
+
+The adapter target passed 14 tests and the sample target passed five.
+The complete 222-line local sample transcript matched the input.
+
+The independent-package commands above passed using
+`C:/Users/drrsm/AppData/Local/Temp/rff-host-progress-9c8e134d45b04c7280f834db78a7fa8d`.
+Offline locked check, Clippy, all seven tests and metadata passed. Metadata
+confirmed one independent workspace member and the sole framework path
+dependency, with two graph packages. The 20,260 source bytes matched with
+SHA256 `4476911cab3b973411aad3cbd18cf00a6cdf7a9ac0bc6c9f9cd5f7c1e473758d`
+and normalized Git blob `06d42a0dffb1c25539e4dd64f712f083487923db`.
+Ignored raw logs are under `target/review-2026-11-14-congestion`.
+
+The new histories exercise the sample window through a state check on the
+warning branch. The preceding shorter deferral history covers an empty
+resumption and the adjusted sample threshold.

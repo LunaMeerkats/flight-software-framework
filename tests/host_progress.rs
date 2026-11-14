@@ -15,6 +15,7 @@ use rust_flight_framework::{
 
 const SAMPLE_WINDOW: Duration = Duration::from_secs(2);
 const WORK_INTERVAL: Duration = Duration::from_secs(1);
+const CONGESTION_WINDOW: Duration = Duration::from_secs(10);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum SampleInput {
@@ -29,6 +30,7 @@ struct ReadFailed;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Diagnostic {
     SampleOverdue,
+    DownstreamCongested,
     WorkReturnedError,
 }
 
@@ -45,6 +47,10 @@ enum TurnProgress {
 #[derive(Debug, Eq, PartialEq)]
 enum PeriodicTurn {
     Deferred,
+    Congested {
+        event: Event<Diagnostic>,
+        outcome: EventEmitOutcome,
+    },
     Disabled,
     Idle(PeriodicWorkOutcome),
     Worked {
@@ -69,11 +75,16 @@ struct SampleHost<'a> {
     warning_attempted: bool,
 }
 
+struct Deferral {
+    started_at: FrameworkInstant,
+    warning_attempted: bool,
+}
+
 struct PeriodicSampleHost<'a> {
     sampler: SampleHost<'a>,
     cursor: Option<PeriodicWork>,
     pending_sample: Option<u8>,
-    deferred_at: Option<FrameworkInstant>,
+    deferral: Option<Deferral>,
 }
 
 impl Application for Sampler<'_> {
@@ -177,7 +188,7 @@ impl<'a> PeriodicSampleHost<'a> {
             sampler,
             cursor: Some(PeriodicWork::new(first, WORK_INTERVAL).unwrap()),
             pending_sample: None,
-            deferred_at: None,
+            deferral: None,
         }
     }
 
@@ -186,14 +197,12 @@ impl<'a> PeriodicSampleHost<'a> {
             return Ok(PeriodicTurn::Disabled);
         };
         if self.pending_sample.is_some() {
-            self.deferred_at
-                .get_or_insert_with(|| self.sampler.clock.now());
-            return Ok(PeriodicTurn::Deferred);
+            return Ok(self.deferred_turn());
         }
-        if let Some(deferred_at) = self.deferred_at.take() {
+        if let Some(deferral) = self.deferral.take() {
             // These readings share one clock: window start <= deferral <= now.
             let elapsed_before_deferral =
-                deferred_at.elapsed() - self.sampler.window_started_at.elapsed();
+                deferral.started_at.elapsed() - self.sampler.window_started_at.elapsed();
             let now = self.sampler.clock.now();
             self.sampler.window_started_at =
                 FrameworkInstant::from_elapsed(now.elapsed() - elapsed_before_deferral);
@@ -219,6 +228,29 @@ impl<'a> PeriodicSampleHost<'a> {
     fn take_pending_sample(&mut self) -> Option<u8> {
         self.pending_sample.take()
     }
+
+    fn deferred_turn(&mut self) -> PeriodicTurn {
+        let now = self.sampler.clock.now();
+        let deferral = self.deferral.get_or_insert(Deferral {
+            started_at: now,
+            warning_attempted: false,
+        });
+        // Both times are observations on the same nondecreasing clock.
+        let elapsed = now.elapsed() - deferral.started_at.elapsed();
+        if deferral.warning_attempted || elapsed < CONGESTION_WINDOW {
+            return PeriodicTurn::Deferred;
+        }
+
+        deferral.warning_attempted = true;
+        let event = Event::new(
+            EventSource::Application(self.sampler.application_id),
+            EventSeverity::Warning,
+            Diagnostic::DownstreamCongested,
+            EventTimestamp::from_instant(now),
+        );
+        let outcome = self.sampler.events.emit(&event);
+        PeriodicTurn::Congested { event, outcome }
+    }
 }
 
 fn overdue_event(application_id: ApplicationId, seconds: u64) -> Event<Diagnostic> {
@@ -226,6 +258,15 @@ fn overdue_event(application_id: ApplicationId, seconds: u64) -> Event<Diagnosti
         EventSource::Application(application_id),
         EventSeverity::Warning,
         Diagnostic::SampleOverdue,
+        EventTimestamp::from_elapsed(Duration::from_secs(seconds)),
+    )
+}
+
+fn congestion_event(application_id: ApplicationId, seconds: u64) -> Event<Diagnostic> {
+    Event::new(
+        EventSource::Application(application_id),
+        EventSeverity::Warning,
+        Diagnostic::DownstreamCongested,
         EventTimestamp::from_elapsed(Duration::from_secs(seconds)),
     )
 }
@@ -465,5 +506,112 @@ fn periodic_failure_at_adjusted_threshold_disables_release() {
     input.set(SampleInput::Ready(8));
     assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
     assert_eq!(input.get(), SampleInput::Ready(8));
+    assert!(host.sampler.events.is_empty());
+}
+
+#[test]
+fn congestion_warns_at_threshold_and_rearms_after_room_is_observed() {
+    let input = Cell::new(SampleInput::Ready(7));
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    host.turn().unwrap();
+
+    host.sampler.clock.advance(Duration::from_secs(3)).unwrap();
+    input.set(SampleInput::ReadFailed);
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler
+        .clock
+        .advance(Duration::from_millis(9_999))
+        .unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    assert!(host.sampler.events.is_empty());
+    host.sampler
+        .clock
+        .advance(Duration::from_millis(1))
+        .unwrap();
+    let first = congestion_event(id, 13);
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Congested {
+            event: first,
+            outcome: EventEmitOutcome::Recorded,
+        })
+    );
+    assert_eq!(host.sampler.events.dequeue(), Some(first));
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    assert!(host.sampler.events.is_empty());
+    assert_eq!(host.sampler.window_started_at, FrameworkInstant::ZERO);
+    assert_eq!(
+        host.sampler.runtime.state(id),
+        Ok(ApplicationState::Running)
+    );
+    assert_eq!(
+        input.replace(SampleInput::Ready(8)),
+        SampleInput::ReadFailed
+    );
+    assert_eq!(host.take_pending_sample(), Some(7));
+
+    let retained = ScheduledWork::new(id, FrameworkInstant::from_elapsed(WORK_INTERVAL));
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Worked {
+            released: retained,
+            progress: TurnProgress::Sample(8),
+        })
+    );
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(Duration::from_secs(11)).unwrap();
+    let second = congestion_event(id, 24);
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Congested {
+            event: second,
+            outcome: EventEmitOutcome::Recorded,
+        })
+    );
+    assert_eq!(host.sampler.events.dequeue(), Some(second));
+}
+
+#[test]
+fn rejected_congestion_warning_preserves_older_event_and_does_not_retry() {
+    let input = Cell::new(SampleInput::Empty);
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    host.turn().unwrap();
+    host.sampler.clock.advance(SAMPLE_WINDOW).unwrap();
+    host.turn().unwrap();
+    let prior = overdue_event(id, 2);
+
+    input.set(SampleInput::Ready(7));
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    host.turn().unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(CONGESTION_WINDOW).unwrap();
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Congested {
+            event: congestion_event(id, 13),
+            outcome: EventEmitOutcome::QueueFull { capacity: 1 },
+        })
+    );
+    assert_eq!(host.sampler.events.dequeue(), Some(prior));
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    assert!(host.sampler.events.is_empty());
+    assert_eq!(host.take_pending_sample(), Some(7));
+
+    input.set(SampleInput::Ready(8));
+    host.turn().unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(CONGESTION_WINDOW).unwrap();
+    assert_eq!(host.take_pending_sample(), Some(8));
+    assert!(matches!(
+        host.turn(),
+        Ok(PeriodicTurn::Worked {
+            progress: TurnProgress::NoSample,
+            ..
+        })
+    ));
     assert!(host.sampler.events.is_empty());
 }

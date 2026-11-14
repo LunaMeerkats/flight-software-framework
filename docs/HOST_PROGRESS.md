@@ -57,9 +57,9 @@ check. Scheduling and any action after a warning remain host decisions.
 
 The periodic consumer adds one `PeriodicWork` cursor for the same application
 and one downstream slot. A successful work turn stages a fresh sample in the
-slot. The caller takes it separately. While the slot is occupied, the host
-returns `Deferred` before polling the cursor. Both the sample and the pending
-release stay in place. The sampler's input remains untouched.
+slot. The caller takes it separately. An occupied slot defers the turn before
+the host polls the cursor. Both the sample and the pending release stay in
+place, and the sampler's input remains untouched.
 
 The first deferred turn starts the pause even if the retained release is
 still in the future. The first later turn that sees room ends the pause, even
@@ -80,11 +80,33 @@ re-arms from its observation time. A waiting or exhausted cursor yields
 A fresh sample still resets the window. A work call that returns a callback
 error or lifecycle rejection passes that error back to the caller and
 disables the cursor. Callback errors include the failure-event attempt.
-Later turns return `Disabled`. The cursor and two optional values for the
-staged sample and pause timestamp add fixed storage. The window describes
-the host's observed opportunity for work. Time spent congested can be
-measured separately if the caller needs that diagnostic.
+Later turns return `Disabled`. The cursor, staged sample and deferral state
+add fixed storage. The sample window describes the host's observed
+opportunity for work.
 [Periodic policy decision](adr/0041-host-observed-application-progress.md#periodic-work-under-downstream-backpressure)
+
+## Report sustained downstream congestion
+
+The periodic host measures how long the downstream slot stays occupied
+from the first deferred turn. The example uses a ten-second threshold.
+An occupied turn before the threshold returns `Deferred`. The first
+occupied turn at or beyond it returns `Congested` with a
+`DownstreamCongested` warning, its observation timestamp and the queue
+outcome. The application ID identifies the affected sample stream. The
+host owns the downstream slot and its drain policy.
+
+Both `Recorded` and `QueueFull { capacity: 1 }` use the one attempt for that
+deferral. After either result, occupied turns return `Deferred`. A turn
+that observes space ends the deferral and re-arms the warning, even if
+the threshold is due or the release is still waiting. A warning leaves
+the pending sample, next release and application input in place.
+
+Congestion, sample-overdue and returned-error events share the same
+one-entry queue. Drain it on separate host turns. Any queued event can
+cause the next attempt to report saturation, including a failure event
+after the runtime commits `Failed`. The warning depends on the host
+continuing to observe the slot.
+[Congestion policy decision](adr/0041-host-observed-application-progress.md#sustained-downstream-congestion)
 
 ## Verify the consumer outside the workspace
 

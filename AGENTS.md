@@ -129,6 +129,7 @@ translate NASA C source.
 - `tests/host_progress.rs`: public-only serial hosts that observe fresh samples
   after work and report queue outcomes. The periodic host excludes observed
   downstream deferral from the sample window while retaining the next release.
+  It attempts one congestion warning per sustained deferral.
   The guide verifies identical tests in an independent Cargo package.
 - `tests/callback_publication.rs`: public-only application-owned reply/retry
   consumer and message-context selective publication evidence. Its guide uses

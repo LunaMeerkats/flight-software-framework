@@ -1,6 +1,6 @@
 # Verification traceability
 
-## Stage 5 application progress — 2026-11-13 and 2026-11-14
+## Stage 5 application progress — 2026-11-13 through 2026-11-15
 
 [ADR-0041](../adr/0041-host-observed-application-progress.md) assigns the
 progress policy to the serial host and uses the existing work failure path.
@@ -9,6 +9,7 @@ progress policy to the serial host and uses the existing work failure path.
 | --- | --- | --- |
 | RFF-LIB-REQ-016 revision 1 | `fresh_sample_at_threshold_resets_window_and_rearms_warning` checks startup timing, a sample at equality, the reset window, and warnings at equality and on a late turn. `full_queue_preserves_prior_warning_and_exposes_rejected_attempt` checks the exact rejected record and suppression after draining. `returned_failure_at_threshold_skips_overdue_observation` checks the typed callback error, Failed state, single error event and later lifecycle rejection. | [Focused host progress review](HOST_PROGRESS_REVIEW.md) |
 | RFF-LIB-REQ-016 revision 2 | `periodic_deferral_preserves_release_and_pre_deferral_elapsed_time` checks repeated deferral, retained output, input and release, late re-arming, a waiting poll and a warning at the adjusted threshold. `periodic_failure_at_adjusted_threshold_disables_release` checks the typed error, exact failure event, Failed state and no further release. | [Periodic deferral review](HOST_PROGRESS_REVIEW.md#periodic-deferral-follow-up) |
+| RFF-LIB-REQ-016 revision 3 | `congestion_warns_at_threshold_and_rearms_after_room_is_observed` checks just before and at equality, suppression after a recorded warning, retained sample, release, input and sample window, and a late warning after rearming. `rejected_congestion_warning_preserves_older_event_and_does_not_retry` checks the exact rejected event, FIFO preservation, suppression after rejection and draining at equality. | [Congestion review](HOST_PROGRESS_REVIEW.md#downstream-congestion-follow-up) |
 
 ## Stage 5 command clearing — 2026-11-12
 

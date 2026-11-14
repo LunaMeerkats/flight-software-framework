@@ -2,7 +2,7 @@
 
 - Status: Accepted for the Stage 5 consumer
 - Date: 2026-11-13
-- Scope: RFF-LIB-REQ-016, revisions 1 and 2
+- Scope: RFF-LIB-REQ-016, revisions 1 through 3
 
 ## Context
 
@@ -75,7 +75,31 @@ releases would change which item is retained. The selected policy preserves
 both the pending release and the pre-deferral progress window.
 
 This is an observation policy for a serial consumer with one downstream
-slot. It uses host turn timestamps for the deferral boundaries. A mission
-that needs to report prolonged downstream congestion should track that
-condition separately. Revisit a shared policy if a second consumer needs
-the same window and gate semantics.
+slot. It uses host turn timestamps for the deferral boundaries. The follow-up below
+observes prolonged downstream congestion using that same clock.
+
+## Sustained downstream congestion
+
+Decision date: 2026-11-15.
+
+A host that excludes deliberate deferral from the sample window still needs
+to tell whether its downstream consumer is making room. Measure occupancy
+from the first deferred turn. On the first occupied turn at or after ten
+seconds, return a `DownstreamCongested` warning with the exact event and
+queue outcome. Ten seconds is a local example policy that allows brief
+downstream delays while distinguishing sustained congestion from the
+two-second sample window. Use the observation timestamp and the selected
+application ID to identify the affected sample stream. The host owns the gate.
+
+Keep one warning-attempt flag with the deferral timestamp. Either queue
+outcome consumes the attempt. Observing room ends the deferral, including
+at threshold equality or on a waiting turn, and re-arms the next deferral.
+The warning shares the existing one-entry FIFO. An undrained warning can
+cause a later event attempt, including a work failure event, to be rejected.
+
+Reporting every occupied turn can crowd out other diagnostics. Failing the
+sampler or discarding a sample on timeout would change lifecycle or data
+policy to report a host-owned condition. One attempt per deferral gives the
+caller a bounded observation without polling the cursor or touching the
+retained work. This uses the existing queue and clock contracts. Revisit a
+shared policy if a second consumer needs the same gate and warning semantics.
