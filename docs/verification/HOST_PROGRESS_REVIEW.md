@@ -200,3 +200,26 @@ Ignored raw logs are under `target/review-2026-11-14-congestion`.
 The new histories exercise the sample window through a state check on the
 warning branch. The preceding shorter deferral history covers an empty
 resumption and the adjusted sample threshold.
+
+Codex and an independent Codex reviewer accepted the full implementation
+diff. The audit covered 56 Rust files, 26,659 physical lines and 1,404
+comment-only lines with zero width findings and three unchanged fulfilled
+Clippy expectations. All 686 relative paths, 61 fragments and 236 exact
+test references resolved. All ten changed Markdown files passed rendered
+content and structure checks. The committed tree and test blob matched
+the reviewed staged tree and verified consumer source.
+
+Implementation `7e1a96738e5cab3b76936cdc2f2c5b45e0895065` reached
+`origin/main` by ordinary fast-forward push.
+[Exact hosted run 43597998608](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43597998608),
+job 132456512701, passed all 20 steps with 272 workspace tests including
+all seven host progress tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined host
+sample matched the input's 222 lines. Hosted Rust/Cargo 1.100.0,
+rustfmt 1.11.0-stable and Clippy 0.1.100 ran on runner 2.338.2 and
+`windows-2025-vs2026` image `20261103.298.1`, matching input.
+
+Codex accepts the serial consumer checkpoint. The warning measures
+elapsed time between host observations of the occupied slot. Event
+acceptance establishes local queue storage. A full queue can reject a
+warning or a later failure event.

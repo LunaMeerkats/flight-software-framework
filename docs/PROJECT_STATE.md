@@ -16,6 +16,9 @@ the regression baseline. Package 0.0.0 is unpublished with provisional APIs.
 - The locked local baseline passes 272 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. All seven host progress tests pass
   in the workspace and an independent package with identical source.
+- Implementation `7e1a96738e5cab3b76936cdc2f2c5b45e0895065` passed all
+  20 hosted steps in run 43597998608 with 272 workspace tests and the same
+  222-line combined host sample.
 
 ## Current architecture
 
@@ -29,7 +32,8 @@ and returned work errors.
 
 ## Work in progress
 
-The congestion checkpoint has local and independent-package evidence.
+The congestion checkpoint has local, independent-package and exact hosted
+implementation evidence.
 [Focused review](verification/HOST_PROGRESS_REVIEW.md#downstream-congestion-follow-up)
 
 ## Highest risks and uncertainties

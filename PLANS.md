@@ -20,3 +20,11 @@ identical source. Review the complete diff, links, rendered guidance and Rust
 source form. Inspect exact hosted CI after the ordinary main push. Stop at
 the demonstrated serial host policy. If verification fails, preserve the
 evidence and withdraw only this run's incomplete changes.
+
+## Result
+
+The locked local baseline passes 272 tests. All seven host progress tests
+pass with identical source in the workspace and an independent package.
+Implementation `7e1a96738e5cab3b76936cdc2f2c5b45e0895065` passed all 20
+steps in hosted run 43597998608.
+[Downstream congestion review](docs/verification/HOST_PROGRESS_REVIEW.md#downstream-congestion-follow-up)
