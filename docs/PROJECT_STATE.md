@@ -16,6 +16,9 @@ the regression baseline. Package 0.0.0 is unpublished with provisional APIs.
 - The locked local baseline passes 274 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. All nine host progress tests pass
   in the workspace and an independent package with identical source.
+- Implementation `842aaaace10051886ee4c1c8a2785941fe37cb11` passed all
+  20 hosted steps in run 43717651968 with 274 workspace tests and the same
+  222-line combined host sample.
 
 ## Current architecture
 
@@ -30,7 +33,8 @@ slot in front of the sink.
 
 ## Work in progress
 
-The diagnostic handoff has local and independent-package evidence.
+Codex accepted the diagnostic handoff with local, independent-package and
+exact hosted evidence.
 [Focused review](verification/HOST_PROGRESS_REVIEW.md#diagnostic-handoff-follow-up)
 
 ## Highest risks and uncertainties

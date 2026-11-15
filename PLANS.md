@@ -26,4 +26,6 @@ preserve the evidence and withdraw only this run's incomplete changes.
 
 The locked local baseline passes 274 tests. All nine host progress tests
 pass with identical source in the workspace and an independent package.
+Implementation `842aaaace10051886ee4c1c8a2785941fe37cb11` passed all 20
+steps in hosted run 43717651968.
 [Diagnostic handoff review](docs/verification/HOST_PROGRESS_REVIEW.md#diagnostic-handoff-follow-up)

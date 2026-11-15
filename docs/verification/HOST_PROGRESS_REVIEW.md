@@ -256,6 +256,25 @@ SHA256 `2bc7b672d6430070496556f1639ee12fcfd6369e54a5e9831ec9f2b22c7f0daa`
 and normalized Git blob `5a8516134aa5e14c881b8408e179f6f4dc73bcc0`.
 Ignored logs are under `target/review-2026-11-16-diagnostic-handoff`.
 
+Codex and an independent Codex reviewer accepted the full implementation
+diff. The audit covered 56 Rust files, 26,790 physical lines and 1,406
+comment-only lines with zero width findings and three unchanged fulfilled
+Clippy expectations. All 698 relative paths, 68 fragments and 238 exact
+test references resolved. All 11 changed Markdown files passed rendered
+content and structure checks. The commit tree matched the reviewed staged
+tree and the committed test blob matched the independent consumer source.
+
+Implementation `842aaaace10051886ee4c1c8a2785941fe37cb11` reached
+`origin/main` by ordinary fast-forward push.
+[Exact hosted run 43717651968](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43717651968),
+job 132822542592, passed all 20 steps with 274 workspace tests including
+all nine host progress tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined host
+sample matched the input's 222 lines. Hosted Rust/Cargo 1.100.0,
+rustfmt 1.11.0-stable and Clippy 0.1.100 ran on runner 2.338.2 and
+`windows-2025-vs2026` image `20261103.298.1`, matching the input.
+
+Codex accepts the serial diagnostic handoff checkpoint.
 The tests exercise whole-event sink acceptance and definite rejection. The
 serial host needs each sink offer to return before it can select another
 turn. A sink with ambiguous effects needs its own retry contract.
