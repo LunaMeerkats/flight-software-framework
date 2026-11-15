@@ -13,6 +13,20 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-DIAGNOSTIC-HANDOFF — Whole-event sink rejection
+
+- Rust Flight Framework input `6a1094d4ef1aa293fe8732246458b0ed177f04e9`,
+  inspected 2026-11-16. The [event queue](../../src/events.rs) transfers the
+  oldest accepted record on dequeue. The
+  [event presenter](../../examples/event_output.rs) retains one dequeued
+  record and a byte cursor under [ADR-0032](../adr/0032-bounded-host-event-presentation.md).
+  Adapt the pending-record policy at a whole-event sink boundary.
+- [FnMut](https://doc.rust-lang.org/std/ops/trait.FnMut.html), Rust standard
+  library, accessed 2026-11-16. It supports repeated calls to a closure with
+  mutable captured state. Use that interface for one owned sink. The
+  consumer supplies its definite-rejection contract and explicit retry.
+  [ADR-0041](../adr/0041-host-observed-application-progress.md#hand-off-diagnostics-to-a-fallible-sink)
+
 ## SRC-RFF-DOWNSTREAM-CONGESTION — One warning per observed deferral
 
 - Rust Flight Framework input revision

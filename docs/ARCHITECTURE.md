@@ -451,6 +451,12 @@ The [guide](EVENT_OUTPUT.md) explains mission-owned source naming, stream
 continuity, concrete errors and separate explicit flush. This composition adds
 no library service, protocol, physical delivery or durability guarantee.
 
+The [sample progress consumer](HOST_PROGRESS.md#hand-off-queued-diagnostics-to-a-fallible-sink)
+applies pending ownership at the whole-event boundary. A separate turn offers
+one record to a host-owned typed sink and retains it on definite rejection.
+The event queue can refill while output waits. Work and warnings continue
+to expose their own queue outcomes.
+
 ## Backpressure-aware recurring host coordination
 
 The [backpressure-aware host coordination decision](adr/0033-backpressure-aware-host-coordination.md)

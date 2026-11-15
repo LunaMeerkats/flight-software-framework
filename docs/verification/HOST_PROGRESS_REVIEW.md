@@ -223,3 +223,39 @@ Codex accepts the serial consumer checkpoint. The warning measures
 elapsed time between host observations of the occupied slot. Event
 acceptance establishes local queue storage. A full queue can reject a
 warning or a later failure event.
+
+## Diagnostic handoff follow-up
+
+Date: **2026-11-16**
+
+[RFF-LIB-REQ-016 revision 4](../REQUIREMENTS.md#rff-lib-req-016--observe-application-progress-on-host-turns)
+and [ADR-0041](../adr/0041-host-observed-application-progress.md#hand-off-diagnostics-to-a-fallible-sink)
+add one typed sink and one pending slot in the public-API consumer. The
+pending record survives repeated rejection. The event queue can refill
+while the caller selects work and output independently. A queue-rejected
+failure event stays visible in the original typed work error. An accepted
+failure event can reach the sink after the cursor is disabled.
+
+Input `6a1094d4ef1aa293fe8732246458b0ed177f04e9` matched refreshed origin.
+[Exact input run 43598192080](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43598192080),
+job 132457091093, passed all 20 steps with 272 workspace tests. The local
+locked input baseline also passed with 272 workspace tests.
+
+The local verification commands above passed with 274 workspace tests
+including nine host progress tests. Local tool versions remained Rust/Cargo
+1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98. The adapter and sample
+targets passed 14 and five tests. `cargo run --locked --example host-echo`
+reproduced all 222 input output lines byte for byte.
+
+The independent-package recipe above passed at
+`C:/Users/drrsm/AppData/Local/Temp/rff-host-progress-de75d7245a8f4676b444ff797c5887cf`.
+Offline locked check, Clippy, all nine tests and metadata passed. Metadata
+confirmed one independent workspace member and the sole framework path
+dependency, with two graph packages. The 24,606 source bytes matched with
+SHA256 `2bc7b672d6430070496556f1639ee12fcfd6369e54a5e9831ec9f2b22c7f0daa`
+and normalized Git blob `5a8516134aa5e14c881b8408e179f6f4dc73bcc0`.
+Ignored logs are under `target/review-2026-11-16-diagnostic-handoff`.
+
+The tests exercise whole-event sink acceptance and definite rejection. The
+serial host needs each sink offer to return before it can select another
+turn. A sink with ambiguous effects needs its own retry contract.

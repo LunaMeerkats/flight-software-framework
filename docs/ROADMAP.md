@@ -14,6 +14,8 @@ composes that policy with a periodic cursor and a downstream slot. An
 observed deferral preserves the pending release and pauses the sample window.
 Revision 3 demonstrates one congestion warning per observed deferral,
 including the queue outcome and rearming when the host sees space.
+Revision 4 retains one dequeued diagnostic across definite sink rejection
+and resumes FIFO output on separate host turns.
 The [consumer guide](HOST_PROGRESS.md) describes the host policies.
 The [focused review](verification/HOST_PROGRESS_REVIEW.md) records the evidence.
 

@@ -130,6 +130,7 @@ translate NASA C source.
   after work and report queue outcomes. The periodic host excludes observed
   downstream deferral from the sample window while retaining the next release.
   It attempts one congestion warning per sustained deferral.
+  A separate typed sink turn retains one dequeued diagnostic across rejection.
   The guide verifies identical tests in an independent Cargo package.
 - `tests/callback_publication.rs`: public-only application-owned reply/retry
   consumer and message-context selective publication evidence. Its guide uses

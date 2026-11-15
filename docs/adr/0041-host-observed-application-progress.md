@@ -2,7 +2,7 @@
 
 - Status: Accepted for the Stage 5 consumer
 - Date: 2026-11-13
-- Scope: RFF-LIB-REQ-016, revisions 1 through 3
+- Scope: RFF-LIB-REQ-016, revisions 1 through 4
 
 ## Context
 
@@ -103,3 +103,33 @@ policy to report a host-owned condition. One attempt per deferral gives the
 caller a bounded observation without polling the cursor or touching the
 retained work. This uses the existing queue and clock contracts. Revisit a
 shared policy if a second consumer needs the same gate and warning semantics.
+
+## Hand off diagnostics to a fallible sink
+
+Decision date: 2026-11-16.
+
+The sample host's event queue preserves accepted records until dequeue. A
+consumer that sends the dequeued record to a busy sink needs to keep that
+record for a later output turn. Adapt pending ownership from
+[ADR-0032](0032-bounded-host-event-presentation.md) at the typed record boundary.
+
+The handoff owns one sink and one pending event slot. An output turn takes
+the oldest queued record only when the slot is empty. It offers at most one
+whole event to the sink. `Ok` releases the slot and returns the accepted
+event. `Err` preserves the exact record and returns the sink's error. The next
+output turn tries the pending record before another dequeue. An empty turn
+returns idle without an offer. The host chooses when to call output and work.
+
+Dropping a dequeued event on sink rejection loses an accepted record.
+Re-enqueueing can lose its FIFO position or hit capacity. Pausing work
+until the sink accepts ties application progress to optional output. The
+separate pending slot preserves order while permitting one more queued event.
+Once both slots are occupied, the queue reports saturation through the
+existing work and warning outcomes. Only accepted queue records reach
+the sink through this handoff.
+
+Two slots bound retained event records in this composition. The host must
+regain control from the sink to choose another turn. An adapter must make
+rejection definite before the host can safely retry. Success establishes
+acceptance by that sink. Revisit for a concrete adapter that exposes partial
+acceptance, ambiguous acknowledgement or a need for independent execution.

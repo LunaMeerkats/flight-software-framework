@@ -108,6 +108,37 @@ after the runtime commits `Failed`. The warning depends on the host
 continuing to observe the slot.
 [Congestion policy decision](adr/0041-host-observed-application-progress.md#sustained-downstream-congestion)
 
+## Hand off queued diagnostics to a fallible sink
+
+Keep a `DiagnosticHandoff` and its sink across output turns. Pass the host's
+event queue to `turn` separately from selecting work. The handoff dequeues
+the oldest event only when its one pending slot is empty. The sink is a
+mutable closure that receives a whole `Event<Diagnostic>` and returns
+`Result<(), E>`.
+
+- `Ok(None)` means the queue and pending slot are empty. The sink receives
+  no call.
+- `Ok(Some(event))` returns the whole event accepted by the sink and frees
+  the pending slot. Offer the next event on a later turn.
+- `Err(error)` returns the sink error. Keep the handoff and call `turn`
+  again when ready to offer the same event, with its original timestamp.
+
+Work can continue between returned sink errors. The FIFO can accept one
+more event while the older event waits. If the FIFO fills, a later warning
+or failed callback still reports its exact queue rejection to the caller.
+Only accepted queue records enter the handoff. In the focused history, the
+sink rejects an overdue warning, then the queue accepts a congestion warning.
+A failed callback commits `Failed` and reports its rejected event. Later
+output turns offer the pending overdue warning and then the queued congestion
+warning. A failure event that the queue accepts can reach the sink after work
+is disabled.
+
+Use a sink that accepts the full record or returns a definite rejection.
+The host decides when to retry and needs each sink call to return. `Ok`
+describes acceptance by that sink. A byte stream needs its own partial-write
+policy, such as the [event output example](EVENT_OUTPUT.md).
+[Handoff decision](adr/0041-host-observed-application-progress.md#hand-off-diagnostics-to-a-fallible-sink)
+
 ## Verify the consumer outside the workspace
 
 Use an unused destination outside this checkout. Copy the public-API test

@@ -87,6 +87,11 @@ struct PeriodicSampleHost<'a> {
     deferral: Option<Deferral>,
 }
 
+struct DiagnosticHandoff<S> {
+    sink: S,
+    pending: Option<Event<Diagnostic>>,
+}
+
 impl Application for Sampler<'_> {
     type StartError = Infallible;
     type WorkError = ReadFailed;
@@ -253,6 +258,35 @@ impl<'a> PeriodicSampleHost<'a> {
     }
 }
 
+impl<S, E> DiagnosticHandoff<S>
+where
+    S: FnMut(Event<Diagnostic>) -> Result<(), E>,
+{
+    fn new(sink: S) -> Self {
+        Self {
+            sink,
+            pending: None,
+        }
+    }
+
+    // The sink accepts one whole record or returns a definite rejection.
+    // Keep the pending head ahead of any records queued during rejection.
+    fn turn(
+        &mut self,
+        events: &mut EventQueue<Diagnostic>,
+    ) -> Result<Option<Event<Diagnostic>>, E> {
+        if self.pending.is_none() {
+            self.pending = events.dequeue();
+        }
+        let Some(event) = self.pending else {
+            return Ok(None);
+        };
+        (self.sink)(event)?;
+        self.pending = None;
+        Ok(Some(event))
+    }
+}
+
 fn overdue_event(application_id: ApplicationId, seconds: u64) -> Event<Diagnostic> {
     Event::new(
         EventSource::Application(application_id),
@@ -267,6 +301,15 @@ fn congestion_event(application_id: ApplicationId, seconds: u64) -> Event<Diagno
         EventSource::Application(application_id),
         EventSeverity::Warning,
         Diagnostic::DownstreamCongested,
+        EventTimestamp::from_elapsed(Duration::from_secs(seconds)),
+    )
+}
+
+fn work_failure_event(application_id: ApplicationId, seconds: u64) -> Event<Diagnostic> {
+    Event::new(
+        EventSource::Application(application_id),
+        EventSeverity::Error,
+        Diagnostic::WorkReturnedError,
         EventTimestamp::from_elapsed(Duration::from_secs(seconds)),
     )
 }
@@ -614,4 +657,92 @@ fn rejected_congestion_warning_preserves_older_event_and_does_not_retry() {
         })
     ));
     assert!(host.sampler.events.is_empty());
+}
+
+#[test]
+fn stalled_diagnostic_handoff_retries_the_head_and_preserves_queue_saturation() {
+    let input = Cell::new(SampleInput::Empty);
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    let overdue = overdue_event(id, 2);
+    let congestion = congestion_event(id, 13);
+    let busy = std::io::ErrorKind::WouldBlock;
+    let mut offers = [
+        (overdue, Err(busy)),
+        (overdue, Err(busy)),
+        (overdue, Ok(())),
+        (congestion, Ok(())),
+    ]
+    .into_iter();
+    let mut handoff = DiagnosticHandoff::new(|event| {
+        let (expected, outcome) = offers.next().expect("one offer on each nonempty turn");
+        assert_eq!(event, expected);
+        outcome
+    });
+
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(None));
+    host.turn().unwrap();
+    host.sampler.clock.advance(SAMPLE_WINDOW).unwrap();
+    host.turn().unwrap();
+    assert_eq!(handoff.turn(&mut host.sampler.events), Err(busy));
+
+    input.set(SampleInput::Ready(7));
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    host.turn().unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(CONGESTION_WINDOW).unwrap();
+    assert_eq!(
+        host.turn(),
+        Ok(PeriodicTurn::Congested {
+            event: congestion,
+            outcome: EventEmitOutcome::Recorded,
+        })
+    );
+    assert_eq!(handoff.turn(&mut host.sampler.events), Err(busy));
+
+    assert_eq!(host.take_pending_sample(), Some(7));
+    input.set(SampleInput::ReadFailed);
+    let error = host.turn().unwrap_err();
+    assert!(matches!(
+        error.work_error(),
+        RuntimeWorkError::Application {
+            source: ReadFailed,
+            ..
+        }
+    ));
+    let rejected = work_failure_event(id, 13);
+    let attempt = error.failure_event_attempt().unwrap();
+    assert_eq!(attempt.event(), &rejected);
+    assert_eq!(
+        attempt.outcome(),
+        EventEmitOutcome::QueueFull { capacity: 1 }
+    );
+    assert_eq!(host.sampler.runtime.state(id), Ok(ApplicationState::Failed));
+
+    let events = &mut host.sampler.events;
+    assert_eq!(handoff.turn(events), Ok(Some(overdue)));
+    assert_eq!(handoff.turn(events), Ok(Some(congestion)));
+    assert_eq!(handoff.turn(events), Ok(None));
+    assert_eq!(offers.next(), None);
+}
+
+#[test]
+fn diagnostic_handoff_accepts_a_queued_work_failure_after_work_is_disabled() {
+    let input = Cell::new(SampleInput::ReadFailed);
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let expected = work_failure_event(host.sampler.application_id, 0);
+    let error = host.turn().unwrap_err();
+    let attempt = error.failure_event_attempt().unwrap();
+    assert_eq!(attempt.event(), &expected);
+    assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
+
+    let mut handoff = DiagnosticHandoff::new(|event| {
+        assert_eq!(event, expected);
+        Ok::<(), Infallible>(())
+    });
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(Some(expected)));
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(None));
 }

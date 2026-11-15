@@ -644,3 +644,22 @@ threshold, suppression after a recorded or rejected warning, FIFO preservation
 on rejection, a late warning after re-arming, and draining at equality.
 Preserve both prior sample-window policies and the typed work failure path.
 Run the identical public-API tests in an independent package.
+
+Revision 4 (2026-11-16) adds a separate diagnostic output turn to the serial
+consumer. The handoff shall own one sink and retain at most one pending event
+from the existing FIFO. An output turn shall use the pending event first or
+dequeue the oldest event when the slot is empty. It shall offer at most one
+whole event to the sink. Acceptance shall clear the pending slot and return
+that event. Rejection shall return the typed sink error and keep the exact
+pending event for a later turn. An empty turn shall leave the sink untouched.
+
+While a sink rejection is pending, the host shall remain free to select work
+turns under the existing rules. Queue saturation shall keep its exact event
+and outcome visible in the existing turn result or work error. Only events
+accepted by the FIFO shall enter the handoff. A sink used for explicit retry
+shall accept the entire event or reject it without accepting any part.
+
+Verify repeated sink rejection, queue refill while the head is
+pending, exact retry in FIFO order, idle output, and typed work failure with
+both a queued event and a saturated queue in separate histories. Run the
+identical public-API tests in an independent package.
