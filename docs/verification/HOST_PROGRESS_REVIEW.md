@@ -319,3 +319,26 @@ its original timestamp after time advances. The other histories verify
 absent and already-recorded attempts, the original failure state and idle
 retry. This host disables work on the first error. Several independent
 failure sources would need their own bound and admission policy.
+
+Codex and an independent Codex reviewer accepted the complete implementation
+diff. The audit covered 56 Rust files, 26,888 physical lines and 1,407
+comment-only lines with zero width findings and three existing fulfilled
+Clippy expectations. All 706 relative paths, 73 fragments and 240 exact
+test references resolved. All 10 changed Markdown files passed rendered
+content and structure checks. The commit tree matched the reviewed staged
+tree and the test blob matched the verified independent source.
+Ignored review artifacts are under `target/review-2026-11-17-source-audit`.
+
+Implementation `4801928432def9b0003eaf8f219d6adb27f4b77b` reached
+`origin/main` by ordinary fast-forward push.
+[Exact hosted run 43873421289](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43873421289),
+job 133320183328, passed all 20 steps with 276 workspace tests including
+11 host progress tests, 14 adapter tests, five sample tests, warnings-denied
+rustdoc and both whitespace checks. The sample matched the input's 222 lines.
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable and Clippy 0.1.100 ran on
+runner 2.338.2 with Windows image `20261103.298.1`, matching the input.
+
+Codex accepts the serial retry checkpoint. The caller chooses when to retry
+and drain. FIFO admission establishes local storage. Acceptance of a whole
+record at the sink is a separate outcome. This evidence record receives its
+own exact hosted check, with the result retained in automation memory.

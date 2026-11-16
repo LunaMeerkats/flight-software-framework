@@ -16,6 +16,9 @@ the regression baseline. Package 0.0.0 is unpublished with provisional APIs.
 - The locked local baseline passes 276 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. All 11 host progress tests pass
   in the workspace and an independent package with identical source.
+- Implementation `4801928432def9b0003eaf8f219d6adb27f4b77b` passed all
+  20 hosted steps in run 43873421289 with 276 workspace tests and the
+  same 222-line combined host sample.
 
 ## Current architecture
 
@@ -31,7 +34,8 @@ The host retains one queue-rejected failure event for explicit FIFO retry.
 
 ## Work in progress
 
-The failure event retry passed local and independent-package verification.
+Codex accepted the failure event retry after local, independent-package
+and exact hosted verification.
 [Focused review](verification/HOST_PROGRESS_REVIEW.md#queue-rejected-failure-follow-up)
 
 ## Highest risks and uncertainties
