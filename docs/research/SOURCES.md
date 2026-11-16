@@ -13,6 +13,20 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-FAILURE-EVENT-RETRY — Explicit queue retry
+
+- Rust Flight Framework input `d7e50431dfe89d331ef3077dc3baec36b9dc28ae`,
+  inspected 2026-11-17. The [typed error](../../src/runtime_events.rs)
+  preserves the exact failure event and its initial queue outcome. The
+  [event queue](../../src/events.rs) preserves accepted records when full.
+  [Direct-runtime tests](../../tests/runtime_events.rs) verify explicit retry
+  after dequeue. Adopt that retry boundary in the existing serial handoff.
+- [Option::as_ref](https://doc.rust-lang.org/std/option/enum.Option.html#method.as_ref),
+  Rust standard library 1.100.0, accessed 2026-11-17. Borrow the saved event
+  for an offer while retaining slot ownership. Clear it on acceptance.
+  [ADR-0041](../adr/0041-host-observed-application-progress.md#retry-a-queue-rejected-work-failure)
+  records the local policy.
+
 ## SRC-RFF-DIAGNOSTIC-HANDOFF — Whole-event sink rejection
 
 - Rust Flight Framework input `6a1094d4ef1aa293fe8732246458b0ed177f04e9`,

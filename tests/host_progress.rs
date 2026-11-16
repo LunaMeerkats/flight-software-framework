@@ -85,6 +85,7 @@ struct PeriodicSampleHost<'a> {
     cursor: Option<PeriodicWork>,
     pending_sample: Option<u8>,
     deferral: Option<Deferral>,
+    pending_failure_event: Option<Event<Diagnostic>>,
 }
 
 struct DiagnosticHandoff<S> {
@@ -194,6 +195,7 @@ impl<'a> PeriodicSampleHost<'a> {
             cursor: Some(PeriodicWork::new(first, WORK_INTERVAL).unwrap()),
             pending_sample: None,
             deferral: None,
+            pending_failure_event: None,
         }
     }
 
@@ -217,10 +219,15 @@ impl<'a> PeriodicSampleHost<'a> {
         let PeriodicWorkOutcome::Released { scheduled_work, .. } = release else {
             return Ok(PeriodicTurn::Idle(release));
         };
-        let progress = self
-            .sampler
-            .work_turn()
-            .inspect_err(|_| self.cursor = None)?;
+        let progress = self.sampler.work_turn().inspect_err(|error| {
+            // Disabling the cursor makes this the only capture for this host.
+            self.cursor = None;
+            if let Some(attempt) = error.failure_event_attempt()
+                && matches!(attempt.outcome(), EventEmitOutcome::QueueFull { .. })
+            {
+                self.pending_failure_event = Some(*attempt.event());
+            }
+        })?;
         if let TurnProgress::Sample(value) = progress {
             self.pending_sample = Some(value);
         }
@@ -232,6 +239,17 @@ impl<'a> PeriodicSampleHost<'a> {
 
     fn take_pending_sample(&mut self) -> Option<u8> {
         self.pending_sample.take()
+    }
+
+    fn retry_failure_event(&mut self) -> Option<EventEmitOutcome> {
+        let outcome = self
+            .sampler
+            .events
+            .emit(self.pending_failure_event.as_ref()?);
+        if outcome == EventEmitOutcome::Recorded {
+            self.pending_failure_event = None;
+        }
+        Some(outcome)
     }
 
     fn deferred_turn(&mut self) -> PeriodicTurn {
@@ -738,6 +756,7 @@ fn diagnostic_handoff_accepts_a_queued_work_failure_after_work_is_disabled() {
     assert_eq!(attempt.event(), &expected);
     assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
     assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
+    assert_eq!(host.retry_failure_event(), None);
 
     let mut handoff = DiagnosticHandoff::new(|event| {
         assert_eq!(event, expected);
@@ -745,4 +764,83 @@ fn diagnostic_handoff_accepts_a_queued_work_failure_after_work_is_disabled() {
     });
     assert_eq!(handoff.turn(&mut host.sampler.events), Ok(Some(expected)));
     assert_eq!(handoff.turn(&mut host.sampler.events), Ok(None));
+}
+
+#[test]
+fn rejected_work_failure_reenters_fifo_behind_older_diagnostics() {
+    let input = Cell::new(SampleInput::Empty);
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    let overdue = overdue_event(id, 2);
+    let congestion = congestion_event(id, 13);
+    let failure = work_failure_event(id, 13);
+    let full = EventEmitOutcome::QueueFull { capacity: 1 };
+    let busy = std::io::ErrorKind::WouldBlock;
+    let mut offers = [
+        (overdue, Err(busy)),
+        (overdue, Ok(())),
+        (congestion, Err(busy)),
+        (congestion, Ok(())),
+        (failure, Ok(())),
+    ]
+    .into_iter();
+    let mut handoff = DiagnosticHandoff::new(|event| {
+        let (expected, outcome) = offers.next().expect("one offer on each nonempty turn");
+        assert_eq!(event, expected);
+        outcome
+    });
+
+    host.turn().unwrap();
+    host.sampler.clock.advance(SAMPLE_WINDOW).unwrap();
+    host.turn().unwrap();
+    assert_eq!(handoff.turn(&mut host.sampler.events), Err(busy));
+    input.set(SampleInput::Ready(7));
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    host.turn().unwrap();
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Deferred));
+    host.sampler.clock.advance(CONGESTION_WINDOW).unwrap();
+    host.turn().unwrap();
+    assert_eq!(host.take_pending_sample(), Some(7));
+
+    input.set(SampleInput::ReadFailed);
+    let error = host.turn().unwrap_err();
+    let attempt = error.failure_event_attempt().unwrap();
+    assert_eq!(attempt.event(), &failure);
+    assert_eq!(attempt.outcome(), full);
+    assert_eq!(host.retry_failure_event(), Some(full));
+
+    host.sampler.clock.advance(WORK_INTERVAL).unwrap();
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(Some(overdue)));
+    assert_eq!(handoff.turn(&mut host.sampler.events), Err(busy));
+    assert_eq!(host.retry_failure_event(), Some(EventEmitOutcome::Recorded));
+    assert_eq!(host.retry_failure_event(), None);
+    assert_eq!(attempt.outcome(), full);
+    assert_eq!(host.sampler.runtime.state(id), Ok(ApplicationState::Failed));
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(Some(congestion)));
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(Some(failure)));
+    assert_eq!(host.retry_failure_event(), None);
+    assert_eq!(handoff.turn(&mut host.sampler.events), Ok(None));
+    assert_eq!(offers.next(), None);
+}
+
+#[test]
+fn periodic_lifecycle_rejection_has_no_failure_event_to_retry() {
+    let input = Cell::new(SampleInput::ReadFailed);
+    let output = Cell::new(None);
+    let mut host = PeriodicSampleHost::start(&input, &output);
+    let id = host.sampler.application_id;
+    host.sampler.runtime.stop(id).unwrap();
+
+    let error = host.turn().unwrap_err();
+    assert!(matches!(error.work_error(), RuntimeWorkError::Lifecycle(_)));
+    assert_eq!(error.failure_event_attempt(), None);
+    assert_eq!(host.retry_failure_event(), None);
+    assert!(host.sampler.events.is_empty());
+    assert_eq!(
+        host.sampler.runtime.state(id),
+        Ok(ApplicationState::Stopped)
+    );
+    assert_eq!(host.turn(), Ok(PeriodicTurn::Disabled));
 }

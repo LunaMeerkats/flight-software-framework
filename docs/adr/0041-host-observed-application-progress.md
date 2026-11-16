@@ -2,7 +2,7 @@
 
 - Status: Accepted for the Stage 5 consumer
 - Date: 2026-11-13
-- Scope: RFF-LIB-REQ-016, revisions 1 through 4
+- Scope: RFF-LIB-REQ-016, revisions 1 through 5
 
 ## Context
 
@@ -133,3 +133,29 @@ regain control from the sink to choose another turn. An adapter must make
 rejection definite before the host can safely retry. Success establishes
 acceptance by that sink. Revisit for a concrete adapter that exposes partial
 acceptance, ambiguous acknowledgement or a need for independent execution.
+
+## Retry a queue-rejected work failure
+
+Decision date: 2026-11-17.
+
+The periodic consumer disables work after the first returned error. When
+that error carries a failure event rejected by the FIFO, the work turn
+saves its exact record in one host-owned slot. The original error still
+describes the callback failure and its first event attempt. The caller
+chooses later retry turns.
+Already recorded events and errors with no event attempt leave the slot empty.
+
+A retry turn offers the saved record to the existing FIFO once. `QueueFull`
+keeps the slot occupied and `Recorded` clears it. Subsequent empty turns
+leave the queue alone. The saved event keeps the source, severity, identifier
+and timestamp of the original attempt. Retry leaves lifecycle and release
+state alone. An older event can move from the FIFO to the handoff and free
+the FIFO entry even while the sink is still rejecting that older event.
+
+Increasing FIFO capacity would move the saturation point. Direct delivery
+to the sink could overtake older accepted records. Routing retries through
+the same FIFO preserves their order and needs only one extra event slot for
+this host's single terminal work error. Warning rejection still follows its
+original one-attempt policy. Revisit slot ownership and scheduling if a host
+can collect several failures before retrying or if failures need priority.
+[Source register](../research/SOURCES.md#src-rff-failure-event-retry--explicit-queue-retry)

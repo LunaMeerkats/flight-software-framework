@@ -663,3 +663,19 @@ Verify repeated sink rejection, queue refill while the head is
 pending, exact retry in FIFO order, idle output, and typed work failure with
 both a queued event and a saturated queue in separate histories. Run the
 identical public-API tests in an independent package.
+
+Revision 5 (2026-11-17) adds explicit queue retry for a returned work failure
+in the periodic consumer. The caller shall save the exact event in one retry
+slot only when the typed work error reports `QueueFull`. A recorded event or
+a lifecycle rejection shall leave an empty retry slot. A retry turn shall
+offer the saved event to the same FIFO at most once, keep it on `QueueFull`,
+and clear it on `Recorded`. An empty retry turn shall leave the FIFO alone.
+The original work error and attempt remain available as history.
+
+To verify revision 5, fill the FIFO while an older record is pending at the sink,
+preserve the rejected failure through a full retry, and admit it when a later
+output turn frees the FIFO entry. Keep both older records ahead of the failure
+at the sink, and preserve its original timestamp and the Failed application
+and disabled cursor. Verify that recorded or absent original attempts and
+repeated empty retries produce no duplicate. Run the identical public-API
+tests in an independent package.

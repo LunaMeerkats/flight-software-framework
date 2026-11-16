@@ -139,6 +139,30 @@ describes acceptance by that sink. A byte stream needs its own partial-write
 policy, such as the [event output example](EVENT_OUTPUT.md).
 [Handoff decision](adr/0041-host-observed-application-progress.md#hand-off-diagnostics-to-a-fallible-sink)
 
+## Retry a work failure rejected by the queue
+
+When the periodic work turn returns an error, it disables its cursor and
+checks `failure_event_attempt()` on the typed error. If the original outcome
+is `QueueFull`, the host saves the exact event in one optional retry slot.
+The caller still receives the original typed error. An event recorded on
+the work turn is already in the FIFO. A lifecycle rejection carries no event.
+
+Call `retry_failure_event` on a separate host turn. `Some(QueueFull { .. })`
+retains the same record. `Some(Recorded)` appends it to the FIFO and clears
+the slot. `None` means the slot was empty and the queue was untouched.
+The original error continues to report the first `QueueFull` even after a
+later turn records the event. Use the retry outcome to track queue progress.
+
+In the focused history the handoff is holding an overdue warning while the
+FIFO holds a congestion warning. The callback fails and its diagnostic goes
+into the retry slot. The retry can succeed once the congestion warning moves
+from the FIFO into the handoff, even if the sink is still busy. The sink
+accepts both older warnings before the failure event, which keeps its
+original time. The sampler stays `Failed` and work stays disabled. The FIFO,
+handoff and failure retry slot each hold at most one event in this consumer.
+Sink acceptance still follows the handoff's whole-record contract.
+[Retry decision](adr/0041-host-observed-application-progress.md#retry-a-queue-rejected-work-failure)
+
 ## Verify the consumer outside the workspace
 
 Use an unused destination outside this checkout. Copy the public-API test

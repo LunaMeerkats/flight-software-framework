@@ -16,6 +16,8 @@ Revision 3 demonstrates one congestion warning per observed deferral,
 including the queue outcome and rearming when the host sees space.
 Revision 4 retains one dequeued diagnostic across definite sink rejection
 and resumes FIFO output on separate host turns.
+Revision 5 lets the periodic host explicitly re-offer its one queue-rejected
+work failure after space opens, preserving the order of accepted diagnostics.
 The [consumer guide](HOST_PROGRESS.md) describes the host policies.
 The [focused review](verification/HOST_PROGRESS_REVIEW.md) records the evidence.
 

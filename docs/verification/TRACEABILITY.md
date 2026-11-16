@@ -1,6 +1,6 @@
 # Verification traceability
 
-## Stage 5 application progress — 2026-11-13 through 2026-11-16
+## Stage 5 application progress — 2026-11-13 through 2026-11-17
 
 [ADR-0041](../adr/0041-host-observed-application-progress.md) assigns the
 progress policy to the serial host and uses the existing work failure path.
@@ -11,6 +11,7 @@ progress policy to the serial host and uses the existing work failure path.
 | RFF-LIB-REQ-016 revision 2 | `periodic_deferral_preserves_release_and_pre_deferral_elapsed_time` checks repeated deferral, retained output, input and release, late re-arming, a waiting poll and a warning at the adjusted threshold. `periodic_failure_at_adjusted_threshold_disables_release` checks the typed error, exact failure event, Failed state and no further release. | [Periodic deferral review](HOST_PROGRESS_REVIEW.md#periodic-deferral-follow-up) |
 | RFF-LIB-REQ-016 revision 3 | `congestion_warns_at_threshold_and_rearms_after_room_is_observed` checks just before and at equality, suppression after a recorded warning, retained sample, release, input and sample window, and a late warning after rearming. `rejected_congestion_warning_preserves_older_event_and_does_not_retry` checks the exact rejected event, FIFO preservation, suppression after rejection and draining at equality. | [Congestion review](HOST_PROGRESS_REVIEW.md#downstream-congestion-follow-up) |
 | RFF-LIB-REQ-016 revision 4 | `stalled_diagnostic_handoff_retries_the_head_and_preserves_queue_saturation` checks repeated exact offers, accepted queue refill, typed failure and the saturated failure event, FIFO recovery and idle output. `diagnostic_handoff_accepts_a_queued_work_failure_after_work_is_disabled` checks that an accepted failure reaches the sink after work is disabled. | [Diagnostic handoff review](HOST_PROGRESS_REVIEW.md#diagnostic-handoff-follow-up) |
+| RFF-LIB-REQ-016 revision 5 | `rejected_work_failure_reenters_fifo_behind_older_diagnostics` checks full retry, admission during sink rejection, original timestamp, ordered output, failed and disabled work, and empty retry after admission. `periodic_lifecycle_rejection_has_no_failure_event_to_retry` checks the empty retry after lifecycle rejection. `diagnostic_handoff_accepts_a_queued_work_failure_after_work_is_disabled` also checks an empty retry after the original event was accepted. | [Queue retry review](HOST_PROGRESS_REVIEW.md#queue-rejected-failure-follow-up) |
 
 ## Stage 5 command clearing — 2026-11-12
 

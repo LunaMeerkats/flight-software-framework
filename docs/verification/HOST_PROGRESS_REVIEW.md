@@ -278,3 +278,44 @@ Codex accepts the serial diagnostic handoff checkpoint.
 The tests exercise whole-event sink acceptance and definite rejection. The
 serial host needs each sink offer to return before it can select another
 turn. A sink with ambiguous effects needs its own retry contract.
+
+## Queue-rejected failure follow-up
+
+Date: **2026-11-17**
+
+[RFF-LIB-REQ-016 revision 5](../REQUIREMENTS.md#rff-lib-req-016--observe-application-progress-on-host-turns)
+and [ADR-0041](../adr/0041-host-observed-application-progress.md#retry-a-queue-rejected-work-failure)
+add one optional retry slot to the periodic host. On a returned work error,
+the host disables the cursor and saves the event only if the original FIFO
+attempt returned `QueueFull`. Retrying after an older event leaves the queue
+preserves the original timestamp and puts the failure after both older
+warnings at the sink. The slot clears on admission. A retry turn on an empty
+slot leaves the FIFO alone. The typed work error keeps its original outcome.
+
+Input `d7e50431dfe89d331ef3077dc3baec36b9dc28ae` matched refreshed origin.
+[Exact input run 43717910335](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/43717910335),
+job 132823326863, passed all 20 steps with 274 workspace tests. The locked
+local input baseline also passed with 274 workspace tests.
+
+The local baseline and focused commands above passed with 276 workspace
+tests including 11 host progress tests. Local Rust/Cargo 1.98.0, rustfmt
+1.9.0-stable and Clippy 0.1.98 match the input. The focused adapter and sample
+targets passed 14 and five tests. `cargo run --locked --example host-echo`
+reproduced the 222-line input transcript byte for byte.
+
+The independent-package recipe above passed at
+`C:/Users/drrsm/AppData/Local/Temp/rff-host-progress-a8bd09d6c0dc49a087671c29c7436843`.
+Offline locked check, Clippy, all 11 tests and metadata passed. Metadata
+confirmed one independent workspace member, two graph packages and the sole
+framework path dependency. The 28,619 source bytes matched with SHA256
+`d59d55310ba4279101951e04bf641b850cedb6a722620b2f92a2bd179fcb43f1`
+and normalized Git blob `909525c6e0de1ea2c3c84910d39a3234c90dce90`.
+Ignored logs are under `target/review-2026-11-17-failure-retry` and
+`target/review-2026-11-17-independent-verification`.
+
+The composed retry history exercises a full retry, queue acceptance while
+an older diagnostic is held at the sink, and one exact failure event at
+its original timestamp after time advances. The other histories verify
+absent and already-recorded attempts, the original failure state and idle
+retry. This host disables work on the first error. Several independent
+failure sources would need their own bound and admission policy.
