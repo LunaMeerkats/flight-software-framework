@@ -19,3 +19,11 @@ Review the whole diff, source form, links and rendered documents. Record local
 evidence and verify the exact hosted head after an ordinary main push.
 Stop at two cooperative applications with one terminal failure. If the change
 cannot pass, retain the research and withdraw only this run's incomplete edits.
+
+## Result
+
+The locked local baseline passed 278 workspace tests. The runnable example
+and both tests passed with identical source in an independent binary.
+Implementation `ac5b960a5e56b49cbc3a874cfbde2ce38311956b` passed all 20
+steps in hosted run 44089160905.
+[Periodic peer review](docs/verification/PERIODIC_PEER_REVIEW.md)

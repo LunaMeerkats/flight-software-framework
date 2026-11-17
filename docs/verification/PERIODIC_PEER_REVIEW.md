@@ -67,3 +67,22 @@ covers event storage and local dequeue.
 
 Raw local results are under the ignored `target/review-2026-11-18-peer-work`
 and `target/review-2026-11-18-document-audit` directories.
+
+## Publication and hosted verification
+
+Implementation `ac5b960a5e56b49cbc3a874cfbde2ce38311956b` reached
+`origin/main` by ordinary fast-forward push. Its commit tree matched the
+reviewed staged tree and the committed example matched the independent
+consumer's Git blob.
+
+[Exact hosted run 44089160905](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/44089160905),
+job 134059454583, passed all 20 steps with 278 workspace tests including
+both periodic peer tests, 14 adapter tests, five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined sample
+reproduced the input's 222 lines. Hosted Rust/Cargo 1.100.0, rustfmt
+1.11.0-stable and Clippy 0.1.100 ran on runner 2.338.2 and
+`windows-2025-vs2026` image `20261103.298.1`.
+
+Codex accepts RFF-LIB-REQ-017 revision 1 for the recorded serial consumer.
+The hosted test harness ran the two focused tests. The executable's
+six-line trace was verified locally in both packages.

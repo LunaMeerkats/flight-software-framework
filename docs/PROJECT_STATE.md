@@ -17,6 +17,9 @@ unpublished with provisional APIs.
 - The locked local baseline passes 278 tests with Rust/Cargo 1.98.0,
   rustfmt 1.9.0-stable and Clippy 0.1.98. Both periodic peer tests and
   the runnable trace pass with identical source in an independent package.
+- Implementation `ac5b960a5e56b49cbc3a874cfbde2ce38311956b` passed all 20
+  steps in hosted run 44089160905 with 278 workspace tests and the same
+  222-line combined host sample.
 
 ## Current architecture
 
@@ -34,8 +37,8 @@ cursors. Returning a work error ends only the selected cursor's releases.
 
 ## Work in progress
 
-The periodic peer example passed local and independent-package checks.
-Exact hosted verification follows publication.
+Codex accepted the periodic peer checkpoint after local, independent-package
+and exact hosted verification.
 [Focused review](verification/PERIODIC_PEER_REVIEW.md)
 
 ## Highest risks and uncertainties
