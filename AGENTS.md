@@ -118,6 +118,11 @@ translate NASA C source.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
+- `examples/periodic_peer.rs`: public-only direct-runtime example with two
+  caller-selected periodic cursors and a shared capacity-one event queue.
+  The host disables the failed cursor and continues healthy peer work.
+  Its test-enabled target and guide verify the same source in an independent
+  binary.
 - `tests/selective_publication.rs`: public-only targeted publication and fixed
   two-subscriber retry consumer. Its guide verifies identical tests in an
   independent Cargo package. The acceptance ledger records inbox enqueue only;
@@ -244,6 +249,13 @@ recipe in [the periodic-work guide](docs/PERIODIC_WORK.md). Check, lint and test
 the identical test source, inspect metadata and compare SHA256 hashes. Record
 the actual package path/results in the focused periodic-work review. A released
 item is not evidence that the host invoked or completed its callback.
+
+When changing the periodic peer example or its guidance, run
+`cargo test --locked --example periodic_peer` and
+`cargo run --locked --example periodic_peer`. Follow the independent
+binary recipe in [its guide](docs/PERIODIC_PEER.md). Check, lint, test and run
+identical source. Inspect metadata, byte equality and SHA256, and record the
+actual results in the [focused review](docs/verification/PERIODIC_PEER_REVIEW.md).
 
 When changing selective publication or its consumer guidance, run
 `cargo test --locked --test selective_publication`, then follow the independent

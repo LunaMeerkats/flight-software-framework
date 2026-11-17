@@ -37,3 +37,7 @@ test = true
 [[example]]
 name = "command_session"
 test = true
+
+[[example]]
+name = "periodic_peer"
+test = true

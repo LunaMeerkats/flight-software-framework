@@ -13,6 +13,21 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-PERIODIC-PEER — Periodic work after returned failure
+
+- Rust Flight Framework input `ca32a428314055f1b2f4eae5214462c6ab129fdb`,
+  inspected 2026-11-18. The [cursor](../../src/scheduling/periodic.rs) consumes
+  a release before the caller invokes work. The [work wrapper](../../src/runtime_events.rs)
+  preserves the typed error and event outcome after committing failure.
+  Adopt both contracts and combine them in a two-cursor serial driver.
+- [The try propagation expression](https://doc.rust-lang.org/reference/expressions/operator-expr.html#the-try-propagation-expression)
+  and [Result::inspect_err](https://doc.rust-lang.org/std/result/enum.Result.html#method.inspect_err),
+  official Rust documentation accessed 2026-11-18. Handle the selected
+  application error within the driver and use `inspect_err` to dispose of
+  its cursor while returning the original error. [Cargo Targets](https://doc.rust-lang.org/cargo/reference/cargo-targets.html#examples)
+  supports testing the same example source as the executable entry point.
+  [ADR-0042](../adr/0042-periodic-peer-work-after-failure.md) records the policy.
+
 ## SRC-RFF-FAILURE-EVENT-RETRY — Explicit queue retry
 
 - Rust Flight Framework input `d7e50431dfe89d331ef3077dc3baec36b9dc28ae`,

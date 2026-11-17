@@ -7,6 +7,11 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-017 and [ADR-0042](adr/0042-periodic-peer-work-after-failure.md)
+provide a [runnable direct-runtime example](PERIODIC_PEER.md) with two
+independent periodic cursors. The host keeps heartbeat work going while a
+sampler failure shares the bounded diagnostic path.
+
 RFF-LIB-REQ-016 and [ADR-0041](adr/0041-host-observed-application-progress.md)
 show how a serial host can recognize overdue sample output across completed
 work turns while preserving the typed returned-error path. Revision 2

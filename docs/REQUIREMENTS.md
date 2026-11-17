@@ -679,3 +679,24 @@ at the sink, and preserve its original timestamp and the Failed application
 and disabled cursor. Verify that recorded or absent original attempts and
 repeated empty retries produce no duplicate. Run the identical public-API
 tests in an independent package.
+
+### RFF-LIB-REQ-017 — Continue periodic peer work after a returned failure
+
+Revision 1 (2026-11-18). A runnable public-API consumer shall pair two
+running applications in one direct runtime with one periodic cursor each,
+one manual clock and a shared capacity-one event queue. One caller-selected
+turn shall poll at most one cursor and invoke work only after its release.
+When work returns an application error, the host shall discard the selected
+cursor and expose the exact typed work error and failure-event attempt.
+Selecting the disabled cursor again shall perform no poll or work.
+
+The peer shall keep its next release and run on later selected turns while
+the diagnostic queue is full and after it drains. An occupied queue shall
+preserve its older record if it rejects the failure event. The host shall
+select diagnostic dequeue separately from work.
+
+Acceptance: execute the sample with an admitted failure event and verify
+the typed error, event identity, timestamp, selected Failed state, preserved
+peer release, and repeated healthy callbacks. Verify the initial queue-full
+path in a separate test. Build, lint, test and run identical source as an
+independent Cargo binary.
