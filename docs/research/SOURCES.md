@@ -13,6 +13,20 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-TWO-FAILURE-RETRY — Bounded host retention
+
+- Rust Flight Framework input `c2da285952d99710adb61eb76ca872213e32edbd`,
+  inspected 2026-11-19. The [one-failure host](../../tests/host_progress.rs)
+  retains one queue-rejected work event. The
+  [peer consumer](../../examples/periodic_peer.rs) disables a selected cursor
+  on error and keeps healthy peer work selectable. The
+  [work error](../../src/runtime_events.rs) retains the exact original attempt;
+  [event emission](../../src/events.rs) borrows a record and preserves the
+  queue on rejection. Adopt those contracts with two fixed retry slots for
+  two terminally failing roles. Retry selection is consumer policy, recorded
+  in [ADR-0042](../adr/0042-periodic-peer-work-after-failure.md#two-retained-failure-events--2026-11-19).
+  No new upstream behavior, dependency or compatibility assumption is needed.
+
 ## SRC-RFF-PERIODIC-PEER — Periodic work after returned failure
 
 - Rust Flight Framework input `ca32a428314055f1b2f4eae5214462c6ab129fdb`,

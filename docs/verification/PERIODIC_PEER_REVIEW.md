@@ -86,3 +86,107 @@ reproduced the input's 222 lines. Hosted Rust/Cargo 1.100.0, rustfmt
 Codex accepts RFF-LIB-REQ-017 revision 1 for the recorded serial consumer.
 The hosted test harness ran the two focused tests. The executable's
 six-line trace was verified locally in both packages.
+
+## Two-failure retry follow-up
+
+Date **2026-11-19**. RFF-LIB-REQ-017 revision 2 and the
+[ADR follow-up](../adr/0042-periodic-peer-work-after-failure.md#two-retained-failure-events--2026-11-19)
+extend the same consumer. Input `c2da285952d99710adb61eb76ca872213e32edbd`
+was clean and matched refreshed origin. Exact input push run 44089559879,
+job 134060813535, passed all 20 steps and 278 workspace tests. The input
+local locked 278-test baseline passed with the same local tools listed above.
+
+### Behavior and evidence
+
+The host registers two independently identified samplers and one healthy
+heartbeat. Two inline optional event slots retain only QueueFull work-failure
+attempts, in host observation order. An explicit retry offers one oldest
+record; full preserves both and acceptance shifts only the remaining record.
+Each failing cursor is disabled before capture. Only the two samplers can
+return work errors, each at most once, so the fixed mission cannot overwrite
+an occupied retry slot. This proof must be revisited if mission roles or
+cursor re-enabling change.
+
+The original two histories remain. The admitted-event history also checks
+an empty retry. `two_rejected_failures_retry_in_observation_order_without_duplicates`
+checks both role orders, exact typed causes and records, distinct original
+timestamps, repeated full retries, healthy work with all event slots occupied,
+one successful admission per turn, and repeated disabled/empty turns without
+duplicates. `lifecycle_rejection_disables_only_selected_cursor_without_retry`
+checks exclusion of a stopped application's lifecycle error. The runnable
+trace test fixes the original six-line prefix and two completed retry admissions.
+
+The locked local baseline passed 281 workspace tests, all-target check,
+warnings-denied Clippy/rustdoc, formatting and whitespace. The focused example
+passed five tests and ran successfully; example-only warnings-denied Clippy
+also passed. Exact commands were:
+
+```text
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo doc --locked --workspace --all-features --no-deps
+cargo test --locked --example periodic_peer
+cargo clippy --locked --example periodic_peer -- -D warnings
+cargo run --locked --example periodic_peer
+cargo run --locked --example host-echo
+git diff --check
+```
+
+`RUSTDOCFLAGS=-D warnings` applied to the doc command. The workspace suite
+included 14 adapter and five sample tests. The combined sample matched the
+input's 222 output lines. Separate adapter/sample commands were not repeated
+locally because their source was unchanged; hosted CI runs them separately.
+Initial focused compilation caught a missing test-only Clock import and an
+unchecked must-use emission; both were corrected before the accepted runs.
+
+### Independent binary and review
+
+The unchanged [independent recipe](../PERIODIC_PEER.md#verify-the-independent-binary)
+passed at
+`C:/Users/drrsm/AppData/Local/Temp/rff-periodic-peer-430e490645ea4a7db217808fba91ffce`.
+Commands used that path as `$consumer`: `cargo new --bin --edition 2024 --vcs
+none $consumer`, then `cargo add --manifest-path "$consumer/Cargo.toml"
+rust-flight-framework --path $framework --offline`, and an exact source copy.
+Locked offline check and Clippy used `--all-targets`; Clippy denied warnings.
+Locked offline test, run and `metadata --format-version 1` passed. Metadata
+confirmed one edition-2024 binary workspace member, the framework as sole path
+dependency and two packages in the graph.
+
+Source bytes match exactly: 19,231 bytes, SHA256
+`35682eda950c7b81a57eb8a117ff30880d86f3ef793174b5465bac11b5d1b877`,
+normalized Git blob `83886bee28bbcb7e36fd7ac3ef030ab24495ab5c`.
+All five independent tests pass. Workspace and independent native stdout match
+all 14 lines / 817 bytes, SHA256
+`7c11489344b9e63ef698251f17b4d5c3288ee686b8ae81801ba682c9de610b3c`.
+The input's native six-line / 233-byte stdout is an exact prefix. The older
+saved sample text used CRLF; combined-sample comparison therefore compares
+its 222 lines rather than claiming raw byte equality across line endings.
+
+Codex and an independent Codex reviewer inspected the complete source and
+documentation diff, including the fixed capture bound, ordering, error
+preservation, ownership, source form and test scope. This verifies the fixed
+cooperative host policy, not a general retry queue or occurrence ordering
+across all fresh and retained events. No new library API, dependency, lint
+waiver or workflow change is made. Callbacks/writes must return and the
+caller must select retry. Queue acceptance and dequeue establish no durable
+or external delivery.
+
+Whole-tree review covers 57 Rust files, 27,421 physical and 1,414 comment-only
+lines with zero width findings and three unchanged fulfilled expectations.
+All 737 relative paths, 81 fragments and 245 exact test references in 121
+Markdown files resolve. All 12 changed Markdown files pass rendered content
+and structure inspection, including text, headings, code, links, tables,
+nesting and encoding. This is structural/content review without browser
+pixel-layout QA. Temporary audit commands were:
+
+```text
+python target/review-2026-11-19-peer-retry-audit/inventory.py
+python target/review-2026-11-19-peer-retry-audit/render.py c2da285952d99710adb61eb76ca872213e32edbd
+python target/review-2026-11-19-peer-retry-audit/inspect_rendered.py c2da285952d99710adb61eb76ca872213e32edbd
+```
+
+Raw evidence is in ignored `target/review-2026-11-19-peer-retry` and
+`target/review-2026-11-19-peer-retry-audit`. Publication results are recorded
+after their actual completion.

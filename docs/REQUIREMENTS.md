@@ -700,3 +700,23 @@ the typed error, event identity, timestamp, selected Failed state, preserved
 peer release, and repeated healthy callbacks. Verify the initial queue-full
 path in a separate test. Build, lint, test and run identical source as an
 independent Cargo binary.
+
+Revision 2 (2026-11-19) adds a second independently registered failing sampler
+and two inline event retry slots to the runnable consumer. Only queue-rejected
+application failure events shall enter these slots, in host observation order.
+Each failing cursor shall remain disabled, bounding this mission at two
+terminal failure events. Original typed errors shall remain available.
+
+One explicit retry turn shall offer only the oldest retained event to the
+shared FIFO. QueueFull shall preserve both slots. Recorded shall remove only
+that oldest record, retaining the other for a later turn. An empty retry turn
+shall leave the FIFO unchanged. Healthy peer work shall remain selectable
+while both slots and the FIFO are occupied. Retry shall preserve the original
+source, severity, identifier and timestamp. Ordering among retained events
+is observation order; the shared FIFO still orders successful acceptance.
+
+Acceptance: preserve revision 1 histories, test both sampler failure orders,
+repeated full retries, exact two-event recovery over separate turns and no
+duplicates after draining. Verify that recorded events and lifecycle
+rejections add no retry record. Run the identical source in an independent
+binary, retaining the original runnable trace as an exact prefix.

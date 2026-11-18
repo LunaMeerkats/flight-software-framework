@@ -4,7 +4,7 @@
 cargo run --locked --example periodic_peer
 ```
 
-The [example](../examples/periodic_peer.rs) starts a sampler and a heartbeat
+The [example](../examples/periodic_peer.rs) starts two samplers and a heartbeat
 application in one direct runtime. The host has one manual clock, one
 periodic cursor per application and a shared event queue with capacity one.
 The sampler returns `SampleUnavailable` on its first work turn, at one
@@ -12,7 +12,8 @@ second. The host prints the typed failure's diagnostic outcome and
 continues heartbeat work at two and three seconds while the event is queued.
 At three seconds the sampler's selection is disabled. The host drains the
 failure event with its original one-second timestamp, then runs the
-heartbeat again at four seconds.
+heartbeat again at four seconds. The backup sampler stays idle in this first
+trace, preserving the original demonstration.
 
 ## Select work and diagnostics independently
 
@@ -32,10 +33,41 @@ heartbeat again at four seconds.
 The example handles the expected sampler error before selecting further
 turns. Setup and console I/O errors end the script. A host chooses polling
 order and must continue taking turns to see progress. A stalled callback
-or console write can stall the serial driver. The two cursors and one
+or console write can stall the serial driver. The three cursors and one
 queued event are logical storage bounds. The sampler remains terminally
 `Failed`. See the [queue retry example](HOST_PROGRESS.md#retry-a-work-failure-rejected-by-the-queue)
 for a host that retains rejected failure events.
+
+## Retry two independent failures
+
+The second trace starts a fresh host and clock with a warning already in
+the capacity-one FIFO. The first sampler fails at one second and the backup
+fails at two seconds. Both exact events are retained in two inline slots,
+in the order the host observed the failures. Both original typed work
+errors remain available at their call sites. The heartbeat can still run
+while the FIFO and both slots are occupied.
+
+Call `retry_failure_event` on a separate turn. It offers only the oldest
+retained event once. `QueueFull` preserves both slots; `Recorded` clears
+only that oldest event and shifts the other into its place. An empty turn
+returns `None`. After draining the older warning, the trace admits and
+dequeues each failure over separate turns, preserving its source and
+original timestamp.
+
+This host has exactly two applications that can return work errors and
+permanently disables each cursor after its error. That bounds retention at
+two events. Accepted events and lifecycle rejections add no retry record.
+Adding another failing role, re-enabling a failed cursor, or retaining other
+diagnostics requires revisiting the bound. These two slots are additional
+to the FIFO's one event; this is a logical record bound, with no byte or
+execution-time guarantee.
+
+Retained failures retry in observation order. The shared FIFO orders
+successful acceptance. A fresh event can be accepted before an older
+rejected event if the caller frees space and selects work before retry.
+The host chooses retry timing and does not reserve capacity. This example
+demonstrates in-process queue acceptance and dequeue; it adds no durable
+storage or reliable external delivery.
 
 ## Verify the independent binary
 

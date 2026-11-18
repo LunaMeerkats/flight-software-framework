@@ -1,10 +1,11 @@
 # Verification traceability
 
-## Stage 5 periodic peer work — 2026-11-18
+## Stage 5 periodic peer work — 2026-11-18 through 2026-11-19
 
 | Requirement | Verification | Record |
 | --- | --- | --- |
 | RFF-LIB-REQ-017 revision 1 | `heartbeat_keeps_its_release_and_runs_before_and_after_drain` checks exact typed failure and event, the unchanged peer release, repeated peer work with the FIFO full and after drain, and the disabled sampler. `rejected_failure_keeps_older_diagnostic_and_peer_work` checks the full-queue rejection, selected Failed state, preservation of the older record and peer work. The same source runs in an independent binary. | [Periodic peer review](PERIODIC_PEER_REVIEW.md) |
+| RFF-LIB-REQ-017 revision 2 | `two_rejected_failures_retry_in_observation_order_without_duplicates` checks both failure orders, exact records, repeated full retries, healthy work with all event slots occupied, one acceptance per retry and no duplicates. `lifecycle_rejection_disables_only_selected_cursor_without_retry` checks exclusion of lifecycle rejections. The revision 1 admitted history also checks no retained retry. `runnable_trace_preserves_original_prefix_and_finishes_two_retries` checks the original prefix and completed recovery trace. Identical source runs in an independent binary. | [Two-failure retry review](PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up) |
 
 ## Stage 5 application progress — 2026-11-13 through 2026-11-17
 

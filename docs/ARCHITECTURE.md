@@ -3,6 +3,17 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Bounded periodic failure retry — 2026-11-19
+
+RFF-LIB-REQ-017 revision 2 extends the [periodic peer consumer](PERIODIC_PEER.md)
+with two terminally failing samplers and a healthy heartbeat. Two inline
+retry slots retain queue-rejected failure events in observation order.
+Separate retry turns offer only the oldest to the capacity-one event FIFO.
+Accepted events leave retention once, while healthy work remains selectable.
+This fixed mission policy uses existing public APIs and adds no library
+supervisor or retry service. [ADR-0042](adr/0042-periodic-peer-work-after-failure.md#two-retained-failure-events--2026-11-19)
+records the bound and acceptance-order limitation.
+
 ## Runnable command session — 2026-11-05
 
 RFF-LIB-REQ-014 and [ADR-0039](adr/0039-runnable-command-session.md) compose

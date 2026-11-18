@@ -1,72 +1,63 @@
 # Project state
 
-Last updated: **2026-11-18**
+Last updated: **2026-11-19**
 
 ## Current milestone
 
-Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-017 adds
-[a runnable two-application example](PERIODIC_PEER.md) that keeps the
-healthy application working after the other returns an error. The reviewed
-host v0.1 milestone remains the regression baseline. Package 0.0.0 is
-unpublished with provisional APIs.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-017 revision 2
+extends the [periodic peer example](PERIODIC_PEER.md) with two fixed retry
+slots for independent queue-rejected work failures. Healthy work remains
+selectable throughout. The reviewed host v0.1 milestone is the regression
+baseline. Package 0.0.0 is unpublished with provisional APIs.
 
 ## Verified baseline
 
-- Input `ca32a428314055f1b2f4eae5214462c6ab129fdb` matched refreshed origin.
-  Hosted run 43873841092 passed all 20 steps with 276 workspace tests.
-- The locked local baseline passes 278 tests with Rust/Cargo 1.98.0,
-  rustfmt 1.9.0-stable and Clippy 0.1.98. Both periodic peer tests and
-  the runnable trace pass with identical source in an independent package.
-- Implementation `ac5b960a5e56b49cbc3a874cfbde2ce38311956b` passed all 20
-  steps in hosted run 44089160905 with 278 workspace tests and the same
-  222-line combined host sample.
+- Clean input `c2da285952d99710adb61eb76ca872213e32edbd` matched refreshed
+  origin. Exact hosted run 44089559879 passed 20 steps and 278 workspace tests.
+- The locked local baseline passes 281 tests on Rust/Cargo 1.98.0,
+  rustfmt 1.9.0-stable and Clippy 0.1.98. Five focused tests and the
+  runnable trace pass with identical source in an independent binary.
+- Local formatting, all-target check/Clippy, warnings-denied rustdoc and
+  whitespace pass. The combined host sample matches 222 input output lines.
 
 ## Current architecture
 
 One unpublished package owns synchronous lifecycle/work, bounded messaging,
 manual time, finite schedules, structured events and optional validated
-configuration. Both messaging owners expose read-only subscription checks.
-The serial command session selects bounded read, admission, dispatch and
-output turns. The periodic host uses one downstream slot and one release
-cursor. It shares one finite queue across sample and congestion warnings
-and returned work errors. A separate output turn adds one pending diagnostic
-slot in front of the sink.
-That host retains one queue-rejected failure event for explicit FIFO retry.
-The periodic peer example uses the direct runtime and two independent
-cursors. Returning a work error ends only the selected cursor's releases.
+configuration. Serial command-session turns separate input, admission,
+dispatch and output. The host-progress consumer retains one rejected failure
+and one diagnostic awaiting a fallible sink. The periodic peer consumer has
+three independent cursors and a capacity-one event FIFO. Two inline retry
+slots retain the two samplers' rejected terminal events in observation order.
+Retry offers only the oldest once; heartbeat work remains caller-selected.
 
 ## Work in progress
 
-Codex accepted the periodic peer checkpoint after local, independent-package
-and exact hosted verification.
-[Focused review](verification/PERIODIC_PEER_REVIEW.md)
+Implementation, independent-package checks and complete source/document
+review pass. Verified main publication is being completed.
+[Focused review](verification/PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up)
 
 ## Highest risks and uncertainties
 
-- Congestion observes occupied host turns on the mission clock. Sample
-  progress checks depend on the callback returning. Any queued event can
-  consume the available slot and cause a later diagnostic to be rejected.
-- The serial host needs each sink call to return. Sink retry requires a
-  definite rejection of the whole event. Queue retry depends on the caller
-  choosing a turn after space opens. The periodic peer example shows
-  continued work after one terminal failure while the host selects turns.
-- Attributing a stop count to specific commands requires complete
-  knowledge of outstanding admissions. Input and output retry require
-  the same retained state and a caller that continues turning.
-- Logical bounds leave process memory and execution time unspecified.
+- The two-event bound depends on two terminally failing roles and permanently
+  disabled cursors. Changing roles or adding recovery requires a new policy.
+- Retained events retry in observation order; the FIFO orders acceptance.
+  Selecting fresh work before retry can admit a newer event first.
+- Continued serial progress depends on returning callbacks/sink calls and
+  caller-selected retry. Logical bounds do not bound bytes or execution time.
+- Attributing discarded commands requires complete serial admission knowledge.
 
 ## Important unresolved decisions
 
 MSRV and external I/O protocols remain undecided. Release, platform,
-security, major API freeze and other consequential decisions retain
-separate gates.
+security, major API freeze and other consequential decisions retain gates.
 
 ## Most likely next task
 
-Assess how a serial host can retain two independent queue-rejected work
-failures with an explicit bound and retry order, if a consumer needs it.
+Assess whether a downstream consumer needs to service retained diagnostics
+before fresh failure-producing work, and what that policy does to peer work.
 
 ## Latest run
 
-2026-11-18. A returned sampler error disables its cursor. The heartbeat
-keeps running while diagnostics occupy the FIFO and after dequeue.
+2026-11-19. Two rejected terminal failures retain their exact identities and
+timestamps through repeated full retries, then enter the FIFO once each.

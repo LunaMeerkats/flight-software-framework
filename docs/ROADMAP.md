@@ -7,10 +7,14 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
-RFF-LIB-REQ-017 and [ADR-0042](adr/0042-periodic-peer-work-after-failure.md)
+RFF-LIB-REQ-017 revision 1 and [ADR-0042](adr/0042-periodic-peer-work-after-failure.md)
 provide a [runnable direct-runtime example](PERIODIC_PEER.md) with two
 independent periodic cursors. The host keeps heartbeat work going while a
 sampler failure shares the bounded diagnostic path.
+Revision 2 adds a second terminally failing sampler and two inline retry
+slots. Explicit turns retry rejected failures in observation order while
+the healthy heartbeat continues. The shared FIFO orders accepted events;
+the host chooses when to retry.
 
 RFF-LIB-REQ-016 and [ADR-0041](adr/0041-host-observed-application-progress.md)
 show how a serial host can recognize overdue sample output across completed

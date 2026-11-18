@@ -1,29 +1,47 @@
-# Continue periodic peer work after a returned failure
+# Retain two independent queue-rejected work failures
 
 ## Objective and acceptance
 
-Give a downstream serial host a runnable example of continuing recurring
-work after a selected application returns a typed error. Existing tests
-demonstrate peer availability and timer disposal. This slice joins repeated
-peer releases and a shared diagnostic FIFO with the direct runtime's work
-error and event attempt. Implement RFF-LIB-REQ-017 in one test-enabled example.
+Extend the runnable periodic peer consumer under RFF-LIB-REQ-017 revision 2.
+Two independently registered samplers may fail while a capacity-one event
+FIFO is occupied. Retain both rejected events in two inline slots, in host
+observation order, and re-offer only the oldest on an explicit retry turn.
+Keep the healthy heartbeat selectable throughout.
 
-Verify the exact failure, only the selected cursor being disabled, the peer's
-retained release, repeated heartbeat callbacks before and after dequeue, and
-preservation of an older queue record when the failure event is rejected.
+Retain original typed errors and timestamps. Full retries preserve both
+slots; acceptance clears only the oldest. Verify both sampler selection
+orders, repeated full retry, one admission per turn, no duplicates after
+draining, and exclusion of recorded events and lifecycle rejections. Preserve
+the two original histories and the original runnable trace as a prefix.
 
-## Verification and stopping point
+## Design and verification
+
+Use the existing public event and runtime APIs; add no library service,
+dependency or recovery policy. A fixed three-application mission bounds
+terminal failures at two because each failing cursor is disabled. Retained
+events retry in observation order; the shared FIFO orders acceptance only.
+Fresh attempts may be admitted before older rejected events if the caller
+frees space and selects work before retry.
 
 Run the locked baseline, focused example and identical independent binary.
-Review the whole diff, source form, links and rendered documents. Record local
-evidence and verify the exact hosted head after an ordinary main push.
-Stop at two cooperative applications with one terminal failure. If the change
-cannot pass, retain the research and withdraw only this run's incomplete edits.
+Inspect metadata, bytes, hashes, source form, links, rendered documents and
+the complete diff. Record Codex review and exact hosted verification after
+an ordinary fast-forward main push. Stop at this cooperative serial policy;
+callbacks and output calls must return and the caller must select retry.
+
+## Input
+
+Clean main `c2da285952d99710adb61eb76ca872213e32edbd` matches refreshed
+origin. The local locked 278-test baseline passes. Exact hosted run
+44089559879 is completed successfully. Local toolchain remains Rust/Cargo
+1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
 
 ## Result
 
-The locked local baseline passed 278 workspace tests. The runnable example
-and both tests passed with identical source in an independent binary.
-Implementation `ac5b960a5e56b49cbc3a874cfbde2ce38311956b` passed all 20
-steps in hosted run 44089160905.
-[Periodic peer review](docs/verification/PERIODIC_PEER_REVIEW.md)
+Implementation and independent review accepted source blob
+`83886bee28bbcb7e36fd7ac3ef030ab24495ab5c`. The locked local baseline
+passes 281 workspace tests and all required static checks. Five focused
+and identical independent binary tests pass. Both binaries emit the same
+14 lines with the exact six-line input prefix. Final source/document audit
+and main publication evidence are recorded in the
+[focused review](docs/verification/PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up).

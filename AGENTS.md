@@ -118,9 +118,11 @@ translate NASA C source.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
-- `examples/periodic_peer.rs`: public-only direct-runtime example with two
+- `examples/periodic_peer.rs`: public-only direct-runtime example with three
   caller-selected periodic cursors and a shared capacity-one event queue.
-  The host disables the failed cursor and continues healthy peer work.
+  The host disables failed cursors and continues healthy peer work. Two
+  inline slots retain queue-rejected terminal failures in observation order
+  for separate explicit retry turns.
   Its test-enabled target and guide verify the same source in an independent
   binary.
 - `tests/selective_publication.rs`: public-only targeted publication and fixed

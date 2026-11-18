@@ -38,3 +38,34 @@ rejected while the original work error remains available. Progress depends
 on the caller selecting turns and each callback returning. Revisit this
 policy when a downstream use demonstrates a need for multi-application
 turn selection, recovery or bounded diagnostic retention.
+
+## Two retained failure events — 2026-11-19
+
+RFF-LIB-REQ-017 revision 2 adds a second independently registered sampler
+alongside the healthy heartbeat. The concrete need is to preserve both
+terminal failure diagnostics when the shared FIFO is occupied, without
+preventing heartbeat work. The one-slot host-progress consumer cannot store
+this history. Existing library APIs expose both exact rejected records.
+
+Keep two inline retry slots in host observation order. Each failing cursor
+is disabled after its one returned error; the heartbeat cannot return an
+application error in this mission. These facts bound retained failures at
+two. Re-offer only the oldest on one explicit retry turn, preserving both
+slots on QueueFull and removing only an accepted record. Keep the original
+typed error available to the caller. Recorded attempts and lifecycle
+rejections add no retry record.
+
+Alternatives considered: independent per-role retry order would reorder
+reversed failures; an unbounded list would hide resource policy; a library
+retry service would impose mission ownership and scheduling rules. A
+separate test consumer could prove the policy, but extending the existing
+executable also makes the recovery sequence runnable without copied private
+fixtures. Retain its original histories and trace prefix.
+
+This orders retained rejected events only. A newly generated event can enter
+the shared FIFO before an older rejected event if the caller selects work
+after freeing space and before retry. The host does not reserve capacity or
+promise global occurrence order. Caller-selected retry and returning
+callbacks/writes remain necessary. Revisit the fixed bound before adding
+another failing role, restart/recovery, or another diagnostic source to the
+retention policy. The guide and focused review record the exact evidence.
