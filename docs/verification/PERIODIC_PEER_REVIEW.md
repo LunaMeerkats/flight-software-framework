@@ -188,5 +188,25 @@ python target/review-2026-11-19-peer-retry-audit/inspect_rendered.py c2da285952d
 ```
 
 Raw evidence is in ignored `target/review-2026-11-19-peer-retry` and
-`target/review-2026-11-19-peer-retry-audit`. Publication results are recorded
-after their actual completion.
+`target/review-2026-11-19-peer-retry-audit`.
+
+### Publication and acceptance
+
+Implementation `4e37bced92142092193b1bb334984c9d427d4ce6` reached
+origin/main by ordinary fast-forward push after remote refresh. The committed
+tree matched the reviewed staged tree; its example matched the independent
+source blob above.
+
+[Exact hosted run 44311260522](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/44311260522),
+job 134825694107, passed all 20 steps, 281 workspace tests including all five
+example regressions, separate 14 adapter and five sample tests,
+warnings-denied rustdoc and both whitespace checks. The combined sample
+matched all 222 input lines. Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable,
+Clippy 0.1.100, runner 2.338.2 and Windows image `20261103.298.1` match the
+input hosted baseline. Local tooling remains 1.98.0.
+
+Codex accepts RFF-LIB-REQ-017 revision 2 for this fixed serial mission after
+root and independent Codex review and the recorded local/downstream/hosted
+checks. This evidence completion changes only three documents. Those changes
+receive document/diff review and their own exact hosted run; final head and
+run results remain in automation memory rather than inheriting this pass.

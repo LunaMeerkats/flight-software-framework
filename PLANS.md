@@ -45,3 +45,6 @@ and identical independent binary tests pass. Both binaries emit the same
 14 lines with the exact six-line input prefix. Final source/document audit
 and main publication evidence are recorded in the
 [focused review](docs/verification/PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up).
+Implementation `4e37bced92142092193b1bb334984c9d427d4ce6` reached
+origin/main by ordinary fast-forward push and passed all 20 steps in exact
+hosted run 44311260522. Codex accepts this fixed consumer checkpoint.

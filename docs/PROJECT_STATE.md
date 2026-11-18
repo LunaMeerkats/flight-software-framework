@@ -19,6 +19,8 @@ baseline. Package 0.0.0 is unpublished with provisional APIs.
   runnable trace pass with identical source in an independent binary.
 - Local formatting, all-target check/Clippy, warnings-denied rustdoc and
   whitespace pass. The combined host sample matches 222 input output lines.
+- Implementation `4e37bced92142092193b1bb334984c9d427d4ce6` passed all
+  20 steps in exact hosted run 44311260522 with 281 workspace tests.
 
 ## Current architecture
 
@@ -33,8 +35,8 @@ Retry offers only the oldest once; heartbeat work remains caller-selected.
 
 ## Work in progress
 
-Implementation, independent-package checks and complete source/document
-review pass. Verified main publication is being completed.
+Codex accepted the two-failure retry checkpoint after local, independent
+consumer, complete source/document and exact hosted verification.
 [Focused review](verification/PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up)
 
 ## Highest risks and uncertainties
