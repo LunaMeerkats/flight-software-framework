@@ -13,10 +13,11 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
 
 ## Verified baseline
 
-- Clean input `dba77f744f9151d515d7110259f425a64254abb1` matched fetched
-  and live origin. Exact hosted run 44311715530 passed all 20 steps.
-- Input locked local baseline passed 281 workspace tests, formatting,
-  all-target check/Clippy, warnings-denied rustdoc and whitespace.
+- Implementation `b3448fb66a470823747092101b002112eac7a65b` reached
+  origin/main by ordinary fast-forward. Exact hosted run 44746489351
+  passed all 20 steps, 285 workspace tests, separate 14 adapter and five
+  sample tests, rustdoc and whitespace. The combined sample matches all
+  222 local lines. Input baseline passed 281 tests before edits.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. Input whole-tree width review found zero findings.
 - Completed locked local replay passes 285 workspace tests, formatting,
@@ -24,6 +25,8 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
 - The focused example and identical independent binary pass nine tests
   each, check, lint and run. Their 23-line output matches exactly and
   preserves the prior 14-line trace byte for byte.
+- Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100 and
+  runner 2.338.2 match input; Windows image is now `20261116.315.1`.
 
 ## Current architecture
 
@@ -38,9 +41,9 @@ Retry and dequeue stay explicit. The original unguarded turn remains.
 
 ## Work in progress
 
-Local/downstream checks and independent source review are complete.
-Finish document review and ordinary main publication for retained priority;
-record exact hosted results before accepting the checkpoint.
+Codex accepts retained admission priority after local, independent consumer,
+source/document review and exact hosted verification. This record-only
+completion receives its own document/diff review and hosted check.
 [Focused review](verification/PERIODIC_PEER_REVIEW.md#retained-admission-priority-follow-up)
 
 ## Highest risks and uncertainties
@@ -67,5 +70,5 @@ Do not expand retry machinery without evidence from a consumer.
 ## Latest run
 
 2026-11-21. Preserved and completed the interrupted retained-priority
-implementation. Local and downstream verification passed. Exact main
-publication and hosted evidence remain pending.
+implementation. Local, independent consumer, root/independent Codex review
+and exact published implementation CI passed. Stop at this checkpoint.

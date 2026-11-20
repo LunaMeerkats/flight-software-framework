@@ -311,6 +311,29 @@ python target/review-2026-11-21-priority-audit/inspect_rendered.py HEAD
 
 Raw completion evidence and the temporary command harness are under
 ignored `target/review-2026-11-21-priority`; preserved pre-edit evidence
-is under `target/review-2026-11-20-priority/input`. Final source/document
-review passes. Ordinary main publication and exact hosted results remain
-to be recorded; local checks do not establish a hosted pass.
+is under `target/review-2026-11-20-priority/input`.
+
+### Publication and acceptance
+
+Implementation `b3448fb66a470823747092101b002112eac7a65b` reached
+origin/main by ordinary fast-forward after remote refresh. Its committed
+tree matches the reviewed staged tree; the committed example matches the
+reviewed source blob and independent consumer above.
+
+[Exact hosted run 44746489351](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/44746489351),
+job 136323028032, passed all 20 steps: 285 workspace tests including nine
+example regressions, separate 14 adapter and five sample tests, formatting,
+all-target check/Clippy, warnings-denied rustdoc and both whitespace checks.
+Hosted combined-sample output matches all 222 local input lines.
+Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100 and runner
+2.338.2 match input; the Windows image is now `20261116.315.1`.
+Local checks remain on 1.98.0. No toolchain/configuration policy changed.
+
+Codex accepts RFF-LIB-REQ-017 revision 3 for the fixed serial mission after
+root and independent Codex review and recorded local/downstream/hosted
+checks. This evidence completion changes only three documents. Review
+those documents and the complete diff, then inspect their own exact hosted
+run. Final record head/results stay in automation memory rather than
+inheriting this implementation pass. This checkpoint does not extend the
+fixed role/bound assumptions or establish fairness, callback completion,
+durability, external delivery or operational suitability.

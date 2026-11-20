@@ -43,6 +43,9 @@ and independent Codex source review. Locked local checks pass 285 workspace
 tests; the focused example and identical independent binary pass nine each.
 Both binaries emit the same 23 lines with the exact 14-line input prefix.
 The [focused review](docs/verification/PERIODIC_PEER_REVIEW.md#retained-admission-priority-follow-up)
-records actual commands, bounds and evidence. Complete document review and
-ordinary main publication, then record exact hosted results. Stop at this
-fixed cooperative policy.
+records actual commands, bounds and evidence. Complete source/document
+review passed. Implementation `b3448fb66a470823747092101b002112eac7a65b`
+reached origin/main by ordinary fast-forward push; exact hosted run
+44746489351 passed all 20 steps and 285 workspace tests. Codex accepts
+this fixed cooperative policy. This record-only completion receives its
+own document/diff review and exact hosted verification.
