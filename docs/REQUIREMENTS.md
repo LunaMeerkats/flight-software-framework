@@ -720,3 +720,22 @@ repeated full retries, exact two-event recovery over separate turns and no
 duplicates after draining. Verify that recorded events and lifecycle
 rejections add no retry record. Run the identical source in an independent
 binary, retaining the original runnable trace as an exact prefix.
+
+Revision 3 (2026-11-20) adds an optional diagnostic-priority work turn.
+While a rejected failure remains retained, selecting an enabled sampler
+shall return `DeferredForDiagnostics` before polling or invoking work.
+Its next release and lifecycle state shall remain unchanged. Heartbeat
+turns shall remain selectable; a disabled sampler shall return `Disabled`.
+Retry and dequeue shall remain separate explicit turns. Admission of the
+last retained event shall remove the gate even while that event occupies
+the FIFO. The original unguarded work policy shall remain available.
+
+Acceptance: preserve earlier histories and the 14-line executable prefix.
+Test both sampler orders, repeated deferral before/after freeing FIFO space,
+full retry, healthy work, disabled selection, and the exact retained release.
+After admission, verify the overdue sampler's typed failure and later
+timestamp, retaining its new rejected event behind the older queued event.
+Verify empty-backlog waiting/lifecycle paths and the runnable priority
+trace. Run identical source in an independent binary. The policy depends
+on this mission's healthy heartbeat and terminally disabled failing roles;
+it supplies no global ordering, fairness or output-delivery guarantee.

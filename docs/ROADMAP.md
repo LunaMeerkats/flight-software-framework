@@ -16,6 +16,12 @@ slots. Explicit turns retry rejected failures in observation order while
 the healthy heartbeat continues. The shared FIFO orders accepted events;
 the host chooses when to retry.
 
+Revision 3 optionally gates enabled samplers on retained-event admission
+while preserving heartbeat selection. Explicit retry/dequeue turns and
+the original unguarded work policy remain. The
+[admission-priority recipe](PERIODIC_PEER.md#admit-retained-failures-before-fresh-sampler-work)
+shows how the consumer prevents fresh sampler failures overtaking retention.
+
 RFF-LIB-REQ-016 and [ADR-0041](adr/0041-host-observed-application-progress.md)
 show how a serial host can recognize overdue sample output across completed
 work turns while preserving the typed returned-error path. Revision 2

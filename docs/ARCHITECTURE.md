@@ -5,6 +5,15 @@ design. Source details and adoption notes are in [the source register](research/
 
 ## Bounded periodic failure retry — 2026-11-19
 
+Revision 3 (2026-11-20) adds an optional host admission gate: enabled
+samplers defer before polling while retained failures await admission.
+Heartbeat work stays selectable; retry/dequeue remain separate turns.
+Admission clears the gate even while the FIFO holds the older event.
+This mission-role policy remains in the public-only example; the original
+unguarded turn remains available. The
+[ADR follow-up](adr/0042-periodic-peer-work-after-failure.md#retained-admission-priority--2026-11-20)
+records alternatives and revisit conditions.
+
 RFF-LIB-REQ-017 revision 2 extends the [periodic peer consumer](PERIODIC_PEER.md)
 with two terminally failing samplers and a healthy heartbeat. Two inline
 retry slots retain queue-rejected failure events in observation order.

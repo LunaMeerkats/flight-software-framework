@@ -69,6 +69,33 @@ The host chooses retry timing and does not reserve capacity. This example
 demonstrates in-process queue acceptance and dequeue; it adds no durable
 storage or reliable external delivery.
 
+## Admit retained failures before fresh sampler work
+
+The third trace opts into `turn_after_retained_failures`. While a failure
+remains in the retry slots, an enabled sampler returns
+`DeferredForDiagnostics` before polling. Its next release and Running
+state remain unchanged. The heartbeat still uses its ordinary release
+policy, and an already disabled sampler still returns `Disabled`.
+
+Retry and dequeue remain separate turns. Even an empty FIFO does not
+remove the gate until the host explicitly admits the retained event.
+After admission, the overdue backup may run while that older event is
+still queued. Its new failure is then rejected and retained with the
+later callback timestamp. Drain the older event before retrying the newer
+one. This prioritizes retained admission rather than waiting for output.
+
+Use this guarded turn consistently for the mission's samplers when that
+ordering matters. The original `turn` remains available for callers that
+choose their own ordering. This gate uses mission knowledge: heartbeat
+work cannot fail here, and failed cursors stay disabled. Revisit the policy
+before changing those facts. A host must still select retries and drains;
+sampler work can remain deferred indefinitely if it does not. Healthy
+work remains selectable without a fairness or completion guarantee.
+
+The original 14-line trace remains an exact prefix. The added trace shows
+the rejected first failure, deferred backup, healthy peer work, explicit
+older-event admission, and the newer retained failure.
+
 ## Verify the independent binary
 
 Run these PowerShell commands from the framework checkout. Use a fresh

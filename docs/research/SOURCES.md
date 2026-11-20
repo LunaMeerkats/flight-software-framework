@@ -13,6 +13,19 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-RETAINED-PRIORITY — Host admission gating
+
+- Rust Flight Framework input `dba77f744f9151d515d7110259f425a64254abb1`,
+  inspected 2026-11-20. The [peer host](../../examples/periodic_peer.rs)
+  retains rejected records in compacted slots but permits fresh work
+  before retry. The [periodic cursor](../../src/scheduling/periodic.rs)
+  exposes its next item without consuming it; polling consumes before
+  work. The [event queue](../../src/events.rs) preserves FIFO acceptance
+  order. Adopt these contracts in an optional mission-owned gate before
+  sampler polling. Compare automatic retry/work and global gating in
+  [ADR-0042](../adr/0042-periodic-peer-work-after-failure.md#retained-admission-priority--2026-11-20).
+  No new upstream fact, dependency or compatibility assumption is needed.
+
 ## SRC-RFF-TWO-FAILURE-RETRY — Bounded host retention
 
 - Rust Flight Framework input `c2da285952d99710adb61eb76ca872213e32edbd`,

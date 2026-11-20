@@ -69,3 +69,32 @@ promise global occurrence order. Caller-selected retry and returning
 callbacks/writes remain necessary. Revisit the fixed bound before adding
 another failing role, restart/recovery, or another diagnostic source to the
 retention policy. The guide and focused review record the exact evidence.
+
+## Retained admission priority — 2026-11-20
+
+Revision 3 addresses the observed gap between rejected-event order and
+fresh failure admission. A host choosing diagnostic priority needs to defer
+new failure-producing work while preserving independent healthy work.
+Add an optional `turn_after_retained_failures` policy to this example.
+An enabled sampler returns `DeferredForDiagnostics` before polling when
+the compacted retry head is occupied. A disabled sampler still reports
+`Disabled`; heartbeat delegates through the existing work path.
+
+Keep retry and dequeue explicit. Once the last retained event is admitted,
+fresh sampler work may proceed even while that event occupies the FIFO.
+Its newer rejected failure is retained through the existing mechanism.
+Keep the unguarded turn for callers choosing a different order.
+
+Alternatives: automatic retry followed by work combines two effects in
+one turn; gating every application prevents useful heartbeat work;
+gating on FIFO occupancy waits for dequeue rather than admission. Reject
+those stronger policies for this consumer. A framework scheduler would
+prematurely generalize mission knowledge about which roles can fail.
+
+The existing cursor, work-error and event-queue contracts suffice. Tests
+compare original release/state and exact event histories under both role
+orders. The guide and focused review record actual downstream evidence.
+Revisit this role policy if heartbeat can fail, cursors can recover, or
+another source shares retention. Selecting only guarded turns prioritizes
+retained admission; it neither schedules retries nor establishes fairness,
+global occurrence order, durable storage or external delivery.

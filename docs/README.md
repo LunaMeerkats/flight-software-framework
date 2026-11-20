@@ -11,7 +11,7 @@
 ## Schedule and observe work
 
 - [Release recurring work](PERIODIC_WORK.md) using an injected clock.
-- [Continue periodic peer work](PERIODIC_PEER.md) and retry two queue-rejected work failures.
+- [Continue periodic peer work](PERIODIC_PEER.md), retry two queue-rejected failures and optionally prioritize their admission.
 - [Transfer ordinary-work output](ORDINARY_WORK_OUTPUT.md) through a bounded slot and account for backpressure.
 - [Attribute diagnostics to an application](APPLICATION_WORK_IDENTITY.md) and [check for overdue samples](HOST_PROGRESS.md).
 - [Filter optional events](EVENT_FILTERING.md) or [write queued events to a host stream](EVENT_OUTPUT.md).

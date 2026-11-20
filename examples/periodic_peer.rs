@@ -2,6 +2,7 @@
 //!
 //! The host selects each release and drains diagnostics on a separate turn.
 //! The first trace leaves the backup idle; the second retains both failures.
+//! The third prioritizes retained admission before new sampler work.
 
 #![forbid(unsafe_code)]
 
@@ -43,6 +44,7 @@ enum Role {
 #[derive(Debug, Eq, PartialEq)]
 enum Turn {
     Disabled,
+    DeferredForDiagnostics,
     Waiting { next_at: FrameworkInstant },
     Exhausted,
     Worked,
@@ -176,6 +178,27 @@ impl<'a> Host<'a> {
         }
     }
 
+    fn turn_after_retained_failures(
+        &mut self,
+        role: Role,
+    ) -> Result<Turn, RuntimeWorkEventError<SampleUnavailable, Diagnostic>> {
+        let selected = match role {
+            Role::Sampler => &self.sampler,
+            Role::BackupSampler => &self.backup_sampler,
+            // Only the samplers can fail in this fixed mission.
+            Role::Heartbeat => return self.turn(role),
+        };
+        if selected.is_none() {
+            return Ok(Turn::Disabled);
+        }
+        // Defer before polling so the original release remains available.
+        // Retry compacts the slots; an empty head means no retained event.
+        if self.pending_failures[0].is_some() {
+            return Ok(Turn::DeferredForDiagnostics);
+        }
+        self.turn(role)
+    }
+
     fn retry_failure_event(&mut self) -> Option<EventEmitOutcome> {
         let outcome = self.events.emit(self.pending_failures[0].as_ref()?);
         if outcome == EventEmitOutcome::Recorded {
@@ -244,7 +267,8 @@ fn run<'a>(heartbeats: &'a Cell<u8>, output: &mut impl Write) -> Result<(), Box<
         host.turn(Role::Heartbeat)?,
         heartbeats.get()
     )?;
-    run_rejected_pair(heartbeats, output)
+    run_rejected_pair(heartbeats, output)?;
+    run_retained_priority(heartbeats, output)
 }
 
 fn run_rejected_pair<'a>(
@@ -299,6 +323,63 @@ fn run_rejected_pair<'a>(
         )?;
     }
     writeln!(output, "retry empty {:?}", host.retry_failure_event())?;
+    Ok(())
+}
+
+fn run_retained_priority<'a>(
+    heartbeats: &'a Cell<u8>,
+    output: &mut impl Write,
+) -> Result<(), Box<dyn Error + 'a>> {
+    heartbeats.set(0);
+    let mut host = Host::new(heartbeats)?;
+    let warning = Event::new(
+        EventSource::Framework,
+        EventSeverity::Warning,
+        Diagnostic::EarlierWarning,
+        EventTimestamp::from_elapsed(Duration::ZERO),
+    );
+    if host.events.emit(&warning) != EventEmitOutcome::Recorded {
+        return Err("expected room for the initial warning".into());
+    }
+    host.clock.advance(Duration::from_secs(1))?;
+    let failure = host
+        .turn_after_retained_failures(Role::Sampler)
+        .err()
+        .ok_or("expected the sampler's injected failure")?;
+    writeln!(output, "priority sampler: {failure}")?;
+    host.clock.advance(Duration::from_secs(1))?;
+    writeln!(
+        output,
+        "priority backup {:?}",
+        host.turn_after_retained_failures(Role::BackupSampler)?
+    )?;
+    writeln!(
+        output,
+        "priority heartbeat {:?} ({})",
+        host.turn_after_retained_failures(Role::Heartbeat)?,
+        heartbeats.get()
+    )?;
+    host.events.dequeue().ok_or("missing older warning")?;
+    writeln!(
+        output,
+        "priority admission {:?}",
+        host.retry_failure_event()
+    )?;
+    let failure = host
+        .turn_after_retained_failures(Role::BackupSampler)
+        .err()
+        .ok_or("expected the backup's injected failure")?;
+    writeln!(output, "priority backup: {failure}")?;
+    for _ in 0..2 {
+        let event = host.events.dequeue().ok_or("missing ordered failure")?;
+        writeln!(
+            output,
+            "priority drained {:?} from {}s",
+            event.source(),
+            event.timestamp().elapsed().as_secs()
+        )?;
+        writeln!(output, "priority retry {:?}", host.retry_failure_event())?;
+    }
     Ok(())
 }
 
@@ -467,6 +548,144 @@ mod tests {
     }
 
     #[test]
+    fn priority_deferral_preserves_release_and_keeps_heartbeat_selectable() {
+        for (failed, waiting) in [
+            (Role::Sampler, Role::BackupSampler),
+            (Role::BackupSampler, Role::Sampler),
+        ] {
+            let heartbeats = Cell::new(0);
+            let (mut host, warning, retained) = capture_one_rejected_failure(&heartbeats, failed);
+            let next = sampler_release(&host, waiting);
+            assert_eq!(next.unwrap().scheduled_at(), instant(1));
+            for seconds in [2, 3] {
+                host.clock.advance(Duration::from_secs(1)).unwrap();
+                assert_eq!(
+                    host.turn_after_retained_failures(waiting).unwrap(),
+                    Turn::DeferredForDiagnostics
+                );
+                assert_eq!(sampler_release(&host, waiting), next);
+                assert_eq!(
+                    host.runtime.state(next.unwrap().application_id()).unwrap(),
+                    ApplicationState::Running
+                );
+                assert_eq!(
+                    host.turn_after_retained_failures(failed).unwrap(),
+                    Turn::Disabled
+                );
+                assert_eq!(
+                    host.turn_after_retained_failures(Role::Heartbeat).unwrap(),
+                    Turn::Worked
+                );
+                assert_eq!(heartbeats.get(), seconds - 1);
+                assert_eq!(
+                    host.retry_failure_event(),
+                    Some(EventEmitOutcome::QueueFull { capacity: 1 })
+                );
+                assert_eq!(host.pending_failures, [Some(retained), None]);
+                assert_eq!(host.events.pending(), 1);
+            }
+            assert_eq!(host.events.dequeue(), Some(warning));
+            assert_eq!(
+                host.turn_after_retained_failures(waiting).unwrap(),
+                Turn::DeferredForDiagnostics
+            );
+            assert_eq!(sampler_release(&host, waiting), next);
+            assert_eq!(host.pending_failures, [Some(retained), None]);
+            assert!(host.events.is_empty());
+        }
+    }
+
+    #[test]
+    fn priority_admission_allows_later_failure_behind_the_older_queued_event() {
+        for (first, later) in [
+            (Role::Sampler, Role::BackupSampler),
+            (Role::BackupSampler, Role::Sampler),
+        ] {
+            let heartbeats = Cell::new(0);
+            let (mut host, warning, retained) = capture_one_rejected_failure(&heartbeats, first);
+            let later_id = sampler_release(&host, later).unwrap().application_id();
+            host.clock.advance(Duration::from_secs(5)).unwrap();
+            assert_eq!(host.events.dequeue(), Some(warning));
+            assert_eq!(host.retry_failure_event(), Some(EventEmitOutcome::Recorded));
+            assert_eq!(host.pending_failures, [None, None]);
+            let failure = host.turn_after_retained_failures(later).unwrap_err();
+            let expected = Event::new(
+                EventSource::Application(later_id),
+                EventSeverity::Error,
+                Diagnostic::WorkFailed,
+                EventTimestamp::from_elapsed(Duration::from_secs(6)),
+            );
+            assert_eq!(
+                failure.work_error(),
+                &RuntimeWorkError::Application {
+                    application_id: later_id,
+                    source: SampleUnavailable,
+                }
+            );
+            let attempt = failure.failure_event_attempt().unwrap();
+            assert_eq!(*attempt.event(), expected);
+            assert_eq!(
+                attempt.outcome(),
+                EventEmitOutcome::QueueFull { capacity: 1 }
+            );
+            assert_eq!(
+                host.runtime.state(later_id).unwrap(),
+                ApplicationState::Failed
+            );
+            assert_eq!(host.pending_failures, [Some(expected), None]);
+            assert_eq!(host.events.dequeue(), Some(retained));
+            assert_eq!(host.retry_failure_event(), Some(EventEmitOutcome::Recorded));
+            assert_eq!(host.events.dequeue(), Some(expected));
+            for role in [first, later] {
+                assert_eq!(
+                    host.turn_after_retained_failures(role).unwrap(),
+                    Turn::Disabled
+                );
+            }
+            assert_eq!(host.retry_failure_event(), None);
+            assert!(host.events.is_empty());
+        }
+    }
+
+    #[test]
+    fn priority_without_retention_keeps_waiting_and_lifecycle_outcomes() {
+        let heartbeats = Cell::new(0);
+        let mut host = Host::new(&heartbeats).unwrap();
+        for role in [Role::Sampler, Role::BackupSampler] {
+            assert_eq!(
+                host.turn_after_retained_failures(role).unwrap(),
+                Turn::Waiting {
+                    next_at: instant(1)
+                }
+            );
+        }
+        assert_eq!(
+            host.turn_after_retained_failures(Role::Heartbeat).unwrap(),
+            Turn::Waiting {
+                next_at: instant(2)
+            }
+        );
+        host.runtime.stop(host.backup_sampler_id).unwrap();
+        host.clock.advance(Duration::from_secs(1)).unwrap();
+        let failure = host
+            .turn_after_retained_failures(Role::BackupSampler)
+            .unwrap_err();
+        assert!(matches!(
+            failure.work_error(),
+            RuntimeWorkError::Lifecycle(_)
+        ));
+        assert!(failure.failure_event_attempt().is_none());
+        assert_eq!(host.retry_failure_event(), None);
+        assert_eq!(
+            host.turn_after_retained_failures(Role::BackupSampler)
+                .unwrap(),
+            Turn::Disabled
+        );
+        assert!(host.events.is_empty());
+        assert_eq!(heartbeats.get(), 0);
+    }
+
+    #[test]
     fn runnable_trace_preserves_original_prefix_and_finishes_two_retries() {
         let heartbeats = Cell::new(0);
         let mut output = Vec::new();
@@ -481,9 +700,82 @@ mod tests {
             "3s drained WorkFailed from 1s\n",
             "4s heartbeat Worked (3)\n",
         )));
-        assert_eq!(trace.lines().count(), 14);
-        assert_eq!(trace.matches("retry admission Some(Recorded)\n").count(), 2);
-        assert!(trace.ends_with("retry empty None\n"));
+        let (original, _) = trace.split_once("priority sampler:").unwrap();
+        assert_eq!(original.lines().count(), 14);
+        assert_eq!(
+            original.matches("retry admission Some(Recorded)\n").count(),
+            2
+        );
+        assert!(original.ends_with("retry empty None\n"));
+    }
+
+    #[test]
+    fn runnable_priority_trace_defers_then_admits_in_order() {
+        let heartbeats = Cell::new(0);
+        let mut output = Vec::new();
+        run_retained_priority(&heartbeats, &mut output).unwrap();
+        assert_eq!(
+            std::str::from_utf8(&output).unwrap(),
+            concat!(
+                "priority sampler: application ApplicationId(0) returned a work error: ",
+                "sample unavailable; failure event was rejected at queue capacity 1\n",
+                "priority backup DeferredForDiagnostics\n",
+                "priority heartbeat Worked (1)\n",
+                "priority admission Some(Recorded)\n",
+                "priority backup: application ApplicationId(1) returned a work error: ",
+                "sample unavailable; failure event was rejected at queue capacity 1\n",
+                "priority drained Application(ApplicationId(0)) from 1s\n",
+                "priority retry Some(Recorded)\n",
+                "priority drained Application(ApplicationId(1)) from 2s\n",
+                "priority retry None\n",
+            )
+        );
+    }
+
+    fn sampler_release(host: &Host<'_>, role: Role) -> Option<ScheduledWork> {
+        match role {
+            Role::Sampler => host.sampler.as_ref().unwrap().next_scheduled_work(),
+            Role::BackupSampler => host.backup_sampler.as_ref().unwrap().next_scheduled_work(),
+            Role::Heartbeat => panic!("expected a sampler role"),
+        }
+    }
+
+    fn capture_one_rejected_failure(
+        heartbeats: &Cell<u8>,
+        role: Role,
+    ) -> (Host<'_>, Event<Diagnostic>, Event<Diagnostic>) {
+        let mut host = Host::new(heartbeats).unwrap();
+        let id = sampler_release(&host, role).unwrap().application_id();
+        let warning = Event::new(
+            EventSource::Framework,
+            EventSeverity::Warning,
+            Diagnostic::EarlierWarning,
+            EventTimestamp::from_elapsed(Duration::ZERO),
+        );
+        assert_eq!(host.events.emit(&warning), EventEmitOutcome::Recorded);
+        host.clock.advance(Duration::from_secs(1)).unwrap();
+        let failure = host.turn_after_retained_failures(role).unwrap_err();
+        assert_eq!(
+            failure.work_error(),
+            &RuntimeWorkError::Application {
+                application_id: id,
+                source: SampleUnavailable,
+            }
+        );
+        let expected = Event::new(
+            EventSource::Application(id),
+            EventSeverity::Error,
+            Diagnostic::WorkFailed,
+            EventTimestamp::from_elapsed(Duration::from_secs(1)),
+        );
+        let attempt = failure.failure_event_attempt().unwrap();
+        assert_eq!(*attempt.event(), expected);
+        assert_eq!(
+            attempt.outcome(),
+            EventEmitOutcome::QueueFull { capacity: 1 }
+        );
+        assert_eq!(host.runtime.state(id).unwrap(), ApplicationState::Failed);
+        (host, warning, expected)
     }
 
     fn capture_rejected_pair(

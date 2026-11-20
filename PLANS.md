@@ -1,50 +1,48 @@
-# Retain two independent queue-rejected work failures
+# Prioritize retained failure admission without blocking healthy work
 
 ## Objective and acceptance
 
-Extend the runnable periodic peer consumer under RFF-LIB-REQ-017 revision 2.
-Two independently registered samplers may fail while a capacity-one event
-FIFO is occupied. Retain both rejected events in two inline slots, in host
-observation order, and re-offer only the oldest on an explicit retry turn.
-Keep the healthy heartbeat selectable throughout.
+RFF-LIB-REQ-017 revision 3 adds an optional turn policy to the existing
+public-only periodic peer consumer. Defer enabled sampler work before
+polling while a rejected failure remains retained. Keep healthy heartbeat
+turns selectable, disabled selections explicit, and retry/dequeue separate.
+Resume fresh work after retained admission, even if the FIFO remains full.
 
-Retain original typed errors and timestamps. Full retries preserve both
-slots; acceptance clears only the oldest. Verify both sampler selection
-orders, repeated full retry, one admission per turn, no duplicates after
-draining, and exclusion of recorded events and lifecycle rejections. Preserve
-the two original histories and the original runnable trace as a prefix.
+Preserve earlier policies and the original 14-line executable trace as a
+prefix. Verify both sampler orders, repeated deferral with full and empty
+FIFO, unchanged release/lifecycle state, peer progress, retry rejection,
+and a new failure retained behind the admitted older event. Verify the
+empty-backlog waiting and lifecycle paths. Add a runnable priority trace.
 
 ## Design and verification
 
-Use the existing public event and runtime APIs; add no library service,
-dependency or recovery policy. A fixed three-application mission bounds
-terminal failures at two because each failing cursor is disabled. Retained
-events retry in observation order; the shared FIFO orders acceptance only.
-Fresh attempts may be admitted before older rejected events if the caller
-frees space and selects work before retry.
+The gate belongs to the fixed mission host: only its two samplers can fail.
+Compare explicit admission gating with automatic retry/work and global
+gating in ADR-0042. Add no framework API, service, queue or dependency.
+Keep the original unguarded policy for consumers choosing their own order.
 
-Run the locked baseline, focused example and identical independent binary.
-Inspect metadata, bytes, hashes, source form, links, rendered documents and
-the complete diff. Record Codex review and exact hosted verification after
-an ordinary fast-forward main push. Stop at this cooperative serial policy;
-callbacks and output calls must return and the caller must select retry.
+Run the locked baseline before implementation and after formatting, focused
+example tests/run and the identical-source independent binary recipe.
+Inspect metadata, bytes/hashes, source widths, Markdown links/rendering and
+the complete diff. Record actual Codex review and exact hosted evidence
+after an ordinary fast-forward main push. Rollback is limited to this
+run's consumer/docs changes; the reviewed input remains the fallback.
 
 ## Input
 
-Clean main `c2da285952d99710adb61eb76ca872213e32edbd` matches refreshed
-origin. The local locked 278-test baseline passes. Exact hosted run
-44089559879 is completed successfully. Local toolchain remains Rust/Cargo
-1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
+Clean main `dba77f744f9151d515d7110259f425a64254abb1` matches fetched
+and live origin. Exact input hosted run 44311715530 completed all 20 steps
+successfully. The saved pre-edit locked baseline passed 281 workspace tests
+and all required static checks. The interrupted 2026-11-20 implementation
+was preserved and completed on 2026-11-21; remote main had not moved.
 
 ## Result
 
-Implementation and independent review accepted source blob
-`83886bee28bbcb7e36fd7ac3ef030ab24495ab5c`. The locked local baseline
-passes 281 workspace tests and all required static checks. Five focused
-and identical independent binary tests pass. Both binaries emit the same
-14 lines with the exact six-line input prefix. Final source/document audit
-and main publication evidence are recorded in the
-[focused review](docs/verification/PERIODIC_PEER_REVIEW.md#two-failure-retry-follow-up).
-Implementation `4e37bced92142092193b1bb334984c9d427d4ce6` reached
-origin/main by ordinary fast-forward push and passed all 20 steps in exact
-hosted run 44311260522. Codex accepts this fixed consumer checkpoint.
+Source blob `2a203431c3677b2216de329cb99c7df079a72c86` passes root
+and independent Codex source review. Locked local checks pass 285 workspace
+tests; the focused example and identical independent binary pass nine each.
+Both binaries emit the same 23 lines with the exact 14-line input prefix.
+The [focused review](docs/verification/PERIODIC_PEER_REVIEW.md#retained-admission-priority-follow-up)
+records actual commands, bounds and evidence. Complete document review and
+ordinary main publication, then record exact hosted results. Stop at this
+fixed cooperative policy.

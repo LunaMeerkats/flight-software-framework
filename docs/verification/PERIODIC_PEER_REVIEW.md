@@ -210,3 +210,107 @@ root and independent Codex review and the recorded local/downstream/hosted
 checks. This evidence completion changes only three documents. Those changes
 receive document/diff review and their own exact hosted run; final head and
 run results remain in automation memory rather than inheriting this pass.
+
+## Retained admission priority follow-up
+
+RFF-LIB-REQ-017 revision 3 and ADR-0042 add an optional pre-poll sampler
+gate. The interrupted 2026-11-20 work was preserved and completed on
+2026-11-21. Input `dba77f744f9151d515d7110259f425a64254abb1` still
+matched refreshed origin/main. Exact input run 44311715530, job
+134827257578, passed all 20 steps. Saved pre-edit local evidence passed
+281 tests; this completion reran the entire changed-tree baseline.
+
+### Behavior and local verification
+
+`turn_after_retained_failures` returns `Disabled` for a discarded cursor,
+or `DeferredForDiagnostics` for an enabled sampler while the compacted
+retry head is occupied. It returns before polling, preserving the release
+and Running state. Heartbeat work remains selectable. Retry and dequeue
+remain explicit; admitting the last retained event removes the gate even
+while that event is queued. The original unguarded policy remains.
+
+Both sampler orders exercise repeated deferral with full and empty FIFO,
+full retry, peer progress, disabled precedence and unchanged release/state.
+After admission, an overdue sampler returns its exact typed error and
+later timestamp; the newer rejected event is retained behind the older
+queued event. Empty-backlog tests preserve waiting and lifecycle rejection.
+All earlier histories remain; a new exact runnable priority trace is tested.
+
+The following commands completed successfully on Rust/Cargo 1.98.0,
+rustfmt 1.9.0-stable and Clippy 0.1.98:
+
+```text
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+cargo doc --locked --workspace --all-features --no-deps
+cargo test --locked --example periodic_peer
+cargo run --locked --example periodic_peer
+cargo test --locked --test host_adapters
+cargo test --locked --test host_sample
+cargo run --locked --example host-echo
+git diff --check
+```
+
+Rustdoc used `RUSTDOCFLAGS=-D warnings`. Results: 285 workspace tests,
+nine focused example tests, 14 adapter tests and five sample tests.
+Combined host output preserves all 222 input lines. The changed source
+blob is `2a203431c3677b2216de329cb99c7df079a72c86`.
+
+### Independent binary and review
+
+The guide recipe created the fresh independent binary at
+`C:/Users/drrsm/AppData/Local/Temp/rff-periodic-peer-4a2ec30b05db424baf3234235d2fa5e5`.
+Using this path as `$consumer` and the checkout as `$framework`, the exact
+commands were:
+
+```powershell
+cargo new --bin --edition 2024 --vcs none $consumer
+cargo add --manifest-path "$consumer/Cargo.toml" rust-flight-framework --path $framework --offline
+Copy-Item -LiteralPath "$framework/examples/periodic_peer.rs" -Destination "$consumer/src/main.rs"
+cargo check --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets
+cargo clippy --manifest-path "$consumer/Cargo.toml" --locked --offline --all-targets -- -D warnings
+cargo test --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo run --manifest-path "$consumer/Cargo.toml" --locked --offline
+cargo metadata --manifest-path "$consumer/Cargo.toml" --locked --offline --format-version 1
+```
+
+All commands and nine tests pass. Metadata confirms one edition-2024
+binary workspace member, the framework as sole path dependency and two
+graph packages. Exact source equality covers 30,864 bytes, SHA256
+`a2be8ac8718113eb0793651f481e778887bb4231d4fdfdc20d66def2e3f65d5e`.
+Both native stdout outputs match 23 lines / 1,353 bytes, SHA256
+`fee976074074fb38877df7d4ea05ab060a24db49843ca71c8ab5055b6d03651f`.
+The saved input's full 14-line / 817-byte stdout is an exact prefix,
+in addition to the Rust regression's exact original six-line assertion.
+
+Root Codex and an independent Codex reviewer found no blocking issue in
+the full source/document diff. Review checks the disabled precedence,
+pre-poll gate, compacted-slot invariant, fixed bound, lifecycle/error
+preservation, test histories and source form. No library API, dependency,
+lint waiver or workflow changes. This is a fixed serial mission policy:
+heartbeat cannot fail here, samplers remain disabled after failure, and
+retry slots stay compacted. A host must select retries/drains and callbacks
+and writes must return. Sampler deferral can be indefinite. Admission and
+dequeue do not establish external delivery or global occurrence order.
+
+Whole-tree audit covers 57 Rust files, 27,713 physical and 1,418
+comment-only lines with zero width findings and three unchanged fulfilled
+expectations. All 744 relative paths, 85 fragments and 249 unique exact
+test references in 121 Markdown files resolve. All 12 changed Markdown
+documents pass rendered text, headings, code, links, tables and nesting
+inspection, with no replacement characters. This is rendered HTML content
+and structure review, without browser pixel-layout QA. Commands:
+
+```text
+python target/review-2026-11-21-priority-audit/inventory.py
+python target/review-2026-11-21-priority-audit/render.py HEAD
+python target/review-2026-11-21-priority-audit/inspect_rendered.py HEAD
+```
+
+Raw completion evidence and the temporary command harness are under
+ignored `target/review-2026-11-21-priority`; preserved pre-edit evidence
+is under `target/review-2026-11-20-priority/input`. Final source/document
+review passes. Ordinary main publication and exact hosted results remain
+to be recorded; local checks do not establish a hosted pass.

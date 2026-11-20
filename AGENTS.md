@@ -123,6 +123,8 @@ translate NASA C source.
   The host disables failed cursors and continues healthy peer work. Two
   inline slots retain queue-rejected terminal failures in observation order
   for separate explicit retry turns.
+  An optional host turn defers enabled samplers before polling until
+  retained failures enter the FIFO, while heartbeat work stays selectable.
   Its test-enabled target and guide verify the same source in an independent
   binary.
 - `tests/selective_publication.rs`: public-only targeted publication and fixed
