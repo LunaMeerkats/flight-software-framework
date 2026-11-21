@@ -599,6 +599,50 @@ impl<A, E, const MAX_CONFIGURATION_BYTES: usize> Runtime<A, E, MAX_CONFIGURATION
         Ok(record.state)
     }
 
+    /// Borrows one owned application for shared inspection between callbacks.
+    ///
+    /// Every known record is accessible, including registered, stopped, and
+    /// failed applications. Lookup invokes no callback and changes no lifecycle
+    /// state. The borrow remains tied to this owner; no mutable application
+    /// reference is exposed. Application-defined interior mutation and effects
+    /// through shared-reference methods remain possible.
+    ///
+    /// Scope the key to its issuing runtime. Equal-position keys from separate
+    /// runtimes can address the corresponding record; lookup does not detect
+    /// that foreign origin or establish authentication or recovery.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`LifecycleError::UnknownApplication`] when the key does not
+    /// name a record in this runtime.
+    ///
+    /// # Examples
+    ///
+    /// Applications need no lifecycle trait merely to be registered or read:
+    ///
+    /// ```
+    /// use rust_flight_framework::Runtime;
+    ///
+    /// let mut values = vec![1_u8];
+    /// values.push(2);
+    /// let mut runtime = Runtime::new(1).unwrap();
+    /// let id = runtime.register(values).unwrap();
+    /// assert_eq!(runtime.application(id).unwrap(), &[1, 2]);
+    /// ```
+    ///
+    /// Ordinary mutable application methods cannot use the shared reference:
+    ///
+    /// ```compile_fail,E0596
+    /// use rust_flight_framework::Runtime;
+    ///
+    /// let mut runtime = Runtime::new(1).unwrap();
+    /// let id = runtime.register(Vec::<u8>::new()).unwrap();
+    /// runtime.application(id).unwrap().push(1);
+    /// ```
+    pub fn application(&self, application_id: ApplicationId) -> Result<&A, LifecycleError> {
+        Ok(&self.record(application_id)?.application)
+    }
+
     /// Validates and activates a replacement at a caller-selected safe point.
     ///
     /// The retained table applies its byte bound, validator, revision, and

@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 shared application inspection — 2026-11-22
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-018 revision 1 | `direct_inspection_retains_owned_observations_across_lifecycle` and `direct_failed_application_remains_inspectable_while_peer_progresses` check ordinary owned fields across lifecycle/work, retained failure diagnostics and peer isolation. | [Inspection review](APPLICATION_INSPECTION_REVIEW.md) |
+| RFF-LIB-REQ-018 revision 1 | `messaging_inspection_preserves_queues_and_in_place_lifecycle`, `messaging_work_failure_inspection_preserves_exact_selected_clearing` and `messaging_callback_failure_inspection_excludes_the_in_flight_message` check queue-preserving lookup, dispatch observations, exact selected clearing and peer FIFO progress. | [Inspection review](APPLICATION_INSPECTION_REVIEW.md) |
+| RFF-LIB-REQ-018 revision 1 | `lookup_without_application_trait_retains_runtime_local_key_limits` and `configured_owner_lookup_requires_no_application_trait_bound` check generic/default/configured owners, unknown slots and documented equal-slot aliases. Four rustdoc examples and explicit negative/positive compiler probes check the borrowing boundary. Identical consumer source runs outside the workspace. | [Inspection review](APPLICATION_INSPECTION_REVIEW.md) |
+
 ## Stage 5 periodic peer work — 2026-11-18 through 2026-11-20
 
 | Requirement | Verification | Record |

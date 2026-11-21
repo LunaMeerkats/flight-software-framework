@@ -115,6 +115,10 @@ translate NASA C source.
 - `tests/work_identity.rs`: public-only diagnostic consumer and context-identity
   integration evidence across every ordinary-work entry path. Its guide verifies
   identical tests in an independent Cargo package without another example target.
+- `tests/application_inspection.rs`: public-only host observations of plain
+  runtime-owned fields across lifecycle, work, dispatch and selected failure.
+  Its guide verifies identical tests in an independent package; shared lookup
+  exposes no mutable owner, while application-defined shared effects remain.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
@@ -246,6 +250,16 @@ recipe in [the identity guide](docs/APPLICATION_WORK_IDENTITY.md). Check, lint
 and test the identical test source; inspect metadata and compare SHA256 hashes.
 Record the actual package path and results in the focused identity review.
 This verifies the controlled consumer, not general adoption or identity origin.
+
+When changing application inspection or its guidance, run
+`cargo test --locked --test application_inspection` and
+`cargo test --locked --doc`, then follow the independent-package recipe in
+[the inspection guide](docs/APPLICATION_INSPECTION.md). Check, lint and test
+identical source; inspect metadata and compare exact bytes/SHA256. Inspect
+the negative borrowing diagnostics and compile corrected counterparts as
+recorded in the [focused review](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
+Shared inspection does not prevent application-defined interior mutation or
+provide mutable access, output draining, origin validation or recovery.
 
 When changing periodic releases or their consumer guidance, run
 `cargo test --locked --test periodic_work`, then follow the independent-package

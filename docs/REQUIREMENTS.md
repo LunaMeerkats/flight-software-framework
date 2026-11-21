@@ -739,3 +739,29 @@ Verify empty-backlog waiting/lifecycle paths and the runnable priority
 trace. Run identical source in an independent binary. The policy depends
 on this mission's healthy heartbeat and terminally disabled failing roles;
 it supplies no global ordering, fairness or output-delivery guarantee.
+
+### RFF-LIB-REQ-018 — Shared inspection of owned applications
+
+Revision 1 (2026-11-22). Both runtime owners shall expose
+`application(&self, ApplicationId) -> Result<&A, LifecycleError>` so a host
+can inspect application-owned observations between callbacks without a
+borrowed external observation slot. Every known record shall remain
+inspectable in Registered, Running, Stopped and Failed states. Lookup shall
+invoke no application callback, change no lifecycle state and consume or
+clear no inbox entry. An unrepresented slot shall return the existing
+`UnknownApplication` error. Keys retain their runtime-local scope and
+cross-runtime equal-slot alias limitation.
+
+The returned shared borrow shall be tied to the owner and shall expose no
+mutable application or inner-runtime reference. Application-defined
+interior mutation and shared-reference side effects remain possible;
+inspection does not establish arbitrary-code isolation or recovery.
+
+Acceptance: a public-only consumer shall observe ordinary owned fields
+across lifecycle, work and message dispatch, selected returned failure and
+healthy peer progress. Check unknown slots, queue preservation before
+dispatch, exact selected clearing on failure and post-failure diagnostics.
+Compile-fail probes shall reject mutable application calls and mutable owner
+use overlapping a live inspection borrow; positive counterparts shall
+compile. Check, lint and test identical consumer source in an independent
+Cargo package. Existing consumer histories remain unchanged.

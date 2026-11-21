@@ -3,6 +3,16 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Shared application inspection — 2026-11-22
+
+RFF-LIB-REQ-018 and [ADR-0043](adr/0043-shared-application-inspection.md)
+add shared lookup of an owned application through either runtime owner.
+All retained lifecycle states remain inspectable without invoking callbacks
+or touching inboxes. The borrow ties observations to the owner, while
+application-defined interior mutation remains possible. No mutable owner
+access or output-transfer policy is added. The
+[consumer guide](APPLICATION_INSPECTION.md) shows the ownership boundary.
+
 ## Bounded periodic failure retry — 2026-11-19
 
 Revision 3 (2026-11-20) adds an optional host admission gate: enabled

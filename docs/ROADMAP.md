@@ -7,6 +7,14 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-018 and [ADR-0043](adr/0043-shared-application-inspection.md)
+select shared application inspection through both runtime owners. A
+[public-only consumer](APPLICATION_INSPECTION.md) reads ordinary owned
+observations across callbacks and lifecycle changes without external Cell
+slots. The [focused review](verification/APPLICATION_INSPECTION_REVIEW.md)
+records actual verification; shared-reference effects remain application
+policy, and mutable application access is outside this increment.
+
 RFF-LIB-REQ-017 revision 1 and [ADR-0042](adr/0042-periodic-peer-work-after-failure.md)
 provide a [runnable direct-runtime example](PERIODIC_PEER.md) with two
 independent periodic cursors. The host keeps heartbeat work going while a

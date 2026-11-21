@@ -309,6 +309,62 @@ impl<A, Topic: Copy + Eq, const MAX_PAYLOAD_BYTES: usize, E, const MAX_CONFIGURA
         self.runtime.state(application_id)
     }
 
+    /// Borrows one owned application without invoking a callback or touching
+    /// any inbox or lifecycle state.
+    ///
+    /// Every known record is accessible, including registered, stopped, and
+    /// failed applications. The shared borrow exposes neither a mutable
+    /// application nor the inner runtime. Application-defined interior
+    /// mutation and shared-reference effects remain possible; this is not a
+    /// recovery or arbitrary-code containment boundary.
+    ///
+    /// Scope the key to its issuing runtime. Equal-position keys from separate
+    /// runtimes can address the corresponding record, as with [`Self::state`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`LifecycleError::UnknownApplication`] when the key does not
+    /// name a record in this runtime.
+    ///
+    /// # Examples
+    ///
+    /// End inspection before invoking a mutable owner operation:
+    ///
+    /// ```
+    /// use rust_flight_framework::{
+    ///     Application, ApplicationId, MessagingRuntime,
+    /// };
+    ///
+    /// fn inspect_then_start<A: Application>(
+    ///     runtime: &mut MessagingRuntime<A, u8, 1>,
+    ///     id: ApplicationId,
+    /// ) {
+    ///     let application = runtime.application(id).unwrap();
+    ///     std::hint::black_box(application);
+    ///     let _ = runtime.start(id);
+    /// }
+    /// ```
+    ///
+    /// A still-live application borrow prevents mutable owner use:
+    ///
+    /// ```compile_fail,E0502
+    /// use rust_flight_framework::{
+    ///     Application, ApplicationId, MessagingRuntime,
+    /// };
+    ///
+    /// fn overlapping_inspection<A: Application>(
+    ///     runtime: &mut MessagingRuntime<A, u8, 1>,
+    ///     id: ApplicationId,
+    /// ) {
+    ///     let application = runtime.application(id).unwrap();
+    ///     let _ = runtime.start(id);
+    ///     std::hint::black_box(application);
+    /// }
+    /// ```
+    pub fn application(&self, application_id: ApplicationId) -> Result<&A, LifecycleError> {
+        self.runtime.application(application_id)
+    }
+
     /// Validates and activates runtime configuration between callbacks.
     ///
     /// # Errors

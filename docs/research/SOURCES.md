@@ -993,6 +993,25 @@ and source-adoption decisions otherwise remain unchanged.
   Do not invent one or imply Australian certification; evaluate the cited ECSS
   sources on their own terms.
 
+## SRC-RUST-SHARED-INSPECTION — Shared borrowing and interior mutation
+
+- Titles: References and Borrowing — The Rust Programming Language;
+  Interior mutability — The Rust Reference
+- Organisation: The Rust Project
+- Sources:
+  <https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html> and
+  <https://doc.rust-lang.org/reference/interior-mutability.html>
+- Version: public language guidance accessed 2026-11-22; local probes use
+  rustc 1.98.0. These are language explanations, not agency requirements.
+- Informed: shared borrows do not grant ordinary mutable access; a shared
+  borrow used after an intervening mutable owner operation conflicts with
+  that operation. Shared references can still support interior mutation.
+- Local treatment: adopt shared application lookup for host observations
+  under ADR-0043, with negative probes and positive counterparts. Explicitly
+  retain application-defined shared-reference effects. Reject treating a
+  shared borrow as arbitrary-code containment or permission for mutable
+  application access. No source code is reused.
+
 ## SRC-RUST-VEC-RESERVATION — Fallible lifecycle record reservation
 
 - Title: `Vec::try_reserve_exact` — Rust standard library

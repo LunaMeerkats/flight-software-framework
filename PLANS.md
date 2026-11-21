@@ -1,51 +1,49 @@
-# Prioritize retained failure admission without blocking healthy work
+# Inspect application-owned observations through public runtime APIs
 
-## Objective and acceptance
+## Objective and context
 
-RFF-LIB-REQ-017 revision 3 adds an optional turn policy to the existing
-public-only periodic peer consumer. Defer enabled sampler work before
-polling while a rejected failure remains retained. Keep healthy heartbeat
-turns selectable, disabled selections explicit, and retry/dequeue separate.
-Resume fresh work after retained admission, even if the FIFO remains full.
+Implement RFF-LIB-REQ-018 revision 1 and ADR-0043. A host should read ordinary
+owned application observations between callbacks without exporting them into
+borrowed Cell slots. At input both owners exposed only lifecycle state.
+Clean main input is `304570ec5341dfa65b8ab1da7a3e2b786afadb01`, matching
+refreshed origin/main. Preserve all earlier consumers and their semantics.
 
-Preserve earlier policies and the original 14-line executable trace as a
-prefix. Verify both sampler orders, repeated deferral with full and empty
-FIFO, unchanged release/lifecycle state, peer progress, retry rejection,
-and a new failure retained behind the admitted older event. Verify the
-empty-backlog waiting and lifecycle paths. Add a runnable priority trace.
+## Acceptance and components
 
-## Design and verification
+- Add shared `application` lookup to Runtime and MessagingRuntime; all known
+  lifecycle states, existing unknown-slot error, no callback/inbox mutation.
+- Add a public-only `tests/application_inspection.rs` consumer with ordinary
+  owned fields, lifecycle/work/dispatch observations and failure/peer history.
+- Record shared-reference/interior-mutability limits in API docs and a guide.
+- Verify negative borrowing probes with positive counterparts, and identical
+  consumer bytes/hash/metadata in an independent Cargo package.
+- Update architecture, requirements, roadmap, traceability and concise state.
 
-The gate belongs to the fixed mission host: only its two samplers can fail.
-Compare explicit admission gating with automatic retry/work and global
-gating in ADR-0042. Add no framework API, service, queue or dependency.
-Keep the original unguarded policy for consumers choosing their own order.
+## Verification and stopping point
 
-Run the locked baseline before implementation and after formatting, focused
-example tests/run and the identical-source independent binary recipe.
-Inspect metadata, bytes/hashes, source widths, Markdown links/rendering and
-the complete diff. Record actual Codex review and exact hosted evidence
-after an ordinary fast-forward main push. Rollback is limited to this
-run's consumer/docs changes; the reviewed input remains the fallback.
+Run the locked baseline before significant edits and after implementation:
+format, all-target check/Clippy, workspace tests, warnings-denied rustdoc and
+whitespace. Run the focused integration test and independent recipe. Inspect
+whole-tree widths, relative Markdown links and changed rendered documents.
+Review the full diff and obtain independent Codex review. After acceptance,
+commit and fast-forward push main; inspect exact-revision hosted CI.
 
-## Input
+Shared inspection does not prevent application interior mutation, supply
+mutable access or transfer non-Copy output. No new dependency or maintained
+crate. Safe fallback is the reviewed input; revert only this run's own changes
+if needed. Stop after this one verified increment, recording actual evidence.
 
-Clean main `dba77f744f9151d515d7110259f425a64254abb1` matches fetched
-and live origin. Exact input hosted run 44311715530 completed all 20 steps
-successfully. The saved pre-edit locked baseline passed 281 workspace tests
-and all required static checks. The interrupted 2026-11-20 implementation
-was preserved and completed on 2026-11-21; remote main had not moved.
+## Local result
 
-## Result
-
-Source blob `2a203431c3677b2216de329cb99c7df079a72c86` passes root
-and independent Codex source review. Locked local checks pass 285 workspace
-tests; the focused example and identical independent binary pass nine each.
-Both binaries emit the same 23 lines with the exact 14-line input prefix.
-The [focused review](docs/verification/PERIODIC_PEER_REVIEW.md#retained-admission-priority-follow-up)
-records actual commands, bounds and evidence. Complete source/document
-review passed. Implementation `b3448fb66a470823747092101b002112eac7a65b`
-reached origin/main by ordinary fast-forward push; exact hosted run
-44746489351 passed all 20 steps and 285 workspace tests. Codex accepts
-this fixed cooperative policy. This record-only completion receives its
-own document/diff review and exact hosted verification.
+Input baseline passed 285 tests. Both accessors and seven public-only consumer
+histories pass; all four rustdoc examples and explicit negative/positive
+compiler probes pass their expected outcomes. The identical independent
+package passes check/Clippy/seven tests with matching bytes/hash and metadata.
+Final locked baseline passes 296 tests and all static/documentation checks.
+An initial OS4551 block before one existing test's execution cleared on an
+unchanged retry; both attempts are recorded. Source review by root and
+independent Codex accepts the three source blobs in the
+[focused record](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
+Complete root/independent Codex document/diff review passes, as do whole-tree
+width/link/traceability and 12 rendered-document inspections. Publication and
+exact hosted verification remain; no source publication is claimed yet.
