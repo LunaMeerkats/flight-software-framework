@@ -11,8 +11,10 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
 
 ## Verified baseline
 
-- Clean input `304570ec5341dfa65b8ab1da7a3e2b786afadb01` matches refreshed
-  origin/main. Exact hosted run 44746983137 passed all 20 steps.
+- Implementation `8ff46483d7cd63f173f993b0fc7882b68efd6d0a` reached
+  origin/main by fast-forward. Exact hosted run 44959470170 passed all 20
+  steps, 296 workspace tests, separate 14 adapter and five sample tests,
+  rustdoc and whitespace. The 222-line sample matches the input run exactly.
 - This run's pre-edit locked format/check/Clippy, 285 workspace tests,
   warnings-denied rustdoc and whitespace all passed.
 - Final locked baseline passes 296 tests, including seven new consumer tests
@@ -20,9 +22,11 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
   One initial Windows Application Control block cleared on an unchanged retry.
 - Identical independent consumer source passes all-target check/Clippy and
   seven tests; explicit negative borrowing probes and positive controls pass
-  their expected outcomes. Hosted implementation evidence is pending.
+  their expected outcomes.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. No toolchain or source-policy change is selected.
+- Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100,
+  runner 2.338.2 and Windows image `20261116.315.1` match input.
 
 ## Current architecture
 
@@ -34,9 +38,10 @@ Existing output-slot and periodic retry policies remain unchanged.
 
 ## Work in progress
 
-Publish the locally verified and root/independent Codex reviewed
-[shared application inspection](APPLICATION_INSPECTION.md) under
-[ADR-0043](adr/0043-shared-application-inspection.md). The
+No implementation remains for this increment. Codex accepts
+[shared application inspection](APPLICATION_INSPECTION.md) after recorded
+local/independent consumer, compiler, source/document and exact hosted review.
+This record-only completion receives its own review and hosted check. The
 [focused review](verification/APPLICATION_INSPECTION_REVIEW.md) records actual
 consumer/probe/independent package evidence and the transient environment block.
 
@@ -61,7 +66,6 @@ adding mutable access or further retry machinery without consumer evidence.
 
 ## Latest run
 
-2026-11-22. Shared inspection passes the full local baseline, identical
-independent consumer and borrowing probes. Root/independent source review
-accepts the implementation and full source/document diff. Width/link/rendered
-document reviews pass. Publication and exact hosted verification remain.
+2026-11-22. Shared inspection is implemented, reviewed, verified and published.
+The exact implementation CI passes. The initial local OS4551 block cleared
+on one unchanged retry. Stop at this bounded inspection checkpoint.

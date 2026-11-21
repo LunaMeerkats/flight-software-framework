@@ -144,7 +144,30 @@ findings. Whole-tree review covers 58 Rust files, 28,166 physical lines and
 sites. All 763 relative paths, 85 fragments and 256 exact test references in
 124 Markdown documents resolve. All 12 changed Markdown documents pass
 rendered content/structure review; browser pixel QA was not performed.
-No publication is claimed yet; exact hosted evidence remains a later gate.
 Shared inspection is neither arbitrary-code containment, output draining,
 origin authentication nor recovery. These controlled consumers establish no
 external adoption, operational suitability or API stability.
+
+## Published implementation and acceptance
+
+Implementation `8ff46483d7cd63f173f993b0fc7882b68efd6d0a` reached
+origin/main by ordinary fast-forward. Its committed tree equals the reviewed
+index tree. Exact hosted run
+[44959470170](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/44959470170),
+job 137014873659, logged that exact checkout and passed all 20 steps,
+296 workspace tests, separate 14 adapter and five sample tests,
+warnings-denied rustdoc and both whitespace checks. The full 222-line hosted
+sample matches the input run's sample exactly.
+
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100,
+runner 2.338.2 and Windows image `20261116.315.1` match the input run.
+Configuration and whole-tree source review retain the existing policy without
+new waivers or findings; local execution remains on 1.98.0. Raw exact-hosted
+metadata/logs and the sample comparison are retained in
+`target/review-2026-11-22-application-access/hosted-implementation/`.
+
+Codex accepts this bounded shared-inspection increment after actual local,
+independent-consumer, compiler-probe, full source/document/diff and exact
+published hosted verification. This record-only completion receives its own
+document/diff/whitespace review and exact hosted check. No later revision's
+hosted result is inferred from the implementation result.

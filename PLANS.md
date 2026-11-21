@@ -45,5 +45,9 @@ unchanged retry; both attempts are recorded. Source review by root and
 independent Codex accepts the three source blobs in the
 [focused record](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
 Complete root/independent Codex document/diff review passes, as do whole-tree
-width/link/traceability and 12 rendered-document inspections. Publication and
-exact hosted verification remain; no source publication is claimed yet.
+width/link/traceability and 12 rendered-document inspections. Implementation
+`8ff46483d7cd63f173f993b0fc7882b68efd6d0a` reached origin/main by ordinary
+fast-forward. Exact hosted run 44959470170 passed all 20 steps and 296 tests;
+separate adapter/sample tests and the unchanged 222-line sample pass.
+Codex accepts this bounded increment. This record-only completion receives
+its own document/diff review and exact hosted check; no unrelated work follows.

@@ -1,6 +1,6 @@
 # ADR-0043: Shared inspection of owned applications
 
-- Status: Accepted; locally verified and reviewed by Codex
+- Status: Accepted; verified and reviewed by Codex
 - Date: 2026-11-22
 - Scope: RFF-LIB-REQ-018 revision 1
 
@@ -48,7 +48,9 @@ in `SRC-RUST-SHARED-INSPECTION` in the [source register](../research/SOURCES.md)
 No upstream code is reused. The [focused record](../verification/APPLICATION_INSPECTION_REVIEW.md)
 records passing public consumer, compile-fail/positive probes, independent
 package and complete root/independent Codex source/document/diff review.
-Publication and exact hosted evidence are recorded separately when completed.
+Published implementation `8ff46483d7cd63f173f993b0fc7882b68efd6d0a` passes
+exact hosted run 44959470170. The focused record retains exact results and
+limitations; a later documentation head requires its own hosted check.
 
 ## Consequences, risks and revisit conditions
 
