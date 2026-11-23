@@ -54,4 +54,9 @@ equality and verified independent metadata. The final locked baseline passes
 304 tests and all static/rustdoc checks. Root and independent Codex accept
 the source hash in the [focused review](docs/verification/OWNED_OUTPUT_REVIEW.md).
 Whole-tree width/link/test-reference audit and all 12 changed rendered
-documents pass review. Publication and exact hosted checks remain pending.
+documents pass review. Reviewed tree `8cff135607143d77091fffe8afacd3cbb6431d68`
+is implementation `6fef2a7896aad016e585c6b08b4ce773d7e55343`, published by
+ordinary fast-forward. Exact hosted run 45134831252 passes all 20 steps,
+304 workspace tests, separate adapter/sample checks and unchanged 222-line
+host output. This record-only completion gets its own review and hosted
+check. Codex accepts the bounded increment; no implementation remains.

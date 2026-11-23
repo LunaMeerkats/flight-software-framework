@@ -123,7 +123,24 @@ external adoption, API stability or flight suitability is established.
 
 ## Publication
 
-Not yet committed or pushed. Local checks do not establish hosted success.
-Exact tested revision and hosted result will be recorded after publication.
+Root and independent Codex accepted staged tree
+`8cff135607143d77091fffe8afacd3cbb6431d68` relative to the clean input.
+Implementation commit `6fef2a7896aad016e585c6b08b4ce773d7e55343` has that
+exact tree and reached origin/main by ordinary fast-forward push. Local,
+tracking and live remote heads matched after publication.
+
+Exact implementation hosted
+[run 45134831252](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45134831252),
+job 137558513653, completed all 20 steps successfully. Its metadata and logged
+checkout match the implementation SHA. It passes 304 workspace tests,
+separate 14 adapter and five sample tests, warning-free rustdoc and both
+whitespace checks. All 222 host-sample output lines match the input job.
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100, runner
+2.338.2 and Windows image `20261116.315.1` match the input; no toolchain or
+source-policy change requires another adoption increment.
+
+Codex accepts this bounded consumer under ADR-0025. This record-only
+completion receives its own source/document/diff review and exact hosted
+check. No implementation remains and no unrelated work follows.
 Raw local logs and temporary review aids live under ignored
 `target/review-2026-11-23-output-access/`.

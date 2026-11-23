@@ -1,6 +1,6 @@
 # ADR-0044: Application-owned output handoff
 
-- Status: Accepted; locally verified and reviewed by Codex
+- Status: Accepted; verified and reviewed by Codex
 - Date: 2026-11-23
 - Scope: RFF-LIB-REQ-019 revision 1
 
@@ -48,8 +48,10 @@ Official std Cell and Option documentation informs `SRC-RUST-OWNED-OUTPUT`
 in the [source register](../research/SOURCES.md). No source code is reused.
 The [focused review](../verification/OWNED_OUTPUT_REVIEW.md) records passing
 304-test local and eight-test independent binary checks, exact source/output
-identity and Codex source/document review. Publication and hosted evidence
-remain separate until actually completed.
+identity and Codex source/document review. Implementation
+`6fef2a7896aad016e585c6b08b4ce773d7e55343` reached origin/main and passes
+exact hosted run 45134831252. The focused record preserves that evidence;
+a later documentation head receives its own check.
 Existing consumers, APIs, dependencies and runtime policies stay unchanged.
 
 Cell provides single-threaded interior mutation; this is application policy,

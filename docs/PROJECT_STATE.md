@@ -11,9 +11,10 @@ Package 0.0.0 remains unpublished with provisional APIs.
 
 ## Verified baseline
 
-- Input `356697a288d11fc168e450cff0d2579f363557d1` matches refreshed
-  origin/main. Exact hosted run 44959878838 passed all 20 steps and 296
-  workspace tests, separate adapter/sample tests, rustdoc and whitespace.
+- Implementation `6fef2a7896aad016e585c6b08b4ce773d7e55343` reached
+  origin/main by fast-forward. Exact hosted run 45134831252 passed all 20
+  steps, 304 workspace tests, separate adapter/sample tests, rustdoc and
+  whitespace. All 222 sample lines match the input job.
 - This run's pre-edit locked format/check/Clippy, 296 workspace tests,
   warnings-denied rustdoc and whitespace all passed.
 - Final locked baseline passes 304 tests and all static/documentation checks.
@@ -21,6 +22,8 @@ Package 0.0.0 remains unpublished with provisional APIs.
   source bytes/SHA256, metadata and seven-line stdout equality.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. No toolchain or source-policy change is selected.
+- Hosted tools remain Rust/Cargo 1.100.0, rustfmt 1.11.0-stable and Clippy
+  0.1.100, runner 2.338.2 and Windows image `20261116.315.1`.
 
 ## Current architecture
 
@@ -32,11 +35,12 @@ shared methods may perform interior mutation and effects.
 
 ## Work in progress
 
-The [owned-output recipe](OWNED_OUTPUT.md) is implemented and locally
-verified. One private application Cell slot and one retained host slot move
-a non-Copy record to a typed sink. Source and rendered-document review pass.
-Publication and exact hosted verification remain pending in the
-[focused record](verification/OWNED_OUTPUT_REVIEW.md).
+No implementation remains. Codex accepts the
+[owned-output recipe](OWNED_OUTPUT.md) after local/independent binary,
+source/document/diff and exact hosted review. The
+[focused record](verification/OWNED_OUTPUT_REVIEW.md) preserves actual
+evidence and limitations. This record-only completion receives its own
+review and exact hosted check.
 
 ## Highest risks and uncertainties
 
@@ -54,12 +58,11 @@ security, major API freeze and other consequential decisions retain gates.
 
 ## Most likely next task
 
-After this bounded handoff checkpoint, reassess a concrete downstream need
-before adding another service or retry policy.
+Assess structured diagnostics for returned message-callback errors against
+the existing ordinary-work failure-event path before selecting another API.
 
 ## Latest run
 
-2026-11-23. Owned-output consumer implemented. The final locked baseline
-passes 304 tests, and the identical independent binary passes eight tests
-and matches stdout. Source/document review accepts; publication and exact
-hosted verification remain pending.
+2026-11-23. Owned-output consumer is implemented, verified, reviewed and
+published. Exact implementation CI passes all 20 steps. Stop at this
+bounded handoff checkpoint; no unrelated work follows.
