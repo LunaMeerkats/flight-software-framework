@@ -1,53 +1,57 @@
-# Inspect application-owned observations through public runtime APIs
+# Move application-owned output to a serial host
 
-## Objective and context
+## Objective and selection
 
-Implement RFF-LIB-REQ-018 revision 1 and ADR-0043. A host should read ordinary
-owned application observations between callbacks without exporting them into
-borrowed Cell slots. At input both owners exposed only lifecycle state.
-Clean main input is `304570ec5341dfa65b8ab1da7a3e2b786afadb01`, matching
-refreshed origin/main. Preserve all earlier consumers and their semantics.
+Implement RFF-LIB-REQ-019 revision 1 in one public-only runnable consumer.
+Input main `356697a288d11fc168e450cff0d2579f363557d1` is clean and matches
+refreshed origin/main. The 296-test locked baseline and exact input hosted
+run 44959878838 pass. The preceding shared-inspection increment is complete.
+
+Owned observations are now accessible, but existing output recipes require
+external borrowed slots and Copy values. Demonstrate ownership transfer of
+a non-Copy record using an application-defined shared drain and existing
+lookup before inventing a framework output API.
+
+This closes a concrete integration gap, is independently verifiable and
+leaves existing APIs/consumers intact. More retry machinery has lower value
+after the completed priority checkpoint. Unrestricted mutable access and a
+new output trait add policy without evidence. Cell, RefCell and external
+slot alternatives are compared in ADR-0044.
 
 ## Acceptance and components
 
-- Add shared `application` lookup to Runtime and MessagingRuntime; all known
-  lifecycle states, existing unknown-slot error, no callback/inbox mutation.
-- Add a public-only `tests/application_inspection.rs` consumer with ordinary
-  owned fields, lifecycle/work/dispatch observations and failure/peer history.
-- Record shared-reference/interior-mutability limits in API docs and a guide.
-- Verify negative borrowing probes with positive counterparts, and identical
-  consumer bytes/hash/metadata in an independent Cargo package.
-- Update architecture, requirements, roadmap, traceability and concise state.
+- `examples/owned_output.rs`: fixed application slot, shared take, one host
+  slot, production gate and typed sink rejection returning ownership.
+- Tests in the test-enabled example exercise both owners, no duplicate take,
+  local rejection/acceptance, lifecycle retention, failure and peer isolation.
+- `docs/OWNED_OUTPUT.md`: runnable/independent recipe and explicit ownership,
+  lifecycle, resource and sink-result boundaries.
+- Requirements, ADR, source register, architecture, roadmap, traceability,
+  repository guidance and concise state track actual results.
+- No library API, dependency, workflow, lint or historical consumer changes.
 
-## Verification and stopping point
+## Verification and safe stopping point
 
-Run the locked baseline before significant edits and after implementation:
-format, all-target check/Clippy, workspace tests, warnings-denied rustdoc and
-whitespace. Run the focused integration test and independent recipe. Inspect
-whole-tree widths, relative Markdown links and changed rendered documents.
-Review the full diff and obtain independent Codex review. After acceptance,
-commit and fast-forward push main; inspect exact-revision hosted CI.
+Run focused example test/run, the locked format/check/Clippy/workspace-test/
+warnings-denied-rustdoc/whitespace baseline, independent binary check/lint/
+test/run, metadata, bytes/SHA256 and transcript comparison. Audit handwritten
+Rust widths, waivers, relative links and exact traceability references;
+render and inspect changed documents and review the complete diff with an
+independent Codex reviewer. Commit and ordinary fast-forward push main after
+acceptance, then inspect exact-head hosted CI.
 
-Shared inspection does not prevent application interior mutation, supply
-mutable access or transfer non-Copy output. No new dependency or maintained
-crate. Safe fallback is the reviewed input; revert only this run's own changes
-if needed. Stop after this one verified increment, recording actual evidence.
+Callbacks and sink turns must return. The sink contract is definite local
+rejection returning the entire record; adapting ambiguous external effects
+requires a different policy. Logical slots do not bound arbitrary consumer
+allocation or runtime. Stop after this one increment. Preserve input as the
+fallback; revert only this run's changes if a healthy result is impossible.
 
 ## Local result
 
-Input baseline passed 285 tests. Both accessors and seven public-only consumer
-histories pass; all four rustdoc examples and explicit negative/positive
-compiler probes pass their expected outcomes. The identical independent
-package passes check/Clippy/seven tests with matching bytes/hash and metadata.
-Final locked baseline passes 296 tests and all static/documentation checks.
-An initial OS4551 block before one existing test's execution cleared on an
-unchanged retry; both attempts are recorded. Source review by root and
-independent Codex accepts the three source blobs in the
-[focused record](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
-Complete root/independent Codex document/diff review passes, as do whole-tree
-width/link/traceability and 12 rendered-document inspections. Implementation
-`8ff46483d7cd63f173f993b0fc7882b68efd6d0a` reached origin/main by ordinary
-fast-forward. Exact hosted run 44959470170 passed all 20 steps and 296 tests;
-separate adapter/sample tests and the unchanged 222-line sample pass.
-Codex accepts this bounded increment. This record-only completion receives
-its own document/diff review and exact hosted check; no unrelated work follows.
+The example and eight focused tests pass. The identical independent binary
+passes all-target check/Clippy/eight tests/run, with exact source and stdout
+equality and verified independent metadata. The final locked baseline passes
+304 tests and all static/rustdoc checks. Root and independent Codex accept
+the source hash in the [focused review](docs/verification/OWNED_OUTPUT_REVIEW.md).
+Whole-tree width/link/test-reference audit and all 12 changed rendered
+documents pass review. Publication and exact hosted checks remain pending.

@@ -41,3 +41,7 @@ test = true
 [[example]]
 name = "periodic_peer"
 test = true
+
+[[example]]
+name = "owned_output"
+test = true

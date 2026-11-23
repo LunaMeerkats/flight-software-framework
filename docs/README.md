@@ -11,6 +11,7 @@
 ## Schedule and observe work
 
 - [Inspect application-owned state](APPLICATION_INSPECTION.md) between callbacks, including retained failure diagnostics.
+- [Take ownership of application output](OWNED_OUTPUT.md) through a shared application method and retain rejected sink offers.
 - [Release recurring work](PERIODIC_WORK.md) using an injected clock.
 - [Continue periodic peer work](PERIODIC_PEER.md), retry two queue-rejected failures and optionally prioritize their admission.
 - [Transfer ordinary-work output](ORDINARY_WORK_OUTPUT.md) through a bounded slot and account for backpressure.

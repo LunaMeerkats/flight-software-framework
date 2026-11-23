@@ -119,6 +119,10 @@ translate NASA C source.
   runtime-owned fields across lifecycle, work, dispatch and selected failure.
   Its guide verifies identical tests in an independent package; shared lookup
   exposes no mutable owner, while application-defined shared effects remain.
+- `examples/owned_output.rs`: public-only application-owned non-Copy output
+  handoff using an application-defined shared take method, one retained host
+  slot and a typed whole-record sink. Its test-enabled target and independent
+  binary recipe retain the same public-API evidence boundary.
 - `tests/periodic_work.rs`: public-only repeated-work consumer and release-policy
   evidence. Its guide verifies identical tests in an independent Cargo package;
   host delegation preserves each existing owner's lifecycle and cleanup boundary.
@@ -260,6 +264,16 @@ the negative borrowing diagnostics and compile corrected counterparts as
 recorded in the [focused review](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
 Shared inspection does not prevent application-defined interior mutation or
 provide mutable access, output draining, origin validation or recovery.
+
+When changing the owned-output example or its guidance, run
+`cargo test --locked --example owned_output` and
+`cargo run --locked --example owned_output`, then follow the independent
+binary recipe in [its guide](docs/OWNED_OUTPUT.md). Check, lint, test and run
+identical source; inspect metadata, exact bytes/SHA256 and stdout. Record
+actual results in [the focused review](docs/verification/OWNED_OUTPUT_REVIEW.md).
+The application method performs transfer; shared lookup supplies its borrow.
+Definite typed rejection must return the entire record. Sink acceptance
+does not establish physical or durable delivery.
 
 When changing periodic releases or their consumer guidance, run
 `cargo test --locked --test periodic_work`, then follow the independent-package

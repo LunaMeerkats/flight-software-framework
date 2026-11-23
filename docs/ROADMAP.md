@@ -7,6 +7,13 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-019 and [ADR-0044](adr/0044-application-owned-output-handoff.md)
+select a [runnable owned-output recipe](OWNED_OUTPUT.md). An application
+method moves a non-Copy record through existing shared lookup into one
+host slot. Explicit sink rejection returns ownership; pending output gates
+new work. The [focused review](verification/OWNED_OUTPUT_REVIEW.md) records
+actual verification. Existing output recipes and library APIs are preserved.
+
 RFF-LIB-REQ-018 and [ADR-0043](adr/0043-shared-application-inspection.md)
 select shared application inspection through both runtime owners. A
 [public-only consumer](APPLICATION_INSPECTION.md) reads ordinary owned

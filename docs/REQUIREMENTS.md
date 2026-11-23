@@ -765,3 +765,30 @@ Compile-fail probes shall reject mutable application calls and mutable owner
 use overlapping a live inspection borrow; positive counterparts shall
 compile. Check, lint and test identical consumer source in an independent
 Cargo package. Existing consumer histories remain unchanged.
+
+### RFF-LIB-REQ-019 — Application-owned output handoff
+
+Revision 1 (2026-11-23). A public-only runnable consumer shall stage one
+non-Copy, non-Clone fixed-size output in application-owned storage. An
+application-defined shared-reference method shall move that output to the
+host through the existing application lookup, leaving the application slot
+empty. A second take shall return None without another callback. Production
+shall reject an occupied application slot without replacing its older value.
+
+The host shall retain at most one taken output. An occupied host slot shall
+gate new work and further takes. A separate sink turn shall move the record
+to a typed sink; definite rejection shall return ownership to that same
+host slot. An empty sink turn shall make no sink call. Successful acceptance
+shall empty only the host slot. Handoff is application policy, not a new
+framework output service or mutable application accessor.
+
+Acceptance: preserve all existing consumers. Verify direct and messaging
+owners, empty/repeated takes, sink rejection and later acceptance, no work
+while host output is pending, stop/restart retention and post-failure drain.
+A defensive full application-slot failure shall preserve the older output,
+the exact typed error, selected inbox clearing and healthy peer progress.
+Taking output shall not dispatch or clear queued messages or change state.
+Build, lint, test and run identical source in an independent path-dependent
+binary. Record exact bytes/hash, metadata and output. Typed sink acceptance
+is local ownership transfer; no reliable transport, durability, recovery,
+concurrency or external-adoption claim follows.

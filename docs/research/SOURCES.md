@@ -993,6 +993,24 @@ and source-adoption decisions otherwise remain unchanged.
   Do not invent one or imply Australian certification; evaluate the cited ECSS
   sources on their own terms.
 
+## SRC-RUST-OWNED-OUTPUT — Moving a non-Copy optional record
+
+- Titles: Cell and Option — Rust standard library documentation
+- Organisation: The Rust Project
+- Sources: <https://doc.rust-lang.org/std/cell/struct.Cell.html> and
+  <https://doc.rust-lang.org/std/option/enum.Option.html>
+- Version: stable 1.100.0 documentation accessed 2026-11-23; local execution
+  uses rustc 1.98.0. These are language/library facts, not agency requirements.
+- Informed: Cell::take moves a value and leaves its Default; it does not
+  require Copy. Option supplies an empty default without requiring its value
+  to implement Default. Cell::get_mut supports exclusive callback staging.
+- Local treatment: adopt application-owned Cell storage and an explicit
+  mission take method in ADR-0044. Compare RefCell, external borrowed slots
+  and a new framework accessor/service; the selected consumer needs none of
+  those additions. Keep the record and both local slots fixed-size. The
+  definite-rejection sink contract is project policy, not a Rust guarantee
+  about external delivery. No source code is reused.
+
 ## SRC-RUST-SHARED-INSPECTION — Shared borrowing and interior mutation
 
 - Titles: References and Borrowing — The Rust Programming Language;

@@ -3,6 +3,15 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Application-owned output handoff — 2026-11-23
+
+RFF-LIB-REQ-019 and [ADR-0044](adr/0044-application-owned-output-handoff.md)
+compose shared lookup with an application-defined take method. One private
+Cell slot owns a non-Copy record; one host slot retains taken output through
+definite sink rejection. Production, take and offer remain separate turns.
+This [consumer policy](OWNED_OUTPUT.md) adds no library output service,
+mutable owner access or external delivery guarantee.
+
 ## Shared application inspection — 2026-11-22
 
 RFF-LIB-REQ-018 and [ADR-0043](adr/0043-shared-application-inspection.md)

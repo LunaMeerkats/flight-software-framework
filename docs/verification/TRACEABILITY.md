@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 application-owned output handoff — 2026-11-23
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-019 revision 1 | `direct_take_moves_one_record_and_repeated_take_is_empty`, `empty_host_turns_do_not_call_the_sink_or_produce_output` and `direct_stop_restart_preserves_application_and_host_slots` check owned/empty takes, idle sink suppression and lifecycle retention. | [Owned-output review](OWNED_OUTPUT_REVIEW.md) |
+| RFF-LIB-REQ-019 revision 1 | `occupied_host_defers_work_and_take_and_retains_rejected_ownership` checks occupied-host work/take deferral and exact record retention through repeated rejection and acceptance. `runnable_trace_separates_take_rejection_and_acceptance` checks the exact executable transcript. | [Owned-output review](OWNED_OUTPUT_REVIEW.md) |
+| RFF-LIB-REQ-019 revision 1 | `direct_full_failure_keeps_the_old_output_for_drain_and_peer_work`, `messaging_take_and_host_gate_preserve_inboxes_and_lifecycle_output` and `messaging_full_failure_clears_only_selected_inbox_and_allows_failed_drain` check typed failure, retained output, selected clearing and peer work/dispatch. The identical independent binary exercises the same histories. | [Owned-output review](OWNED_OUTPUT_REVIEW.md) |
+
 ## Stage 5 shared application inspection — 2026-11-22
 
 | Requirement | Verification | Record |

@@ -1,57 +1,51 @@
 # Project state
 
-Last updated: **2026-11-22**
+Last updated: **2026-11-23**
 
 ## Current milestone
 
-Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-018 revision 1
-adds shared inspection of runtime-owned applications through both owners.
-The reviewed host v0.1 milestone remains the regression baseline. Package
-0.0.0 remains unpublished with provisional APIs.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-019 revision 1
+selects application-owned non-Copy output handoff through existing shared
+lookup. The reviewed host v0.1 milestone remains the regression baseline.
+Package 0.0.0 remains unpublished with provisional APIs.
 
 ## Verified baseline
 
-- Implementation `8ff46483d7cd63f173f993b0fc7882b68efd6d0a` reached
-  origin/main by fast-forward. Exact hosted run 44959470170 passed all 20
-  steps, 296 workspace tests, separate 14 adapter and five sample tests,
-  rustdoc and whitespace. The 222-line sample matches the input run exactly.
-- This run's pre-edit locked format/check/Clippy, 285 workspace tests,
+- Input `356697a288d11fc168e450cff0d2579f363557d1` matches refreshed
+  origin/main. Exact hosted run 44959878838 passed all 20 steps and 296
+  workspace tests, separate adapter/sample tests, rustdoc and whitespace.
+- This run's pre-edit locked format/check/Clippy, 296 workspace tests,
   warnings-denied rustdoc and whitespace all passed.
-- Final locked baseline passes 296 tests, including seven new consumer tests
-  and four rustdoc examples, with all static/documentation checks passing.
-  One initial Windows Application Control block cleared on an unchanged retry.
-- Identical independent consumer source passes all-target check/Clippy and
-  seven tests; explicit negative borrowing probes and positive controls pass
-  their expected outcomes.
+- Final locked baseline passes 304 tests and all static/documentation checks.
+  Identical independent binary check/Clippy/eight tests/run pass with exact
+  source bytes/SHA256, metadata and seven-line stdout equality.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. No toolchain or source-policy change is selected.
-- Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100,
-  runner 2.338.2 and Windows image `20261116.315.1` match input.
 
 ## Current architecture
 
 One unpublished package owns synchronous lifecycle/work, bounded messaging,
-manual time, finite schedules, structured events and optional validated
-configuration. Hosts select callback and I/O turns. Shared application
-lookup exposes retained observations without mutable inner-owner access.
-Existing output-slot and periodic retry policies remain unchanged.
+manual time, finite schedules, events and optional validated configuration.
+Hosts select callback and I/O turns. Shared application lookup exposes
+retained values without mutable inner-owner access. Application-defined
+shared methods may perform interior mutation and effects.
 
 ## Work in progress
 
-No implementation remains for this increment. Codex accepts
-[shared application inspection](APPLICATION_INSPECTION.md) after recorded
-local/independent consumer, compiler, source/document and exact hosted review.
-This record-only completion receives its own review and hosted check. The
-[focused review](verification/APPLICATION_INSPECTION_REVIEW.md) records actual
-consumer/probe/independent package evidence and the transient environment block.
+The [owned-output recipe](OWNED_OUTPUT.md) is implemented and locally
+verified. One private application Cell slot and one retained host slot move
+a non-Copy record to a typed sink. Source and rendered-document review pass.
+Publication and exact hosted verification remain pending in the
+[focused record](verification/OWNED_OUTPUT_REVIEW.md).
 
 ## Highest risks and uncertainties
 
-- Shared application methods may have interior mutation and other effects.
+- Typed sink rejection must return the whole unaccepted record. Ambiguous
+  external effects require another policy.
+- Shared application methods can have interior mutation and other effects.
+- Callbacks and sink turns must return. Logical bounds do not bound arbitrary
+  allocation or execution time; local acceptance does not prove delivery.
 - IDs remain runtime-local, with equal-slot cross-owner aliasing possible.
-- Callbacks and writes must return. Logical bounds do not bound application
-  allocation or execution time; admission does not prove external delivery.
-- Shared inspection neither drains owned output nor establishes recovery.
 
 ## Important unresolved decisions
 
@@ -60,12 +54,12 @@ security, major API freeze and other consequential decisions retain gates.
 
 ## Most likely next task
 
-Reassess downstream use after this inspection checkpoint, including whether
-host-owned output recipes have a concrete ownership-transfer gap. Avoid
-adding mutable access or further retry machinery without consumer evidence.
+After this bounded handoff checkpoint, reassess a concrete downstream need
+before adding another service or retry policy.
 
 ## Latest run
 
-2026-11-22. Shared inspection is implemented, reviewed, verified and published.
-The exact implementation CI passes. The initial local OS4551 block cleared
-on one unchanged retry. Stop at this bounded inspection checkpoint.
+2026-11-23. Owned-output consumer implemented. The final locked baseline
+passes 304 tests, and the identical independent binary passes eight tests
+and matches stdout. Source/document review accepts; publication and exact
+hosted verification remain pending.
