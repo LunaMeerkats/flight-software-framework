@@ -18,6 +18,10 @@ The reviewed host v0.1 milestone remains the regression baseline. Package
   all corresponding static/documentation checks.
 - Seven focused public-API histories also pass in an independent library
   consumer with exact source bytes/SHA256 and verified metadata.
+- Implementation `420d5e342a9096a878dfea57bc69be0d4830fa2a` reached
+  origin/main by fast-forward. Exact hosted run 45329058609 passes all 20
+  steps, 311 workspace tests and separate adapter/sample checks. All 222
+  combined sample stdout lines match input.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. Input hosted tools remain Rust/Cargo 1.100.0, rustfmt
   1.11.0-stable, Clippy 0.1.100, runner 2.338.2 and Windows image
@@ -35,10 +39,11 @@ effects; application-owned output handoff remains consumer policy.
 ## Work in progress
 
 Implementation and local/independent-consumer verification are complete.
-Root and independent Codex accept the source/tests. Final document/diff
-review, ordinary source publication and exact-head hosted inspection follow;
-the [focused record](verification/MESSAGE_FAILURE_EVENTS_REVIEW.md)
-preserves actual evidence and limits.
+Root and independent Codex accept the complete source/document/diff and
+the exact implementation hosted result passes. The
+[focused record](verification/MESSAGE_FAILURE_EVENTS_REVIEW.md) preserves
+actual evidence and limits. This record-only completion receives its own
+review and exact hosted check.
 
 ## Highest risks and uncertainties
 
@@ -61,6 +66,6 @@ bounded host output before adding more callback wrappers or services.
 
 ## Latest run
 
-2026-11-24. Added and locally verified owner-preserving message-callback
-failure diagnostics. Stop after review/publication of this bounded increment;
-no unrelated work follows.
+2026-11-24. Message-callback failure diagnostics are implemented, locally
+and independently verified, reviewed and published. Exact implementation
+CI passes all 20 steps. Stop at this bounded checkpoint.

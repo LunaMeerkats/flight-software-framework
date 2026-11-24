@@ -86,7 +86,9 @@ fragments, exact test references and rendered content/structure. Audit passes
 findings and three unchanged fulfilled expectations. All 803 relative paths,
 88 fragments and 271 unique exact test references across 130 Markdown files
 resolve. All 12 changed Markdown documents pass rendered content/structure
-inspection. Complete document/diff acceptance is required before commit.
+inspection. Root and independent Codex accept the complete implementation
+source/document/diff at staged tree
+`ad3c08ebe1937656a3aca778de3830acd6a81665`.
 These temporary aids do not establish new adopted gates or browser pixel QA.
 
 The first rendered-document pass found an unquoted generic type interpreted
@@ -106,6 +108,22 @@ without qualification, external-adoption or API-stability claims.
 
 ## Publication
 
-Source publication and exact implementation hosted inspection follow final
-local source/document/diff review. No hosted pass is claimed for the new
-implementation until its exact run completes.
+Implementation `420d5e342a9096a878dfea57bc69be0d4830fa2a` has that exact
+reviewed tree and reached origin/main by ordinary fast-forward push.
+Local, tracking and live remote heads match after publication.
+
+Exact implementation hosted
+[run 45329058609](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45329058609),
+job 138225516658, completes all 20 steps successfully. Metadata and logged
+checkout identify the exact implementation SHA. The job passes 311 workspace
+tests, separate 14 adapter and five sample tests, warnings-denied rustdoc and
+both whitespace checks. All 222 host-sample stdout lines match the input job.
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100, runner
+2.338.2 and Windows image `20261116.315.1` match input. No toolchain/source-
+policy change is selected; the local toolchain remains separately 1.98.0.
+
+Codex accepts this bounded increment under ADR-0025. This record-only
+completion receives separate document/diff review and exact hosted checking.
+No implementation remains and no unrelated work follows. Raw local,
+independent-consumer, audit and hosted evidence lives under ignored
+`target/review-2026-11-24-message-events/`.

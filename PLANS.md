@@ -51,5 +51,11 @@ Clippy/seven tests/metadata pass with exact bytes/SHA256. Root and
 independent Codex accept source and tests. Whole-tree width/link/test-
 reference and rendered-document review complete before publication;
 the [focused record](docs/verification/MESSAGE_FAILURE_EVENTS_REVIEW.md)
-preserves exact results and limits. No implementation remains. Commit,
-ordinary source publication and exact-head hosted inspection follow review.
+preserves exact results and limits. All 12 changed Markdown documents pass
+rendered content/structure review. Accepted staged tree
+`ad3c08ebe1937656a3aca778de3830acd6a81665` is implementation
+`420d5e342a9096a878dfea57bc69be0d4830fa2a`, published by ordinary
+fast-forward. Exact hosted run 45329058609 passes all 20 steps, 311 workspace
+tests, separate adapter/sample tests and unchanged 222-line sample stdout.
+No implementation remains. The record-only completion receives separate
+review and exact hosted inspection. Stop at this one increment.

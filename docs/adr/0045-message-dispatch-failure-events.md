@@ -66,6 +66,9 @@ The locked local baseline passes 311 workspace tests. Seven focused tests
 also pass as identical source in an independent edition 2024 package.
 Root and independent Codex source review find no issues; exact source
 identity, document review and publication evidence are in the focused record.
+Implementation `420d5e342a9096a878dfea57bc69be0d4830fa2a` reached
+origin/main by fast-forward and passes exact hosted run 45329058609, all
+20 steps. The later record-only completion receives its own check.
 
 The clear count excludes the attempted in-flight item and includes accepted
 self-publications remaining in the failed inbox. Accepted peer effects
