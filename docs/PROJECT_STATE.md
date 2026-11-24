@@ -1,54 +1,52 @@
 # Project state
 
-Last updated: **2026-11-23**
+Last updated: **2026-11-24**
 
 ## Current milestone
 
-Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-019 revision 1
-selects application-owned non-Copy output handoff through existing shared
-lookup. The reviewed host v0.1 milestone remains the regression baseline.
-Package 0.0.0 remains unpublished with provisional APIs.
+Stage 5 practical library use under ADR-0025. RFF-LIB-REQ-020 revision 1
+adds opt-in structured diagnostics for returned message-callback errors.
+The reviewed host v0.1 milestone remains the regression baseline. Package
+0.0.0 remains unpublished with provisional APIs.
 
 ## Verified baseline
 
-- Implementation `6fef2a7896aad016e585c6b08b4ce773d7e55343` reached
-  origin/main by fast-forward. Exact hosted run 45134831252 passed all 20
-  steps, 304 workspace tests, separate adapter/sample tests, rustdoc and
-  whitespace. All 222 sample lines match the input job.
-- This run's pre-edit locked format/check/Clippy, 296 workspace tests,
-  warnings-denied rustdoc and whitespace all passed.
-- Final locked baseline passes 304 tests and all static/documentation checks.
-  Identical independent binary check/Clippy/eight tests/run pass with exact
-  source bytes/SHA256, metadata and seven-line stdout equality.
+- Clean input `151511aec980dffe41dc25ab5d406798437459ee` matches fetched
+  origin/main. Exact input hosted run 45135377234 passes all 20 steps.
+- Pre-edit locked format/check/Clippy, 304 workspace tests, warnings-denied
+  rustdoc and whitespace pass. Final locked baseline passes 311 tests and
+  all corresponding static/documentation checks.
+- Seven focused public-API histories also pass in an independent library
+  consumer with exact source bytes/SHA256 and verified metadata.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
-  0.1.98. No toolchain or source-policy change is selected.
-- Hosted tools remain Rust/Cargo 1.100.0, rustfmt 1.11.0-stable and Clippy
-  0.1.100, runner 2.338.2 and Windows image `20261116.315.1`.
+  0.1.98. Input hosted tools remain Rust/Cargo 1.100.0, rustfmt
+  1.11.0-stable, Clippy 0.1.100, runner 2.338.2 and Windows image
+  `20261116.315.1`. No toolchain or policy change is selected.
 
 ## Current architecture
 
 One unpublished package owns synchronous lifecycle/work, bounded messaging,
 manual time, finite schedules, events and optional validated configuration.
-Hosts select callback and I/O turns. Shared application lookup exposes
-retained values without mutable inner-owner access. Application-defined
-shared methods may perform interior mutation and effects.
+Hosts select callback and I/O turns. Opt-in work and message-error reporting
+borrows time/event services after owner-specific lifecycle/inbox cleanup.
+Shared application lookup supports observations and application-defined
+effects; application-owned output handoff remains consumer policy.
 
 ## Work in progress
 
-No implementation remains. Codex accepts the
-[owned-output recipe](OWNED_OUTPUT.md) after local/independent binary,
-source/document/diff and exact hosted review. The
-[focused record](verification/OWNED_OUTPUT_REVIEW.md) preserves actual
-evidence and limitations. This record-only completion receives its own
-review and exact hosted check.
+Implementation and local/independent-consumer verification are complete.
+Root and independent Codex accept the source/tests. Final document/diff
+review, ordinary source publication and exact-head hosted inspection follow;
+the [focused record](verification/MESSAGE_FAILURE_EVENTS_REVIEW.md)
+preserves actual evidence and limits.
 
 ## Highest risks and uncertainties
 
-- Typed sink rejection must return the whole unaccepted record. Ambiguous
-  external effects require another policy.
-- Shared application methods can have interior mutation and other effects.
-- Callbacks and sink turns must return. Logical bounds do not bound arbitrary
-  allocation or execution time; local acceptance does not prove delivery.
+- Events can saturate; caller-retained retries need a separate finite bound.
+- Callback/clock/sink turns must return. Logical bounds do not bound arbitrary
+  allocation or execution time, and acceptance does not prove delivery.
+- Message failure clears self/tail deliveries while accepted peer effects
+  persist; it supplies no transaction rollback or recovery.
 - IDs remain runtime-local, with equal-slot cross-owner aliasing possible.
 
 ## Important unresolved decisions
@@ -58,11 +56,11 @@ security, major API freeze and other consequential decisions retain gates.
 
 ## Most likely next task
 
-Assess structured diagnostics for returned message-callback errors against
-the existing ordinary-work failure-event path before selecting another API.
+Assess a runnable command consumer using message-error diagnostics and
+bounded host output before adding more callback wrappers or services.
 
 ## Latest run
 
-2026-11-23. Owned-output consumer is implemented, verified, reviewed and
-published. Exact implementation CI passes all 20 steps. Stop at this
-bounded handoff checkpoint; no unrelated work follows.
+2026-11-24. Added and locally verified owner-preserving message-callback
+failure diagnostics. Stop after review/publication of this bounded increment;
+no unrelated work follows.

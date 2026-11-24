@@ -17,6 +17,7 @@
 - [Transfer ordinary-work output](ORDINARY_WORK_OUTPUT.md) through a bounded slot and account for backpressure.
 - [Attribute diagnostics to an application](APPLICATION_WORK_IDENTITY.md) and [check for overdue samples](HOST_PROGRESS.md).
 - [Filter optional events](EVENT_FILTERING.md) or [write queued events to a host stream](EVENT_OUTPUT.md).
+- [Report returned message-callback errors](MESSAGE_FAILURE_EVENTS.md) with preserved cleanup and explicit event saturation.
 - [Run the combined host sample](verification/HOST_SAMPLE.md) for lifecycle, configuration, scheduling, and a returned work failure.
 
 ## Explore the project

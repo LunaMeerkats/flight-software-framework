@@ -23,7 +23,7 @@ use crate::runtime::{
     Application, RunningCallbackError, Runtime, RuntimeConfigurationError, RuntimeRestartError,
     RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
-use crate::runtime_events::RuntimeWorkEventError;
+use crate::runtime_events::{MessageDispatchEventError, RuntimeWorkEventError};
 use crate::scheduling::{ScheduledWorkError, ScheduledWorkOutcome, WorkSchedule};
 
 /// The reason a runtime could not take ownership of a message topology.
@@ -722,6 +722,52 @@ impl<
                 },
             )),
         }
+    }
+
+    /// Dispatches one message with opt-in returned-error event reporting.
+    ///
+    /// Delegates once to [`Self::dispatch_one`]. Only a returned application
+    /// message error reads `clock` once and attempts one application-sourced
+    /// [`crate::EventSeverity::Error`] event with the supplied identifier.
+    /// Terminal Failed commitment and selected-inbox cleanup finish before
+    /// reporting. The clear count excludes the attempted in-flight delivery
+    /// and includes accepted self-publications still queued at failure;
+    /// accepted peer publications remain intact.
+    ///
+    /// Empty, successful and lifecycle-rejected dispatches read no clock and
+    /// emit nothing. Queue saturation preserves older events and retains the
+    /// exact rejected event for explicit caller handling. No retry, rollback
+    /// or recovery is automatic. The caller owns the clock and event queue.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the complete dispatch error and discarded-delivery count in
+    /// [`MessagingOperationError`]. Its [`MessageDispatchEventError`] carries
+    /// a [`crate::FailureEventAttempt`] only for a returned application error.
+    pub fn dispatch_one_with_failure_event<EventId, C>(
+        &mut self,
+        application_id: ApplicationId,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Result<
+        MessageDispatchOutcome,
+        MessagingOperationError<MessageDispatchEventError<A::MessageError, EventId>>,
+    >
+    where
+        EventId: Copy,
+        C: Clock + ?Sized,
+    {
+        self.dispatch_one(application_id)
+            .map_err(|error| MessagingOperationError {
+                operation_error: MessageDispatchEventError::from_dispatch_error(
+                    error.operation_error,
+                    failure_event_identifier,
+                    clock,
+                    event_queue,
+                ),
+                discarded_deliveries: error.discarded_deliveries,
+            })
     }
 }
 

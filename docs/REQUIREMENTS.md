@@ -792,3 +792,28 @@ Build, lint, test and run identical source in an independent path-dependent
 binary. Record exact bytes/hash, metadata and output. Typed sink acceptance
 is local ownership transfer; no reliable transport, durability, recovery,
 concurrency or external-adoption claim follows.
+
+### RFF-LIB-REQ-020 — Returned message-callback failure events
+
+Revision 1 (2026-11-24). MessagingRuntime shall offer an opt-in operation
+that delegates exactly once to dispatch_one and reports a returned
+application message error after terminal Failed commitment and selected
+inbox cleanup. It shall preserve the original MessageDispatchError and
+exact discarded-delivery count, excluding the attempted in-flight item
+and including accepted self-publications still queued at failure.
+
+Only a returned application error shall read the caller-supplied clock
+once and attempt one application-sourced Error event with a caller-supplied
+identifier. The typed result shall retain that exact event and Recorded
+or QueueFull outcome. Empty, successful and lifecycle-rejected dispatches
+shall read no clock and attempt no event. Older queued events and accepted
+peer publications shall remain intact. Reporting shall add no implicit
+retry, rollback or recovery; explicit retry uses the original event.
+
+Acceptance: verify all no-event paths and lifecycle rejection states,
+exact error/source chain and ownership accessors, self/peer effects before
+failure, selected clearing, peer progress, one clock read, event fields,
+saturation and explicit retry without duplicate reporting on later failed
+dispatch. Inspect cleanup-before-clock ordering. Run identical public-only
+tests in an independent path-dependent Cargo package, checking source
+bytes/SHA256 and metadata. Preserve existing dispatch/work-event tests.

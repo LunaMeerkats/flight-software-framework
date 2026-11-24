@@ -3,6 +3,17 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Returned message-callback failure events — 2026-11-24
+
+RFF-LIB-REQ-020 and [ADR-0045](adr/0045-message-dispatch-failure-events.md)
+add an opt-in dispatch wrapper that completes the existing messaging-owner
+operation before reading time and attempting one error event. A distinct
+message error wrapper preserves callback identity, the concrete error and
+event outcome; the outer messaging error preserves exact selected clearing.
+The [consumer guide](MESSAGE_FAILURE_EVENTS.md) explains no-event paths,
+peer retention and explicit retry. Ordinary work shares only private event
+construction policy; its public error and callback semantics remain intact.
+
 ## Application-owned output handoff — 2026-11-23
 
 RFF-LIB-REQ-019 and [ADR-0044](adr/0044-application-owned-output-handoff.md)

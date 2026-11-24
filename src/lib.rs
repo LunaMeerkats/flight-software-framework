@@ -30,6 +30,9 @@ most one item; the host explicitly invokes work and chooses error policy.
 `docs/EVENT_FILTERING.md` shows explicit severity admission for optional event
 records, with distinct suppression, recording and queue-saturation outcomes.
 
+`docs/MESSAGE_FAILURE_EVENTS.md` shows opt-in diagnostics for returned message
+callback errors, preserving selected cleanup, peer effects and exact failures.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are
@@ -76,7 +79,7 @@ pub use runtime::{
     RuntimeRegistrationError, RuntimeRestartError, RuntimeStartError, RuntimeStopError,
     RuntimeWorkError,
 };
-pub use runtime_events::{FailureEventAttempt, RuntimeWorkEventError};
+pub use runtime_events::{FailureEventAttempt, MessageDispatchEventError, RuntimeWorkEventError};
 pub use scheduling::{
     PeriodicWork, PeriodicWorkCreateError, PeriodicWorkOutcome, ScheduledWork, ScheduledWorkError,
     ScheduledWorkOutcome, WorkSchedule, WorkScheduleCreateError,

@@ -1,12 +1,13 @@
 //! Runtime integration for cooperative application failure events.
 //!
-//! This module composes the existing synchronous work, injected-clock, and
-//! bounded-event boundaries. It adds one opt-in work operation and does not
-//! attach a clock or event queue permanently to the runtime.
+//! This module composes synchronous work and message errors with the
+//! injected-clock and bounded-event boundaries. Reporting does not attach a
+//! clock or event queue permanently to either runtime owner.
 
 use std::error::Error;
 use std::fmt;
 
+use crate::application_messaging::MessageDispatchError;
 use crate::clock::Clock;
 use crate::events::{
     Event, EventEmitOutcome, EventQueue, EventSeverity, EventSource, EventTimestamp,
@@ -55,6 +56,73 @@ impl<EventId: Copy> FailureEventAttempt<EventId> {
 pub struct RuntimeWorkEventError<E, EventId: Copy> {
     work_error: RuntimeWorkError<E>,
     failure_event_attempt: Option<FailureEventAttempt<EventId>>,
+}
+
+/// Message-dispatch failure with an optional cooperative failure-event attempt.
+///
+/// Only [`MessageDispatchError::Application`] carries an attempt. Lifecycle
+/// rejection reads no clock and has no attempt. The enclosing
+/// [`crate::MessagingOperationError`] retains the selected inbox's clear count.
+#[derive(Debug, Eq, PartialEq)]
+pub struct MessageDispatchEventError<E, EventId: Copy> {
+    dispatch_error: MessageDispatchError<E>,
+    failure_event_attempt: Option<FailureEventAttempt<EventId>>,
+}
+
+impl<E, EventId: Copy> MessageDispatchEventError<E, EventId> {
+    /// Borrows the complete error from the ordinary message-dispatch path.
+    #[must_use]
+    pub const fn dispatch_error(&self) -> &MessageDispatchError<E> {
+        &self.dispatch_error
+    }
+
+    /// Borrows the exact application failure-event attempt, when one occurred.
+    #[must_use]
+    pub const fn failure_event_attempt(&self) -> Option<&FailureEventAttempt<EventId>> {
+        self.failure_event_attempt.as_ref()
+    }
+
+    /// Returns the complete dispatch error without event-attempt context.
+    #[must_use]
+    pub fn into_dispatch_error(self) -> MessageDispatchError<E> {
+        self.dispatch_error
+    }
+
+    /// Returns the complete dispatch error and optional event attempt.
+    #[must_use]
+    pub fn into_parts(
+        self,
+    ) -> (
+        MessageDispatchError<E>,
+        Option<FailureEventAttempt<EventId>>,
+    ) {
+        (self.dispatch_error, self.failure_event_attempt)
+    }
+}
+
+impl<E: fmt::Display, EventId: Copy> fmt::Display for MessageDispatchEventError<E, EventId> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.dispatch_error, formatter)?;
+        if let Some(attempt) = self.failure_event_attempt
+            && let EventEmitOutcome::QueueFull { capacity } = attempt.outcome()
+        {
+            write!(
+                formatter,
+                "; failure event was rejected at queue capacity {capacity}"
+            )?;
+        }
+        Ok(())
+    }
+}
+
+impl<E, EventId> Error for MessageDispatchEventError<E, EventId>
+where
+    E: Error + 'static,
+    EventId: Copy + fmt::Debug,
+{
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.dispatch_error)
+    }
 }
 
 impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
@@ -163,14 +231,12 @@ impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
         let failure_event_attempt = match &work_error {
             RuntimeWorkError::Lifecycle(_) => None,
             RuntimeWorkError::Application { application_id, .. } => {
-                let event = Event::new(
-                    EventSource::Application(*application_id),
-                    EventSeverity::Error,
+                Some(FailureEventAttempt::record(
+                    *application_id,
                     failure_event_identifier,
-                    EventTimestamp::from_clock(clock),
-                );
-                let outcome = event_queue.emit(&event);
-                Some(FailureEventAttempt { event, outcome })
+                    clock,
+                    event_queue,
+                ))
             }
         };
 
@@ -178,5 +244,49 @@ impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
             work_error,
             failure_event_attempt,
         }
+    }
+}
+
+impl<E, EventId: Copy> MessageDispatchEventError<E, EventId> {
+    // The messaging owner completes dispatch and selected cleanup first.
+    pub(crate) fn from_dispatch_error<C: Clock + ?Sized>(
+        dispatch_error: MessageDispatchError<E>,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Self {
+        let failure_event_attempt = match &dispatch_error {
+            MessageDispatchError::Lifecycle(_) => None,
+            MessageDispatchError::Application { application_id, .. } => {
+                Some(FailureEventAttempt::record(
+                    *application_id,
+                    failure_event_identifier,
+                    clock,
+                    event_queue,
+                ))
+            }
+        };
+        Self {
+            dispatch_error,
+            failure_event_attempt,
+        }
+    }
+}
+
+impl<EventId: Copy> FailureEventAttempt<EventId> {
+    fn record<C: Clock + ?Sized>(
+        application_id: ApplicationId,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Self {
+        let event = Event::new(
+            EventSource::Application(application_id),
+            EventSeverity::Error,
+            failure_event_identifier,
+            EventTimestamp::from_clock(clock),
+        );
+        let outcome = event_queue.emit(&event);
+        Self { event, outcome }
     }
 }

@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 message-callback failure events — 2026-11-24
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-020 revision 1 | `empty_and_successful_dispatch_do_not_read_clock_or_emit_events`, `every_non_running_state_rejects_without_callback_clock_or_event` and `unknown_identity_preserves_both_inboxes_without_reporting` check no-event outcomes, exact lifecycle errors and unchanged queues. | [Message failure review](MESSAGE_FAILURE_EVENTS_REVIEW.md) |
+| RFF-LIB-REQ-020 revision 1 | `callback_failure_clears_selected_tail_and_keeps_peer_effects_and_progress` checks exact selected clearing, accepted self/peer effects, original error/source chain, one timestamp, event fields and later healthy peer work/FIFO dispatch. | [Message failure review](MESSAGE_FAILURE_EVENTS_REVIEW.md) |
+| RFF-LIB-REQ-020 revision 1 | `saturated_event_retains_error_and_original_timestamp_for_explicit_retry`, `later_failed_dispatch_never_duplicates_the_recorded_event` and `equal_slot_foreign_identity_reports_only_the_receiving_application` check ownership accessors, saturation, explicit retry, no duplicate reporting and retained identity-origin limits. Identical source runs in an independent Cargo package. | [Message failure review](MESSAGE_FAILURE_EVENTS_REVIEW.md) |
+
 ## Stage 5 application-owned output handoff — 2026-11-23
 
 | Requirement | Verification | Record |

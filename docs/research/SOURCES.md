@@ -993,6 +993,28 @@ and source-adoption decisions otherwise remain unchanged.
   Do not invent one or imply Australian certification; evaluate the cited ECSS
   sources on their own terms.
 
+## SRC-RFF-MESSAGE-FAILURE — Existing owner and diagnostic contracts
+
+- Titles: ADR-0012 application dispatch; ADR-0016 returned-work events;
+  ADR-0020 messaging-owned work failure events; current implementation
+- Organisation: Rust Flight Framework, Daniel Smith; Codex implementation
+- Sources: [ADR-0012](../adr/0012-application-message-dispatch.md),
+  [ADR-0016](../adr/0016-returned-work-failure-events.md),
+  [ADR-0020](../adr/0020-messaging-work-failure-events.md),
+  [messaging owner](../../src/messaging_runtime.rs) and
+  [event integration](../../src/runtime_events.rs)
+- Version: input `151511aec980dffe41dc25ab5d406798437459ee`, inspected
+  2026-11-24. Repository contracts are authoritative for local behavior.
+- Informed: dispatch excludes the in-flight message from clearing, retains
+  peer effects and clears accepted self-publications on returned failure.
+  Existing work reporting preserves original errors and reports only after
+  owner cleanup, with one injected timestamp and explicit FIFO saturation.
+- Local treatment: extend that established opt-in policy to message errors
+  under ADR-0045 with a distinct error wrapper and shared private event
+  construction. Compare host construction, unconditional reporting, error
+  translation and a generic callback abstraction. No external code or cFS
+  behavior is imported, and no external research uncertainty is assumed.
+
 ## SRC-RUST-OWNED-OUTPUT — Moving a non-Copy optional record
 
 - Titles: Cell and Option — Rust standard library documentation
