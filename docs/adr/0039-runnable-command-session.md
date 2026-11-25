@@ -4,6 +4,47 @@
 - Date: 2026-11-05
 - Scope: Public-only executable consumer under RFF-LIB-REQ-014
 
+## Message-failure diagnostic follow-up
+
+Decision recorded on 2026-11-25 under RFF-LIB-REQ-014 revision 7.
+
+The completed ADR-0045 API preserves message failures and their event
+attempt, but the runnable command consumer still reports only ordinary
+dispatch errors. Its existing malformed-callback history provides a concrete
+integration case: accepted peer replies survive one malformed producer head
+and its counted cleared tail. Compose these public contracts in the same
+example with an opt-in diagnosed producer turn. Preserve ordinary dispatch
+and its existing occupied-result gate.
+
+The host owns a capacity-one event FIFO, one queue-rejected failure slot
+and one diagnostic output slot. Only the producer uses this diagnostic
+path and it can enter terminal Failed once, bounding retained failures to
+one. Explicit retry preserves the original event and clears retention only
+on Recorded. Separate staging refuses to dequeue while diagnostic output
+is occupied. Reuse SlotOutput's single borrowed writer, fixed 128-byte line
+and accepted-byte cursor with compact mission formatting. The exact raw
+event remains inspectable; rendering errors preserve its slot. Subscribers
+remain selectable while the diagnostic line is pending.
+
+Alternatives considered: a new example would copy a substantial command
+mission; a generic library presenter would widen the API before evidence
+of shared production need. Printing the raw error and stopping would omit
+bounded diagnostic composition and peer progress. A one-shot event take
+before writing would lose the resumable record after partial output.
+Automatic retry inside dispatch would mix admission and callback turns.
+Select separate explicit consumer turns and preserve older examples/tests.
+
+Repository-local sources at input
+`d252d50d77230de7299ed3ed20d6d4fcda5f0d27` inform this decision, recorded
+as SRC-RFF-COMMAND-DIAGNOSTICS in the source register. No new external
+behavior, code or dependency is needed. The
+[guide](../COMMAND_SESSION.md#report-a-returned-command-callback-failure) and
+[focused record](../verification/COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up)
+retain executed evidence. Revisit the single-failure bound if more roles
+report events or producer replacement/recovery becomes supported. Caller
+selection and returning callbacks/clocks/writers remain required. Event
+admission and writer acceptance establish neither durability nor delivery.
+
 ## Context
 
 ADR-0037/0038 demonstrate correlated commands and local results in integration

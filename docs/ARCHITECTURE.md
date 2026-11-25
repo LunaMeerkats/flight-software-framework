@@ -3,6 +3,17 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Runnable command-failure diagnostics — 2026-11-25
+
+RFF-LIB-REQ-014 revision 7 composes message-failure reporting with the
+existing command consumer and bounded writer. The
+[ADR follow-up](adr/0039-runnable-command-session.md#message-failure-diagnostic-follow-up)
+selects an optional diagnosed producer turn, a capacity-one event FIFO,
+one rejected terminal producer event and one output slot. Explicit retry,
+staging and writing preserve event timestamps, FIFO admission and partial
+output ownership while subscribers remain selectable. This demonstrates
+public-API composition without adding a library presenter or transport.
+
 ## Returned message-callback failure events — 2026-11-24
 
 RFF-LIB-REQ-020 and [ADR-0045](adr/0045-message-dispatch-failure-events.md)

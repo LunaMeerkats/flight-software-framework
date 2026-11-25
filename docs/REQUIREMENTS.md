@@ -570,6 +570,29 @@ byte-identical prefix and verify the identical independent binary. Reject
 unexpected starting backlog before attributing any commands. Attribution
 depends on the host knowing every admission to the selected inbox.
 
+Revision 7 supplement (2026-11-25). The example shall offer an opt-in
+producer turn using structured message-failure reporting, preserving the
+occupied-result gate and exact original error, selected clear count and
+event outcome. A finite fault scenario shall distinguish the consumed
+malformed head from its cleared tail and retain previously accepted peer
+replies without inventing a successful command result.
+
+The host shall own a capacity-one event FIFO, at most one queue-rejected
+producer failure and one diagnostic output slot. The single terminal
+producer failure bounds retention. Explicit retry shall preserve the
+original timestamp and clear retention only after admission. Dequeue shall
+pause while output is occupied. One bounded rendered line and accepted-byte
+cursor shall preserve the exact diagnostic through partial writes/errors.
+Healthy subscribers shall remain selectable while that line is pending.
+
+Acceptance: preserve every previous history and the exact transcript prefix.
+Verify admitted failure/cleanup, full-queue retention and repeated retry,
+no duplicate admission, occupied-result callback/clock suppression, output
+suffix recovery, no dequeue while occupied and independent peer progress.
+Verify compact rendering at its supported field bounds and the identical
+independent binary. Runtime errors, event admission, subscriber handling
+and writer acceptance remain separate observations.
+
 ### RFF-LIB-REQ-015 — Read-only subscription inspection
 
 Revision 1 (2026-11-06). A host shall be able to query whether a configured

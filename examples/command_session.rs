@@ -12,12 +12,14 @@ use std::error::Error;
 use std::fmt;
 use std::io::{self, Cursor, Read, Write};
 use std::num::NonZeroU8;
+use std::time::Duration;
 
 use rust_flight_framework::{
-    Application, ApplicationId, ApplicationMessageContext, ApplicationWorkContext, DeliveryStatus,
-    Message, MessageCreateError, MessageDispatchError, MessageDispatchOutcome,
-    MessagingApplication, MessagingOperationError, MessagingRuntime, PublishToError, Runtime,
-    RuntimeInboxConfig,
+    Application, ApplicationId, ApplicationMessageContext, ApplicationWorkContext, Clock,
+    DeliveryStatus, Event, EventEmitOutcome, EventQueue, EventQueueCreateError, EventSeverity,
+    EventSource, EventTimestamp, ManualClock, Message, MessageCreateError, MessageDispatchError,
+    MessageDispatchEventError, MessageDispatchOutcome, MessagingApplication,
+    MessagingOperationError, MessagingRuntime, PublishToError, Runtime, RuntimeInboxConfig,
 };
 
 const OUTPUT_LINE_CAPACITY: usize = 128;
@@ -189,6 +191,7 @@ struct CommandResult {
 struct HostSlots {
     result: Cell<Option<CommandResult>>,
     outputs: [Cell<Option<Reply>>; 2],
+    diagnostic: Cell<Option<DiagnosticLine>>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -224,6 +227,33 @@ enum Actor<'a> {
 
 type Owner<'a> = MessagingRuntime<Actor<'a>, Topic, 3>;
 type DispatchError = MessagingOperationError<MessageDispatchError<SessionError>>;
+type DiagnosedDispatchError =
+    MessagingOperationError<MessageDispatchEventError<SessionError, DiagnosticId>>;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum DiagnosticId {
+    BeforeFault,
+    CommandFailed,
+}
+
+#[derive(Clone, Copy, Eq, PartialEq)]
+struct DiagnosticLine {
+    event: Event<DiagnosticId>,
+    producer: ApplicationId,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum DiagnosticStage {
+    SlotOccupied,
+    Empty,
+    Staged,
+}
+
+struct CommandDiagnostics {
+    producer: ApplicationId,
+    events: EventQueue<DiagnosticId>,
+    rejected: Option<Event<DiagnosticId>>,
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum HostTurn {
@@ -436,6 +466,31 @@ impl<'a> Session<'a> {
             .map(HostTurn::Dispatch)
     }
 
+    fn producer_turn_with_diagnostics(
+        &mut self,
+        diagnostics: &mut CommandDiagnostics,
+        clock: &(impl Clock + ?Sized),
+    ) -> Result<HostTurn, DiagnosedDispatchError> {
+        if self.slots.result.get().is_some() {
+            return Ok(HostTurn::SlotOccupied);
+        }
+        let result = self.owner.dispatch_one_with_failure_event(
+            self.producer,
+            DiagnosticId::CommandFailed,
+            clock,
+            &mut diagnostics.events,
+        );
+        if let Err(error) = &result
+            && let Some(attempt) = error.operation_error().failure_event_attempt()
+            && matches!(attempt.outcome(), EventEmitOutcome::QueueFull { .. })
+        {
+            // This session has one producer, whose first callback error is
+            // terminal. No later turn can create another failure attempt.
+            diagnostics.rejected = Some(*attempt.event());
+        }
+        result.map(HostTurn::Dispatch)
+    }
+
     fn subscriber_turn(&mut self, subscriber: Subscriber) -> Result<HostTurn, DispatchError> {
         let index = subscriber as usize;
         if self.slots.outputs[index].get().is_some() {
@@ -444,6 +499,64 @@ impl<'a> Session<'a> {
         self.owner
             .dispatch_one(self.subscribers[index])
             .map(HostTurn::Dispatch)
+    }
+}
+
+impl fmt::Debug for DiagnosticLine {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let elapsed = self.event.timestamp().elapsed();
+        write!(
+            formatter,
+            "t={}.{:09} source=",
+            elapsed.as_secs(),
+            elapsed.subsec_nanos()
+        )?;
+        match self.event.source() {
+            EventSource::Framework => formatter.write_str("framework")?,
+            EventSource::Application(id) if id == self.producer => {
+                formatter.write_str("producer")?;
+            }
+            EventSource::Application(id) => write!(formatter, "unknown({id:?})")?,
+        }
+        write!(
+            formatter,
+            " severity={:?} event={:?}",
+            self.event.severity(),
+            self.event.identifier(),
+        )
+    }
+}
+
+impl CommandDiagnostics {
+    fn new(producer: ApplicationId) -> Result<Self, EventQueueCreateError> {
+        Ok(Self {
+            producer,
+            events: EventQueue::new(1)?,
+            rejected: None,
+        })
+    }
+
+    fn retry_turn(&mut self) -> Option<EventEmitOutcome> {
+        let event = self.rejected?;
+        let outcome = self.events.emit(&event);
+        if outcome == EventEmitOutcome::Recorded {
+            self.rejected = None;
+        }
+        Some(outcome)
+    }
+
+    fn stage_turn(&mut self, output: &Cell<Option<DiagnosticLine>>) -> DiagnosticStage {
+        if output.get().is_some() {
+            return DiagnosticStage::SlotOccupied;
+        }
+        let Some(event) = self.events.dequeue() else {
+            return DiagnosticStage::Empty;
+        };
+        output.set(Some(DiagnosticLine {
+            event,
+            producer: self.producer,
+        }));
+        DiagnosticStage::Staged
     }
 }
 
@@ -617,7 +730,68 @@ fn run_session(output: &mut impl Write) -> Result<(), Box<dyn Error>> {
     observe_reply(&mut session, Subscriber::First, output)?;
     observe_reply(&mut session, Subscriber::Second, output)?;
     recover_ingress(&mut session, id, output)?;
-    observe_stop_cleanup(&mut session, id, output)
+    observe_stop_cleanup(&mut session, id, output)?;
+    observe_message_failure(&mut session, output)
+}
+
+fn observe_message_failure(
+    session: &mut Session<'_>,
+    output: &mut impl Write,
+) -> Result<(), Box<dyn Error>> {
+    let accepted = session.new_command(13)?;
+    let Command::New { id, .. } = accepted else {
+        return Err(SessionError::InvalidFrame.into());
+    };
+    send(session, accepted, output)?;
+    let mut diagnostics = CommandDiagnostics::new(session.producer)?;
+    let older = Event::new(
+        EventSource::Framework,
+        EventSeverity::Warning,
+        DiagnosticId::BeforeFault,
+        EventTimestamp::from_elapsed(Duration::ZERO),
+    );
+    if diagnostics.events.emit(&older) != EventEmitOutcome::Recorded {
+        return Err(io::Error::other("expected room for the older diagnostic").into());
+    }
+    let malformed = Message::try_new(Topic::Command, &[2, 0])?;
+    if session.owner.publish_to(session.producer, &malformed)? != DeliveryStatus::Delivered {
+        return Err(io::Error::other("expected the malformed head to enter").into());
+    }
+    admit(session, Command::Retry(id), output)?;
+    let clock = ManualClock::from_elapsed(Duration::from_secs(1));
+    let error = match session.producer_turn_with_diagnostics(&mut diagnostics, &clock) {
+        Err(error) => error,
+        Ok(_) => return Err(io::Error::other("expected a returned command error").into()),
+    };
+    writeln!(output, "producer returned error: {error}")?;
+    let attempt = error
+        .operation_error()
+        .failure_event_attempt()
+        .ok_or_else(|| io::Error::other("expected a failure event attempt"))?;
+    writeln!(output, "failure event: {:?}", attempt.outcome())?;
+    writeln!(
+        output,
+        "diagnostic stage: {:?}",
+        diagnostics.stage_turn(&session.slots.diagnostic)
+    )?;
+    writeln!(output, "diagnostic retry: {:?}", diagnostics.retry_turn())?;
+    let line = SlotOutput::new(&session.slots.diagnostic, output, "diagnostic")?;
+    session.subscriber_turn(Subscriber::First)?;
+    line.finish()?;
+    observe_reply(session, Subscriber::First, output)?;
+    writeln!(
+        output,
+        "diagnostic stage: {:?}",
+        diagnostics.stage_turn(&session.slots.diagnostic)
+    )?;
+    SlotOutput::new(&session.slots.diagnostic, output, "diagnostic")?.finish()?;
+    observe_reply(session, Subscriber::Second, output)?;
+    writeln!(
+        output,
+        "diagnostic retry after admission: {:?}",
+        diagnostics.retry_turn()
+    )?;
+    Ok(())
 }
 
 fn recover_ingress(
@@ -765,7 +939,7 @@ fn observe_reply(
 
 #[cfg(test)]
 mod tests {
-    use rust_flight_framework::ApplicationState;
+    use rust_flight_framework::{ApplicationState, FrameworkInstant};
 
     use super::*;
 
@@ -773,6 +947,24 @@ mod tests {
         "result: CommandResult { command: New { id: OperationId(1), value: 3 }, ",
         "effect: ReplyAccepted([true, true]) }"
     );
+
+    const DIAGNOSTIC_FIFO_OUTPUT: &str = concat!(
+        "diagnostic: t=0.000000000 source=framework severity=Warning event=BeforeFault\n",
+        "diagnostic: t=0.000000000 source=producer severity=Error event=CommandFailed\n",
+    );
+
+    #[derive(Default)]
+    struct CountingClock {
+        elapsed: Cell<Duration>,
+        reads: Cell<usize>,
+    }
+
+    impl Clock for CountingClock {
+        fn now(&self) -> FrameworkInstant {
+            self.reads.set(self.reads.get() + 1);
+            FrameworkInstant::from_elapsed(self.elapsed.get())
+        }
+    }
 
     #[derive(Default)]
     struct ShortReader {
@@ -867,6 +1059,7 @@ mod tests {
             .into_iter()
             .chain(expected_ingress_recovery())
             .chain(expected_stop_cleanup())
+            .chain(expected_message_failure())
             .collect();
         assert_eq!(actual.lines().collect::<Vec<_>>(), expected);
     }
@@ -1108,6 +1301,327 @@ mod tests {
             "result: CommandResult { command: Retry(OperationId(2)), effect: NoMatch }",
             "producer turn after restart: Dispatch(InboxEmpty)",
         ]
+    }
+
+    fn expected_message_failure() -> [&'static str; 14] {
+        [
+            "ingress New { id: OperationId(7), value: 13 }: Delivered",
+            "producer turn: Dispatch(Dispatched)",
+            concat!(
+                "result: CommandResult { command: New { id: OperationId(7), value: 13 }, ",
+                "effect: ReplyAccepted([true, true]) }"
+            ),
+            "ingress Retry(OperationId(7)): Delivered",
+            concat!(
+                "producer returned error: application ApplicationId(2) returned a message error: ",
+                "invalid command or reply frame; failure event was rejected at queue capacity 1; ",
+                "discarded 1 queued deliveries"
+            ),
+            "failure event: QueueFull { capacity: 1 }",
+            "diagnostic stage: Staged",
+            "diagnostic retry: Some(Recorded)",
+            "diagnostic: t=0.000000000 source=framework severity=Warning event=BeforeFault",
+            "subscriber 0: Reply { id: OperationId(7), value: 13 }",
+            "diagnostic stage: Staged",
+            "diagnostic: t=1.000000000 source=producer severity=Error event=CommandFailed",
+            "subscriber 1: Reply { id: OperationId(7), value: 13 }",
+            "diagnostic retry after admission: None",
+        ]
+    }
+
+    fn queue_malformed_head_and_tail(session: &mut Session<'_>) -> Command {
+        let accepted = session.new_command(5).unwrap();
+        assert_eq!(
+            invoke(session, accepted),
+            CommandEffect::ReplyAccepted([true; 2])
+        );
+        let malformed = Message::try_new(Topic::Command, &[2, 0]).unwrap();
+        assert_eq!(
+            session.owner.publish_to(session.producer, &malformed),
+            Ok(DeliveryStatus::Delivered)
+        );
+        assert_eq!(
+            session.enqueue(Command::Retry(id(accepted))),
+            Ok(DeliveryStatus::Delivered)
+        );
+        accepted
+    }
+
+    fn before_fault_event() -> Event<DiagnosticId> {
+        Event::new(
+            EventSource::Framework,
+            EventSeverity::Warning,
+            DiagnosticId::BeforeFault,
+            EventTimestamp::from_elapsed(Duration::ZERO),
+        )
+    }
+
+    fn diagnose_behind_older_event(
+        session: &mut Session<'_>,
+        clock: &impl Clock,
+    ) -> (CommandDiagnostics, DiagnosedDispatchError) {
+        let mut diagnostics = CommandDiagnostics::new(session.producer).unwrap();
+        assert_eq!(
+            diagnostics.events.emit(&before_fault_event()),
+            EventEmitOutcome::Recorded
+        );
+        let error = session
+            .producer_turn_with_diagnostics(&mut diagnostics, clock)
+            .unwrap_err();
+        (diagnostics, error)
+    }
+
+    #[test]
+    fn diagnosed_failure_preserves_error_cleanup_and_accepted_peer_replies() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let accepted = queue_malformed_head_and_tail(&mut session);
+        let clock = CountingClock::default();
+        clock.elapsed.set(Duration::from_millis(750));
+        let mut diagnostics = CommandDiagnostics::new(session.producer).unwrap();
+        let error = session
+            .producer_turn_with_diagnostics(&mut diagnostics, &clock)
+            .unwrap_err();
+        assert_eq!(error.discarded_deliveries(), 1);
+        assert_eq!(
+            error.operation_error().dispatch_error(),
+            &MessageDispatchError::Application {
+                application_id: session.producer,
+                source: SessionError::InvalidFrame,
+            }
+        );
+        let attempt = error.operation_error().failure_event_attempt().unwrap();
+        let expected = Event::new(
+            EventSource::Application(session.producer),
+            EventSeverity::Error,
+            DiagnosticId::CommandFailed,
+            EventTimestamp::from_elapsed(Duration::from_millis(750)),
+        );
+        assert_eq!(attempt.outcome(), EventEmitOutcome::Recorded);
+        assert_eq!(attempt.event(), &expected);
+        assert_eq!(clock.reads.get(), 1);
+        assert_eq!(diagnostics.rejected, None);
+        assert_eq!(
+            session.owner.state(session.producer),
+            Ok(ApplicationState::Failed)
+        );
+        assert_eq!(session.owner.pending(session.producer), Ok(0));
+        assert_eq!(slots.result.get(), None);
+        for subscriber in [Subscriber::First, Subscriber::Second] {
+            assert_eq!(
+                drain(&mut session, subscriber),
+                Reply {
+                    id: id(accepted),
+                    value: 5
+                }
+            );
+        }
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Staged
+        );
+        assert_eq!(slots.diagnostic.take().unwrap().event, expected);
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Empty
+        );
+    }
+
+    #[test]
+    fn rejected_diagnostic_retries_original_timestamp_once_after_space_opens() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        queue_malformed_head_and_tail(&mut session);
+        let clock = CountingClock::default();
+        clock.elapsed.set(Duration::from_secs(1));
+        let older = before_fault_event();
+        let (mut diagnostics, error) = diagnose_behind_older_event(&mut session, &clock);
+        let attempt = error.operation_error().failure_event_attempt().unwrap();
+        let original = *attempt.event();
+        assert_eq!(
+            attempt.outcome(),
+            EventEmitOutcome::QueueFull { capacity: 1 }
+        );
+        assert_eq!(diagnostics.rejected, Some(original));
+        clock.elapsed.set(Duration::from_secs(99));
+        for _ in 0..2 {
+            assert_eq!(
+                diagnostics.retry_turn(),
+                Some(EventEmitOutcome::QueueFull { capacity: 1 })
+            );
+            assert_eq!(diagnostics.rejected, Some(original));
+            let error = session
+                .producer_turn_with_diagnostics(&mut diagnostics, &clock)
+                .unwrap_err();
+            assert_eq!(error.discarded_deliveries(), 0);
+            assert_eq!(error.operation_error().failure_event_attempt(), None);
+        }
+        assert_eq!(clock.reads.get(), 1);
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Staged
+        );
+        assert_eq!(slots.diagnostic.get().unwrap().event, older);
+        assert_eq!(diagnostics.retry_turn(), Some(EventEmitOutcome::Recorded));
+        assert_eq!(diagnostics.rejected, None);
+        assert_eq!(diagnostics.retry_turn(), None);
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::SlotOccupied
+        );
+        assert_eq!(diagnostics.events.pending(), 1);
+        slots.diagnostic.set(None);
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Staged
+        );
+        assert_eq!(slots.diagnostic.take().unwrap().event, original);
+        assert_eq!(original.timestamp().elapsed(), Duration::from_secs(1));
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Empty
+        );
+    }
+
+    #[test]
+    fn occupied_result_suppresses_diagnosed_dispatch_clock_and_event() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let command = session.new_command(5).unwrap();
+        session.enqueue(command).unwrap();
+        session.producer_turn().unwrap();
+        let result = slots.result.get();
+        let malformed = Message::try_new(Topic::Command, &[2, 0]).unwrap();
+        session
+            .owner
+            .publish_to(session.producer, &malformed)
+            .unwrap();
+        let clock = CountingClock::default();
+        let mut diagnostics = CommandDiagnostics::new(session.producer).unwrap();
+        for _ in 0..2 {
+            assert_eq!(
+                session.producer_turn_with_diagnostics(&mut diagnostics, &clock),
+                Ok(HostTurn::SlotOccupied)
+            );
+            assert_eq!(slots.result.get(), result);
+            assert_eq!(session.owner.pending(session.producer), Ok(1));
+            assert_eq!(
+                session.owner.state(session.producer),
+                Ok(ApplicationState::Running)
+            );
+            assert_eq!(clock.reads.get(), 0);
+            assert!(diagnostics.events.is_empty());
+            assert_eq!(diagnostics.rejected, None);
+        }
+        slots.result.set(None);
+        assert!(
+            session
+                .producer_turn_with_diagnostics(&mut diagnostics, &clock)
+                .is_err()
+        );
+        assert_eq!(clock.reads.get(), 1);
+        assert_eq!(diagnostics.events.pending(), 1);
+    }
+
+    #[test]
+    fn diagnostic_write_retry_preserves_fifo_suffix_and_peer_progress() {
+        let slots = HostSlots::default();
+        let mut session = Session::new(&slots).unwrap();
+        let accepted = queue_malformed_head_and_tail(&mut session);
+        let older = before_fault_event();
+        let (mut diagnostics, _) = diagnose_behind_older_event(&mut session, &ManualClock::new());
+        let failure = diagnostics.rejected.unwrap();
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Staged
+        );
+        assert_eq!(diagnostics.retry_turn(), Some(EventEmitOutcome::Recorded));
+        let mut writer = ScriptedWriter::default();
+        let mut output = SlotOutput::new(&slots.diagnostic, &mut writer, "diagnostic").unwrap();
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Pending);
+        for kind in [
+            io::ErrorKind::WouldBlock,
+            io::ErrorKind::WriteZero,
+            io::ErrorKind::InvalidData,
+        ] {
+            assert_eq!(output.write_turn().unwrap_err().kind(), kind);
+            assert_eq!(output.writer.accepted, b"diagnos");
+            assert_eq!(slots.diagnostic.get().unwrap().event, older);
+            assert_eq!(
+                diagnostics.stage_turn(&slots.diagnostic),
+                DiagnosticStage::SlotOccupied
+            );
+            assert_eq!(diagnostics.events.pending(), 1);
+        }
+        let peer = drain(&mut session, Subscriber::Second);
+        assert_eq!(
+            peer,
+            Reply {
+                id: id(accepted),
+                value: 5
+            }
+        );
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Accepted);
+        assert_eq!(slots.diagnostic.get(), None);
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Staged
+        );
+        assert_eq!(slots.diagnostic.get().unwrap().event, failure);
+        assert_eq!(output.write_turn().unwrap(), LineWrite::Accepted);
+        assert_eq!(slots.diagnostic.get().unwrap().event, failure);
+        assert_eq!(output.writer.calls, 5);
+        output.finish().unwrap();
+        SlotOutput::new(&slots.diagnostic, &mut writer, "diagnostic")
+            .unwrap()
+            .finish()
+            .unwrap();
+        assert_eq!(writer.accepted, DIAGNOSTIC_FIFO_OUTPUT.as_bytes());
+        assert_eq!(
+            diagnostics.stage_turn(&slots.diagnostic),
+            DiagnosticStage::Empty
+        );
+    }
+
+    #[test]
+    fn compact_diagnostic_rendering_fits_supported_field_bounds() {
+        let slots = HostSlots::default();
+        let session = Session::new(&slots).unwrap();
+        for source in [
+            EventSource::Framework,
+            EventSource::Application(session.producer),
+        ] {
+            for severity in [
+                EventSeverity::Informational,
+                EventSeverity::Warning,
+                EventSeverity::Error,
+            ] {
+                for identifier in [DiagnosticId::BeforeFault, DiagnosticId::CommandFailed] {
+                    let event = Event::new(
+                        source,
+                        severity,
+                        identifier,
+                        EventTimestamp::from_elapsed(Duration::MAX),
+                    );
+                    slots.diagnostic.set(Some(DiagnosticLine {
+                        event,
+                        producer: session.producer,
+                    }));
+                    let mut writer = Vec::new();
+                    let output =
+                        SlotOutput::new(&slots.diagnostic, &mut writer, "diagnostic").unwrap();
+                    assert!(output.line.position() as usize <= OUTPUT_LINE_CAPACITY);
+                    assert_eq!(slots.diagnostic.get().unwrap().event, event);
+                    output.finish().unwrap();
+                    assert_eq!(slots.diagnostic.get(), None);
+                    assert!(
+                        String::from_utf8(writer)
+                            .unwrap()
+                            .contains("18446744073709551615.999999999")
+                    );
+                }
+            }
+        }
     }
 
     #[test]

@@ -7,6 +7,14 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-014 revision 7 integrates the message-failure operation into
+the runnable command session. The
+[diagnostic recipe](COMMAND_SESSION.md#report-a-returned-command-callback-failure)
+joins exact typed errors, bounded event admission/retry and retained host
+output while preserving healthy subscriber progress. The
+[focused follow-up](verification/COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up)
+records actual verification and its single-terminal-producer bound.
+
 RFF-LIB-REQ-020 and [ADR-0045](adr/0045-message-dispatch-failure-events.md)
 select opt-in structured diagnostics for returned message-callback errors.
 The operation preserves ordinary dispatch/cleanup, concrete message errors

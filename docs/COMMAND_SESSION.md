@@ -127,6 +127,41 @@ requests. A returned message callback error consumes the attempted head
 separately from the counted discarded tail. The fixed script uses
 successful stop and leaves any resubmission decision with the host.
 
+## Report a returned command callback failure
+
+The final scenario opts into structured reporting through
+`producer_turn_with_diagnostics`. Like the ordinary producer turn, it checks
+the result slot before dispatch. The framework commits Failed and clears
+the selected inbox before reading the injected clock and attempting one
+Error event. The returned typed error still owns its original callback
+error, exact tail-clear count and Recorded or QueueFull attempt.
+
+The host first produces replies accepted by both subscribers, then places
+one malformed command directly into the producer inbox followed by a valid
+tail. This explicit fault injection bypasses validated ingress. The failed
+head is consumed; the clear count describes only the queued tail. No new
+successful command result appears. Previously accepted replies remain
+available for healthy subscriber dispatch.
+
+CommandDiagnostics owns a capacity-one event FIFO and one rejected producer
+event; HostSlots owns one staged diagnostic. Only this producer uses the diagnosed
+turn and it can fail terminally once. That bounds the rejected-event slot;
+using the recipe for more applications or recovery needs a new bound.
+Explicit retry offers the original event once and clears retention only
+after admission, preserving its original timestamp. It neither dispatches
+commands nor drains the FIFO. A staging turn moves at most one queued event
+into output and refuses to dequeue while that output is occupied.
+
+The compact diagnostic renderer retains the exact event behind its line.
+The existing scoped SlotOutput keeps one writer and its accepted-byte cursor
+through short writes and returned errors. Subscribers can dispatch into
+their own output slots while that line is pending; writing those replies
+waits for the shared writer to become available. The fixed script finishes
+each line after positive writes and exits on an I/O error. A host choosing
+to retry must retain the same presenter and writer. Tests separately cover
+event saturation, retry and output errors. These are local observations,
+without recovery, reliable transport or durable delivery.
+
 ## Write a result or reply
 
 The host opens a `SlotOutput` over the selected result or reply slot and its
@@ -160,7 +195,10 @@ reply inboxes of capacity one, a three-byte maximum message payload, one pending
 reply with two acceptance flags, one local result, two local outputs, one
 issuer for IDs 1..=255, one saved ingress command, one two-byte input buffer
 with its read position and one fixed rendered line with an accepted-byte
-offset. Setup uses the framework's
+offset. The optional diagnostic path adds one capacity-one event FIFO, one
+retained queue-rejected producer event, one staged diagnostic and a manual
+clock. Its scoped line shares the existing 128-byte bound and writer policy.
+Setup uses the framework's
 finite-capacity constructors.
 The host owns `HostSlots` and applications borrow its `Cell` slots directly.
 The host selects every callback and keeps each occupied record until its line

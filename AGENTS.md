@@ -176,6 +176,10 @@ translate NASA C source.
   binary recipe verify the same source without importing historical test fixtures.
   One finite reader stages New requests in the saved command slot and pauses
   while it is occupied. Read, admission, dispatch and output use separate turns.
+  An opt-in producer turn composes message-failure reporting with one event
+  FIFO slot, one rejected terminal producer event and one diagnostic output.
+  Explicit retry, staging and writes preserve bounded ownership while healthy
+  subscribers remain selectable; more reporting roles need a new retry bound.
 - `rustfmt.toml` and `clippy.toml`: stable formatting and selected Clippy
   configuration.
 - `Cargo.toml` and `Cargo.lock`: root package/workspace configuration and

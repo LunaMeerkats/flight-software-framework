@@ -13,6 +13,27 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-COMMAND-DIAGNOSTICS — Runnable failure/output composition
+
+- Titles: Command session; message-dispatch failure events; bounded event
+  output; existing public API and consumer tests
+- Organisation: Rust Flight Framework, Daniel Smith; Codex implementation
+- Sources: [command session](../../examples/command_session.rs),
+  [message-error consumer](../../tests/message_dispatch_events.rs),
+  [event writer](../../examples/event_output.rs) and
+  [ADR-0045](../adr/0045-message-dispatch-failure-events.md)
+- Version: input `d252d50d77230de7299ed3ed20d6d4fcda5f0d27`, inspected
+  2026-11-25. These are authoritative local contracts and existing evidence.
+- Informed: selected cleanup precedes reporting; event saturation preserves
+  the exact original attempt; occupied host slots gate corresponding turns;
+  a retained writer cursor resumes only the unwritten suffix.
+- Local treatment: compose these contracts in an opt-in command producer
+  path with one rejected terminal failure and one diagnostic output slot.
+  Compare a copied example, generic library presenter, immediate output and
+  automatic retry in the [ADR-0039 follow-up](../adr/0039-runnable-command-session.md#message-failure-diagnostic-follow-up).
+  No new external fact, upstream code, dependency or compatibility assumption
+  is needed. Further roles or recovery require re-evaluating retention.
+
 ## SRC-RFF-RETAINED-PRIORITY — Host admission gating
 
 - Rust Flight Framework input `dba77f744f9151d515d7110259f425a64254abb1`,

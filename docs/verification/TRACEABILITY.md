@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 runnable command diagnostics — 2026-11-25
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-014 revision 7 | `diagnosed_failure_preserves_error_cleanup_and_accepted_peer_replies` checks exact callback error, cleared tail, timestamp, admitted event, no false command result and healthy subscriber replies. | [Command diagnostic review](COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up) |
+| RFF-LIB-REQ-014 revision 7 | `rejected_diagnostic_retries_original_timestamp_once_after_space_opens` and `occupied_result_suppresses_diagnosed_dispatch_clock_and_event` check bounded retention, saturation, no duplicates and occupied-result suppression. | [Command diagnostic review](COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up) |
+| RFF-LIB-REQ-014 revision 7 | `diagnostic_write_retry_preserves_fifo_suffix_and_peer_progress`, `compact_diagnostic_rendering_fits_supported_field_bounds` and the extended exact transcript check output ownership, FIFO staging, errors, field bounds and peer progress. The identical independent binary retains all prior histories and transcript prefix. | [Command diagnostic review](COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up) |
+
 ## Stage 5 message-callback failure events — 2026-11-24
 
 | Requirement | Verification | Record |

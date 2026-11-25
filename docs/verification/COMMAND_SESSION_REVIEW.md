@@ -683,3 +683,77 @@ combined sample matched the input run. Hosted Rust/Cargo 1.99.1, rustfmt
 Codex accepts this bounded serial host checkpoint. The evidence covers
 successful stop with known admissions and a retained earlier callback
 result. The record revision receives a separate hosted check.
+
+## Message-failure diagnostics follow-up
+
+RFF-LIB-REQ-014 revision 7 and the
+[ADR-0039 follow-up](../adr/0039-runnable-command-session.md#message-failure-diagnostic-follow-up)
+compose the completed message-failure API into the existing executable.
+Input `d252d50d77230de7299ed3ed20d6d4fcda5f0d27` was clean on main and
+matched refreshed origin/main. Exact input
+[run 45329451567](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45329451567),
+job 138226818201, passes all 20 steps and logs the expected checkout.
+
+The 2026-11-25 locked input baseline passes 311 workspace tests,
+format/check/Clippy, warnings-denied rustdoc and whitespace. Both the
+command session and combined sample run successfully. The source-policy
+input audit covers 60 Rust files, 29,418 physical and 1,550 comment-only
+lines with zero width findings and three unchanged expectations. All 803
+relative paths, 88 fragments and 271 exact test references in 130 Markdown
+files resolve. No source-quality policy, dependencies or workflow change.
+Local Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98 remain;
+input hosted tools are Rust/Cargo 1.100.0, rustfmt 1.11.0-stable and Clippy
+0.1.100 on runner 2.338.2/image `20261116.315.1`.
+
+Required completion commands:
+
+```powershell
+cargo fmt --all -- --check
+cargo check --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-features
+$env:RUSTDOCFLAGS = '-D warnings'
+cargo doc --locked --workspace --all-features --no-deps
+git diff --check
+cargo test --locked --example command_session
+cargo run --locked --example command_session
+cargo test --locked --test host_adapters
+cargo test --locked --test host_sample
+cargo run --locked --example host-echo
+```
+
+All completion commands above pass: 316 workspace tests, 24 focused example
+tests, 14 adapter tests and five sample tests. All 222 combined sample stdout
+lines match input. Five new histories cover admitted failure/cleanup and
+peer replies, saturated original-timestamp retry, occupied-result suppression,
+FIFO/suffix recovery with peer progress and maximum supported render fields.
+All 19 previous command histories remain. An initial expected-error-string
+mismatch, must-use warning and test function-size/drop findings were corrected
+before the accepted runs; no waivers or policy thresholds changed.
+
+The identical independent binary recipe passes creation, offline path
+dependency setup, all-target locked offline check/Clippy, 24 tests, run and
+metadata at
+`C:/Users/drrsm/AppData/Local/Temp/rff-command-session-adb43dd155dc467b99fc623c3dbef877`.
+Metadata shows one edition 2024 binary workspace member, its sole framework
+path dependency and a two-package graph. The framework has no dependencies.
+Exact source equality covers 77,697 bytes and 2,155 lines, SHA256
+`14b0690e4b64afbd2a9b32aa5fc9fd331255476ab2e8f1a7a75be6b8e5e785d4`
+and Git blob `b01d2741825ec0e14feea121d81e506628c9d616`. Both executables
+emit the same 65 lines/3,764 bytes, SHA256
+`97d7e69bee76be53459b8c521daa1cb56edfd03aaba7c56a688820e00541d354`,
+including the exact 51-line/2,904-byte input prefix.
+
+Root Codex and independent Codex accept the complete implementation source
+and documentation diff without findings. The final audit covers 60 Rust
+files, 29,932 physical and 1,552 comment-only lines with zero width findings
+and three unchanged fulfilled expectations. All 817 relative paths, 100
+fragments and 276 exact test references in 130 Markdown files resolve.
+All 12 changed Markdown documents pass rendered content/structure review;
+this is not browser pixel QA. Publication receives exact-head inspection.
+Temporary raw logs, source hashes, metadata, audits and hosted evidence are saved under
+`target/review-2026-11-25-command-diagnostics` and are not maintained gates.
+The bound is one terminal producer failure; further roles or recovery need
+a new retention policy. Callbacks, clocks and writers must return. Event
+admission, subscriber handling and writer acceptance remain distinct local
+observations without physical/durable delivery or recovery guarantees.
