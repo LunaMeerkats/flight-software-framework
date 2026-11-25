@@ -19,6 +19,10 @@ Package 0.0.0 remains unpublished with provisional APIs.
   checks. All 24 focused command tests also pass in the identical independent
   binary; metadata, source bytes/hash and stdout match. The exact prior
   51-line transcript is preserved as a prefix. Combined sample is unchanged.
+- Implementation `04521873273b581a3e6b529ff3e5a14f8e4aff34` reached
+  origin/main by fast-forward. Exact hosted run 45555614969 passes all 20
+  steps, 316 tests and separate adapter/sample checks at that checkout.
+  The combined sample matches all 222 input stdout lines.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy
   0.1.98. Input hosted tools remain Rust/Cargo 1.100.0, rustfmt
   1.11.0-stable, Clippy 0.1.100, runner 2.338.2 and Windows image
@@ -36,12 +40,13 @@ APIs, ownership and cleanup policies remain unchanged by this consumer.
 
 ## Work in progress
 
-Implementation and local/independent binary checks are complete. Root and
-independent Codex source review accepts the increment. The
+No implementation remains. Root and independent Codex accept the complete
+source/document/diff review and exact implementation hosted evidence. The
 [focused follow-up](verification/COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up)
-records actual evidence. Final document review and exact publication
-verification are separate; source/link/width and all 12 rendered-document
-reviews pass. Exact publication verification remains before stopping.
+records actual evidence, including passing source/link/width and all 12
+rendered-document reviews. Evidence-only completion receives separate
+review and exact hosted inspection; its final result is retained in
+automation memory.
 
 ## Highest risks and uncertainties
 
@@ -66,5 +71,6 @@ Avoid extending retry machinery without a demonstrated use.
 
 ## Latest run
 
-2026-11-25. Command-session diagnostics pass local and independent checks
-with no source review findings; document/publication evidence is pending.
+2026-11-25. Command-session diagnostics are implemented, locally and
+independently verified, reviewed and published. Exact implementation CI
+passes all 20 steps. Stop at this bounded checkpoint.

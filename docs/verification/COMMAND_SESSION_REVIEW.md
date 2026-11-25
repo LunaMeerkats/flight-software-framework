@@ -750,7 +750,21 @@ files, 29,932 physical and 1,552 comment-only lines with zero width findings
 and three unchanged fulfilled expectations. All 817 relative paths, 100
 fragments and 276 exact test references in 130 Markdown files resolve.
 All 12 changed Markdown documents pass rendered content/structure review;
-this is not browser pixel QA. Publication receives exact-head inspection.
+this is not browser pixel QA.
+
+The reviewed staged tree `567b732f9a355845f57bf3eb3cca844796d93102`
+matches implementation `04521873273b581a3e6b529ff3e5a14f8e4aff34`,
+published to origin/main by ordinary fast-forward. Root and independent
+Codex inspect exact
+[run 45555614969](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45555614969),
+job 139006820729: all 20 steps pass at the logged implementation SHA,
+including 316 workspace tests, all 24 command histories, 14 separate
+adapter tests, five separate sample tests, warnings-denied rustdoc and
+both whitespace checks. All 222 combined sample stdout lines match input.
+Hosted tools, runner and Windows image match the input versions above.
+Codex accepts this bounded public-consumer checkpoint. This evidence-only
+completion receives its own complete review and exact hosted inspection;
+final record-head evidence remains in automation memory.
 Temporary raw logs, source hashes, metadata, audits and hosted evidence are saved under
 `target/review-2026-11-25-command-diagnostics` and are not maintained gates.
 The bound is one terminal producer failure; further roles or recovery need

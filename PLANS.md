@@ -55,4 +55,9 @@ Root and independent Codex accept source review without findings. The
 [focused follow-up](docs/verification/COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up)
 preserves exact commands, paths and results. Whole-tree width/link/test-
 reference and all 12 rendered-document content/structure reviews pass.
-Exact-head publication evidence remains before stopping.
+Accepted staged tree `567b732f9a355845f57bf3eb3cca844796d93102` matches
+implementation `04521873273b581a3e6b529ff3e5a14f8e4aff34`, published by
+ordinary fast-forward. Exact hosted run 45555614969 passes all 20 steps,
+316 workspace tests and separate host checks with unchanged sample output.
+No implementation remains. The evidence-only completion receives separate
+review and exact hosted inspection. Stop at this one increment.
