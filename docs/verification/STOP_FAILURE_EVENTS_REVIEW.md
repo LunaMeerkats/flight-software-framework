@@ -89,12 +89,32 @@ rendered content/structure inspection and independent manual review. This does
 not claim browser pixel QA. Temporary aids and review records live under the
 ignored evidence folder's audit directory; they establish no new checker gate.
 
-## Publication status
+## Publication
 
-Local verification and complete source/document/diff review are accepted by
-Codex. Commit and authorized fast-forward publication follow; hosted success
-is not inferred from local checks. Exact revision and completed hosted evidence
-will be recorded after publication.
+Implementation `a81111c3e0293b6581931aa17745e633aeefdb56` matches the
+accepted staged tree `e76dbfd7cfefe15476b42c599d158110feb663f1` and reached
+origin/main by ordinary fast-forward. Local/tracking/live remote heads match.
+Exact implementation
+[run 45783032972](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45783032972),
+job 139782868369, passes all 20 steps at that logged checkout. It passes
+324 workspace tests, separate 14 adapter/five sample tests, warnings-denied
+rustdoc and both whitespace checks. All 222 combined-sample stdout lines
+match the exact input run.
+
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100 and runner
+2.338.2 match input. Windows image `windows-2025-vs2026` advances from
+`20261116.315.1` to `20261123.321.1`. No equality with local tooling or local
+execution of the hosted toolchain is inferred. Local tools remain on 1.98.0.
+Source/configuration review retains the existing policy without waivers or
+workflow changes. Root review accepts exact metadata, logged checkout,
+commands and sample comparison. Independent Codex review accepts that evidence
+and the complete five-file record-only diff without findings. All five changed
+record documents pass rendered content/structure review; source remains equal
+to the accepted implementation.
+
+No implementation remains. This evidence-only completion receives separate
+source/document/diff review and exact hosted inspection; its final result is
+retained in automation memory. Stop at this bounded increment.
 
 Callbacks and clocks must return. The event is a framework observation after
 cleanup, not the application-internal fault instant. Reporting supplies no

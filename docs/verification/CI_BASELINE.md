@@ -3,6 +3,21 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Returned-stop diagnostics checkpoint — 2026-11-26
+
+Implementation `a81111c3e0293b6581931aa17745e633aeefdb56` passes exact main
+[push run 45783032972](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45783032972),
+job 139782868369, all 20 steps: 324 workspace tests, 14 adapter/five sample
+tests, warnings-denied rustdoc and both whitespace checks. Combined sample
+stdout matches all 222 input lines. Hosted Rust/Cargo 1.100.0, rustfmt
+1.11.0-stable, Clippy 0.1.100 and runner 2.338.2 match input run 45556097802;
+the Windows image advances from `20261116.315.1` to `20261123.321.1`.
+Local tooling remains separately on Rust/Cargo 1.98.0. Configuration and
+whole-tree review preserve the existing source policy without new waivers.
+The [focused review](STOP_FAILURE_EVENTS_REVIEW.md) records public-consumer,
+source-form, complete diff and rendered-document evidence outside CI. This
+record-only completion receives separate review and exact hosted inspection.
+
 ## Runnable command-session checkpoint — 2026-11-05
 
 Implementation 3d171dc22d9c2661baf4d077871ebc60cad83003 is published by ordinary

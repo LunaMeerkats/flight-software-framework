@@ -56,8 +56,11 @@ actual public-only/independent-package checks and Codex review evidence.
 The locked baseline passes 324 workspace tests; all eight focused histories
 also pass as identical source in an independent Cargo package. Root and
 independent Codex accept the complete source/document/diff and rendered review.
-Publication evidence follows separately. No dependency, service owner, workflow
-or lint policy change is selected.
+Implementation `a81111c3e0293b6581931aa17745e633aeefdb56` reaches origin/main
+by fast-forward and passes exact hosted run 45783032972, all 20 steps. The
+focused review records checkout, sample comparison and updated Windows image.
+The later evidence-only record receives separate review and hosted inspection.
+No dependency, service owner, workflow or lint policy change is selected.
 
 Callbacks and clocks must return. Reporting adds no recovery, rollback,
 implicit retry, reserved event capacity or delivery guarantee. Caller-owned

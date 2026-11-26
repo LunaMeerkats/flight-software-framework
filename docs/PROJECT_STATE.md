@@ -21,6 +21,10 @@ unpublished with provisional APIs.
 - Final locked baseline passes 324 workspace tests and all static/documentation
   checks. All eight focused tests also pass as identical source in an independent
   Cargo package; bytes/SHA256 and workspace/dependency metadata match.
+- Implementation `a81111c3e0293b6581931aa17745e633aeefdb56` reached origin/main
+  by fast-forward. Exact hosted run 45783032972 passes all 20 steps, 324 tests
+  and separate adapter/sample checks. All 222 sample output lines match input.
+  Hosted tools are unchanged; the Windows image advances to `20261123.321.1`.
 
 ## Current architecture
 
@@ -35,7 +39,9 @@ keeps the original stop error, clear count and exact event attempt.
 
 No implementation remains. Root and independent Codex accept the complete
 source/document/diff review, source-form/link audit and all 12 rendered-document
-reviews. Publish the verified increment and inspect exact-head hosted CI. The
+reviews. Exact implementation CI passes. The evidence-only completion receives
+separate review and exact hosted inspection; its final result is retained in
+automation memory. The
 [focused review](verification/STOP_FAILURE_EVENTS_REVIEW.md) records evidence.
 
 ## Highest risks and uncertainties
@@ -58,6 +64,6 @@ integration gap before adding further lifecycle wrappers or retry machinery.
 
 ## Latest run
 
-2026-11-26. Stop diagnostics pass local/independent verification and complete
-Codex review. Publication and exact-head hosted evidence are next. Stop at
+2026-11-26. Stop diagnostics are implemented, locally/independently verified,
+reviewed and published. Exact implementation CI passes all 20 steps. Stop at
 this one bounded increment.

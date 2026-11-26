@@ -49,5 +49,11 @@ Root and independent Codex accept source/test/design review without findings.
 The [focused review](docs/verification/STOP_FAILURE_EVENTS_REVIEW.md) records
 actual commands, consumer path, results and limits. Whole-tree width/link/test-
 reference audit and all 12 rendered-document content/structure reviews pass.
-Root and independent Codex accept the complete implementation diff. Publication
-and exact-head hosted inspection remain; no unrelated implementation follows.
+Root and independent Codex accept the complete implementation diff. Accepted
+staged tree `e76dbfd7cfefe15476b42c599d158110feb663f1` matches implementation
+`a81111c3e0293b6581931aa17745e633aeefdb56`, published by ordinary fast-forward.
+Exact hosted run 45783032972/job 139782868369 passes all 20 steps, 324 workspace
+tests and separate host checks. All 222 sample stdout lines match input.
+Hosted tools remain unchanged; Windows image advances to `20261123.321.1`.
+No implementation remains. Evidence-only completion receives separate review
+and exact hosted inspection. Stop at this one increment.
