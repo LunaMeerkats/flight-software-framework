@@ -1103,3 +1103,28 @@ and source-adoption decisions otherwise remain unchanged.
   The same distinction applies to the event queue's nonzero-sized records:
   retain its explicit record limit and test exact impossible-capacity rejection
   without adopting an allocator-injection mechanism or changing the API.
+
+## SRC-RFF-STOP-FAILURE — Existing shutdown and diagnostic contracts
+
+- Titles: ADR-0007 owned stop; ADR-0011 lifecycle-aware messaging;
+  ADR-0016/0020 work events; ADR-0045 message events; stop-failure consumer
+- Organisation: Rust Flight Framework, Daniel Smith; Codex implementation
+- Sources: [ADR-0007](../adr/0007-operation-specific-owned-stop-boundary.md),
+  [ADR-0011](../adr/0011-runtime-owned-message-availability.md),
+  [ADR-0016](../adr/0016-returned-work-failure-events.md),
+  [ADR-0020](../adr/0020-messaging-work-failure-events.md),
+  [ADR-0045](../adr/0045-message-dispatch-failure-events.md),
+  [stop consumer](../../tests/messaging_stop_failure.rs),
+  [runtime](../../src/runtime.rs) and
+  [messaging owner](../../src/messaging_runtime.rs)
+- Version: input `8fca981837327828b3caf6245984f5fa639e4fd6`, inspected
+  2026-11-26. These project contracts govern local behavior.
+- Informed: stop success and returned failure clear the selected inbox;
+  lifecycle rejection does not. Existing work/message reporting happens
+  after owner commitment/cleanup, preserves original errors and exposes
+  exact bounded admission outcomes.
+- Local treatment: adopt the same opt-in policy for returned stop failures
+  under ADR-0046. Preserve operation-specific errors and success types.
+  Compare host construction, a broader lifecycle family, always-on events
+  and generic error translation. No external code, cFS behavior or uncertain
+  language/tooling assumption is imported.

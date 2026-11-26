@@ -840,3 +840,28 @@ saturation and explicit retry without duplicate reporting on later failed
 dispatch. Inspect cleanup-before-clock ordering. Run identical public-only
 tests in an independent path-dependent Cargo package, checking source
 bytes/SHA256 and metadata. Preserve existing dispatch/work-event tests.
+
+### RFF-LIB-REQ-021 — Returned-stop failure events
+
+Revision 1 (2026-11-26). Runtime and MessagingRuntime shall offer opt-in
+stop operations that delegate exactly once through their existing stop path.
+Success shall preserve ApplicationState or MessagingStopOutcome, respectively.
+A returned application error shall commit terminal Failed and complete selected
+inbox cleanup before one injected clock read and one application-sourced Error
+event with a caller-supplied identifier. The result shall preserve the original
+RuntimeStopError, source chain, optional exact FailureEventAttempt and messaging
+discarded-delivery count.
+
+Success and lifecycle rejection shall read no clock and attempt no event.
+Saturation shall preserve older events, the stop error and the rejected event
+with its original timestamp for explicit caller retry. Reporting shall add no
+implicit retry, recovery or rollback; later rejected stops shall not duplicate
+reporting. Peer queues and progress shall retain ordinary-stop semantics.
+
+Acceptance: public-only tests cover direct and messaging success/failure,
+all non-running states and unknown identities, exact error/source/accessors,
+one timestamp, event fields, selected clearing, retained peer FIFO/work,
+saturation and explicit retry without duplicate reporting. Inspect owner
+cleanup before the clock call. Run identical tests in an independent Cargo
+package and compare bytes/SHA256 and metadata. Preserve existing stop, work
+and message diagnostic tests and runtime-local identity limitations.

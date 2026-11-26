@@ -33,6 +33,9 @@ records, with distinct suppression, recording and queue-saturation outcomes.
 `docs/MESSAGE_FAILURE_EVENTS.md` shows opt-in diagnostics for returned message
 callback errors, preserving selected cleanup, peer effects and exact failures.
 
+`docs/STOP_FAILURE_EVENTS.md` shows opt-in shutdown diagnostics through both
+runtime owners, preserving typed stop errors and exact selected cleanup.
+
 The crate is not flight-qualified, safety-certified, NASA-affiliated, or
 suitable for operational spacecraft, safety-critical, or human-rated use.
 No Technology Readiness Level is demonstrated. Its APIs and behavior are
@@ -79,7 +82,9 @@ pub use runtime::{
     RuntimeRegistrationError, RuntimeRestartError, RuntimeStartError, RuntimeStopError,
     RuntimeWorkError,
 };
-pub use runtime_events::{FailureEventAttempt, MessageDispatchEventError, RuntimeWorkEventError};
+pub use runtime_events::{
+    FailureEventAttempt, MessageDispatchEventError, RuntimeStopEventError, RuntimeWorkEventError,
+};
 pub use scheduling::{
     PeriodicWork, PeriodicWorkCreateError, PeriodicWorkOutcome, ScheduledWork, ScheduledWorkError,
     ScheduledWorkOutcome, WorkSchedule, WorkScheduleCreateError,

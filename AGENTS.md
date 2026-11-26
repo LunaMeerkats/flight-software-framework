@@ -121,6 +121,10 @@ translate NASA C source.
   runtime-owned fields across lifecycle, work, dispatch and selected failure.
   Its guide verifies identical tests in an independent package; shared lookup
   exposes no mutable owner, while application-defined shared effects remain.
+- `tests/stop_failure_events.rs`: public-only opt-in shutdown diagnostics
+  through both runtime owners. Its independent-package guide checks preserved
+  success/error types, exact selected cleanup, no-event paths, peer progress
+  and explicit event saturation/retry.
 - `tests/message_dispatch_events.rs`: public-only opt-in message-failure
   diagnostic consumer. Its independent-package guide checks exact original
   errors, selected cleanup, peer effects, no-event paths and bounded retry.
@@ -273,6 +277,14 @@ the negative borrowing diagnostics and compile corrected counterparts as
 recorded in the [focused review](docs/verification/APPLICATION_INSPECTION_REVIEW.md).
 Shared inspection does not prevent application-defined interior mutation or
 provide mutable access, output draining, origin validation or recovery.
+
+When changing stop failure events or their guidance, run
+`cargo test --locked --test stop_failure_events` and the independent-package
+recipe in [the guide](docs/STOP_FAILURE_EVENTS.md). Check, lint and test identical
+source; inspect metadata and compare bytes/SHA256. Record actual results in
+[the focused review](docs/verification/STOP_FAILURE_EVENTS_REVIEW.md). Review
+owner cleanup before the injected clock call and preserve ordinary stop, work
+and message-event tests. Reporting adds no retry or recovery.
 
 When changing message-dispatch failure events or their guidance, run
 `cargo test --locked --test message_dispatch_events` and follow the independent

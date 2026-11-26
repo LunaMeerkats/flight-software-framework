@@ -7,6 +7,14 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-021 and [ADR-0046](adr/0046-returned-stop-failure-events.md)
+select opt-in returned-stop failure events through both runtime owners.
+The [shutdown guide](STOP_FAILURE_EVENTS.md) connects typed stop errors,
+selected cleanup and bounded event admission. The
+[focused review](verification/STOP_FAILURE_EVENTS_REVIEW.md) records actual
+public-only and independent-consumer verification. Start/restart reporting
+is deferred until a concrete consumer needs it.
+
 RFF-LIB-REQ-014 revision 7 integrates the message-failure operation into
 the runnable command session. The
 [diagnostic recipe](COMMAND_SESSION.md#report-a-returned-command-callback-failure)

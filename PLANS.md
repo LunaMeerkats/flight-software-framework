@@ -1,63 +1,53 @@
-# Command-session failure diagnostics
+# Returned-stop failure diagnostics
 
 ## Objective and selection
 
-Compose the completed message-failure API into the runnable command session
-under RFF-LIB-REQ-014 revision 7. Clean input main
-`d252d50d77230de7299ed3ed20d6d4fcda5f0d27` matches refreshed origin/main.
-The existing consumer demonstrates command results and reply output, but its
-callback failures have no executable structured diagnostic/output path.
-Extend that consumer rather than copying its mission into another example
-or adding a library presenter. ADR-0039 records the alternatives.
+Add opt-in shutdown failure events through both runtime owners under new
+RFF-LIB-REQ-021 revision 1. Clean input main
+`8fca981837327828b3caf6245984f5fa639e4fd6` matches refreshed origin/main.
+Existing stop-failure evidence has nonempty selected cleanup and healthy peer
+progress, but consumers must construct structured shutdown events themselves.
+ADR-0046 compares the small stop path with host construction and broader
+lifecycle wrappers. Preserve ordinary start/stop/restart and existing consumers.
 
 ## Acceptance and components
 
-- Preserve ordinary producer dispatch, historical tests and the exact prior
-  transcript prefix. Add an opt-in diagnosed producer turn with the same
-  occupied-result gate and the original typed failure/count/event outcome.
-- Append a finite malformed-callback scenario: one consumed malformed head,
-  one cleared tail, no success result, retained accepted peer replies and
-  continued subscriber dispatch while diagnostic output is pending.
-- Use a capacity-one event FIFO, one retained rejected failure and one
-  output slot. Only one terminal producer failure can populate retention.
-  Retry, dequeue and write are separate caller-selected turns; retries
-  preserve the original event timestamp and never duplicate admission.
-- Reuse the bounded writer/cursor policy with a compact diagnostic format.
-  Preserve the output slot and suffix through short writes and errors;
-  do not dequeue another event while that slot remains occupied.
-- Update the guide, requirement, ADR, traceability and concise project state.
-  No library API, dependencies, workflow, lint or historical fixture changes.
+- Delegate once through each owner's stop; preserve direct ApplicationState
+  and messaging MessagingStopOutcome on success.
+- Return the exact RuntimeStopError, source chain, optional event attempt and
+  messaging clear count. Report only returned application errors, after Failed
+  commitment and owner cleanup, using one clock read and one Error event.
+- Success and every rejected lifecycle state read no clock and emit nothing.
+- Retain older events and rejected records at saturation; explicit retry keeps
+  the original timestamp. Later rejected stops cannot duplicate reporting.
+- Verify selected clearing, retained peer FIFO/work, ownership accessors and
+  receiving-owner identity limits through public-only integration tests.
+- Add a consumer guide, focused evidence, requirement, ADR and traceability.
+  No dependencies, workflow changes, new service owner or implicit retry.
 
 ## Verification and stopping point
 
-Establish the locked input baseline, then focused example tests/run and the
-locked format/check/Clippy/workspace-test/warnings-denied-rustdoc/whitespace
-baseline. Run the documented independent binary recipe and inspect exact
-bytes/SHA256, workspace/dependency metadata and output/prefix equality.
-Preserve message-event, callback and correlated-command regression evidence.
-Review handwritten Rust widths/waivers, links, test references and rendered
-changed documents, then obtain an independent complete diff review.
+Run the documented locked input and final format/check/Clippy/workspace-test/
+warnings-denied-rustdoc/whitespace baseline. Run focused stop-event tests and
+identical source in an independent Cargo package; check/lint/test it and
+inspect bytes/SHA256 and workspace/dependency metadata. Review whole-tree
+widths, scoped expectations, Markdown links, rendered changed documents and
+the complete diff with an independent Codex reviewer.
 
-Commit and fast-forward push main after actual checks/review pass. Inspect
-exact-head hosted CI and record results. Stop at this one consumer increment.
-Preserve the baseline; revert only current-run implementation if necessary.
-Callbacks, clocks and writers must return; no recovery, reliable transport,
-durability or delivery guarantee follows from the controlled scenario.
+After local checks and reviews pass, commit on main and fast-forward push.
+Inspect exact-head hosted CI and record its actual result. Stop at this one
+increment. Preserve the baseline and revert only current-run implementation
+if it cannot pass. Callbacks and clocks must return; reporting adds no recovery,
+delivery guarantee or permission to release.
 
 ## Local result
 
-The locked input baseline passes 311 tests. All final baseline commands
-pass with 316 workspace tests, plus 24 focused command tests, 14 adapters,
-five sample tests and an unchanged 222-line combined sample. The identical
-independent binary passes check/Clippy/24 tests/run/metadata; exact source
-bytes/SHA256 and 65-line stdout match, preserving the 51-line input prefix.
-Root and independent Codex accept source review without findings. The
-[focused follow-up](docs/verification/COMMAND_SESSION_REVIEW.md#message-failure-diagnostics-follow-up)
-preserves exact commands, paths and results. Whole-tree width/link/test-
-reference and all 12 rendered-document content/structure reviews pass.
-Accepted staged tree `567b732f9a355845f57bf3eb3cca844796d93102` matches
-implementation `04521873273b581a3e6b529ff3e5a14f8e4aff34`, published by
-ordinary fast-forward. Exact hosted run 45555614969 passes all 20 steps,
-316 workspace tests and separate host checks with unchanged sample output.
-No implementation remains. The evidence-only completion receives separate
-review and exact hosted inspection. Stop at this one increment.
+The locked input baseline passes 316 tests. Final locked baseline commands
+pass with 324 workspace tests, plus eight focused and eight identical
+independent tests. Independent metadata and exact bytes/SHA256 match.
+Root and independent Codex accept source/test/design review without findings.
+The [focused review](docs/verification/STOP_FAILURE_EVENTS_REVIEW.md) records
+actual commands, consumer path, results and limits. Whole-tree width/link/test-
+reference audit and all 12 rendered-document content/structure reviews pass.
+Root and independent Codex accept the complete implementation diff. Publication
+and exact-head hosted inspection remain; no unrelated implementation follows.

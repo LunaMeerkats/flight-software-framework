@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 returned-stop failure events — 2026-11-26
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-021 revision 1 | `direct_and_messaging_success_preserve_stop_results_without_reporting`, `direct_and_messaging_reject_every_non_running_state_without_reporting` and `unknown_identity_rejects_both_owners_without_reporting` check success types, exact success clearing and callback/clock/event suppression. | [Stop-event review](STOP_FAILURE_EVENTS_REVIEW.md) |
+| RFF-LIB-REQ-021 revision 1 | `direct_failure_preserves_typed_error_and_healthy_peer_work` and `messaging_failure_clears_selected_inbox_and_preserves_peer_fifo` check original non-Copy errors, accessors/source chains, one timestamp, exact selected clearing and healthy peer FIFO/work. | [Stop-event review](STOP_FAILURE_EVENTS_REVIEW.md) |
+| RFF-LIB-REQ-021 revision 1 | `saturated_stop_event_retains_original_record_for_explicit_retry`, `later_failed_stop_cannot_duplicate_reporting` and `equal_slot_foreign_identity_affects_only_receiving_owner` check rejection, original-timestamp retry, duplicate suppression and retained identity-origin limits. Identical source is checked independently as recorded. | [Stop-event review](STOP_FAILURE_EVENTS_REVIEW.md) |
+
 ## Stage 5 runnable command diagnostics — 2026-11-25
 
 | Requirement | Verification | Record |

@@ -23,7 +23,9 @@ use crate::runtime::{
     Application, RunningCallbackError, Runtime, RuntimeConfigurationError, RuntimeRestartError,
     RuntimeStartError, RuntimeStopError, RuntimeWorkError,
 };
-use crate::runtime_events::{MessageDispatchEventError, RuntimeWorkEventError};
+use crate::runtime_events::{
+    MessageDispatchEventError, RuntimeStopEventError, RuntimeWorkEventError,
+};
 use crate::scheduling::{ScheduledWorkError, ScheduledWorkOutcome, WorkSchedule};
 
 /// The reason a runtime could not take ownership of a message topology.
@@ -636,6 +638,50 @@ impl<
                 Err(MessagingOperationError::without_clearing(error))
             }
         }
+    }
+
+    /// Stops with selected inbox cleanup and opt-in failure reporting.
+    ///
+    /// Delegates exactly once to [`Self::stop`]. A returned application error
+    /// commits terminal [`ApplicationState::Failed`] and clears the selected
+    /// inbox before reading `clock` once and attempting one bounded Error
+    /// event. Event fields follow [`Runtime::stop_with_failure_event`].
+    ///
+    /// Success retains the ordinary [`MessagingStopOutcome`], reads no clock
+    /// and emits nothing. Lifecycle rejection also reads no clock and
+    /// emits nothing. Saturation preserves older events and returns the exact
+    /// rejected event for explicit retry. No recovery or rollback is added;
+    /// the caller owns both services, and callbacks and clocks must return.
+    ///
+    /// # Errors
+    ///
+    /// Preserves the exact stop error, discarded-delivery count and optional
+    /// event attempt inside [`MessagingOperationError`]. Only a returned
+    /// application error carries a [`crate::FailureEventAttempt`].
+    pub fn stop_with_failure_event<EventId, C>(
+        &mut self,
+        application_id: ApplicationId,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Result<
+        MessagingStopOutcome,
+        MessagingOperationError<RuntimeStopEventError<A::StopError, EventId>>,
+    >
+    where
+        EventId: Copy,
+        C: Clock + ?Sized,
+    {
+        self.stop(application_id)
+            .map_err(|error| MessagingOperationError {
+                operation_error: RuntimeStopEventError::from_stop_error(
+                    error.operation_error,
+                    failure_event_identifier,
+                    clock,
+                    event_queue,
+                ),
+                discarded_deliveries: error.discarded_deliveries,
+            })
     }
 
     /// Restarts a stopped application and reconnects its already-empty inbox.

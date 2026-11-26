@@ -1,6 +1,6 @@
 //! Runtime integration for cooperative application failure events.
 //!
-//! This module composes synchronous work and message errors with the
+//! This module composes synchronous work, stop and message errors with the
 //! injected-clock and bounded-event boundaries. Reporting does not attach a
 //! clock or event queue permanently to either runtime owner.
 
@@ -13,7 +13,7 @@ use crate::events::{
     Event, EventEmitOutcome, EventQueue, EventSeverity, EventSource, EventTimestamp,
 };
 use crate::lifecycle::{ApplicationId, ApplicationState};
-use crate::runtime::{Application, Runtime, RuntimeWorkError};
+use crate::runtime::{Application, Runtime, RuntimeStopError, RuntimeWorkError};
 
 /// One runtime-generated failure event and its bounded queue outcome.
 ///
@@ -55,6 +55,18 @@ impl<EventId: Copy> FailureEventAttempt<EventId> {
 #[derive(Debug, Eq, PartialEq)]
 pub struct RuntimeWorkEventError<E, EventId: Copy> {
     work_error: RuntimeWorkError<E>,
+    failure_event_attempt: Option<FailureEventAttempt<EventId>>,
+}
+
+/// Stop failure with an optional cooperative failure-event attempt.
+///
+/// Only [`RuntimeStopError::Application`] carries an attempt. Lifecycle
+/// rejection reads no clock and has no attempt. When returned through a
+/// [`crate::MessagingOperationError`], the enclosing wrapper retains the
+/// selected inbox's exact discarded-delivery count.
+#[derive(Debug, Eq, PartialEq)]
+pub struct RuntimeStopEventError<E, EventId: Copy> {
+    stop_error: RuntimeStopError<E>,
     failure_event_attempt: Option<FailureEventAttempt<EventId>>,
 }
 
@@ -176,6 +188,57 @@ where
     }
 }
 
+impl<E, EventId: Copy> RuntimeStopEventError<E, EventId> {
+    /// Borrows the complete error returned by the ordinary runtime stop path.
+    #[must_use]
+    pub const fn stop_error(&self) -> &RuntimeStopError<E> {
+        &self.stop_error
+    }
+
+    /// Borrows the application failure-event attempt, when one occurred.
+    #[must_use]
+    pub const fn failure_event_attempt(&self) -> Option<&FailureEventAttempt<EventId>> {
+        self.failure_event_attempt.as_ref()
+    }
+
+    /// Returns the complete stop error without event-attempt context.
+    #[must_use]
+    pub fn into_stop_error(self) -> RuntimeStopError<E> {
+        self.stop_error
+    }
+
+    /// Returns the complete stop error and optional event attempt.
+    #[must_use]
+    pub fn into_parts(self) -> (RuntimeStopError<E>, Option<FailureEventAttempt<EventId>>) {
+        (self.stop_error, self.failure_event_attempt)
+    }
+}
+
+impl<E: fmt::Display, EventId: Copy> fmt::Display for RuntimeStopEventError<E, EventId> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.stop_error, formatter)?;
+        if let Some(attempt) = self.failure_event_attempt
+            && let EventEmitOutcome::QueueFull { capacity } = attempt.outcome()
+        {
+            write!(
+                formatter,
+                "; failure event was rejected at queue capacity {capacity}"
+            )?;
+        }
+        Ok(())
+    }
+}
+
+impl<E, EventId> Error for RuntimeStopEventError<E, EventId>
+where
+    E: Error + 'static,
+    EventId: Copy + fmt::Debug,
+{
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.stop_error)
+    }
+}
+
 impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
     Runtime<A, E, MAX_CONFIGURATION_BYTES>
 {
@@ -217,6 +280,44 @@ impl<A: Application, E, const MAX_CONFIGURATION_BYTES: usize>
             )
         })
     }
+
+    /// Stops one application and reports a returned application error once.
+    ///
+    /// Delegates exactly once to [`Runtime::stop`]. Success and lifecycle
+    /// rejection read no clock and emit nothing. After a returned application
+    /// error commits the selected record to [`ApplicationState::Failed`], this
+    /// captures one clock reading and attempts one application-sourced
+    /// [`EventSeverity::Error`] event with the caller's identifier.
+    ///
+    /// Queue saturation preserves older events and returns the rejected event
+    /// with its original timestamp. Retry is explicit caller policy. The
+    /// caller retains ownership of the clock and event queue. The callback and
+    /// clock must return; reporting adds no recovery or rollback.
+    ///
+    /// # Errors
+    ///
+    /// Preserves every [`RuntimeStopError`] inside [`RuntimeStopEventError`].
+    /// Only a returned application error carries a [`FailureEventAttempt`].
+    pub fn stop_with_failure_event<EventId, C>(
+        &mut self,
+        application_id: ApplicationId,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Result<ApplicationState, RuntimeStopEventError<A::StopError, EventId>>
+    where
+        EventId: Copy,
+        C: Clock + ?Sized,
+    {
+        self.stop(application_id).map_err(|stop_error| {
+            RuntimeStopEventError::from_stop_error(
+                stop_error,
+                failure_event_identifier,
+                clock,
+                event_queue,
+            )
+        })
+    }
 }
 
 impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
@@ -242,6 +343,32 @@ impl<E, EventId: Copy> RuntimeWorkEventError<E, EventId> {
 
         Self {
             work_error,
+            failure_event_attempt,
+        }
+    }
+}
+
+impl<E, EventId: Copy> RuntimeStopEventError<E, EventId> {
+    // Each owner finishes lifecycle commitment and inbox cleanup first.
+    pub(crate) fn from_stop_error<C: Clock + ?Sized>(
+        stop_error: RuntimeStopError<E>,
+        failure_event_identifier: EventId,
+        clock: &C,
+        event_queue: &mut EventQueue<EventId>,
+    ) -> Self {
+        let failure_event_attempt = match &stop_error {
+            RuntimeStopError::Lifecycle(_) => None,
+            RuntimeStopError::Application { application_id, .. } => {
+                Some(FailureEventAttempt::record(
+                    *application_id,
+                    failure_event_identifier,
+                    clock,
+                    event_queue,
+                ))
+            }
+        };
+        Self {
+            stop_error,
             failure_event_attempt,
         }
     }

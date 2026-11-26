@@ -3,6 +3,16 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Returned-stop failure events — 2026-11-26
+
+RFF-LIB-REQ-021 and [ADR-0046](adr/0046-returned-stop-failure-events.md)
+add opt-in shutdown diagnostics to both runtime owners. Each operation
+finishes ordinary stop and selected cleanup before one timestamp and event
+attempt. The distinct stop-event error preserves RuntimeStopError; messaging
+retains its clear count and MessagingStopOutcome success shape. The
+[consumer guide](STOP_FAILURE_EVENTS.md) explains no-event paths, saturation
+and explicit retry. Ordinary lifecycle operations remain unchanged.
+
 ## Runnable command-failure diagnostics — 2026-11-25
 
 RFF-LIB-REQ-014 revision 7 composes message-failure reporting with the
@@ -573,12 +583,12 @@ sample and separate contexts are revisable choices, not a permanent scope limit.
   be non-monotonic when combined. The direct failure path captures one supplied
   clock, but explicit standalone events can still use arbitrary timestamps;
   FIFO remains emission order rather than timestamp sorting.
-- Failure-event reporting is opt-in and applies only to returned ordinary-work
-  errors. Its timestamp is captured after `Failed` is committed, represents
-  framework observation rather than an application-internal fault instant, and
-  leaves a caller-owned event copy outside the queue's retained-record bound.
-  The messaging-owned path also finishes selected-inbox clearing before that
-  observation. Message dispatch and scheduled work do not emit failure events.
+- Failure-event reporting is opt-in for returned ordinary-work, message and
+  stop callback errors. Its timestamp is captured after `Failed` commitment,
+  represents framework observation rather than an application-internal fault
+  instant, and leaves a caller-owned copy outside the queue's record bound.
+  Messaging owners finish selected-inbox clearing before that observation.
+  Ordinary operations and one-shot scheduled work do not emit these events.
 - The finite WorkSchedule cannot detect an identity from another same-shaped
   runtime or an instant from another clock origin. It retains consumed items until
   drop, has no recurrence or reconfiguration policy, and schedules ordinary work
