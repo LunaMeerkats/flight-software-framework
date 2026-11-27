@@ -7,6 +7,13 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-022 and [ADR-0047](adr/0047-host-elapsed-clock.md) select a
+reusable HostClock and [finite runnable polling consumer](HOST_CLOCK.md).
+The adapter observes one private host origin through the existing Clock
+boundary; manual scenarios remain controlled. The
+[focused review](verification/HOST_CLOCK_REVIEW.md) records conversion,
+consumer and independent-package evidence with platform timing limits.
+
 RFF-LIB-REQ-021 and [ADR-0046](adr/0046-returned-stop-failure-events.md)
 select opt-in returned-stop failure events through both runtime owners.
 The [shutdown guide](STOP_FAILURE_EVENTS.md) connects typed stop errors,

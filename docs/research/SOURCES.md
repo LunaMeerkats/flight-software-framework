@@ -13,6 +13,23 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RUST-HOST-CLOCK — Elapsed host observation
+
+- Titles: Instant; thread::sleep — Rust standard library
+- Organisation: The Rust Project
+- Source: <https://doc.rust-lang.org/std/time/struct.Instant.html>
+- Host wait: <https://doc.rust-lang.org/std/thread/fn.sleep.html>
+- Version: stable 1.100.0 documentation, accessed 2026-11-27; local execution
+  remains on 1.98.0. The versioned 1.98.0 web page was inaccessible.
+- Informed: saturating_duration_since maps an earlier observation to zero.
+  Native instants are opaque; clock anomalies, rate and suspend accounting
+  limit timing interpretation. Sleep blocks the calling thread and may exceed
+  its requested duration; it supplies no exact host polling period.
+- Local treatment: adopt one private origin and explicit saturating subtraction
+  under ADR-0047. Preserve manual time for controlled tests. Reject UTC mapping,
+  cached regression recovery and runtime-owned waiting for this consumer need.
+  Add no dependency and copy no upstream source code.
+
 ## SRC-RFF-COMMAND-DIAGNOSTICS — Runnable failure/output composition
 
 - Titles: Command session; message-dispatch failure events; bounded event

@@ -27,6 +27,9 @@ establish processing or retention after a later stop or failure.
 with the existing direct and messaging work boundaries. Polling releases at
 most one item; the host explicitly invokes work and chooses error policy.
 
+`cargo run --locked --example host_clock` and `docs/HOST_CLOCK.md` show five
+caller-owned polling turns against host elapsed time through `HostClock`.
+
 `docs/EVENT_FILTERING.md` shows explicit severity admission for optional event
 records, with distinct suppression, recording and queue-saturation outcomes.
 
@@ -57,7 +60,7 @@ mod scheduling;
 pub use application_messaging::{
     ApplicationMessageContext, MessageDispatchError, MessageDispatchOutcome, MessagingApplication,
 };
-pub use clock::{Clock, FrameworkInstant, ManualClock, ManualClockAdvanceError};
+pub use clock::{Clock, FrameworkInstant, HostClock, ManualClock, ManualClockAdvanceError};
 pub use configuration::{ConfigurationError, ConfigurationSnapshot, ConfigurationTable};
 pub use events::{
     Event, EventEmitOutcome, EventFilter, EventQueue, EventQueueCreateError, EventSeverity,

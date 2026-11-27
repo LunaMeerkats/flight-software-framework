@@ -144,6 +144,9 @@ translate NASA C source.
   retained failures enter the FIFO, while heartbeat work stays selectable.
   Its test-enabled target and guide verify the same source in an independent
   binary.
+- `examples/host_clock.rs`: public-only finite host-time polling consumer.
+  One HostClock origin feeds one recurring cursor; the host explicitly waits,
+  invokes work and stops. Tests inject ManualClock into the same polling turn.
 - `tests/selective_publication.rs`: public-only targeted publication and fixed
   two-subscriber retry consumer. Its guide verifies identical tests in an
   independent Cargo package. The acceptance ledger records inbox enqueue only;
@@ -317,6 +320,16 @@ When changing the periodic peer example or its guidance, run
 binary recipe in [its guide](docs/PERIODIC_PEER.md). Check, lint, test and run
 identical source. Inspect metadata, byte equality and SHA256, and record the
 actual results in the [focused review](docs/verification/PERIODIC_PEER_REVIEW.md).
+
+When changing HostClock or its consumer guidance, run
+`cargo test --locked --lib clock::tests`,
+`cargo test --locked --example host_clock` and
+`cargo run --locked --example host_clock`. Follow the independent binary
+recipe in [the guide](docs/HOST_CLOCK.md), checking/linting/testing/running
+identical source and inspecting metadata, bytes and SHA256. Record actual
+results in [the focused review](docs/verification/HOST_CLOCK_REVIEW.md).
+Live counts may vary; verify output shape and finite invocation bounds without
+sleep thresholds. Same-origin and platform timing limits remain caller concerns.
 
 When changing selective publication or its consumer guidance, run
 `cargo test --locked --test selective_publication`, then follow the independent

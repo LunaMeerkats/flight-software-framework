@@ -865,3 +865,28 @@ saturation and explicit retry without duplicate reporting. Inspect owner
 cleanup before the clock call. Run identical tests in an independent Cargo
 package and compare bytes/SHA256 and metadata. Preserve existing stop, work
 and message diagnostic tests and runtime-local identity limitations.
+
+### RFF-LIB-REQ-022 — Host elapsed-clock integration
+
+Revision 1 (2026-11-27). A reusable HostClock shall implement Clock using one
+private host Instant origin captured at construction. Each read shall sample
+the host once and return its saturating elapsed duration from that origin.
+An observation before the origin shall map to zero without duration addition
+or panic. Default shall construct a fresh origin. The adapter shall retain
+only its origin and perform no waiting, application dispatch or background work.
+
+Existing ManualClock behavior and time consumers shall remain unchanged.
+Clock observation does not explicitly advance the source; host time may pass
+between reads. Origins are instance-local and untagged. Host readings inherit
+platform accuracy, regression and suspend limitations; no clock recovery,
+cross-origin ordering, UTC, steady-rate or real-time guarantee is provided.
+
+Acceptance: deterministic private tests check exact nanosecond conversion,
+equal observations and pre-origin saturation. A public-only runnable consumer
+shall use a finite host-owned polling loop, one periodic cursor and explicit
+ordinary work. Controlled tests of that same turn shall use ManualClock for
+waiting, equality, overdue coalescing and lifecycle rejection. Live-clock
+checks shall require no positive elapsed threshold or wall-time deadline.
+Check/lint/test/run identical source in an independent path-dependent binary,
+inspect metadata and compare exact source bytes/SHA256. Live output counts
+may differ; finite turn bounds and shutdown shall remain observable.

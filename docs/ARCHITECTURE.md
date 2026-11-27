@@ -3,6 +3,15 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Host elapsed-clock integration — 2026-11-27
+
+RFF-LIB-REQ-022 and [ADR-0047](adr/0047-host-elapsed-clock.md) add HostClock
+behind the existing Clock boundary. One private Instant origin maps each
+host sample to a saturating elapsed duration. The host still owns polling,
+waiting, work selection and shutdown; ManualClock remains the controlled
+test source. The [finite consumer](HOST_CLOCK.md) demonstrates that split.
+No cached history or clock-fault recovery policy is introduced.
+
 ## Returned-stop failure events — 2026-11-26
 
 RFF-LIB-REQ-021 and [ADR-0046](adr/0046-returned-stop-failure-events.md)

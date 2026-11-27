@@ -45,3 +45,7 @@ test = true
 [[example]]
 name = "owned_output"
 test = true
+
+[[example]]
+name = "host_clock"
+test = true

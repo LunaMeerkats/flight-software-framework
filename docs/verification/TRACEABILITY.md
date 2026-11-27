@@ -1,5 +1,12 @@
 # Verification traceability
 
+## Stage 5 host elapsed-clock integration — 2026-11-27
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-022 revision 1 | `host_mapping_preserves_elapsed_seconds_and_nanoseconds`, `host_mapping_at_origin_is_zero`, `host_mapping_before_origin_saturates_without_changing_origin` and `host_mapping_does_not_clamp_regressing_observations` check exact conversion and defined anomaly behavior. `host_observation_uses_retained_origin_between_native_samples` brackets the actual Clock entry point without waiting. | [Host-clock review](HOST_CLOCK_REVIEW.md) |
+| RFF-LIB-REQ-022 revision 1 | `controlled_turn_waits_then_runs_at_equality_without_duplicate_work` and `overdue_turn_coalesces_and_lifecycle_rejection_keeps_consumption` check the identical host turn under manual time. `live_clocks_support_finite_public_polling_without_timing_thresholds` checks new/Default through public-only finite polling. The identical binary is verified independently as recorded. | [Host-clock review](HOST_CLOCK_REVIEW.md) |
+
 ## Stage 5 returned-stop failure events — 2026-11-26
 
 | Requirement | Verification | Record |
