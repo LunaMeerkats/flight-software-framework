@@ -85,9 +85,33 @@ findings. Whole-tree review covers 62 Rust files / 31,021 physical lines and
 expectations. All 859 relative paths, 100 fragments and 292 exact test references
 across 136 Markdown files resolve. All 12 changed documents pass rendered
 content/structure review, and the generated HostClock API page is inspected.
-This does not claim browser pixel QA. Exact publication evidence remains
-pending. Raw logs and temporary review aids are retained under ignored
+This does not claim browser pixel QA. Raw logs and temporary review aids are
+retained under ignored
 `target/review-2026-11-27/`; no new source checker is adopted.
+
+## Publication
+
+Implementation `94db1becd473fe597d69ab2feed4671c0dbf4a94` matches accepted
+staged tree `6644904dfcb3d12cb797b8f8485db3e83adbbffb` and reaches
+origin/main by ordinary fast-forward. Exact
+[push run 45933189182](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/45933189182),
+job 140290281493, passes all 20 steps at that logged checkout. It passes
+332 workspace tests, separate 14 adapter/five sample tests, warnings-denied
+rustdoc and both whitespace checks. All 222 combined-sample stdout lines match
+the exact input run. The new live polling binary is run locally/independently;
+the existing hosted workspace command executes its three tests.
+
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100, runner
+2.338.2 and image `20261116.315.1` match this run's input. Local tooling
+remains separate on 1.98.0. Existing source/lint/workflow policies remain
+unchanged and warning-free. Connector job steps agree with raw metadata/logs;
+gh locates the push run because the connector's commit-run lookup is PR-only.
+Root and independent Codex accept exact checkout, commands, results and
+sample comparison, plus the complete four-file evidence-only diff. All four
+changed records pass rendered content/structure review; source is unchanged.
+This evidence-only completion receives separate full-diff/rendered-document
+review and exact hosted inspection; the final result is retained in automation
+memory. No implementation remains. Stop at this bounded increment.
 
 Platform clock anomalies may regress elapsed observations; saturation does
 not recover the clock. Same-origin pairing remains caller-owned. Finite turns

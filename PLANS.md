@@ -52,4 +52,9 @@ the supported count remains one through five. The
 package path and limits. Root and independent Codex accept the complete
 16-file source/document/diff review without findings. Whole-tree widths,
 links, exact test references and all 12 rendered-document content/structure
-reviews pass. Publication and exact hosted inspection remain.
+reviews pass. Accepted staged tree `6644904dfcb3d12cb797b8f8485db3e83adbbffb`
+matches implementation `94db1becd473fe597d69ab2feed4671c0dbf4a94`, published
+by ordinary fast-forward. Exact run 45933189182/job 140290281493 passes all
+20 steps, 332 workspace tests and separate host checks. All 222 sample stdout
+lines match input; hosted tools/runner/image match this run's input. Evidence-only
+completion receives separate review and exact hosted inspection. Stop here.

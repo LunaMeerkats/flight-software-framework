@@ -22,6 +22,10 @@ unpublished with provisional APIs.
   check. Five focused clock tests and three example tests pass. Identical source
   passes check/Clippy/three tests/run independently; source bytes/hash and
   workspace/dependency metadata match. Both live runs stop after five turns.
+- Implementation `94db1becd473fe597d69ab2feed4671c0dbf4a94` is published
+  by fast-forward. Exact run 45933189182 passes all 20 steps, 332 workspace
+  tests and separate host checks. All 222 sample lines match input. Hosted
+  tools, runner and Windows image remain unchanged from this run's input.
 
 ## Current architecture
 
@@ -35,8 +39,9 @@ HostClock observes elapsed host time without owning an execution loop.
 
 No implementation remains. Root and independent Codex accept the complete
 source/document/diff and 12 rendered-document reviews without findings.
-Whole-tree source-form/link/test-reference checks pass. Source publication
-and exact hosted inspection remain. The
+Whole-tree source-form/link/test-reference checks and exact implementation
+CI pass. Evidence-only completion receives separate review and exact hosted
+inspection; its final result is retained in automation memory. The
 [focused review](verification/HOST_CLOCK_REVIEW.md) records actual results.
 
 ## Highest risks and uncertainties
@@ -61,5 +66,5 @@ adding further lifecycle wrappers or host orchestration APIs.
 ## Latest run
 
 2026-11-27. Host elapsed-clock integration passes local and independent
-verification and complete review. Publication remains. Stop at this bounded
-increment.
+verification, complete review and publication. Exact implementation CI passes
+all 20 steps. Stop at this bounded increment.
