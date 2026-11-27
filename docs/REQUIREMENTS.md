@@ -890,3 +890,29 @@ checks shall require no positive elapsed threshold or wall-time deadline.
 Check/lint/test/run identical source in an independent path-dependent binary,
 inspect metadata and compare exact source bytes/SHA256. Live output counts
 may differ; finite turn bounds and shutdown shall remain observable.
+
+### RFF-LIB-REQ-023 — Bounded startup and cleanup consumer
+
+Revision 1 (2026-11-28). A runnable public-only consumer shall start three
+distinct, initially Registered applications in a fixed order. It shall stop
+starting at the first error, preserve the original typed RuntimeStartError
+and leave the later applications untouched. It shall then stop only the
+successfully started prefix in reverse order, continuing after a stop error
+and retaining every exact typed result in at most three inline report slots.
+Complete startup shall leave all three Running until a separate explicit
+reverse shutdown uses the same cleanup policy.
+
+The failed startup application shall remain Failed after a returned callback
+error and receive no stop callback. Cleanup shall not claim rollback of its
+effects, recovery, or independent proof of application resource cleanup.
+The fixed order and distinct same-owner identities are consumer setup
+invariants, not a new generic framework group API.
+
+Acceptance: verify all-success order and explicit shutdown, first/middle/last
+startup failures, untouched suffix, original non-Copy errors and source
+chains, multiple cleanup failures with continued cleanup, and lifecycle
+rejection without falsely including that application in the started prefix.
+Check exact bounded report ordering and callback observations. Build, lint,
+test and run identical source in an independent path-dependent Cargo binary;
+inspect metadata, exact bytes/SHA256 and deterministic stdout. Preserve
+existing consumers and public API contracts.

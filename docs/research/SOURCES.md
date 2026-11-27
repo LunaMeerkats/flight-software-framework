@@ -13,6 +13,27 @@ boundary or locally designed behavior, not claiming compatibility. This
 checkpoint uses factual paraphrases rather than translated NASA implementation
 code. Any future source reuse must record provenance and licence obligations.
 
+## SRC-RFF-STARTUP-CLEANUP — Existing lifecycle composition contracts
+
+- Titles: LC1 lifecycle; static owned runtime; operation-specific stop;
+  public composition example and guide
+- Organisation: Rust Flight Framework, Daniel Smith; Codex implementation
+- Sources: [ADR-0003](../adr/0003-stop-gated-lifecycle-and-runtime-local-identity.md),
+  [ADR-0006](../adr/0006-static-application-ownership-for-initial-runtime.md),
+  [ADR-0007](../adr/0007-operation-specific-owned-stop-boundary.md),
+  [runtime](../../src/runtime.rs), [composition](../../examples/composition.rs)
+  and [guide](../COMPOSING_APPLICATIONS.md)
+- Version: input `82ed58a04aba1bcc0660c3bc386902ff3e0654ac`, inspected
+  2026-11-28. These repository contracts govern the local consumer.
+- Informed: successful starts enter Running; returned errors enter terminal
+  Failed and preserve the concrete cause. Stop only accepts Running and
+  does not independently prove application resource cleanup. The existing
+  composition recipe uses infallible lifecycle callbacks.
+- Local treatment: adopt fixed consumer-owned ordered startup and reverse
+  cleanup under ADR-0048. Compare a generic group API, immediate return,
+  cleanup fail-fast, messaging ownership and another diagnostic wrapper.
+  No external source/code or uncertain tooling assumption is imported.
+
 ## SRC-RUST-HOST-CLOCK — Elapsed host observation
 
 - Titles: Instant; thread::sleep — Rust standard library

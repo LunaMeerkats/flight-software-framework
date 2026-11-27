@@ -49,3 +49,7 @@ test = true
 [[example]]
 name = "host_clock"
 test = true
+
+[[example]]
+name = "startup_cleanup"
+test = true

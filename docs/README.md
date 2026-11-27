@@ -5,6 +5,7 @@
 ## Build an application
 
 - [Compose independent applications](COMPOSING_APPLICATIONS.md) with typed errors and bounded messaging.
+- [Handle partial startup](STARTUP_CLEANUP.md) and retain every reverse cleanup result.
 - [Run a command session](COMMAND_SESSION.md) with framed input, reply routing, host output and returned-callback diagnostics.
 - [Retry selected subscribers](SELECTIVE_PUBLICATION.md), [send replies from a callback](CALLBACK_PUBLICATION.md), or [correlate retries and cancellations](CORRELATED_COMMANDS.md).
 

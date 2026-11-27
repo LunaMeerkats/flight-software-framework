@@ -3,6 +3,16 @@
 This document separates observed upstream responsibilities from proposed local
 design. Source details and adoption notes are in [the source register](research/SOURCES.md).
 
+## Consumer-owned startup and cleanup — 2026-11-28
+
+RFF-LIB-REQ-023 and [ADR-0048](adr/0048-bounded-startup-cleanup-consumer.md)
+compose existing direct Runtime operations in one fixed three-application
+host. The [consumer](STARTUP_CLEANUP.md) stops startup at the first error,
+then stops the successful prefix in reverse order while retaining every
+typed result and continuing after cleanup errors. Complete startup requires
+a separate explicit shutdown. The policy adds no library group abstraction
+and does not compensate failed-start effects or prove resource cleanup.
+
 ## Host elapsed-clock integration — 2026-11-27
 
 RFF-LIB-REQ-022 and [ADR-0047](adr/0047-host-elapsed-clock.md) add HostClock

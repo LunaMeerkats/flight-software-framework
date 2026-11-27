@@ -7,6 +7,14 @@ evidence changes, but scope changes must be recorded rather than implied.
 
 Status: **Active**
 
+RFF-LIB-REQ-023 and [ADR-0048](adr/0048-bounded-startup-cleanup-consumer.md)
+select a [fixed startup/cleanup consumer](STARTUP_CLEANUP.md). It joins
+ordered startup, first-error retention and reverse cleanup with every stop
+result preserved, using existing public APIs. The
+[focused review](verification/STARTUP_CLEANUP_REVIEW.md) records actual
+consumer verification. Generic orchestration, compensation and recovery
+remain deferred until concrete requirements establish their semantics.
+
 RFF-LIB-REQ-022 and [ADR-0047](adr/0047-host-elapsed-clock.md) select a
 reusable HostClock and [finite runnable polling consumer](HOST_CLOCK.md).
 The adapter observes one private host origin through the existing Clock

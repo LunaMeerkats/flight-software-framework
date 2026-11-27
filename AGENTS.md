@@ -147,6 +147,10 @@ translate NASA C source.
 - `examples/host_clock.rs`: public-only finite host-time polling consumer.
   One HostClock origin feeds one recurring cursor; the host explicitly waits,
   invokes work and stops. Tests inject ManualClock into the same polling turn.
+- `examples/startup_cleanup.rs`: public-only fixed three-application startup
+  and reverse cleanup policy. It preserves the first start error and every
+  bounded stop result while continuing cleanup after returned failures.
+  Its test-enabled target and guide verify identical independent source.
 - `tests/selective_publication.rs`: public-only targeted publication and fixed
   two-subscriber retry consumer. Its guide verifies identical tests in an
   independent Cargo package. The acceptance ledger records inbox enqueue only;
@@ -330,6 +334,16 @@ identical source and inspecting metadata, bytes and SHA256. Record actual
 results in [the focused review](docs/verification/HOST_CLOCK_REVIEW.md).
 Live counts may vary; verify output shape and finite invocation bounds without
 sleep thresholds. Same-origin and platform timing limits remain caller concerns.
+
+When changing startup/cleanup or its consumer guidance, run
+`cargo test --locked --example startup_cleanup` and
+`cargo run --locked --example startup_cleanup`. Follow the independent binary
+recipe in [the guide](docs/STARTUP_CLEANUP.md), checking/linting/testing/running
+identical source and inspecting metadata, bytes, SHA256 and stdout. Record
+actual results in [the focused review](docs/verification/STARTUP_CLEANUP_REVIEW.md).
+Only successful starts enter the reverse cleanup prefix. Retain every stop
+result and continue after failure. Callback success does not prove application
+resource cleanup; a failed start can retain effects and is terminal Failed.
 
 When changing selective publication or its consumer guidance, run
 `cargo test --locked --test selective_publication`, then follow the independent

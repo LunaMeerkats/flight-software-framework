@@ -1,5 +1,13 @@
 # Verification traceability
 
+## Stage 5 bounded startup and cleanup consumer — 2026-11-28
+
+| Requirement | Verification | Record |
+| --- | --- | --- |
+| RFF-LIB-REQ-023 revision 1 | `complete_start_waits_for_explicit_reverse_shutdown` checks ordered startup, Running states before explicit shutdown and reverse successful stop order. `each_start_failure_cleans_only_successful_prefix_and_keeps_failed_effect` checks first/middle/last failures, untouched suffix, failed-start effects and exact prefix cleanup. | [Startup/cleanup review](STARTUP_CLEANUP_REVIEW.md) |
+| RFF-LIB-REQ-023 revision 1 | `partial_start_retains_primary_and_multiple_owned_cleanup_sources` checks original non-Copy errors, sources, bounded report ordering and retained ownership after runtime destruction. `cleanup_continues_after_error_to_an_earlier_successful_stop` and `explicit_shutdown_keeps_all_errors_and_finishes_the_reverse_sequence` check continued cleanup after errors in partial and complete startup paths. | [Startup/cleanup review](STARTUP_CLEANUP_REVIEW.md) |
+| RFF-LIB-REQ-023 revision 1 | `lifecycle_rejection_never_adds_the_rejected_application_to_cleanup` checks rejected-start callback suppression and exclusion from cleanup. `demonstration_reports_deterministic_success_and_secondary_failures` checks exact stdout. Identical source is checked as an independent binary as recorded. | [Startup/cleanup review](STARTUP_CLEANUP_REVIEW.md) |
+
 ## Stage 5 host elapsed-clock integration — 2026-11-27
 
 | Requirement | Verification | Record |
