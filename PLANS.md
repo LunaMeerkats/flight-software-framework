@@ -48,4 +48,10 @@ Root and independent Codex accept the full 14-file increment without findings.
 Whole-tree source-form/link/test-reference review and all 12 rendered-document
 content/structure reviews pass; no new waiver, policy or dependency is added.
 The focused record is docs/verification/STARTUP_CLEANUP_REVIEW.md.
-Publication and exact hosted CI remain separate next actions for this run.
+Accepted staged tree `f097cb12491567dc864833d7f15dea1936dbf184` matches
+implementation `df30c44b9201e74f56904da4d4f23cadbd2fb156`, published by
+ordinary fast-forward. Exact run 46005118740/job 140526235236 passes all
+20 steps, 339 workspace tests and separate host checks. All 222 sample
+stdout lines match input; hosted tools, runner and image match input.
+Evidence-only completion receives separate review and exact hosted inspection.
+Stop here; no implementation remains.

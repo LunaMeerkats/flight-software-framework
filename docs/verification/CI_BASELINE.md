@@ -3,6 +3,28 @@
 Date: **2026-09-12**
 Status: **Hosted baseline passed at the exact revision below**
 
+## Startup/cleanup consumer checkpoint — 2026-11-28
+
+Implementation `df30c44b9201e74f56904da4d4f23cadbd2fb156` passes exact
+[main push run 46005118740](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/46005118740),
+job 140526235236, all 20 steps: 339 workspace tests, separate 14 adapter/five
+sample tests, warnings-denied rustdoc and both whitespace checks. All 222
+combined-sample stdout lines match input run 45933553084. Hosted Rust/Cargo
+1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100, runner 2.338.2 and image
+`20261123.321.1` match input. Local execution remains on Rust/Cargo 1.98.0.
+Connector job steps agree with saved raw metadata/logs and exact checkout.
+
+The [focused review](STARTUP_CLEANUP_REVIEW.md) records identical public-only
+independent source, seven focused/independent tests, metadata, exact bytes/
+SHA256 and ten-line stdout. Root and independent Codex accept the complete
+14-file increment. Whole-tree review covers 63 Rust files / 31,617 physical
+and 1,637 comment-only lines, zero width findings and three unchanged fulfilled
+expectations. All 12 changed documents pass rendered content/structure review;
+880 relative paths, 101 fragments and 299 unique exact test references resolve.
+These reviews remain outside CI. No library API, dependency, lint or workflow
+change is introduced. Evidence-only completion receives separate complete
+review and exact hosted inspection; final results remain in automation memory.
+
 ## Host elapsed-clock checkpoint — 2026-11-27
 
 Implementation `94db1becd473fe597d69ab2feed4671c0dbf4a94` passes exact

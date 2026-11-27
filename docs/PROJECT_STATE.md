@@ -21,6 +21,10 @@ unpublished with provisional APIs.
 - Local tools remain Rust/Cargo 1.98.0, rustfmt 1.9.0-stable and Clippy 0.1.98.
   Input hosted tools are Rust/Cargo 1.100.0, rustfmt 1.11.0-stable,
   Clippy 0.1.100, runner 2.338.2 and image `20261123.321.1`.
+- Implementation `df30c44b9201e74f56904da4d4f23cadbd2fb156` is published
+  by fast-forward. Exact run 46005118740 passes all 20 steps, 339 workspace
+  tests and separate host checks. All 222 sample lines match input; hosted
+  tools, runner and Windows image match input.
 
 ## Current architecture
 
@@ -33,12 +37,12 @@ No framework group abstraction, dependency or recovery policy is added.
 
 ## Work in progress
 
-Implementation, local/independent verification and root/independent Codex
-complete source/document/diff review pass without findings. Whole-tree widths,
-links, exact test references and 12 rendered-document content/structure reviews
-pass. Authorized publication and exact hosted inspection remain. The
-[focused review](verification/STARTUP_CLEANUP_REVIEW.md) records actual
-commands, package path, hashes, test coverage and limits.
+No implementation remains. Root and independent Codex accept complete
+source/document/diff review, whole-tree source-form/link/test-reference review
+and all 12 rendered-document content/structure checks. Exact implementation
+CI passes. Evidence-only completion receives separate review and exact hosted
+inspection, with final results retained in automation memory. The
+[focused review](verification/STARTUP_CLEANUP_REVIEW.md) records actual evidence.
 
 ## Highest risks and uncertainties
 
@@ -62,5 +66,6 @@ activation before adding generic mission orchestration or recovery.
 
 ## Latest run
 
-2026-11-28. Startup/cleanup consumer passes local and independent verification.
-Complete review passes; authorized publication and exact hosted inspection remain.
+2026-11-28. Startup/cleanup consumer passes local/independent verification,
+complete review and publication. Exact implementation CI passes all 20 steps.
+Stop at this bounded increment.

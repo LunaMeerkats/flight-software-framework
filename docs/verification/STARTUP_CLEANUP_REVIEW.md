@@ -58,7 +58,8 @@ its test. Trace observations and report identity/results remain separate.
 
 Executed the [guide recipe](../STARTUP_CLEANUP.md#verify-identical-source-independently)
 at `C:/Users/drrsm/AppData/Local/Temp/rff-startup-cleanup-0298a82756174a93ad6360a8bc4cd393`.
-After cargo new/add, these commands pass with that absolute directory substituted for `<consumer>`:
+After cargo new/add, these commands pass with that absolute directory
+substituted for `<consumer>`:
 
 ```text
 cargo check --manifest-path <consumer>/Cargo.toml --locked --offline --all-targets
@@ -91,8 +92,31 @@ and 299 unique exact test references resolve. All 12 changed documents pass
 rendered content/structure review, including manual inspection of guide,
 ADR and focused evidence. This does not claim browser pixel QA. Raw commands,
 hashes, metadata and temporary review aids are retained under ignored
-`target/review-2026-11-28/`; no new checker is adopted. Authorized publication
-and exact hosted inspection remain separate from this local acceptance.
+`target/review-2026-11-28/`; no new checker is adopted. Publication is recorded below.
+
+## Publication
+
+Implementation `df30c44b9201e74f56904da4d4f23cadbd2fb156` matches accepted
+staged tree `f097cb12491567dc864833d7f15dea1936dbf184` and reaches
+origin/main by ordinary fast-forward. Exact
+[push run 46005118740](https://github.com/LunaMeerkats/flight-software-framework/actions/runs/46005118740),
+job 140526235236, passes all 20 steps at the logged checkout. Raw metadata
+and logs confirm 339 workspace tests, separate 14 adapter/five sample tests,
+warnings-denied rustdoc and both whitespace checks. All 222 combined-sample
+stdout lines match input run 45933553084. Connector job steps agree with the
+saved raw evidence. The CLI locates push runs because the connector's commit
+lookup currently filters to pull-request runs.
+
+Hosted Rust/Cargo 1.100.0, rustfmt 1.11.0-stable, Clippy 0.1.100,
+runner 2.338.2 and image `20261123.321.1` match this run's input. Local
+execution remains separate on 1.98.0. The temporary log collector's filename
+mismatch is corrected before successful exact-checkout inspection; it does
+not represent a hosted command failure.
+
+This four-file evidence-only completion changes no Rust source, Cargo, lint,
+dependency or workflow file. It receives separate complete-diff/rendered-
+document review and exact hosted inspection; final results remain in automation
+memory. No implementation remains. Stop at this bounded increment.
 
 ## Limits
 
